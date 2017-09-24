@@ -1,0 +1,30 @@
+[Buildset]
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00"\x00v\x00i\x00s\x00u\x00a\x00l\x00i\x00z\x00e\x00G\x00e\x00o\x00m\x00e\x00t\x00r\x00y)
+
+[CMake]
+Build Directory Count=1
+Current Build Directory Index=0
+ProjectRootRelative=./
+
+[CMake][CMake Build Directory 0]
+Build Directory Path=file:///home/ewenwan/ewenwan/learn/vSLAM/test/ch3/visualizeGeometry/build
+Build Type=Debug
+CMake Binary=file:///usr/bin/cmake
+Environment Profile=
+Extra Arguments=
+Install Directory=file:///usr/local
+
+[Launch]
+Launch Configurations=Launch Configuration 0
+
+[Launch][Launch Configuration 0]
+Configured Launch Modes=debug
+Configured Launchers=gdb
+Name=visualizeGeometry
+Type=Native Application
+
+[Launch][Launch Configuration 0][Data]
+Configured from ProjectItem=visualizeGeometry,visualizeGeometry
+Project Target=visualizeGeometry,visualizeGeometry
+Working Directory=file:///home/ewenwan/ewenwan/learn/vSLAM/test/ch3/visualizeGeometry/build/
+isExecutable=false

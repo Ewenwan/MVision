@@ -1,0 +1,30 @@
+[Buildset]
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x16\x00u\x00s\x00e\x00G\x00e\x00o\x00m\x00e\x00t\x00r\x00y)
+
+[CMake]
+Build Directory Count=1
+Current Build Directory Index=0
+ProjectRootRelative=./
+
+[CMake][CMake Build Directory 0]
+Build Directory Path=file:///home/ewenwan/ewenwan/learn/vSLAM/test/ch3/useGeometry/build
+Build Type=Debug
+CMake Binary=file:///usr/bin/cmake
+Environment Profile=
+Extra Arguments=
+Install Directory=
+
+[Launch]
+Launch Configurations=Launch Configuration 0
+
+[Launch][Launch Configuration 0]
+Configured Launch Modes=debug
+Configured Launchers=gdb
+Name=eigenGeometry
+Type=Native Application
+
+[Launch][Launch Configuration 0][Data]
+Configured from ProjectItem=useGeometry,eigenGeometry
+Project Target=useGeometry,eigenGeometry
+Working Directory=file:///home/ewenwan/ewenwan/learn/vSLAM/test/ch3/useGeometry/build/
+isExecutable=false

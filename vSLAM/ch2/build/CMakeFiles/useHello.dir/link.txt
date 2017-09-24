@@ -1,0 +1,1 @@
+/usr/bin/c++   -g    CMakeFiles/useHello.dir/useHelloSLAM.cpp.o  -o useHello -rdynamic libhello_shared.so -Wl,-rpath,/home/ewenwan/ewenwan/learn/vSLAM/test/ch2/build 
