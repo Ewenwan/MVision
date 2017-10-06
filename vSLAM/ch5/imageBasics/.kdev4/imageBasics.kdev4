@@ -1,0 +1,40 @@
+[Buildset]
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x16\x00i\x00m\x00a\x00g\x00e\x00B\x00a\x00s\x00i\x00c\x00s)
+
+[CMake]
+Build Directory Count=1
+Current Build Directory Index=0
+ProjectRootRelative=./
+
+[CMake][CMake Build Directory 0]
+Build Directory Path=file:///home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch5/imageBasics/build
+Build Type=Debug
+CMake Binary=file:///usr/bin/cmake
+Environment Profile=
+Extra Arguments=
+Install Directory=file:///usr/local
+
+[Launch]
+Launch Configurations=Launch Configuration 0
+
+[Launch][Launch Configuration 0]
+Configured Launch Modes=debug
+Configured Launchers=gdb
+Name=imageBasics
+Type=Native Application
+
+[Launch][Launch Configuration 0][Data]
+Arguments=../ubuntu.png
+Configured from ProjectItem=imageBasics,imageBasics
+Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
+Dependency Action=Nothing
+EnvironmentGroup=default
+Executable=file:///home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch5/imageBasics/
+External Terminal=konsole --noclose --workdir %workdir -e %exe
+Project Target=imageBasics,imageBasics
+Use External Terminal=false
+Working Directory=file:///home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch5/imageBasics/build/
+isExecutable=false
+
+[Project]
+VersionControlSupport=kdevgit

@@ -1,3 +1,11 @@
+
+linux下安装
+
+sudo apt-get install libeigen3-dev
+定位安装位置
+locate eigen3
+sudo updatedb
+
 Eigen 矩阵定义
 复制代码
 

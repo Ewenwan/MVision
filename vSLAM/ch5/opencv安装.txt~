@@ -1,0 +1,19 @@
+
+安装依赖项
+sudo apt-get install build-essential libgtk2.0-dev libvtk5-dev libjpeg-dev libtiff4-dev libjasper-dev libopenexr-dev libtbb-dev 
+
+下载　  ippicv_linux_20151201
+http://blog.csdn.net/huangkangying/article/details/53406370
+
+下载　opencv-3.1.0.zip
+https://sourceforge.net/projects/opencvlibrary/files/opencv-unix/3.1.0/opencv-3.1.0.zip/download
+
+拷贝　ippicv_linux_20151201到　opencv-3.1.0/3rdparty/ippicv/downloads/linux-808b791a6eac9ed78d32a7666804320e
+下
+
+进入主目录　
+mkdir build
+cmake ..
+make
+sudo make install  安装
+

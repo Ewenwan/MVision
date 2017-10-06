@@ -1,0 +1,25 @@
+
+1最小二成问题求解算法库　Cress安装
+安装依赖
+sudo apt-get install liblapack-dev libsuitesparse-dev libcxsparse3.1.2 libgflags-dev libgoogle-glog-dev libgtest-dev
+可以去github上下载
+https://github.com/ceres-solver/ceres-solver
+
+进入主目录
+mkdir build
+cd build
+cmake ..
+make
+sudo make install 安装
+
+
+
+2图优化方法
+sudo apt-get install libeigen3-dev libsuitesparse-dev libqt4-dev qt4-qmake libqglviewer-qt4-dev　libcxsparse3.1.2
+
+进入主目录
+mkdir build
+cd build
+cmake ..
+make
+sudo make install 安装

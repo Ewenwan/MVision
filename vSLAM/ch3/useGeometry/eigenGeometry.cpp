@@ -105,7 +105,8 @@ int main ( int argc, char** argv )
 Eigen::Matrix3d q1rotation_matrix = Eigen::Matrix3d::Identity();//单位阵
 q1rotation_matrix=q1.toRotationMatrix();
 Eigen::Isometry3d Tc1w=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵　　齐次坐标
-  
+//以上也可　Eigen::Isometry3d  Tc1w(q1)　一步  
+
 Tc1w.rotate (q1rotation_matrix );                                    // 按照q1rotation_matrix进行旋转
 Tc1w.pretranslate ( t1);                                                     // 把平移向量设成t1
 
@@ -115,8 +116,8 @@ Eigen::Matrix<double, 3, 1> pw=Tc1w.inverse()*p1;    //将c1坐标系下的点p1
 Eigen::Matrix3d q2rotation_matrix = Eigen::Matrix3d::Identity();//单位阵
 q2rotation_matrix=q2.toRotationMatrix();
 Eigen::Isometry3d Tc2w=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵　　齐次坐标
-  
-Tc2w.rotate (q2rotation_matrix );                                    // 按照q1rotation_matrix进行旋转
+Tc2w.rotate (q2rotation_matrix );                                    // 按照q1rotation_matrix进行旋转 // Eigen::Isometry3d  Tc2w(q2)
+//以上也可　Eigen::Isometry3d  Tc2w(q2)　一步
 Tc2w.pretranslate ( t2);                                                     // 把平移向量设成t1
 
 Eigen::Matrix<double, 3, 1> p2=Tc2w*pw;    //将world坐标系下的点pw变换到c2坐标系下

@@ -1,0 +1,1 @@
+/usr/bin/c++   -g    CMakeFiles/useSophus.dir/useSophus.cpp.o  -o useSophus -rdynamic /home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch4/Sophus/build/libSophus.so -Wl,-rpath,/home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch4/Sophus/build 

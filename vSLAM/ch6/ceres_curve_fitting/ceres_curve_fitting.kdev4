@@ -1,0 +1,3 @@
+[Project]
+Manager=KDevCMakeManager
+Name=ceres_curve_fitting

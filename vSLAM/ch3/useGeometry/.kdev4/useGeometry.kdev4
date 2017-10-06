@@ -12,7 +12,7 @@ Build Type=Debug
 CMake Binary=file:///usr/bin/cmake
 Environment Profile=
 Extra Arguments=
-Install Directory=
+Install Directory=file:///usr/local
 
 [Launch]
 Launch Configurations=Launch Configuration 0
@@ -28,3 +28,6 @@ Configured from ProjectItem=useGeometry,eigenGeometry
 Project Target=useGeometry,eigenGeometry
 Working Directory=file:///home/ewenwan/ewenwan/learn/vSLAM/test/ch3/useGeometry/build/
 isExecutable=false
+
+[Project]
+VersionControlSupport=kdevgit

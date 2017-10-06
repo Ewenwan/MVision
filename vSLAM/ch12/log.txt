@@ -1,0 +1,62 @@
+comparing images with database 
+database info: Database: Entries = 10, Using direct index = no. Vocabulary: k = 10, L = 5, Weighting = tf-idf, Scoring = L1-norm, Number of words = 99566
+searching for image 0 returns 4 results:
+<EntryId: 0, Score: 1>
+<EntryId: 9, Score: 0.0320906>
+<EntryId: 8, Score: 0.0103268>
+<EntryId: 4, Score: 0.0066729>
+
+searching for image 1 returns 4 results:
+<EntryId: 1, Score: 1>
+<EntryId: 2, Score: 0.0238409>
+<EntryId: 8, Score: 0.00814409>
+<EntryId: 3, Score: 0.00697527>
+
+searching for image 2 returns 4 results:
+<EntryId: 2, Score: 1>
+<EntryId: 1, Score: 0.0238409>
+<EntryId: 5, Score: 0.00897928>
+<EntryId: 8, Score: 0.00893477>
+
+searching for image 3 returns 4 results:
+<EntryId: 3, Score: 1>
+<EntryId: 5, Score: 0.0107005>
+<EntryId: 8, Score: 0.00870392>
+<EntryId: 6, Score: 0.00720695>
+
+searching for image 4 returns 4 results:
+<EntryId: 4, Score: 1>
+<EntryId: 6, Score: 0.0069998>
+<EntryId: 0, Score: 0.0066729>
+<EntryId: 5, Score: 0.0062834>
+
+searching for image 5 returns 4 results:
+<EntryId: 5, Score: 1>
+<EntryId: 3, Score: 0.0107005>
+<EntryId: 2, Score: 0.00897928>
+<EntryId: 4, Score: 0.0062834>
+
+searching for image 6 returns 4 results:
+<EntryId: 6, Score: 1>
+<EntryId: 7, Score: 0.00915307>
+<EntryId: 3, Score: 0.00720695>
+<EntryId: 4, Score: 0.0069998>
+
+searching for image 7 returns 4 results:
+<EntryId: 7, Score: 1>
+<EntryId: 6, Score: 0.00915307>
+<EntryId: 8, Score: 0.00814517>
+<EntryId: 1, Score: 0.00538609>
+
+searching for image 8 returns 4 results:
+<EntryId: 8, Score: 1>
+<EntryId: 0, Score: 0.0103268>
+<EntryId: 2, Score: 0.00893477>
+<EntryId: 3, Score: 0.00870392>
+
+searching for image 9 returns 4 results:
+<EntryId: 9, Score: 1>
+<EntryId: 0, Score: 0.0320906>
+<EntryId: 8, Score: 0.00636511>
+<EntryId: 1, Score: 0.00587605>
+

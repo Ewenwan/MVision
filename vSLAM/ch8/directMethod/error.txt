@@ -1,0 +1,27 @@
+iteration= 0	 chi2= 6293572.221433	 time= 0.000394226	 cumTime= 0.000394226	 edges= 1402	 schur= 0	 lambda= 965806.498992	 levenbergIter= 1
+iteration= 1	 chi2= 5888155.828834	 time= 0.000265647	 cumTime= 0.000659873	 edges= 1402	 schur= 0	 lambda= 321935.499664	 levenbergIter= 1
+iteration= 2	 chi2= 5548017.147678	 time= 0.000732586	 cumTime= 0.00139246	 edges= 1402	 schur= 0	 lambda= 107311.833221	 levenbergIter= 1
+iteration= 3	 chi2= 5290937.995946	 time= 0.000365522	 cumTime= 0.00175798	 edges= 1402	 schur= 0	 lambda= 35770.611074	 levenbergIter= 1
+iteration= 4	 chi2= 5207371.610703	 time= 0.000397368	 cumTime= 0.00215535	 edges= 1402	 schur= 0	 lambda= 11923.537025	 levenbergIter= 1
+iteration= 5	 chi2= 5156306.765017	 time= 0.000284486	 cumTime= 0.00243984	 edges= 1402	 schur= 0	 lambda= 3974.512342	 levenbergIter= 1
+iteration= 6	 chi2= 5133807.422806	 time= 0.000323557	 cumTime= 0.00276339	 edges= 1402	 schur= 0	 lambda= 1324.837447	 levenbergIter= 1
+iteration= 7	 chi2= 5124650.368695	 time= 0.000267957	 cumTime= 0.00303135	 edges= 1402	 schur= 0	 lambda= 441.612482	 levenbergIter= 1
+iteration= 8	 chi2= 5112774.456392	 time= 0.000385355	 cumTime= 0.0034167	 edges= 1402	 schur= 0	 lambda= 147.204161	 levenbergIter= 1
+iteration= 9	 chi2= 5103863.403139	 time= 0.00149921	 cumTime= 0.00491591	 edges= 1402	 schur= 0	 lambda= 49.068054	 levenbergIter= 1
+iteration= 10	 chi2= 5085463.721599	 time= 0.00132396	 cumTime= 0.00623987	 edges= 1402	 schur= 0	 lambda= 16.356018	 levenbergIter= 1
+iteration= 11	 chi2= 5052922.896857	 time= 0.000287381	 cumTime= 0.00652725	 edges= 1402	 schur= 0	 lambda= 5.452006	 levenbergIter= 1
+iteration= 12	 chi2= 4972629.841316	 time= 0.000337961	 cumTime= 0.00686521	 edges= 1402	 schur= 0	 lambda= 1.817335	 levenbergIter= 1
+iteration= 13	 chi2= 4900169.515522	 time= 0.000257514	 cumTime= 0.00712273	 edges= 1402	 schur= 0	 lambda= 0.605778	 levenbergIter= 1
+iteration= 14	 chi2= 4894170.497107	 time= 0.000970985	 cumTime= 0.00809371	 edges= 1402	 schur= 0	 lambda= 13876259126.694111	 levenbergIter= 9
+iteration= 15	 chi2= 4892574.374873	 time= 0.000460114	 cumTime= 0.00855383	 edges= 1402	 schur= 0	 lambda= 37003357671.184296	 levenbergIter= 3
+iteration= 16	 chi2= 4892132.791107	 time= 0.000412851	 cumTime= 0.00896668	 edges= 1402	 schur= 0	 lambda= 171071666037.912109	 levenbergIter= 3
+iteration= 17	 chi2= 4891847.537750	 time= 0.000377585	 cumTime= 0.00934426	 edges= 1402	 schur= 0	 lambda= 228095554717.216125	 levenbergIter= 2
+iteration= 18	 chi2= 4891798.798656	 time= 0.000811767	 cumTime= 0.010156	 edges= 1402	 schur= 0	 lambda= 1216509625158.485840	 levenbergIter= 3
+iteration= 19	 chi2= 4891798.326224	 time= 0.000840762	 cumTime= 0.0109968	 edges= 1402	 schur= 0	 lambda= 51904410673428.726562	 levenbergIter= 4
+iteration= 20	 chi2= 4891798.196469	 time= 0.00082029	 cumTime= 0.0118171	 edges= 1402	 schur= 0	 lambda= 1107294094366479.500000	 levenbergIter= 4
+iteration= 21	 chi2= 4891797.647419	 time= 0.000268081	 cumTime= 0.0120852	 edges= 1402	 schur= 0	 lambda= 369098031455493.125000	 levenbergIter= 1
+iteration= 22	 chi2= 4891797.624365	 time= 0.000561999	 cumTime= 0.0126472	 edges= 1402	 schur= 0	 lambda= 7874091337717186.000000	 levenbergIter= 4
+iteration= 23	 chi2= 4891797.530209	 time= 0.000311073	 cumTime= 0.0129582	 edges= 1402	 schur= 0	 lambda= 2624697112572395.000000	 levenbergIter= 1
+iteration= 24	 chi2= 4891797.422097	 time= 0.000362698	 cumTime= 0.0133209	 edges= 1402	 schur= 0	 lambda= 6999192300193053.000000	 levenbergIter= 3
+iteration= 25	 chi2= 4891797.422097	 time= 0.000622083	 cumTime= 0.013943	 edges= 1402	 schur= 0	 lambda= 229349533292725960704.000000	 levenbergIter= 5
+
