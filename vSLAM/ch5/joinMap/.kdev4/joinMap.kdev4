@@ -24,8 +24,15 @@ Name=joinMap
 Type=Native Application
 
 [Launch][Launch Configuration 0][Data]
+Arguments=../pose.txt
 Configured from ProjectItem=joinMap,joinMap
+Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x00)
+Dependency Action=Nothing
+EnvironmentGroup=default
+Executable=file:///home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch5/joinMap/
+External Terminal=konsole --noclose --workdir %workdir -e %exe
 Project Target=joinMap,joinMap
+Use External Terminal=false
 Working Directory=file:///home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch5/joinMap/build/
 isExecutable=false
 

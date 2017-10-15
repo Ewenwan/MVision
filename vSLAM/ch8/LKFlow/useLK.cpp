@@ -1,5 +1,9 @@
+/*
+ * LK光流法跟踪特征点
+ * ./useLK ../../data
+ */
 #include <iostream>
-#include <fstream>
+#include <fstream>//文件数据流
 #include <list>
 #include <vector>
 #include <chrono>
@@ -8,7 +12,7 @@ using namespace std;
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/features2d/features2d.hpp>
-#include <opencv2/video/tracking.hpp>
+#include <opencv2/video/tracking.hpp>//跟踪算法
 
 int main( int argc, char** argv )
 {
@@ -21,7 +25,7 @@ int main( int argc, char** argv )
     string associate_file = path_to_dataset + "/associate.txt";
     
     ifstream fin( associate_file );
-    if ( !fin ) 
+    if ( !fin ) //打开文件失败
     {
         cerr<<"I cann't find associate.txt!"<<endl;
         return 1;
@@ -34,9 +38,10 @@ int main( int argc, char** argv )
     for ( int index=0; index<100; index++ )
     {
         fin>>time_rgb>>rgb_file>>time_depth>>depth_file;
+	//rgb图像对应时间 rgb图像 深度图像对应时间 深度图像
         color = cv::imread( path_to_dataset+"/"+rgb_file );
         depth = cv::imread( path_to_dataset+"/"+depth_file, -1 );
-        if (index ==0 )
+        if (index ==0 )//第一帧图像
         {
             // 对第一帧提取FAST特征点
             vector<cv::KeyPoint> kps;
@@ -50,8 +55,8 @@ int main( int argc, char** argv )
         if ( color.data==nullptr || depth.data==nullptr )
             continue;
         // 对其他帧用LK跟踪特征点
-        vector<cv::Point2f> next_keypoints; 
-        vector<cv::Point2f> prev_keypoints;
+        vector<cv::Point2f> next_keypoints; //下一帧关键点
+        vector<cv::Point2f> prev_keypoints; //上一帧关键点
         for ( auto kp:keypoints )
             prev_keypoints.push_back(kp);
         vector<unsigned char> status;
@@ -84,7 +89,7 @@ int main( int argc, char** argv )
         for ( auto kp:keypoints )
             cv::circle(img_show, kp, 10, cv::Scalar(0, 240, 0), 1);
         cv::imshow("corners", img_show);
-        cv::waitKey(0);
+        cv::waitKey(0);//等待按键按下 遍历下一张图片
         last_color = color;
     }
     return 0;

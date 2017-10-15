@@ -1,3 +1,4 @@
+/*Pnp+g2o_BundleAdjustment*/
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
@@ -11,11 +12,12 @@
 #include <g2o/core/optimization_algorithm_levenberg.h>
 #include <g2o/solvers/csparse/linear_solver_csparse.h>
 #include <g2o/types/sba/types_six_dof_expmap.h>
-#include <chrono>
+#include <chrono>//时间计时
 
-using namespace std;
-using namespace cv;
+using namespace std;//标准库　命名空间
+using namespace cv; //opencv库命名空间
 
+//特征匹配 计算匹配点对
 void find_feature_matches (
     const Mat& img_1, const Mat& img_2,
     std::vector<KeyPoint>& keypoints_1,
@@ -25,6 +27,7 @@ void find_feature_matches (
 // 像素坐标转相机归一化坐标
 Point2d pixel2cam ( const Point2d& p, const Mat& K );
 
+//g2o_BundleAdjustment 优化
 void bundleAdjustment (
     const vector<Point3f> points_3d,
     const vector<Point2f> points_2d,
@@ -34,7 +37,7 @@ void bundleAdjustment (
 
 int main ( int argc, char** argv )
 {
-    if ( argc != 5 )
+    if ( argc != 5 )// 命令行参数 img1 img2 depth1 depth2
     {
         cout<<"usage: pose_estimation_3d2d img1 img2 depth1 depth2"<<endl;
         return 1;
@@ -43,14 +46,14 @@ int main ( int argc, char** argv )
     Mat img_1 = imread ( argv[1], CV_LOAD_IMAGE_COLOR );
     Mat img_2 = imread ( argv[2], CV_LOAD_IMAGE_COLOR );
 
-    vector<KeyPoint> keypoints_1, keypoints_2;
-    vector<DMatch> matches;
+    vector<KeyPoint> keypoints_1, keypoints_2;//关键点
+    vector<DMatch> matches;//特征点匹配对
     find_feature_matches ( img_1, img_2, keypoints_1, keypoints_2, matches );
     cout<<"一共找到了"<<matches.size() <<"组匹配点"<<endl;
 
     // 建立3D点
     Mat d1 = imread ( argv[3], CV_LOAD_IMAGE_UNCHANGED );       // 深度图为16位无符号数，单通道图像
-    Mat K = ( Mat_<double> ( 3,3 ) << 520.9, 0, 325.1, 0, 521.0, 249.7, 0, 0, 1 );
+    Mat K = ( Mat_<double> ( 3,3 ) << 520.9, 0, 325.1, 0, 521.0, 249.7, 0, 0, 1 );// 相机内参,TUM Freiburg2
     vector<Point3f> pts_3d;
     vector<Point2f> pts_2d;
     for ( DMatch m:matches )
@@ -59,7 +62,7 @@ int main ( int argc, char** argv )
         if ( d == 0 )   // bad depth
             continue;
         float dd = d/1000.0;
-        Point2d p1 = pixel2cam ( keypoints_1[m.queryIdx].pt, K );
+        Point2d p1 = pixel2cam ( keypoints_1[m.queryIdx].pt, K );// 像素坐标转相机归一化坐标
         pts_3d.push_back ( Point3f ( p1.x*dd, p1.y*dd, dd ) );
         pts_2d.push_back ( keypoints_2[m.trainIdx].pt );
     }
@@ -71,25 +74,26 @@ int main ( int argc, char** argv )
     Mat R;
     cv::Rodrigues ( r, R ); // r为旋转向量形式，用Rodrigues公式转换为矩阵
 
-    cout<<"R="<<endl<<R<<endl;
-    cout<<"t="<<endl<<t<<endl;
+    cout<<"旋转矩阵 R="<<endl<<R<<endl;
+    cout<<"平移向量 t="<<endl<<t<<endl;
 
     cout<<"calling bundle adjustment"<<endl;
 
     bundleAdjustment ( pts_3d, pts_2d, K, R, t );
 }
 
+//特征匹配 计算匹配点对 函数
 void find_feature_matches ( const Mat& img_1, const Mat& img_2,
                             std::vector<KeyPoint>& keypoints_1,
                             std::vector<KeyPoint>& keypoints_2,
                             std::vector< DMatch >& matches )
 {
-    //-- 初始化
-    Mat descriptors_1, descriptors_2;
-    // used in OpenCV3
+    //--------------------第0步:初始化------------------------------------------------------
+    Mat descriptors_1, descriptors_2;//描述子
+    //  OpenCV3 特征点检测器  描述子生成器 用法
     Ptr<FeatureDetector> detector = ORB::create();
     Ptr<DescriptorExtractor> descriptor = ORB::create();
-    // use this if you are in OpenCV2
+    // OpenCV2 特征点检测器  描述子生成器 用法
     // Ptr<FeatureDetector> detector = FeatureDetector::create ( "ORB" );
     // Ptr<DescriptorExtractor> descriptor = DescriptorExtractor::create ( "ORB" );
     Ptr<DescriptorMatcher> matcher  = DescriptorMatcher::create ( "BruteForce-Hamming" );
@@ -130,6 +134,7 @@ void find_feature_matches ( const Mat& img_1, const Mat& img_2,
     }
 }
 
+// 像素坐标转相机归一化坐标
 Point2d pixel2cam ( const Point2d& p, const Mat& K )
 {
     return Point2d
@@ -138,7 +143,7 @@ Point2d pixel2cam ( const Point2d& p, const Mat& K )
                ( p.y - K.at<double> ( 1,2 ) ) / K.at<double> ( 1,1 )
            );
 }
-
+// g2o_BundleAdjustment 优化
 void bundleAdjustment (
     const vector< Point3f > points_3d,
     const vector< Point2f > points_2d,

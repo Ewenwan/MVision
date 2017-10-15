@@ -25,11 +25,14 @@ int main ( int argc, char** argv )
     //-- 初始化
     std::vector<KeyPoint> keypoints_1, keypoints_2;//关键点
     Mat descriptors_1, descriptors_2;			      //关键点对应的描述子
-    Ptr<FeatureDetector> detector = ORB::create();  //cv下　特征检测
-    Ptr<DescriptorExtractor> descriptor = ORB::create();//cv下　描述子
+    Ptr<FeatureDetector> detector = ORB::create();  //cv3下　特征检测
+    Ptr<DescriptorExtractor> descriptor = ORB::create();//cv3下　描述子
     // Ptr<FeatureDetector> detector = FeatureDetector::create(detector_name);
     // Ptr<DescriptorExtractor> descriptor = DescriptorExtractor::create(descriptor_name);
-    Ptr<DescriptorMatcher> matcher  = DescriptorMatcher::create ( "BruteForce-Hamming" );//汉明
+   // use this if you are in OpenCV2 
+    // Ptr<FeatureDetector> detector = FeatureDetector::create ( "ORB" );
+    // Ptr<DescriptorExtractor> descriptor = DescriptorExtractor::create ( "ORB" );
+    Ptr<DescriptorMatcher> matcher  = DescriptorMatcher::create ( "BruteForce-Hamming" );//汉明点对匹配
 
     //-- 第一步:检测 Oriented FAST 角点位置
     detector->detect ( img_1,keypoints_1 );

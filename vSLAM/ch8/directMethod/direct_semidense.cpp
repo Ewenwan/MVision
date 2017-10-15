@@ -1,3 +1,7 @@
+/*
+ * 半稠密直接法  求相机位姿
+ * ./direct_sparse ../../data/
+ */
 #include <iostream>
 #include <fstream>
 #include <list>
@@ -53,7 +57,7 @@ inline Eigen::Vector2d project3Dto2D ( float x, float y, float z, float fx, floa
 // 返回：true为成功，false失败
 bool poseEstimationDirect ( const vector<Measurement>& measurements, cv::Mat* gray, Eigen::Matrix3f& intrinsics, Eigen::Isometry3d& Tcw );
 
-
+//g20图优化
 // project a 3d point into an image plane, the error is photometric error
 // an unary edge with one vertex SE3Expmap (the pose of camera)
 class EdgeSE3ProjectDirect: public BaseUnaryEdge< 1, double, VertexSE3Expmap>
@@ -66,7 +70,7 @@ public:
     EdgeSE3ProjectDirect ( Eigen::Vector3d point, float fx, float fy, float cx, float cy, cv::Mat* image )
         : x_world_ ( point ), fx_ ( fx ), fy_ ( fy ), cx_ ( cx ), cy_ ( cy ), image_ ( image )
     {}
-
+//计算误差
     virtual void computeError()
     {
         const VertexSE3Expmap* v  =static_cast<const VertexSE3Expmap*> ( _vertices[0] );
@@ -84,7 +88,7 @@ public:
             _error ( 0,0 ) = getPixelValue ( x,y ) - _measurement;
         }
     }
-
+//求雅克比矩阵
     // plus in manifold
     virtual void linearizeOplus( )
     {
@@ -158,7 +162,7 @@ int main ( int argc, char** argv )
 {
     if ( argc != 2 )
     {
-        cout<<"usage: useLK path_to_dataset"<<endl;
+        cout<<"usage:  direct_semidense path_to_dataset"<<endl;
         return 1;
     }
     srand ( ( unsigned int ) time ( 0 ) );
@@ -194,7 +198,8 @@ int main ( int argc, char** argv )
         cv::cvtColor ( color, gray, cv::COLOR_BGR2GRAY );
         if ( index ==0 )
         {
-            // select the pixels with high gradiants 
+            // 选择灰度变化(梯度)明显的点 select the pixels with high gradiants 
+	    // 而没有选择提取FAST特征点
             for ( int x=10; x<gray.cols-10; x++ )
                 for ( int y=10; y<gray.rows-10; y++ )
                 {
@@ -223,7 +228,7 @@ int main ( int argc, char** argv )
         cout<<"direct method costs time: "<<time_used.count() <<" seconds."<<endl;
         cout<<"Tcw="<<Tcw.matrix() <<endl;
 
-        // plot the feature points
+        // 画特征点 plot the feature points
         cv::Mat img_show ( color.rows*2, color.cols, CV_8UC3 );
         prev_color.copyTo ( img_show ( cv::Rect ( 0,0,color.cols, color.rows ) ) );
         color.copyTo ( img_show ( cv::Rect ( 0,color.rows,color.cols, color.rows ) ) );

@@ -1,5 +1,6 @@
-#include <iostream>
-#include <fstream>
+#include <iostream>//字符io流
+#include <fstream>//文件流
+#include <cstdlib>//命令行调用
 using namespace std;
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -43,20 +44,23 @@ int main( int argc, char** argv )
      -1.55819 -0.301094 1.6215 -0.02707 -0.250946 -0.0412848 0.966741
      分别为五张图相机的位置和姿态
      */
-    ifstream fin("pose.txt");
+   // ifstream fin("pose.txt");
+    ifstream fin(argv[1]);//命令行加入参数  ../pose.txt
     if (!fin)
     {
         cerr<<"请在有pose.txt的目录下运行此程序"<<endl;
         return 1;
     }
     
-    for ( int i=0; i<5; i++ )
+    for ( int i=0; i<5; i++ )//5行数据
     {
         boost::format fmt( "./%s/%d.%s" ); //图像文件格式
-        colorImgs.push_back( cv::imread( (fmt%"color"%(i+1)%"png").str() ));//color/1.png~5.png
-        depthImgs.push_back( cv::imread( (fmt%"depth"%(i+1)%"pgm").str(), -1 ));//depth/1.pgm~5.pgm 使用-1读取原始图像
-        
-        double data[7] = {0};
+        //colorImgs.push_back( cv::imread( (fmt%"color"%(i+1)%"png").str() ));//彩色图color/1.png~5.png
+        //depthImgs.push_back( cv::imread( (fmt%"depth"%(i+1)%"pgm").str(), -1 ));//深度图depth/1.pgm~5.pgm 使用-1读取原始图像
+        colorImgs.push_back( cv::imread( (fmt%"../color"%(i+1)%"png").str() ));//彩色图color/1.png~5.png
+        depthImgs.push_back( cv::imread( (fmt%"../depth"%(i+1)%"pgm").str(), -1 ));//深度图depth/1.pgm~5.pgm 使用-1读取原始图像
+	
+        double data[7] = {0};//每一行7个数据
         for ( auto& d:data )//txt文件的每一行数据
             fin>>d;
         Eigen::Quaterniond q( data[6], data[3], data[4], data[5] );//data[6]为四元数实部
@@ -81,12 +85,14 @@ int main( int argc, char** argv )
     
     // 新建一个点云
     PointCloud::Ptr pointCloud( new PointCloud ); 
-    for ( int i=0; i<5; i++ )
+    for ( int i=0; i<5; i++ )//5张图像对
     {
         cout<<"转换图像中: "<<i+1<<endl; 
         cv::Mat color = colorImgs[i]; //彩色图像
         cv::Mat depth = depthImgs[i];//深度图像
-        Eigen::Isometry3d T = poses[i];//每个图像对应的摄像机位资
+        Eigen::Isometry3d T = poses[i];//每个图像对应的摄像机位姿
+        
+        //对每个像素值对应的点 转换到现实世界
         for ( int v=0; v<color.rows; v++ )//每一行
             for ( int u=0; u<color.cols; u++ )//每一列
             {
@@ -101,7 +107,7 @@ int main( int argc, char** argv )
                 Eigen::Vector3d pointWorld = T*point;//位于世界坐标系中的实际位置  x,y,z
               //外参数  转换 
                 PointT p ; //XYZRGB
-                p.x = pointWorld[0];
+                p.x = pointWorld[0];//现实世界中的位置坐标
                 p.y = pointWorld[1];
                 p.z = pointWorld[2];
                 p.b = color.data[ v*color.step+u*color.channels() ];//注意opencv彩色图像通道的顺序为 bgr
@@ -115,5 +121,7 @@ int main( int argc, char** argv )
     cout<<"点云共有"<<pointCloud->size()<<"个点."<<endl;
     pcl::io::savePCDFileBinary("map.pcd", *pointCloud );
     //  可在命令行内使用　pcl_viewer map.pcd 查看点云数据
+    //C语言有一个system函数（在<stdlib.h>头中，C++则为<cstdlib>头），可以用来调用终端命令。
+    system("pcl_viewer map.pcd");
     return 0;
 }

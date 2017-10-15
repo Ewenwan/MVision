@@ -1,3 +1,7 @@
+/*
+ * 迭代最近点 Iterative Closest Point, ICP求解 3D坐标 到 3D坐标的转换矩阵(不用求解距离 激光SLAM 以及 RGB-D SLAM)
+ * 使用 线性代数SVD奇异值分解 或者 非线性优化方法 求解
+ */
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
@@ -12,11 +16,12 @@
 #include <g2o/core/optimization_algorithm_gauss_newton.h>
 #include <g2o/solvers/eigen/linear_solver_eigen.h>
 #include <g2o/types/sba/types_six_dof_expmap.h>
-#include <chrono>
+#include <chrono>//算法计时
 
-using namespace std;
-using namespace cv;
+using namespace std;//标准库　命名空间
+using namespace cv; //opencv库命名空间
 
+//特征匹配 计算匹配点对
 void find_feature_matches (
     const Mat& img_1, const Mat& img_2,
     std::vector<KeyPoint>& keypoints_1,
@@ -26,12 +31,14 @@ void find_feature_matches (
 // 像素坐标转相机归一化坐标
 Point2d pixel2cam ( const Point2d& p, const Mat& K );
 
+//ICP求解 3D坐标 到 3D坐标的转换矩阵 使用 线性代数SVD奇异值分解
 void pose_estimation_3d3d (
     const vector<Point3f>& pts1,
     const vector<Point3f>& pts2,
     Mat& R, Mat& t
 );
 
+//g2o_BundleAdjustment 优化  非线性优化方法 求解
 void bundleAdjustment(
     const vector<Point3f>& points_3d,
     const vector<Point3f>& points_2d,
@@ -51,7 +58,7 @@ public:
         // measurement is p, point is p'
         _error = _measurement - pose->estimate().map( _point );
     }
-    
+   // 3d-3d自定义求解器 
     virtual void linearizeOplus()
     {
         g2o::VertexSE3Expmap* pose = static_cast<g2o::VertexSE3Expmap *>(_vertices[0]);
@@ -60,7 +67,7 @@ public:
         double x = xyz_trans[0];
         double y = xyz_trans[1];
         double z = xyz_trans[2];
-        
+        // 3×6的雅克比矩阵
         _jacobianOplusXi(0,0) = 0;
         _jacobianOplusXi(0,1) = -z;
         _jacobianOplusXi(0,2) = y;
@@ -108,7 +115,7 @@ int main ( int argc, char** argv )
     // 建立3D点
     Mat depth1 = imread ( argv[3], CV_LOAD_IMAGE_UNCHANGED );       // 深度图为16位无符号数，单通道图像
     Mat depth2 = imread ( argv[4], CV_LOAD_IMAGE_UNCHANGED );       // 深度图为16位无符号数，单通道图像
-    Mat K = ( Mat_<double> ( 3,3 ) << 520.9, 0, 325.1, 0, 521.0, 249.7, 0, 0, 1 );
+    Mat K = ( Mat_<double> ( 3,3 ) << 520.9, 0, 325.1, 0, 521.0, 249.7, 0, 0, 1 );// 相机内参,TUM Freiburg2
     vector<Point3f> pts1, pts2;
 
     for ( DMatch m:matches )
@@ -127,18 +134,19 @@ int main ( int argc, char** argv )
 
     cout<<"3d-3d pairs: "<<pts1.size() <<endl;
     Mat R, t;
+    cout<<"线性代数SVD奇异值分解求解变换矩阵"<<endl;
     pose_estimation_3d3d ( pts1, pts2, R, t );
     cout<<"ICP via SVD results: "<<endl;
-    cout<<"R = "<<R<<endl;
+    cout<<"R = "<<R<<endl;//第二张图到第一张图的转换
     cout<<"t = "<<t<<endl;
-    cout<<"R_inv = "<<R.t() <<endl;
+    cout<<"R_inv = "<<R.t() <<endl;//第一张图到第二张图的转换
     cout<<"t_inv = "<<-R.t() *t<<endl;
 
-    cout<<"calling bundle adjustment"<<endl;
+    cout<<"非线性优化方法  bundle adjustment 求解"<<endl;
 
     bundleAdjustment( pts1, pts2, R, t );
     
-    // verify p1 = R*p2 + t
+    // 验证 verify p1 = R*p2 + t
     for ( int i=0; i<5; i++ )
     {
         cout<<"p1 = "<<pts1[i]<<endl;

@@ -1,3 +1,7 @@
+/*
+ * 稀疏直接法  求相机位姿
+ * ./direct_sparse ../../data/
+ */
 #include <iostream>
 #include <fstream>
 #include <list>
@@ -29,8 +33,8 @@ using namespace g2o;
 struct Measurement
 {
     Measurement ( Eigen::Vector3d p, float g ) : pos_world ( p ), grayscale ( g ) {}
-    Eigen::Vector3d pos_world;
-    float grayscale;
+    Eigen::Vector3d pos_world;//世界坐标系下三维点
+    float grayscale;//点对应的灰度值
 };
 
 inline Eigen::Vector3d project2Dto3D ( int x, int y, int d, float fx, float fy, float cx, float cy, float scale )
@@ -53,7 +57,7 @@ inline Eigen::Vector2d project3Dto2D ( float x, float y, float z, float fx, floa
 // 返回：true为成功，false失败
 bool poseEstimationDirect ( const vector<Measurement>& measurements, cv::Mat* gray, Eigen::Matrix3f& intrinsics, Eigen::Isometry3d& Tcw );
 
-
+//g20图优化
 // project a 3d point into an image plane, the error is photometric error
 // an unary edge with one vertex SE3Expmap (the pose of camera)
 class EdgeSE3ProjectDirect: public BaseUnaryEdge< 1, double, VertexSE3Expmap>
@@ -66,7 +70,7 @@ public:
     EdgeSE3ProjectDirect ( Eigen::Vector3d point, float fx, float fy, float cx, float cy, cv::Mat* image )
         : x_world_ ( point ), fx_ ( fx ), fy_ ( fy ), cx_ ( cx ), cy_ ( cy ), image_ ( image )
     {}
-
+//计算误差
     virtual void computeError()
     {
         const VertexSE3Expmap* v  =static_cast<const VertexSE3Expmap*> ( _vertices[0] );
@@ -85,6 +89,7 @@ public:
         }
     }
 
+  //求雅克比矩阵
     // plus in manifold
     virtual void linearizeOplus( )
     {
@@ -149,16 +154,16 @@ protected:
                );
     }
 public:
-    Eigen::Vector3d x_world_;   // 3D point in world frame
-    float cx_=0, cy_=0, fx_=0, fy_=0; // Camera intrinsics
-    cv::Mat* image_=nullptr;    // reference image
+    Eigen::Vector3d x_world_;          // 3D point in world frame
+    float cx_=0, cy_=0, fx_=0, fy_=0; // Camera intrinsics 相机内参
+    cv::Mat* image_=nullptr;           // reference image
 };
 
 int main ( int argc, char** argv )
 {
     if ( argc != 2 )
     {
-        cout<<"usage: useLK path_to_dataset"<<endl;
+        cout<<"usage: direct_sparse  path_to_dataset"<<endl;
         return 1;
     }
     srand ( ( unsigned int ) time ( 0 ) );
@@ -168,6 +173,7 @@ int main ( int argc, char** argv )
     ifstream fin ( associate_file );
 
     string rgb_file, depth_file, time_rgb, time_depth;
+    	//rgb图像对应时间 rgb图像 深度图像对应时间 深度图像
     cv::Mat color, depth, gray;
     vector<Measurement> measurements;
     // 相机内参
@@ -179,7 +185,7 @@ int main ( int argc, char** argv )
     Eigen::Matrix3f K;
     K<<fx,0.f,cx,0.f,fy,cy,0.f,0.f,1.0f;
 
-    Eigen::Isometry3d Tcw = Eigen::Isometry3d::Identity();
+    Eigen::Isometry3d Tcw = Eigen::Isometry3d::Identity();//相机位姿
 
     cv::Mat prev_color;
     // 我们以第一个图像为参考，对后续图像和参考图像做直接法
@@ -191,8 +197,8 @@ int main ( int argc, char** argv )
         depth = cv::imread ( path_to_dataset+"/"+depth_file, -1 );
         if ( color.data==nullptr || depth.data==nullptr )
             continue; 
-        cv::cvtColor ( color, gray, cv::COLOR_BGR2GRAY );
-        if ( index ==0 )
+        cv::cvtColor ( color, gray, cv::COLOR_BGR2GRAY );//彩色图到灰度图
+        if ( index ==0 )//第一帧
         {
             // 对第一帧提取FAST特征点
             vector<cv::KeyPoint> keypoints;
@@ -221,7 +227,7 @@ int main ( int argc, char** argv )
         cout<<"direct method costs time: "<<time_used.count() <<" seconds."<<endl;
         cout<<"Tcw="<<Tcw.matrix() <<endl;
 
-        // plot the feature points
+        // 画特征点 plot the feature points
         cv::Mat img_show ( color.rows*2, color.cols, CV_8UC3 );
         prev_color.copyTo ( img_show ( cv::Rect ( 0,0,color.cols, color.rows ) ) );
         color.copyTo ( img_show ( cv::Rect ( 0,color.rows,color.cols, color.rows ) ) );
@@ -244,7 +250,7 @@ int main ( int argc, char** argv )
             cv::line ( img_show, cv::Point2d ( pixel_prev ( 0,0 ), pixel_prev ( 1,0 ) ), cv::Point2d ( pixel_now ( 0,0 ), pixel_now ( 1,0 ) +color.rows ), cv::Scalar ( b,g,r ), 1 );
         }
         cv::imshow ( "result", img_show );
-        cv::waitKey ( 0 );
+        cv::waitKey ( 0 );//等待按键
 
     }
     return 0;
