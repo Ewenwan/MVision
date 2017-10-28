@@ -1,0 +1,341 @@
+http://lucianlv.blog.51cto.com/9871307/1812733
+MXnet基本概念和操作
+
+【1】NDArray
+
+    多维的数据结构，提供在 cpu 或者 gpu 上进行矩阵运算和张量计算，
+   能够自动并行计算
+
+NDArray 是 MXnet 中最底层的计算单元，与 numpy.ndarray 非常相似，
+ 但是也有 2 点不同的特性：
+
+  1）支持多设备
+所有的操作可以在不同的设备上运行，包括 cpu 和 gpu。
+
+	####### 测试例子#####
+	>>> import mxnet as mx 
+	## 在cpu0上创建一个2X3的矩阵
+	>>> a = mx.nd.empty((2, 3)) 
+	## 在gpu上创建一个2X3的矩阵 
+	>>> b = mx.nd.empty((2, 3), mx.gpu())  # 在gpu0上创建一个2X3的矩阵
+	>>> c = mx.nd.empty((2, 3), mx.gpu(2)) # 在gpu2上创建一个2X3的矩阵
+	>>> c.shape # 维度(2L, 3L)
+	>>> c.context # 设备信息gpu(2)
+
+	############################################## 
+	### 其他的初始化方式
+	>>> a = mx.nd.zeros((2, 3)) # 创建2X3的全0矩阵
+	>>> b = mx.nd.ones((2, 3))  # 创建2X3的全1矩阵
+	>>> b[:] = 2 # 所有元素赋值为2
+
+	>>> b = mx.nd.zeros((2, 3), mx.gpu())
+	>>> a = mx.nd.ones((2, 3))  # 创建2X3的全1矩阵
+	## 不同的设备之间进行数据拷贝
+	>>> a.copyto(b) # 从cpu拷贝数据到gpu
+
+	###########################################
+	## NDArray转换为numpy.ndarray ##
+	>>> a = mx.nd.ones((2, 3))
+	>>> b = a.asnumpy() 
+	>>> type(b)
+	<type 'numpy.ndarray'>
+	>>> print b[[ 1.  1.  1.]
+	 [ 1.  1.  1.]]
+
+	##########################################
+	## numpy.ndarray转换为NDArray ##
+	>>> import numpy as np
+	>>> a = mx.nd.empty((2, 3))
+	>>> a[:] = np.random.uniform(-0.1, 0.1, a.shape)
+	>>> print a.asnumpy()[[-0.06821112 -0.03704893  0.06688045]
+	 [ 0.09947646 -0.07700162  0.07681718]]
+
+	########################################### 
+	### NDArray基本运算 #############
+	>>> a = mx.nd.ones((2, 3)) * 2
+	>>> b = mx.nd.ones((2, 3)) * 4
+	>>> print b.asnumpy()[[ 4.  4.  4.]
+	 [ 4.  4.  4.]]
+	>>> c = a + b   # 对应元素求和
+	>>> print c.asnumpy()
+	[[ 6.  6.  6.]
+	 [ 6.  6.  6.]]
+	>>> d = a * b   # 对应元素求积
+	>>> print d.asnumpy()
+	[[ 8.  8.  8.]
+	 [ 8.  8.  8.]]
+
+
+	###################################################### 
+	### 不同设备上的NDArray需要移动到一起才能计算 ###
+	>>> a = mx.nd.ones((2, 3)) * 2 ## 默认在CPU上
+	>>> b = mx.nd.ones((2, 3), mx.gpu()) * 3
+	>>> c = a.copyto(mx.gpu()) * b
+	>>> print c.asnumpy()
+	[[ 6.  6.  6.]
+	 [ 6.  6.  6.]]
+
+	############################################# 
+	### 数据的导出与载入 ###
+	## 1. 通过pickle导出与载入数据
+	>>> import mxnet as mx
+	>>> import pickle as pkl
+	>>> a = mx.nd.ones((2, 3)) * 2
+	>>> data = pkl.dumps(a) ##导出 存储数据 
+	>>> b = pkl.loads(data) ##载入 获取数据
+	>>> print b.asnumpy()
+	[[ 2.  2.  2.]
+	 [ 2.  2.  2.]]
+
+	##################################
+	## 2. 直接保存为二进制文件 
+	>>> a = mx.nd.ones((2,3))*2
+	>>> b = mx.nd.ones((2,3))*3
+	>>> mx.nd.save('mydata.bin', [a, b]) ##保存成二进制文件
+	>>> c = mx.nd.load('mydata.bin')     ##载入二进制文件数据
+	>>> print c[0].asnumpy() ## c[0] 为a
+	[[ 2.  2.  2.]
+	 [ 2.  2.  2.]]
+	>>> print c[1].asnumpy() ## c[1] 为b
+	[[ 3.  3.  3.] 
+	 [ 3.  3.  3.]]
+
+	####################################### 
+	## 直接保存到分布式文件系统上（s3或hdfs） 
+	>>> mx.nd.save('s3://mybucket/mydata.bin', [a,b])
+	>>> mx.nd.save('hdfs///users/myname/mydata.bin', [a,b])
+
+	###############################################################
+	#################
+
+
+ 2）自动并行计算
+不同的操作自动进行并行计算。	
+	a = mx.nd.ones((2,3)) ## 默认cpu上
+	b = a                 ## cpu上
+	c = a.copyto(mx.gpu())## gpu上
+	a += 1
+	b *= 3
+	c *= 3
+
+	a += 1可与c *= 3并行计算，因为在不同的设备上，
+        但是a += 1和b *= 3只能相继执行。
+
+
+【2】符号式运算 Symbol
+    Symbol使得非常容易定义神经网络，并且能自动求导
+以下的范例创建了一个 2 层的感知器网络:
+
+>>> import mxnet as mx
+>>> net = mx.symbol.Variable('data')
+>>> net = mx.symbol.FullyConnected(data=net, name='fc1', num_hidden=128)##全连接层
+>>> net = mx.symbol.Activation(data=net, name='relu1', act_type="relu") ##激活
+>>> net = mx.symbol.FullyConnected(data=net, name='fc2', num_hidden=64) ##全连接
+>>> net = mx.symbol.SoftmaxOutput(data=net, name='out')                 ##softmax回归输出层
+>>> type(net)
+<class 'mxnet.symbol.Symbol'>
+
+
+每一个 Symbol 可以绑定一个名字，Variable 通常用来定义输入，
+其他的 Symbol 有一个参数data以一个Symbol 类型作为输入数据，
+另外还有其他的超参数num_hidden（隐藏层的神经元数目)，act_type(激活函数的类型)。
+
+Symbol 的作用可以被简单的看成是实现了一个函数，函数的参数名称自动生成，可以通过以下的方式查看:
+	
+>>> net.list_arguments()
+['data', 'fc1_weight', 'fc1_bias', 'fc2_weight', 'fc2_bias', 'out_label']
+
+
+
+2）我们也可以明确指定这些自动生成的参数的名字:
+	
+>>> net2 = mx.symbol.Variable('data')
+>>> w = mx.symbol.Variable('myweight')
+>>> net2 = mx.symbol.FullyConnected(data=net2, weight=w, name='fc1', num_hidden=128)
+>>> net2.list_arguments()
+['data', 'myweight', 'fc1_bias']
+
+3）Symbol 可以组合之后，在传入全连接中:	
+>>> lhs = mx.symbol.Variable('data1')
+>>> rhs = mx.symbol.Variable('data2')
+>>> net = mx.symbol.FullyConnected(data=lhs + rhs, name='fc1', num_hidden=128)
+>>> net.list_arguments()
+['data1', 'data2', 'fc1_weight', 'fc1_bias']
+
+
+3）Symbol 也可以被随后的操作替换:	
+>>> net = mx.symbol.Variable('data')
+>>> net = mx.symbol.FullyConnected(data=net, name='fc1', num_hidden=128)
+>>> net2 = mx.symbol.Variable('data2')
+>>> net2 = mx.symbol.FullyConnected(data=net2, name='net2', num_hidden=128)
+>>> composed_net = net(data=net2, name='compose')
+>>> composed_net.list_arguments()
+['data2', 'net2_weight', 'net2_bias', 'compose_fc1_weight', 'compose_fc1_bias']
+
+
+
+
+4）一旦定义好了 Symbol，只需要指定输入数据的维度，就可以推算出各级中间参数的维度:	
+>>> net = mx.symbol.Variable('data')
+>>> net = mx.symbol.FullyConnected(data=net, name='fc1', num_hidden=10)
+>>> arg_shape, out_shape, aux_shape = net.infer_shape(data=(100, 100))
+>>> dict(zip(net.list_arguments(), arg_shape))
+{'data': (100, 100), 'fc1_weight': (10, 100), 'fc1_bias': (10,)}
+>>> out_shape
+[(100, 10)]
+
+
+5）接下来通过绑定变量，就可以执行实际的运算了:	
+>>> # 定义计算图
+>>> A = mx.symbol.Variable('A')
+>>> B = mx.symbol.Variable('B')
+>>> C = A * B
+
+>>> a = mx.nd.ones(3) * 4
+>>> b = mx.nd.ones(3) * 2
+>>> # 绑定变量到Symbol
+>>> c_exec = C.bind(ctx=mx.cpu(), args={'A' : a, 'B': b})
+>>> # 进行前向计算
+>>> c_exec.forward()
+>>> c_exec.outputs[0].asnumpy()
+[ 8.  8.  8.]
+
+
+
+【3】数据同步 KVStore
+
+    KVStore 实现了在多个运算器之间，或者在多台计算机之间的数据同步
+MXNet提供一个分布式的key-value存储来进行数据交换。它主要有两个函数，
+
+push： 将key-value对从一个设备push进存储
+pull：将某个key上的值从存储中pull出来此外，
+      KVStore还接受自定义的更新函数来控制收到的值如何写入到存储中。
+最后KVStore提供数种包含最终一致性模型和顺序一致性模型在内的数据一致性模型。
+ 
+
+1）通过create可以对 kvstore 进行简单的初始化:	
+>>> kv = mx.kv.create('local') # 创建一个本地的kvstore
+>>> shape = (2,3)
+>>> kv.init(3, mx.nd.ones(shape)*2)
+>>> a = mx.nd.zeros(shape)
+>>> kv.pull(3, out = a)
+>>> print a.asnumpy()
+[[ 2.  2.  2.]
+ [ 2.  2.  2.]]
+
+2）初始化后，可以通过相同的 key 进行数值更新:	
+>>> kv.push(3, mx.nd.ones(shape)*8)
+>>> kv.pull(3, out = a) # 取出值
+>>> print a.asnumpy()
+[[ 8.  8.  8.]
+ [ 8.  8.  8.]]
+
+3）push的数据可以在任何设备上，此外，可以在同一个 key 上传递多个值，KVStore 会对多个值求和，push聚合后的值:
+	
+>>> gpus = [mx.gpu(i) for i in range(4)]
+>>> b = [mx.nd.ones(shape, gpu) for gpu in gpus]
+>>> kv.push(3, b)
+>>> kv.pull(3, out = a)
+>>> print a.asnumpy()
+[[ 4.  4.  4.]
+ [ 4.  4.  4.]]
+
+
+
+4）KVStore 对每次push进来的值做的默认行为是ASSIGN，这个行为可以被自定义的行为替换:
+	
+>>> def update(key, input, stored):
+>>>     print "update on key: %d" % key
+>>>     stored += input * 2
+>>> kv._set_updater(update)
+>>> kv.pull(3, out=a)
+>>> print a.asnumpy()
+[[ 4.  4.  4.]
+ [ 4.  4.  4.]]
+>>> kv.push(3, mx.nd.ones(shape))
+update on key: 3
+>>> kv.pull(3, out=a)
+>>> print a.asnumpy()
+[[ 6.  6.  6.]
+ [ 6.  6.  6.]]
+
+
+5）同push类似，通过一次调用，我们也可以将值同时pull到多个设备上:	
+>>> b = [mx.nd.ones(shape, gpu) for gpu in gpus]
+>>> kv.pull(3, out = b)
+>>> print b[1].asnumpy()
+[[ 6.  6.  6.]
+ [ 6.  6.  6.]]
+
+
+
+6） 除了单个 key-value 的存储，KVStrore 还提供了批量的接口:
+	
+# 针对单个设备
+>>> keys = [5, 7, 9]
+>>> kv.init(keys, [mx.nd.ones(shape)]*len(keys))
+>>> kv.push(keys, [mx.nd.ones(shape)]*len(keys))
+update on key: 5
+update on key: 7
+update on key: 9
+>>> b = [mx.nd.zeros(shape)]*len(keys)
+>>> kv.pull(keys, out = b)
+>>> print b[1].asnumpy()
+[[ 3.  3.  3.]
+ [ 3.  3.  3.]]
+ 
+# 针对多个设备 
+>>> b = [[mx.nd.ones(shape, gpu) for gpu in gpus]] * len(keys)
+>>> kv.push(keys, b)
+update on key: 5
+update on key: 7
+update on key: 9
+>>> kv.pull(keys, out = b)
+>>> print b[1][1].asnumpy()
+[[ 11.  11.  11.]
+ [ 11.  11.  11.]]
+
+#####################################
+######################################
+MXnet体验
+以下借助 MXnet 实现了一个简单的单变量线性回归程序：
+
+import mxnet as mx
+import numpy as np
+import matplotlib.pyplot as plt
+ 
+# 定义输入数据
+X_data = np.linspace(-1, 1, 100)
+noise = np.random.normal(0, 0.5, 100)
+y_data = 5 * X_data + noise
+ 
+# Plot 输入数据
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1)
+ax.scatter(X_data, y_data)
+ 
+# 定义mxnet变量
+X = mx.symbol.Variable('data')
+Y = mx.symbol.Variable('softmax_label')
+ 
+# 定义网络
+Y_ = mx.symbol.FullyConnected(data=X, num_hidden=1, name='pre')
+loss = mx.symbol.LinearRegressionOutput(data=Y_, label=Y, name='loss')
+ 
+# 定义模型
+model = mx.model.FeedForward(
+            ctx=mx.cpu(),
+            symbol=loss,
+            num_epoch=100,
+            learning_rate=0.001,
+            numpy_batch_size=1
+        )
+ 
+# 训练模型
+model.fit(X=X_data, y=y_data)
+ 
+# 预测
+prediction = model.predict(X_data)
+lines = ax.plot(X_data, prediction, 'r-', lw=5)
+plt.show()
+

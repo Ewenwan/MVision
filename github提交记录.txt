@@ -1,11 +1,11 @@
 cd 目标文件夹
-echo "# PyML" >> README.md  # 添加文件
+echo "# MVsion" >> README.md  # 添加文件
 git init #初始化
 git config --global user.email "you@example.com"  # 邮箱
 git config --global user.name "Your Name"         # 用户名
 git add README.md            # 添加文件
 git commit -m "first commit" # 提交 
-git remote add origin https://github.com/Ewenwan/PyML.git #增加一个远程服务器端版本库
+git remote add origin https://github.com/Ewenwan/MVision.git #增加一个远程服务器端版本库
 git push -u origin master # 将本地文件提交到Github。
 
 提交所有文件:
