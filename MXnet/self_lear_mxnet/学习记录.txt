@@ -68,16 +68,35 @@ export PYTHONPATH=~/mxnet/python
 cp -r ~/mxnet/python/mxnet .
 cp ~/mxnet/lib/libmxnet.so mxnet/
 
-//我的工作目录
-export PYTHONPATH=/home/ewenwan/ewenwan/learn/MXnet/mxnet/python
-cp -r /home/ewenwan/ewenwan/learn/MXnet/mxnet/python/mxnet .
-cp -r /home/ewenwan/ewenwan/learn/MXnet/mxnet/lib/libmxnet.so mxnet/
+//我的安装目录
+export PYTHONPATH=/home/ewenwan/ewenwan/learn/vSLAM/test/MXnet/mxnet/python
+cp -r /home/ewenwan/ewenwan/learn/vSLAM/test/MXnet/mxnet/python/mxnet .
+cp -r /home/ewenwan/ewenwan/learn/vSLAM/test/MXnet/mxnet/lib/libmxnet.so mxnet/
 
 本次对话生效
 sudo vi /etc/profile
 在最后添加
 
-export PYTHONPATH=/home/ewenwan/ewenwan/learn/MXnet/mxnet/python
+export PYTHONPATH=/home/ewenwan/ewenwan/learn/vSLAM/test/MXnet/mxnet/python
+
+上述方法的PATH 在终端关闭 后就会消失。所以还是建议通过编辑/etc/profile来改PATH，
+也可以改家目录下的.bashrc(即：~/.bashrc)。
+ 
+
+第二种方法：
+# vim /etc/profile
+在文档最后，添加:
+export PYTHONPATH=/home/ewenwan/ewenwan/learn/vSLAM/test/MXnet/mxnet/python
+保存，退出，然后运行：
+#source /etc/profile
+
+不报错则成功。
+
+第三种
+vim ~/.bashrc
+在文档最后，添加:
+export PYTHONPATH=/home/ewenwan/ewenwan/learn/vSLAM/test/MXnet/mxnet/python
+
 
 7、github教程
 https://github.com/dmlc/mxnet-notebooks

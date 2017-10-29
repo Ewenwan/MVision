@@ -1,0 +1,312 @@
+    name: "ZF"  
+    layer {  
+      name: 'input-data' #这一层就是最开始数据输入  
+      type: 'Python'  
+      top: 'data' # top表示该层的输出，所以可以看到这一层输出三组数据，data，真值框gt_boxes，和相关信息im_info  
+      top: 'im_info' # 这些都是存储在矩阵中的  
+      top: 'gt_boxes'  
+      python_param {  
+        module: 'roi_data_layer.layer'  
+        layer: 'RoIDataLayer'  
+        param_str: "'num_classes': 21"  
+      }  
+    }  
+      
+    #========= conv1-conv5 ============  
+      
+    layer {  
+        name: "conv1"  
+        type: "Convolution"  
+        bottom: "data" # 输入data  
+        top: "conv1" # 输出conv1，这里conv1就代表了这一层输出数据的名称，存储在对应的矩阵中  
+        param { lr_mult: 1.0 }  
+        param { lr_mult: 2.0 }  
+        convolution_param {  
+            num_output: 96  
+            kernel_size: 7  
+            pad: 3  # 这里可以看到卷积1层 填充了3个像素  
+            stride: 2  
+        }  
+    }  
+    layer {  
+        name: "relu1"  
+        type: "ReLU"  
+        bottom: "conv1"  
+        top: "conv1"  
+    }  
+    layer {  
+        name: "norm1"  
+        type: "LRN"  
+        bottom: "conv1"  
+        top: "norm1" # 做归一化操作，通俗点说就是做个除法  
+        lrn_param {  
+            local_size: 3  
+            alpha: 0.00005  
+            beta: 0.75  
+            norm_region: WITHIN_CHANNEL  
+        engine: CAFFE  
+        }  
+    }  
+    layer {  
+        name: "pool1"  
+        type: "Pooling"  
+        bottom: "norm1"  
+        top: "pool1"  
+        pooling_param {  
+            kernel_size: 3  
+            stride: 2  
+            pad: 1 # 池化的时候，又做了填充  
+            pool: MAX  
+        }  
+    }  
+    layer {  
+        name: "conv2"  
+        type: "Convolution"  
+        bottom: "pool1"  
+        top: "conv2"  
+        param { lr_mult: 1.0 }  
+        param { lr_mult: 2.0 }  
+        convolution_param {  
+            num_output: 256  
+            kernel_size: 5  
+            pad: 2  
+            stride: 2  
+        }  
+    }  
+    layer {  
+        name: "relu2"  
+        type: "ReLU"  
+        bottom: "conv2"  
+        top: "conv2"  
+    }  
+    layer {  
+        name: "norm2"  
+        type: "LRN"  
+        bottom: "conv2"  
+        top: "norm2"  
+        lrn_param {  
+            local_size: 3  
+            alpha: 0.00005  
+            beta: 0.75  
+            norm_region: WITHIN_CHANNEL  
+        engine: CAFFE  
+        }  
+    }  
+    layer {  
+        name: "pool2"  
+        type: "Pooling"  
+        bottom: "norm2"  
+        top: "pool2"  
+        pooling_param {  
+            kernel_size: 3  
+            stride: 2  
+            pad: 1  
+            pool: MAX  
+        }  
+    }  
+    layer {  
+        name: "conv3"  
+        type: "Convolution"  
+        bottom: "pool2"  
+        top: "conv3"  
+        param { lr_mult: 1.0 }  
+        param { lr_mult: 2.0 }  
+        convolution_param {  
+            num_output: 384  
+            kernel_size: 3  
+            pad: 1  
+            stride: 1  
+        }  
+    }  
+    layer {  
+        name: "relu3"  
+        type: "ReLU"  
+        bottom: "conv3"  
+        top: "conv3"  
+    }  
+    layer {  
+        name: "conv4"  
+        type: "Convolution"  
+        bottom: "conv3"  
+        top: "conv4"  
+        param { lr_mult: 1.0 }  
+        param { lr_mult: 2.0 }  
+        convolution_param {  
+            num_output: 384  
+            kernel_size: 3  
+            pad: 1  
+            stride: 1  
+        }  
+    }  
+    layer {  
+        name: "relu4"  
+        type: "ReLU"  
+        bottom: "conv4"  
+        top: "conv4"  
+    }  
+    layer {  
+        name: "conv5"  
+        type: "Convolution"  
+        bottom: "conv4"  
+        top: "conv5"  
+        param { lr_mult: 1.0 }  
+        param { lr_mult: 2.0 }  
+        convolution_param {  
+            num_output: 256  
+            kernel_size: 3  
+            pad: 1  
+            stride: 1  
+        }  
+    }  
+    layer {  
+        name: "relu5"  
+        type: "ReLU"  
+        bottom: "conv5"  
+        top: "conv5"  
+    }  
+      
+    #========= RPN ============  
+    # 到我们的RPN网络部分了，前面的都是共享的5层卷积层的部分  
+    layer {  
+      name: "rpn_conv1"  
+      type: "Convolution"  
+      bottom: "conv5"  
+      top: "rpn_conv1"  
+      param { lr_mult: 1.0 }  
+      param { lr_mult: 2.0 }  
+      convolution_param {  
+        num_output: 256  
+        kernel_size: 3 pad: 1 stride: 1 #这里作者把每个滑窗3*3，通过3*3*256*256的卷积核输出256维，完整的输出其实是12*12*256,  
+        weight_filler { type: "gaussian" std: 0.01 }  
+        bias_filler { type: "constant" value: 0 }  
+      }  
+    }  
+    layer {  
+      name: "rpn_relu1"  
+      type: "ReLU"  
+      bottom: "rpn_conv1"  
+      top: "rpn_conv1"  
+    }  
+    layer {  
+      name: "rpn_cls_score"  
+      type: "Convolution"  
+      bottom: "rpn_conv1"  
+      top: "rpn_cls_score"  
+      param { lr_mult: 1.0 }  
+      param { lr_mult: 2.0 }  
+      convolution_param {  
+        num_output: 18   # 2(bg/fg) * 9(anchors)  
+        kernel_size: 1 pad: 0 stride: 1 #这里看的很清楚，作者通过1*1*256*18的卷积核，将前面的256维数据转换成了18个输出  
+        weight_filler { type: "gaussian" std: 0.01 }  
+        bias_filler { type: "constant" value: 0 }  
+      }  
+    }  
+    layer {  
+      name: "rpn_bbox_pred"  
+      type: "Convolution"  
+      bottom: "rpn_conv1"  
+      top: "rpn_bbox_pred"  
+      param { lr_mult: 1.0 }  
+      param { lr_mult: 2.0 }  
+      convolution_param {  
+        num_output: 36   # 4 * 9(anchors)  
+        kernel_size: 1 pad: 0 stride: 1 <span style="font-family: Arial, Helvetica, sans-serif;">#这里看的很清楚，作者通过1*1*256*36的卷积核，将前面的256维数据转换成了36个输出</span>  
+        weight_filler { type: "gaussian" std: 0.01 }  
+        bias_filler { type: "constant" value: 0 }  
+      }  
+    }  
+    layer {  
+       bottom: "rpn_cls_score"  
+       top: "rpn_cls_score_reshape" # 我们之前说过，其实这一层是12*12*256的，所以后面我们要送给损失函数，需要将这个矩阵reshape一下，我们需要的是144个滑窗，每个对应的256的向量  
+       name: "rpn_cls_score_reshape"  
+       type: "Reshape"  
+       reshape_param { shape { dim: 0 dim: 2 dim: -1 dim: 0 } }  
+    }  
+    layer {  
+      name: 'rpn-data'  
+      type: 'Python'  
+      bottom: 'rpn_cls_score'  
+      bottom: 'gt_boxes'  
+      bottom: 'im_info'  
+      bottom: 'data'  
+      top: 'rpn_labels'  
+      top: 'rpn_bbox_targets'  
+      top: 'rpn_bbox_inside_weights'  
+      top: 'rpn_bbox_outside_weights'  
+      python_param {  
+        module: 'rpn.anchor_target_layer'  
+        layer: 'AnchorTargetLayer'  
+        param_str: "'feat_stride': 16"  
+      }  
+    }  
+    layer {  
+      name: "rpn_loss_cls"  
+      type: "SoftmaxWithLoss" # 很明显这里是计算softmax的损失，输入labels和cls layer的18个输出（中间reshape了一下），输出损失函数的具体值  
+      bottom: "rpn_cls_score_reshape"  
+      bottom: "rpn_labels"  
+      propagate_down: 1  
+      propagate_down: 0  
+      top: "rpn_cls_loss"  
+      loss_weight: 1  
+      loss_param {  
+        ignore_label: -1  
+        normalize: true  
+      }  
+    }  
+    layer {  
+      name: "rpn_loss_bbox"  
+      type: "SmoothL1Loss" # 这里计算的框回归损失函数具体的值  
+      bottom: "rpn_bbox_pred"  
+      bottom: "rpn_bbox_targets"  
+      bottom: "rpn_bbox_inside_weights"  
+      bottom: "rpn_bbox_outside_weights"  
+      top: "rpn_loss_bbox"  
+      loss_weight: 1  
+      smooth_l1_loss_param { sigma: 3.0 }  
+    }  
+      
+    #========= RCNN ============  
+    # Dummy layers so that initial parameters are saved into the output net  
+      
+    layer {  
+      name: "dummy_roi_pool_conv5"  
+      type: "DummyData"  
+      top: "dummy_roi_pool_conv5"  
+      dummy_data_param {  
+        shape { dim: 1 dim: 9216 }  
+        data_filler { type: "gaussian" std: 0.01 }  
+      }  
+    }  
+    layer {  
+      name: "fc6"  
+      type: "InnerProduct"  
+      bottom: "dummy_roi_pool_conv5"  
+      top: "fc6"  
+      param { lr_mult: 0 decay_mult: 0 }  
+      param { lr_mult: 0 decay_mult: 0 }  
+      inner_product_param {  
+        num_output: 4096  
+      }  
+    }  
+    layer {  
+      name: "relu6"  
+      type: "ReLU"  
+      bottom: "fc6"  
+      top: "fc6"  
+    }  
+    layer {  
+      name: "fc7"  
+      type: "InnerProduct"  
+      bottom: "fc6"  
+      top: "fc7"  
+      param { lr_mult: 0 decay_mult: 0 }  
+      param { lr_mult: 0 decay_mult: 0 }  
+      inner_product_param {  
+        num_output: 4096  
+      }  
+    }  
+    layer {  
+      name: "silence_fc7"  
+      type: "Silence"  
+      bottom: "fc7"  
+    }  
