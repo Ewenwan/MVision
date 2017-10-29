@@ -7,7 +7,7 @@
 from mxnet import ndarray as nd
 from mxnet import autograd
 import random
-from mxnet import gluon
+#from mxnet import gluon
 
 import matplotlib.pyplot as plt#画图
 

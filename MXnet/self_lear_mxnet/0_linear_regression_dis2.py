@@ -42,7 +42,7 @@ mx.viz.plot_network(symbol=lro)
 ##优化训练模型
 model.fit(train_iter, eval_iter,
             optimizer_params={'learning_rate':0.005, 'momentum': 0.9},## 学习率 动量
-            num_epoch=50,#训练次数
+            num_epoch=20,#训练整个数据集的次数
             eval_metric='mse',#校验数据所需要的评价指标 mean square error 误差平方均值
             batch_end_callback = mx.callback.Speedometer(batch_size, 2))
             # 在每批数据训练完成后的回调函数 打印logging信息(每经过2个batch_size打印logging) 
