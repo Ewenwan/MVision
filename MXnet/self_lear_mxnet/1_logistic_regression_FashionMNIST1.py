@@ -20,6 +20,8 @@ def transform(data, label):
 #下载数据
 mnist_train = gluon.data.vision.FashionMNIST(train=True, transform=transform)
 mnist_test = gluon.data.vision.FashionMNIST(train=False, transform=transform)
+#mnist_train = gluon.data.vision.MNIST(train=True, transform=transform)
+#mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 # 打印一个样本的形状和它的标号
 data, label = mnist_train[0]#('example shape: ', (28, 28, 1), 'label:', 2.0)
 print data.shape, label
@@ -44,6 +46,7 @@ data, label = mnist_train[0:10]
 show_images(data)#图像
 print(get_text_labels(label))##标号
 ## 准备 训练和测试数据集
+# 这个DataLoader是一个iterator对象类(每次只载入一个banch的数据进入内存)，非常适合处理规模较大的数据集
 batch_size = 256#每次训练 输入的图片数量
 train_data = gluon.data.DataLoader(mnist_train, batch_size, shuffle=True)#按照 batch_size 分割成 每次训练时的数据
 test_data = gluon.data.DataLoader(mnist_test, batch_size, shuffle=False) #测试数据

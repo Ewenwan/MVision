@@ -485,7 +485,7 @@ xilaili
 https://github.com/xilaili/maskrcnn.mxnet
 
 TuSimple
-GitHub: https://github.com/TuSimple/mx-maskrcnn 
+https://github.com/TuSimple/mx-maskrcnn 
 
 
 本文主要将 Faster R-CNN 拓展到图像分割上，提出了 Mask R-CNN 简单快捷的解决 Instance segmentation，
@@ -556,7 +556,45 @@ RoIAlign: 是对RoI Pooling的改进。RoI Pooling在 Pooling时可能会有misa
 
 
 
+作者将网络分成两个部分：
+1 用于提取特征的“backbone”，
+2 和用于classification、regression、mask prediction的“head”。
+
+“backbone”方面，作者用了两种不同深度的残差网络：
+50层的ResNet和101层的ResNeXt。
+这几个残差可以分成4段，特征将在最后的卷积层C4提取出来。
+另外，作者还使用了Feature Pyramid Network（FPN）。
+FPN会从不同等级的特征金字塔中提取ROI特征，实验也表明，在backbone中用FPN效果更好。
+
+“head”方面，根据之前的backbone是Resnet还是FPN有两种形式： 
+
+
+https://github.com/TuSimple/mx-maskrcnn 
+代码运行记录：
+软件依赖
+Ubuntu 16.04, Python 2.7
+numpy(1.12.1), cv2(2.4.9), PIL(4.3), matplotlib(2.1.0), cython(0.26.1), easydict
 
 
 
+1 下载数据集：
+   城市地形数据集 Cityscapes data,
+       官方下载  https://www.cityscapes-dataset.com/
+       (gtFine_trainvaltest.zip, leftImg8bit_trainvaltest.zip)
+   下载后解压到data/cityscape/
 
+├── leftImg8bit/
+│   ├── train/
+│   ├── val/
+│   └── test/
+├── gtFine/
+│   ├── train/
+│   ├── val/
+│   └── test/
+└── imglists/
+    ├── train.lst
+    ├── val.lst
+    └── test.lst
+
+
+2 下载预训练的模型 Resnet-50

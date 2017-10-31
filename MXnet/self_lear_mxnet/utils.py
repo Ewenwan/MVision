@@ -55,9 +55,31 @@ def load_data_fashion_mnist(batch_size, resize=None):
         return nd.transpose(data.astype('float32'), (0,3,1,2))/255, label.astype('float32')
     mnist_train = gluon.data.vision.FashionMNIST(train=True, transform=transform_mnist)#下载训练数据
     mnist_test = gluon.data.vision.FashionMNIST(train=False, transform=transform_mnist)#下载测试数据
+    # 这个DataLoader是一个iterator对象类(每次只载入一个banch的数据进入内存)，非常适合处理规模较大的数据集
     train_data = DataLoader(mnist_train, batch_size, shuffle=True)#按照 batch_size 分割训练数据
     test_data = DataLoader(mnist_test, batch_size, shuffle=False) #按照 batch_size 分割测试数据
     return (train_data, test_data)
+
+##### 载入手写字体MNIST数据集
+def load_data_mnist(batch_size, resize=None):
+    """download the fashion mnist dataest and then load into memory"""
+    def transform_mnist(data, label):
+        # transform a batch of examples
+        if resize:#改变形状
+            n = data.shape[0]#样本数量 n* 784 *1 ——————> n* 28 * 28 *1 
+            new_data = nd.zeros((n, resize, resize, data.shape[3]))#data.shape[3]为通道数量
+            for i in range(n):
+                new_data[i] = image.imresize(data[i], resize, resize)
+            data = new_data
+        # change data from batch x height x weight x channel to batch 0 x channel 3 x height 1 x weight 2
+        return nd.transpose(data.astype('float32'), (0,3,1,2))/255, label.astype('float32')
+    mnist_train = gluon.data.vision.MNIST(train=True, transform=transform_mnist)#下载训练数据
+    mnist_test = gluon.data.vision.MNIST(train=False, transform=transform_mnist)#下载测试数据
+    # 这个DataLoader是一个iterator对象类(每次只载入一个banch的数据进入内存)，非常适合处理规模较大的数据集
+    train_data = DataLoader(mnist_train, batch_size, shuffle=True)#按照 batch_size 分割训练数据
+    test_data = DataLoader(mnist_test, batch_size, shuffle=False) #按照 batch_size 分割测试数据
+    return (train_data, test_data)
+
 
 def try_gpu():
     """If GPU is available, return mx.gpu(0); else return mx.cpu()"""
