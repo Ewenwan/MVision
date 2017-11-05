@@ -1,0 +1,18 @@
+[Buildset]
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x06\x000\x00.\x001)
+
+[CMake]
+Build Directory Count=1
+Current Build Directory Index=0
+ProjectRootRelative=./
+
+[CMake][CMake Build Directory 0]
+Build Directory Path=file:///home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch9%20project/0.1/build
+Build Type=Debug
+CMake Binary=file:///usr/bin/cmake
+Environment Profile=
+Extra Arguments=
+Install Directory=file:///usr/local
+
+[Project]
+VersionControlSupport=kdevgit
