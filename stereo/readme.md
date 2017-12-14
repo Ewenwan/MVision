@@ -62,4 +62,14 @@
 - [双目相机](stereo/stereo_calib.cpp)
 
 
+# OpenCV提供了以下四种立体匹配算法的函数：
+
+1. 基于局部的块匹配    Block Matching（BM） StereoBM
+2. 半全局块匹配        Semi-Global Block Matching（SGBM） StereoSGBM
+>第一步对每一个Pixel使用块匹配BM进行匹配，得到了全部Pixel的disparity map。
+>第二步对Disparity map建立图，用Graph Cut对其进行全局优化。
+>利用Rectification将二维转化为一维
+3. 基于全局的图割      Graph Cut（GC）cvStereoGCState()
+4. 基于全局的 动态规划 Dynamic Programming（DP）cvFindStereoCorrespondence()
+
 
