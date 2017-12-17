@@ -31,3 +31,8 @@ target_link_libraries( Stereo_Calibr  ${OpenCV_LIBS} )
 add_executable( Stereo_Match stereo_match.cpp )
 # 链接OpenCV库 pcl库
 target_link_libraries( Stereo_Match ${OpenCV_LIBS} ${PCL_LIBRARIES})
+
+#双目相机 立体匹配
+add_executable( stereo_m_on_line stereo_match_on_line.cpp )
+# 链接OpenCV库 pcl库
+target_link_libraries(stereo_m_on_line ${OpenCV_LIBS})
