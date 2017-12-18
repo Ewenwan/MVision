@@ -6,37 +6,85 @@ sudo apt-get install libeigen3-dev
 locate eigen3
 sudo updatedb
 
-Eigen 矩阵定义
-复制代码
 
+
+头文件包含
 #include <Eigen/Dense>
+Eigen 矩阵定义
+Eigen中关于矩阵类的模板函数中，共有六个模板参数，常用的只有前三个。
+其前三个参数分别表示矩阵元素的类型、行数和列数。
+矩阵定义时可以使用Dynamic来表示矩阵的行列数为未知。
 
-Matrix<double, 3, 3> A;               // Fixed rows and cols. Same as Matrix3d.
-Matrix<double, 3, Dynamic> B;         // Fixed rows, dynamic cols.
-Matrix<double, Dynamic, Dynamic> C;   // Full dynamic. Same as MatrixXd.
-Matrix<double, 3, 3, RowMajor> E;     // Row major; default is column-major.
-Matrix3f P, Q, R;                     // 3x3 float matrix.
-Vector3f x, y, z;                     // 3x1 float matrix.
-RowVector3f a, b, c;                  // 1x3 float matrix.
-VectorXd v;                           // Dynamic column vector of doubles
+ 矩阵类型：
+ Eigen中的矩阵类型一般都是用类似MatrixXXX来表示，可以根据该名字来判断其数据类型，
+ 比如”d”表示double类型，
+ ”f”表示float类型，
+ ”i”表示整数，
+ ”c”表示复数；
+ Matrix2f，表示的是一个2*2维的，其每个元素都是float类型。
+ 
+   数据存储：
+   Matrix<double, 3, 3, RowMajor> E;       //  行排列(存储)的矩阵
+ Matrix<int,3, 4, ColMajor> Acolmajor;   //   默认为列排列(存储)的矩阵  
+ 
+  动态矩阵和静态矩阵：
+         动态矩阵是指其大小在运行时确定，静态矩阵是指其大小在编译时确定。
+         MatrixXd：表示任意大小的元素类型为double的矩阵变量，其大小只有在运行时被赋值之后才能知道。
+         Matrix3d：表示元素类型为double大小为3*3的矩阵变量，其大小在编译时就知道。
+         在Eigen中行优先的矩阵会在其名字中包含有row，否则就是列优先。
+         Eigen中的向量只是一个特殊的矩阵，其维度为1而已。
+ 
+  矩阵元素的访问：
+      在矩阵的访问中，行索引总是作为第一个参数，Eigen中矩阵、数组、向量的下标都是从0开始。
+      矩阵元素的访问可以通过”()”操作符完成。
+      例如m(2, 3)既是获取矩阵m的第2行第3列元素。
+      针对向量还提供”[]”操作符，注意矩阵则不可如此使用。
+         
+   设置矩阵的元素：
+   在Eigen中重载了”<<”操作符，
+   通过该操作符即可以一个一个元素的进行赋值，
+   也可以一块一块的赋值。
+   另外也可以使用下标进行赋值。
+   A << 1, 2, 3,  // 按列填充A
+     4, 5, 6,         //  
+     7, 8, 9;         //  
+  B << A, A, A;   //  块赋值
+  A.fill(10);        //  函数赋值
+
+  重置矩阵大小：
+  当前矩阵的行数、列数、大小可以通过rows()、cols()和size()来获取，
+  对于动态矩阵可以通过resize()函数来动态修改矩阵的大小。
+  注意：(1)、固定大小的矩阵是不能使用resize()来修改矩阵的大小；
+  (2)、resize()函数会析构掉原来的数据，因此调用resize()函数之后将不能保证元素的值不改变；
+  (3)、使用”=”操作符操作动态矩阵时，如果左右两边的矩阵大小不等，
+         则左边的动态矩阵的大小会被修改为右边的大小。
+  
+  如何选择动态矩阵和静态矩阵：对于小矩阵(一般大小小于16)使用固定大小的静态矩阵，它可以带来比较高的效率；
+  对于大矩阵(一般大小大于32)建议使用动态矩阵。
+  注意：如果特别大的矩阵使用了固定大小的静态矩阵则可能会造成栈溢出的问题。
+  
+  
+  
+  
+  
+Matrix<double, 3, 3> A;                           // 固定行和列的矩阵 Fixed   Matrix3d.
+Matrix<double, 3, Dynamic> B;              // 固定行，列数不定的矩阵  Matrix<double, Dynamic，3> BB;  
+Matrix<double, Dynamic, Dynamic> C; // 行列数不定的矩阵              MatrixXd.
+Matrix<double, 3, 3, RowMajor> E;       //  行排列(存储)的矩阵， ，，默认为列排列(存储)的矩阵  Matrix<int,3, 4, ColMajor> Acolmajor;
+Matrix3f P, Q, R;                                      // 3x3 float matrix. 浮点型 3x3矩阵
+Vector3f x, y, z;                                        // 3x1 float matrix. 浮点型 3x1向量
+RowVector3f a, b, c;                  // 行向量 1x3 float matrix.
+VectorXd v;                               //  动态 doubles 类型向量
+
+
+ Eigen 基础使用
 // Eigen          // Matlab           // comments
 x.size()          // length(x)        // vector size
-C.rows()          // size(C,1)        // number of rows
-C.cols()          // size(C,2)        // number of columns
-x(i)              // x(i+1)           // Matlab is 1-based
-C(i,j)            // C(i+1,j+1)       //
+C.rows()          // size(C,1)        // 行数量
+C.cols()          // size(C,2)         // 列数量
+x(i)              // x(i+1)                //按列排列顺序(或行排列顺序)取元素  Matlab is 1-based
+C(i,j)            // C(i+1,j+1)         //对应行和列的元素
 
-复制代码
- Eigen 基础使用
-复制代码
-
-// Basic usage
-// Eigen        // Matlab           // comments
-x.size()        // length(x)        // vector size
-C.rows()        // size(C,1)        // number of rows
-C.cols()        // size(C,2)        // number of columns
-x(i)            // x(i+1)           // Matlab is 1-based
-C(i, j)         // C(i+1,j+1)       //
 
 A.resize(4, 4);   // Runtime error if assertions are on.
 B.resize(4, 9);   // Runtime error if assertions are on.
@@ -49,9 +97,8 @@ A << 1, 2, 3,     // Initialize A. The elements can also be
 B << A, A, A;     // B is three horizontally stacked A's.
 A.fill(10);       // Fill A with all 10's.
 
-复制代码
 Eigen 特殊矩阵生成
-复制代码
+
 
 // Eigen                            // Matlab
 MatrixXd::Identity(rows,cols)       // eye(rows,cols)
@@ -65,21 +112,30 @@ C.setRandom(rows,cols)              // C = rand(rows,cols)*2-1
 VectorXd::LinSpaced(size,low,high)  // linspace(low,high,size)'
 v.setLinSpaced(size,low,high)       // v = linspace(low,high,size)'
 
-复制代码
-Eigen 矩阵分块
-复制代码
+矩阵的块操作：有两种使用方法：
 
-// Matrix slicing and blocks. All expressions listed here are read/write.
-// Templated size versions are faster. Note that Matlab is 1-based (a size N
+         matrix.block(i,j, p, q) : 表示返回从矩阵(i, j)开始，每行取p个元素，每列取q个元素所组成的临时新矩阵对象，原矩阵的元素不变；
+         matrix.block<p,q>(i, j) :<p, q>可理解为一个p行q列的子矩阵，该定义表示从原矩阵中第(i, j)开始，
+         获取一个p行q列的子矩阵，返回该子矩阵组成的临时矩阵对象，原矩阵的元素不变；
+  
+  向量的块操作：
+
+         获取向量的前n个元素：vector.head(n);
+         获取向量尾部的n个元素：vector.tail(n);
+         获取从向量的第i个元素开始的n个元素：vector.segment(i,n);
+         Map类：在已经存在的矩阵或向量中，不必拷贝对象，而是直接在该对象的内存上进行运算操作。
+         
+Eigen 矩阵分块
+
 // vector is x(1)...x(N)).
 // Eigen                           // Matlab
-x.head(n)                          // x(1:n)
+x.head(n)                          // x(1:n)     向量快操作
 x.head<n>()                        // x(1:n)
 x.tail(n)                          // x(end - n + 1: end)
 x.tail<n>()                        // x(end - n + 1: end)
 x.segment(i, n)                    // x(i+1 : i+n)
 x.segment<n>(i)                    // x(i+1 : i+n)
-P.block(i, j, rows, cols)          // P(i+1 : i+rows, j+1 : j+cols)
+P.block(i, j, rows, cols)          // P(i+1 : i+rows, j+1 : j+cols)    矩阵块操作
 P.block<rows, cols>(i, j)          // P(i+1 : i+rows, j+1 : j+cols)
 P.row(i)                           // P(i+1, :)
 P.col(j)                           // P(:, j+1)
@@ -105,16 +161,18 @@ P.bottomLeftCorner<rows,cols>()    // P(end-rows+1:end, 1:cols)
 P.bottomRightCorner<rows,cols>()   // P(end-rows+1:end, end-cols+1:end)
 
 复制代码
-Eigen 矩阵元素交换
-
 // Of particular note is Eigen's swap function which is highly optimized.
 // Eigen                           // Matlab
 R.row(i) = P.col(j);               // R(i, :) = P(:, i)
 R.col(j1).swap(mat1.col(j2));      // R(:, [j1 j2]) = R(:, [j2, j1])
 
-Eigen 矩阵转置
-复制代码
 
+求矩阵的转置、共轭矩阵、伴随矩阵：可以通过成员函数transpose()、conjugate()、adjoint()来完成。
+注意：这些函数返回操作后的结果，而不会对原矩阵的元素进行直接操作，
+如果要让原矩阵进行转换，则需要使用响应的InPlace函数，
+如transpoceInPlace()等；
+
+Eigen 矩阵转置
 // Views, transpose, etc; all read-write except for .adjoint().
 // Eigen                           // Matlab
 R.adjoint()                        // R'
@@ -124,10 +182,19 @@ x.asDiagonal()                     // diag(x)
 R.transpose().colwise().reverse(); // rot90(R)
 R.conjugate()                      // conj(R)
 
-复制代码
-Eigen 矩阵乘积
-复制代码
 
+矩阵和向量的算术运算：在Eigen中算术运算重载了C++的+、-、*
+
+         (1)、矩阵的运算：
+         提供+、-、一元操作符
+         ”-”、+=、-=；二元操作符
+         +/-，
+         表示两矩阵相加(矩阵中对应元素相加/减，返回一个临时矩阵)；
+         一元操作符-表示对矩阵取负(矩阵中对应元素取负，返回一个临时矩阵)；
+         组合操作法+=或者-=表示(对应每个元素都做相应操作)；
+         矩阵还提供与标量(单一数字)的乘除操作，表示每个元素都与该标量进行乘除操作；
+         
+Eigen 矩阵乘积
 // All the same as Matlab, but matlab doesn't have *= style operators.
 // Matrix-vector.  Matrix-matrix.   Matrix-scalar.
 y  = M*x;          R  = P*Q;        R  = P*s;
@@ -137,18 +204,16 @@ a *= M;            R  = P + Q;      R  = P/s;
                    R += Q;          R *= s;
                    R -= Q;          R /= s;
 
-复制代码
 Eigen 矩阵单个元素操作
-复制代码
 
 // Vectorized operations on each element independently
-// Eigen                  // Matlab
+// Eigen                            // Matlab
 R = P.cwiseProduct(Q);    // R = P .* Q
-R = P.array() * s.array();// R = P .* s
+R = P.array() * s.array();  // R = P .* s
 R = P.cwiseQuotient(Q);   // R = P ./ Q
-R = P.array() / Q.array();// R = P ./ Q
-R = P.array() + s.array();// R = P + s
-R = P.array() - s.array();// R = P - s
+R = P.array() / Q.array();  // R = P ./ Q
+R = P.array() + s.array();  // R = P + s
+R = P.array() - s.array();   // R = P - s
 R.array() += s;           // R = R + s
 R.array() -= s;           // R = R - s
 R.array() < Q.array();    // R < Q
