@@ -9,6 +9,12 @@ using namespace std;
 #include "sophus/so3.h"
 #include "sophus/se3.h"
 /*
+ * sophus 库安装 
+ * 本库为来版本 非模板的版本
+ * git clone https://github.com//strasdat/Sophus.git
+ * git checkout a621ff   版本
+ * 在cmake编译
+ * 
  SO(n) 特殊正交群      对应 n*n 的旋转矩阵  群(集合)
  SE(n+1) 特殊欧式群   对应   n*n 的旋转矩阵和 n*1的平移向量 组合成的  变换矩阵 群(集合)
  so(n)  对应 的李代数 为 so(n)   n×1  列向量   使得向量 和 代数 一一对应  可以使用代数的更新方法来更新 矩阵
@@ -16,8 +22,8 @@ using namespace std;
  
  SO(3) 表示三维空间的 旋转矩阵 集合  3×3
  SE(3)  表示三维空间的 变换矩阵 集合  4×4
- 李代数 so3的本质就是个三维向量，直接Eigen::Vector3d定义。
- 
+ 李代数 so3的本质就是个三维向量，直接Eigen::Vector3d定义。 3个旋转
+ 李代数 se3的本质就是个六维向量，3个旋转 + 3个平移
  
  欧拉角定义：
  旋转向量定义的 李群SO(3)   Sophus::SO3 SO3_v( 0, 0, M_PI/2 );  // 亦可从旋转向量构造  这里注意，不是旋转向量的三个坐标值，有点像欧拉角构造。
@@ -60,7 +66,7 @@ int main( int argc, char** argv )
 	显示的貌似是三个过程，先转Ｘ轴，再转Ｙ轴，再转Ｚ轴，完全跟旋转向量不搭边。瞅着过程有点像欧拉角的过程，三个轴分了三步。  
 	我就有一个(1, 1, 1)旋转向量，如何构造成SO3呢？也就是让它输出(1, 1, 1)。
         Eigen::Vector3d so33 (1, 1, 1);  
-        Sophus::SO3 SO3 =Sophus::SO3::exp(so33);  
+        Sophus::SO3 SO3 =Sophus::SO3::exp(so33);  //李代数 指数映射成 旋转矩阵 对于的 李群
          cout<<"SO3=\n"<<SO3<<endl;  
      */
     Eigen::Quaterniond q(R);            // 或者四元数(从旋转矩阵构造)
