@@ -8,6 +8,16 @@ using namespace std;
 
 /****************************
 * 本程序演示了 Eigen 几何模块的使用方法
+* 旋转向量  Eigen::AngleAxisd    轴角度
+* 旋转矩阵  Eigen::Matrix3d    rotation_vector.toRotationMatrix(); 旋转向量转换到旋转矩阵
+* 欧拉角      Eigen::Vector3d    rotation_matrix.eulerAngles ( 2,1,0 ); // ZYX顺序，即roll pitch yaw顺序  旋转矩阵到 欧拉角转换到欧拉角
+* 欧式变换矩阵 Eigen::Isometry3d T=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵   旋转 R+ 平移T 
+*                            T.rotate ( rotation_vector );                                       // 按照rotation_vector进行旋转
+*                            T.pretranslate ( Eigen::Vector3d ( 1,3,4 ) );              // 把平移向量设成(1,3,4)
+*                            cout<< T.matrix() <<endl;
+* 四元素      Eigen::Quaterniond q = Eigen::Quaterniond ( rotation_vector );// 旋转向量 定义四元素 
+*                              q = Eigen::Quaterniond ( rotation_matrix );  //旋转矩阵定义四元素
+* 
 ****************************/
 
 int main ( int argc, char** argv )
@@ -23,31 +33,37 @@ int main ( int argc, char** argv )
      /*********************************/
     /*旋转向量　沿 Z 轴旋转 45 度         角度　轴 */
     Eigen::AngleAxisd rotation_vector ( M_PI/4, Eigen::Vector3d ( 0,0,1 ) );     //沿 Z 轴旋转 45 度
-    cout .precision(3);
+    cout .precision(3);//输出精度
     cout<<"rotation matrix =\n"<<rotation_vector.matrix() <<endl;                //用matrix()转换成矩阵
+    
+    
     // 也可以直接赋值
     /*********************************/
    /*旋转矩阵*/
-   Eigen::Matrix3d rotation_matrix = Eigen::Matrix3d::Identity();//单位阵
-    rotation_matrix = rotation_vector.toRotationMatrix();//转成旋转矩阵　由罗德里格公式进行转换
+   Eigen::Matrix3d rotation_matrix = Eigen::Matrix3d::Identity();//单位阵  3x3
+    rotation_matrix = rotation_vector.toRotationMatrix();             // 旋转向量转成旋转矩阵　由罗德里格公式进行转换
+    
+    
     // 用 AngleAxis 可以进行坐标变换
     Eigen::Vector3d v ( 1,0,0 );
      /*************旋转向量进行坐标变换********************/
     Eigen::Vector3d v_rotated = rotation_vector * v;
     cout<<"(1,0,0) after rotation = "<<v_rotated.transpose()<<endl;
     // 或者用旋转矩阵
+    
      /*****************旋转矩阵进行坐标变换****************/
     v_rotated = rotation_matrix * v;
     cout<<"(1,0,0) after rotation = "<<v_rotated.transpose()<<endl;
 
     /**欧拉角表示的旋转**/
-    // 欧拉角: 可以将旋转矩阵直接转换成欧拉角
+    // 欧拉角: 可以将  旋转矩阵直接转换成欧拉角
     Eigen::Vector3d euler_angles = rotation_matrix.eulerAngles ( 2,1,0 ); // ZYX顺序，即roll pitch yaw顺序
     cout<<"yaw pitch roll = "<<euler_angles.transpose()<<endl;
 
-   /***欧式变换矩阵表示旋转**/
+   /***欧式变换矩阵表示旋转+平移**/  
+   //  R t;0 0 0 1
     // 欧氏变换矩阵使用 Eigen::Isometry
-    Eigen::Isometry3d T=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵　　齐次坐标
+    Eigen::Isometry3d T=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵　
     T.rotate ( rotation_vector );                                        // 按照rotation_vector进行旋转
     T.pretranslate ( Eigen::Vector3d ( 1,3,4 ) );               // 把平移向量设成(1,3,4)
     cout << "Transform matrix = \n" << T.matrix() <<endl;
@@ -69,7 +85,7 @@ int main ( int argc, char** argv )
     v_rotated = q*v; // 注意数学上是q*v*q^{-1}  而程序为了简化表示　直接使用　q*v代替
     cout<<"(1,0,0) after Quaterniond rotation = "<<v_rotated.transpose()<<endl;
   /*编程题目
-   小萝卜１号位姿q1=[0.35,0.2,0.3,0.1],t1=[0.3,0.1,0.1]'　　　世界坐标系到相机变换
+   小萝卜１号位姿q1=[0.35,0.2,0.3,0.1],t1=[0.3,0.1,0.1]'　　　 世界坐标系到相机变换
    小萝卜２号位姿q2=[-0.5,0.4,-0.1,0.2],t2=[-0.1,0.5,0.3]'
    小萝卜１号看到位于自身坐标系下p=[0.5,0,0.2]'
    求该向量在小萝卜２号下的坐标
@@ -82,7 +98,7 @@ int main ( int argc, char** argv )
   //q2 << -0.5,0.4,-0.1,0.2;
   Eigen::Matrix<double, 3, 1> t2;//float类型
   t2 << -0.1,0.5,0.3;
-  Eigen::Matrix<double, 3, 1> p1;//float类型
+  Eigen::Matrix<double, 3, 1> p1;//float类型  坐标
   p1 << 0.5,0,0.2;
   
   cout<<"q1= \n"<< q1.coeffs() <<endl;
@@ -104,7 +120,7 @@ int main ( int argc, char** argv )
   
 Eigen::Matrix3d q1rotation_matrix = Eigen::Matrix3d::Identity();//单位阵
 q1rotation_matrix=q1.toRotationMatrix();
-Eigen::Isometry3d Tc1w=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵　　齐次坐标
+Eigen::Isometry3d Tc1w=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵 
 //以上也可　Eigen::Isometry3d  Tc1w(q1)　一步  
 
 Tc1w.rotate (q1rotation_matrix );                                    // 按照q1rotation_matrix进行旋转
