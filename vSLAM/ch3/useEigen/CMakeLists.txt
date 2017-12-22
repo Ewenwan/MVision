@@ -9,5 +9,5 @@ include_directories( "/usr/include/eigen3" )
 
 # in osx and brew install
 # include_directories( /usr/local/Cellar/eigen/3.3.3/include/eigen3 )
-
+# eigen 是现编译的 没有调用 动态链接库
 add_executable( eigenMatrix eigenMatrix.cpp )
