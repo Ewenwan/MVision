@@ -46,14 +46,14 @@ int main ( int argc, char** argv )
     /*********************************/
    /*旋转矩阵*/
    Eigen::Matrix3d rotation_matrix = Eigen::Matrix3d::Identity();//单位阵  3x3
-    rotation_matrix = rotation_vector.toRotationMatrix();             // 旋转向量转成旋转矩阵　由罗德里格公式进行转换
+    rotation_matrix = rotation_vector.toRotationMatrix();        // 旋转向量转成旋转矩阵　由罗德里格公式进行转换
     
     
     // 用 AngleAxis 可以进行坐标变换
     Eigen::Vector3d v ( 1,0,0 );
      /*************旋转向量进行坐标变换********************/
     Eigen::Vector3d v_rotated = rotation_vector * v;
-    cout<<"(1,0,0) after rotation = "<<v_rotated.transpose()<<endl;
+    cout<<"(1,0,0) after rotation = "<<v_rotated.transpose()<<endl;// transpose纯粹是为了输出美观一些
     // 或者用旋转矩阵
     
      /*****************旋转矩阵进行坐标变换****************/
