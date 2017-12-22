@@ -1,23 +1,26 @@
 #include <iostream>
 #include <cmath>
 using namespace std;
-
+// Eigen 部分
 #include <Eigen/Core>
 // Eigen 几何模块
 #include <Eigen/Geometry>
 
 /****************************
 * 本程序演示了 Eigen 几何模块的使用方法
-* 旋转向量  Eigen::AngleAxisd    轴角度
+* 旋转向量  Eigen::AngleAxisd    角度 轴   Eigen::AngleAxisd rotation_vector ( M_PI/4, Eigen::Vector3d ( 0,0,1 ) );     //沿 Z 轴旋转 45 度
 * 旋转矩阵  Eigen::Matrix3d    rotation_vector.toRotationMatrix(); 旋转向量转换到旋转矩阵
-* 欧拉角      Eigen::Vector3d    rotation_matrix.eulerAngles ( 2,1,0 ); // ZYX顺序，即roll pitch yaw顺序  旋转矩阵到 欧拉角转换到欧拉角
+* 欧拉角      Eigen::Vector3d    rotation_matrix.eulerAngles ( 2,1,0 ); // ( 2,1,0 )表示ZYX顺序，即roll pitch yaw顺序  旋转矩阵到 欧拉角转换到欧拉角
+* 四元素      Eigen::Quaterniond q = Eigen::Quaterniond ( rotation_vector );// 旋转向量 定义四元素 
+*                                                     q = Eigen::Quaterniond ( rotation_matrix );  //旋转矩阵定义四元素
+* 
 * 欧式变换矩阵 Eigen::Isometry3d T=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵   旋转 R+ 平移T 
 *                            T.rotate ( rotation_vector );                                       // 按照rotation_vector进行旋转
+*                            也可 Eigen::Isometry3d  T(q)　                                // 一步    按四元素表示的旋转 旋转 转换矩阵
 *                            T.pretranslate ( Eigen::Vector3d ( 1,3,4 ) );              // 把平移向量设成(1,3,4)
 *                            cout<< T.matrix() <<endl;
-* 四元素      Eigen::Quaterniond q = Eigen::Quaterniond ( rotation_vector );// 旋转向量 定义四元素 
-*                              q = Eigen::Quaterniond ( rotation_matrix );  //旋转矩阵定义四元素
-* 
+*                        
+
 ****************************/
 
 int main ( int argc, char** argv )
@@ -57,7 +60,7 @@ int main ( int argc, char** argv )
 
     /**欧拉角表示的旋转**/
     // 欧拉角: 可以将  旋转矩阵直接转换成欧拉角
-    Eigen::Vector3d euler_angles = rotation_matrix.eulerAngles ( 2,1,0 ); // ZYX顺序，即roll pitch yaw顺序
+    Eigen::Vector3d euler_angles = rotation_matrix.eulerAngles ( 2,1,0 ); // (2,1,0)表示ZYX顺序，即roll pitch yaw顺序
     cout<<"yaw pitch roll = "<<euler_angles.transpose()<<endl;
 
    /***欧式变换矩阵表示旋转+平移**/  
@@ -66,7 +69,7 @@ int main ( int argc, char** argv )
     Eigen::Isometry3d T=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵　
     T.rotate ( rotation_vector );                                        // 按照rotation_vector进行旋转
     T.pretranslate ( Eigen::Vector3d ( 1,3,4 ) );               // 把平移向量设成(1,3,4)
-    cout << "Transform matrix = \n" << T.matrix() <<endl;
+    cout << "转换矩阵 Transform matrix = \n" << T.matrix() <<endl;
     // 用变换矩阵进行坐标变换
     Eigen::Vector3d v_transformed = T*v;                              // 相当于R*v+t
     cout<<"(1,0,0) after Isometry3d tranformed = "<<v_transformed.transpose()<<endl;
@@ -77,7 +80,7 @@ int main ( int argc, char** argv )
     // 可以直接把AngleAxis赋值给四元数，反之亦然 Quaterniond 表示双精度　四元素　Quaternionf　表示单精度四元素
     Eigen::Quaterniond q = Eigen::Quaterniond ( rotation_vector );// 表示沿Z 轴旋转 45 度　的四元素变换 
     cout<<"quaternion from AngleAxis rotation_vector = \n"<<q.coeffs() <<endl;   // 请注意coeffs的顺序是(x,y,z,w),w为实部，前三者为虚部
-    // 也可以把旋转矩阵赋给它
+    // 也可以把 旋转矩阵 赋给它
     q = Eigen::Quaterniond ( rotation_matrix );
     cout<<"quaternion from rotation_matrix = \n"<<q.coeffs() <<endl;
     // 使用四元数旋转一个向量，使用重载的乘法即可
@@ -92,13 +95,13 @@ int main ( int argc, char** argv )
    */  
   Eigen::Quaterniond q1(0.35,0.2,0.3,0.1);//wxyz q1.coeffs()  xyzw  q1.vec()  xyz
   //q1 << 0.35,0.2,0.3,0.1;
-  Eigen::Matrix<double, 3, 1> t1;//float类型
+  Eigen::Matrix<double, 3, 1> t1;//double类型
   t1 <<  0.3,0.1,0.1;
   Eigen::Quaterniond q2(-0.5,0.4,-0.1,0.2);
   //q2 << -0.5,0.4,-0.1,0.2;
-  Eigen::Matrix<double, 3, 1> t2;//float类型
+  Eigen::Matrix<double, 3, 1> t2;//double类型
   t2 << -0.1,0.5,0.3;
-  Eigen::Matrix<double, 3, 1> p1;//float类型  坐标
+  Eigen::Matrix<double, 3, 1> p1;//double类型  坐标
   p1 << 0.5,0,0.2;
   
   cout<<"q1= \n"<< q1.coeffs() <<endl;
@@ -107,7 +110,7 @@ int main ( int argc, char** argv )
   cout<<"t2= \n"<< t2 <<endl;
 
   /*
-  q1.setIdentity(); 
+  q1.setIdentity(); //单位四元素
   cout<<"q1 after setIdentity \n"<<q1.coeffs() <<endl;
    q2.setIdentity(); 
   cout<<"q2 after setIdentity \n"<<q2.coeffs() <<endl;
@@ -118,10 +121,10 @@ int main ( int argc, char** argv )
    q2=q2.normalized(); 
   cout<<"q2 after normalized \n"<<q2.coeffs() <<endl;
   
-Eigen::Matrix3d q1rotation_matrix = Eigen::Matrix3d::Identity();//单位阵
-q1rotation_matrix=q1.toRotationMatrix();
+Eigen::Matrix3d q1rotation_matrix = Eigen::Matrix3d::Identity();//初始化为单位阵
+q1rotation_matrix=q1.toRotationMatrix();//四元素到旋转矩阵
 Eigen::Isometry3d Tc1w=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵 
-//以上也可　Eigen::Isometry3d  Tc1w(q1)　一步  
+//以上也可　Eigen::Isometry3d  Tc1w(q1)　一步    按四元素表示的旋转 旋转 转换矩阵
 
 Tc1w.rotate (q1rotation_matrix );                                    // 按照q1rotation_matrix进行旋转
 Tc1w.pretranslate ( t1);                                                     // 把平移向量设成t1
@@ -129,8 +132,8 @@ Tc1w.pretranslate ( t1);                                                     // 
 //Eigen::Isometry3d Twc1=Tc1w.inverse();//由world 到c1的逆变换　　成　c1到world
 Eigen::Matrix<double, 3, 1> pw=Tc1w.inverse()*p1;    //将c1坐标系下的点p1变换到world坐标系下
 
-Eigen::Matrix3d q2rotation_matrix = Eigen::Matrix3d::Identity();//单位阵
-q2rotation_matrix=q2.toRotationMatrix();
+Eigen::Matrix3d q2rotation_matrix = Eigen::Matrix3d::Identity();//初始化为单位阵
+q2rotation_matrix=q2.toRotationMatrix();//四元素到旋转矩阵
 Eigen::Isometry3d Tc2w=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵　　齐次坐标
 Tc2w.rotate (q2rotation_matrix );                                    // 按照q1rotation_matrix进行旋转 // Eigen::Isometry3d  Tc2w(q2)
 //以上也可　Eigen::Isometry3d  Tc2w(q2)　一步
