@@ -8,16 +8,16 @@ using namespace std;
 
 /****************************
 * 本程序演示了 Eigen 几何模块的使用方法
-* 旋转向量  Eigen::AngleAxisd    角度 轴   Eigen::AngleAxisd rotation_vector ( M_PI/4, Eigen::Vector3d ( 0,0,1 ) );     //沿 Z 轴旋转 45 度
+* 旋转向量  Eigen::AngleAxisd    角度 轴   Eigen::AngleAxisd rotation_vector ( M_PI/4, Eigen::Vector3d ( 0,0,1 ) ); //沿 Z 轴旋转 45 度
 * 旋转矩阵  Eigen::Matrix3d    rotation_vector.toRotationMatrix(); 旋转向量转换到旋转矩阵
-* 欧拉角      Eigen::Vector3d    rotation_matrix.eulerAngles ( 2,1,0 ); // ( 2,1,0 )表示ZYX顺序，即roll pitch yaw顺序  旋转矩阵到 欧拉角转换到欧拉角
+* 欧拉角      Eigen::Vector3d    rotation_matrix.eulerAngles ( 2,1,0 );// ( 2,1,0 )表示ZYX顺序，即roll pitch yaw顺序  旋转矩阵到 欧拉角转换到欧拉角
 * 四元素      Eigen::Quaterniond q = Eigen::Quaterniond ( rotation_vector );// 旋转向量 定义四元素 
-*                                                     q = Eigen::Quaterniond ( rotation_matrix );  //旋转矩阵定义四元素
+*                                q = Eigen::Quaterniond ( rotation_matrix );//旋转矩阵定义四元素
 * 
 * 欧式变换矩阵 Eigen::Isometry3d T=Eigen::Isometry3d::Identity();// 虽然称为3d，实质上是4＊4的矩阵   旋转 R+ 平移T 
-*                            T.rotate ( rotation_vector );                                       // 按照rotation_vector进行旋转
-*                            也可 Eigen::Isometry3d  T(q)　                                // 一步    按四元素表示的旋转 旋转 转换矩阵
-*                            T.pretranslate ( Eigen::Vector3d ( 1,3,4 ) );              // 把平移向量设成(1,3,4)
+*                            T.rotate ( rotation_vector );                     // 按照rotation_vector进行旋转
+*                            也可 Eigen::Isometry3d  T(q)　                    // 一步    按四元素表示的旋转 旋转 转换矩阵
+*                            T.pretranslate ( Eigen::Vector3d ( 1,3,4 ) );     // 把平移向量设成(1,3,4)
 *                            cout<< T.matrix() <<endl;
 *                        
 
