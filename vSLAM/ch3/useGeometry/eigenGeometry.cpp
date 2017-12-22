@@ -8,8 +8,10 @@ using namespace std;
 
 /****************************
 * 本程序演示了 Eigen 几何模块的使用方法
-* 旋转向量  Eigen::AngleAxisd    角度 轴   Eigen::AngleAxisd rotation_vector ( M_PI/4, Eigen::Vector3d ( 0,0,1 ) ); //沿 Z 轴旋转 45 度
-* 旋转矩阵  Eigen::Matrix3d    rotation_vector.toRotationMatrix(); 旋转向量转换到旋转矩阵
+* 旋转向量  Eigen::AngleAxisd    角度 轴   Eigen::AngleAxisd rotation_vector ( M_PI/4, Eigen::Vector3d ( 0,0,1 ) );     //沿 Z 轴旋转 45 度
+* 旋转矩阵  Eigen::Matrix3d    rotation_vector.toRotationMatrix(); //旋转向量转换到旋转矩阵
+*                  Eigen::Matrix3d R = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d(0,0,1)).toRotationMatrix();// 直接转
+* 
 * 欧拉角      Eigen::Vector3d    rotation_matrix.eulerAngles ( 2,1,0 );// ( 2,1,0 )表示ZYX顺序，即roll pitch yaw顺序  旋转矩阵到 欧拉角转换到欧拉角
 * 四元素      Eigen::Quaterniond q = Eigen::Quaterniond ( rotation_vector );// 旋转向量 定义四元素 
 *                                q = Eigen::Quaterniond ( rotation_matrix );//旋转矩阵定义四元素
