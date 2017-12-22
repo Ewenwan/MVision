@@ -27,8 +27,11 @@ int main( int argc, char** argv )
     Eigen::Matrix<float,3,1> vd_3d;//float类型
 
     // Matrix3d 实质上是 Eigen::Matrix<double, 3, 3>
-    Eigen::Matrix3d matrix_33 = Eigen::Matrix3d::Zero(); //初始化为零
-    // 如果不确定矩阵大小，可以使用动态大小的矩阵
+    Eigen::Matrix3d matrix_33 = Eigen::Matrix3d::Zero(); //零矩阵
+    // MatrixXd::Identity() 单位矩阵  Eigen::Matrix3d::Random(); 随机数矩阵  MatrixXd::Ones(rows,cols)     
+    // 均可以 用C.setXXX 设置  C.setIdentity(rows,cols)   设置单位矩阵
+    // 向量初始化  VectorXd::LinSpaced(size,low,high)  // 线性分布
+    // 如果不确定矩阵大小，可以使用动态大小的矩阵  建议大矩阵使用 
     Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic > matrix_dynamic;
     // 更简单的
     Eigen::MatrixXd matrix_x;
@@ -36,12 +39,17 @@ int main( int argc, char** argv )
 
     // 下面是对Eigen阵的操作
     // 输入数据（初始化）
+    //  在Eigen中重载了”<<”操作符
+    // 通过该操作符即可以一个一个元素的进行赋值，
+    // 也可以一块一块的赋值。
+    // 另外也可以使用下标进行赋值。
     //matrix_23 << 1, 2, 3, 4, 5, 6;
     matrix_23 << 2,3,4,5,6;  //注意常量矩阵的赋值
     // 正常矩阵形式输出
     cout << matrix_23 << endl;
 
     // 用()访问矩阵中的元素
+    // 针对向量还提供”[]”操作符，注意矩阵则不可如此使用
     for (int i=0; i<2; i++) {
         for (int j=0; j<3; j++)
             cout<<matrix_23(i,j)<<"\t";//每行元素的分隔符
@@ -79,8 +87,8 @@ int main( int argc, char** argv )
     // 特征值
     // 实对称矩阵可以保证对角化成功
     Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eigen_solver ( matrix_33.transpose()*matrix_33 );
-    cout << "Eigen values = \n" << eigen_solver.eigenvalues() << endl;
-    cout << "Eigen vectors = \n" << eigen_solver.eigenvectors() << endl;
+    cout << "Eigen values = \n" << eigen_solver.eigenvalues() << endl;//特征值
+    cout << "Eigen vectors = \n" << eigen_solver.eigenvectors() << endl;//特征向量
 
     // 解方程
     // 我们求解 matrix_NN * x = v_Nd 这个方程
@@ -88,9 +96,9 @@ int main( int argc, char** argv )
     // 直接求逆自然是最直接的，但是求逆运算量大
 
     Eigen::Matrix< double, MATRIX_SIZE, MATRIX_SIZE > matrix_NN;
-    matrix_NN = Eigen::MatrixXd::Random( MATRIX_SIZE, MATRIX_SIZE );
-    Eigen::Matrix< double, MATRIX_SIZE,  1> v_Nd;
-    v_Nd = Eigen::MatrixXd::Random( MATRIX_SIZE,1 );
+    matrix_NN = Eigen::MatrixXd::Random( MATRIX_SIZE, MATRIX_SIZE );//随机变量初始化
+    Eigen::Matrix< double, MATRIX_SIZE,  1> v_Nd;        //列向量
+    v_Nd = Eigen::MatrixXd::Random( MATRIX_SIZE,1 ); //随机变量初始化
 
     clock_t time_stt = clock(); // 计时
     // 直接求逆
