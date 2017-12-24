@@ -1,0 +1,113 @@
+/*
+ chrono是一个time library, 源于boost，现在已经是C++标准。
+ 
+ https://www.cnblogs.com/jwk000/p/3560086.html
+ 
+ 要使用chrono库，需要#include<chrono>，其所有实现均在std::chrono namespace下。
+ chrono是一个模版库，使用简单，功能强大，只需要理解三个概念：duration、time_point、clock
+ 
+###################################
+# 1.Durations  固定时间间隔
+std::chrono::duration 表示一段时间，比如两个小时，12.88秒，半个时辰，一炷香的时间等等，只要能换算成秒即可。
+ template <class Rep, class Period = ratio<1> > class duration;
+其中
+Rep表示一种数值类型，用来表示Period的数量，比如int float double
+Period是ratio类型，用来表示【用秒表示的时间单位】比如second milisecond
+
+  
+常用的duration<Rep,Period>已经定义好了，在std::chrono::duration下：
+ratio<3600, 1>                hours     1小时
+ratio<60, 1>                    minutes 1分钟
+ratio<1, 1>                      seconds 1秒
+ratio<1, 1000>               milliseconds    1毫妙   1/1000 秒
+ratio<1, 1000000>         microseconds 1微妙   1/1000000秒
+ratio<1, 1000000000>    nanosecons   1纳秒   1/1000000000秒
+ 
+这里需要说明一下ratio这个类模版的原型：
+template <intmax_t N, intmax_t D = 1> class ratio;       #include <ratio>
+N代表分子，D代表分母，所以ratio表示一个分数值。
+注意，我们自己可以定义Period，比如ratio<1, -2>表示单位时间是-0.5秒。
+
+由于各种duration表示不同，chrono库提供了duration_cast类型转换函数。
+
+ template <class ToDuration, class Rep, class Period>
+ constexpr ToDuration duration_cast (const duration<Rep,Period>& dtn);
+ 
+   typedef std::chrono::duration<int> seconds_type;                           //1秒
+   typedef std::chrono::duration<int,std::milli> milliseconds_type;    //1毫秒
+   typedef std::chrono::duration<int,std::ratio<60*60>> hours_type;//1小时
+
+  hours_type h_oneday (24);                           // 24h       1天 24小时
+  seconds_type s_oneday (60*60*24);           // 86400s  86400秒
+  milliseconds_type ms_oneday (s_oneday);    // 86400000ms 毫秒
+  seconds_type s_onehour (60*60);                 // 3600s   1小时 3600秒
+   //hours_type h_onehour (s_onehour);          // 无效 类型截断  秒转到小时 整数除法 会有截断 NOT VALID (type truncates), use:
+  hours_type h_onehour (std::chrono::duration_cast<hours_type>(s_onehour)); // s_onehour 转换成 hours_type 小时类型
+ milliseconds_type ms_onehour (s_onehour);  // 3600000ms (ok, no type truncation)  小时 转成 毫秒  整数乘法  无截断 可以直接强转
+ std::cout << ms_onehour.count() << "ms in 1h" << std::endl; //输出显示
+
+####################################### 
+# 2.Time points    固定时间点
+ 
+std::chrono::time_point 表示一个具体时间，如上个世纪80年代、你的生日、今天下午、火车出发时间等，
+只要它能用计算机时钟表示。鉴于我们使用时间的情景不同，这个time point具体到什么程度，由选用的单位决定。
+一个time point必须有一个clock计时。参见clock的说明。
+
+template <class Clock, class Duration = typename Clock::duration>  class time_point;
+system_clock::time_point tp_epoch;  //Epoch指的是一个特定的时间： 1970-01-01 00:00:00 UTC
+time_point <system_clock,duration<int>> tp_seconds (duration<int>(1));  //1秒
+  std::cout << tp.time_since_epoch().count();//
+ // 显示时间点
+ std::time_t tt = system_clock::to_time_t(tp);
+  std::cout << "time_point tp is: " << ctime(&tt);
+  
+  
+  time_point有一个函数time_from_eproch()用来获得1970年1月1日 Epoch 到time_point时间经过的duration。
+举个例子，如果timepoint以天为单位，函数返回的duration就以天为单位。
+
+typedef duration<int,std::ratio<60*60*24>> days_type; // 天 类型
+time_point<system_clock,days_type> today = time_point_cast<days_type>(system_clock::now());
+std::cout << today.time_since_epoch().count() << " days since epoch" << std::endl;//当前经历的时间天数
+
+#################################
+# 3.Clocks 时钟
+std::chrono::system_clock 它表示当前的系统时钟，系统中运行的所有进程使用now()得到的时间是一致的。
+每一个clock类中都有确定的time_point, duration, Rep, Period类型。
+操作有：
+now() 当前时间点 time_point
+to_time_t()          time_point转换成time_t秒
+from_time_t()    从time_t转换成time_point
+典型的应用是计算时间日期：
+
+using std::chrono::system_clock;
+system_clock::time_point today = system_clock::now();//今天时间点
+system_clock::time_point tomorrow = today + one_day;//明天时间点
+
+   tt = system_clock::to_time_t ( today );//转换成time_t秒
+  std::cout << "today is: " << ctime(&tt);
+   tt = system_clock::to_time_t ( tomorrow );//转换成time_t秒
+   std::cout << "tomorrow will be: " << ctime(&tt);
+
+
+  std::chrono::steady_clock 为了表示稳定的时间间隔，后一次调用now()得到的时间总是比前一次的值大
+  （这句话的意思其实是，如果中途修改了系统时间，也不影响now()的结果），每次tick都保证过了稳定的时间间隔。 
+   
+   操作有：
+now() 获取当前时钟
+典型的应用是给算法计时：
+// 打印 1000个 *  系统需要的时间
+  using namespace std::chrono;
+  steady_clock::time_point t1 = steady_clock::now();//此刻时间点
+  std::cout << "printing out 1000 stars...\n";
+  for (int i=0; i<1000; ++i) std::cout << "*";
+  std::cout << std::endl;
+  steady_clock::time_point t2 = steady_clock::now();//当前时间点
+  duration<double> time_span = duration_cast<duration<double>>(t2 - t1);//计算时间差
+  std::cout << "It took me " << time_span.count() << " seconds."; 
+  
+  
+  最后一个时钟，std::chrono::high_resolution_clock 顾名思义，这是系统可用的最高精度的时钟。
+  实际上high_resolution_clock只不过是system_clock或者steady_clock的typedef。
+  
+  
+ */
