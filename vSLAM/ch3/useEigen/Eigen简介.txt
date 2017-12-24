@@ -7,6 +7,35 @@ locate eigen3
 sudo updatedb
 
 
+* 当调用 Eigen库 成员 时，一下情况需要注意
+     Eigen库中的数据结构作为自定义的结构体或者类中的成员;
+     STL容器含有Eigen的数据结构
+     Eigen数据结构作为函数的参数
+     
+    
+     1:数据结构使用 Eigen库 成员
+  class Foo
+    {
+      ...
+      Eigen::Vector2d v;//
+      ...
+    public:
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW //不加  会提示 对其错误
+    }
+
+    2.STL Containers 标准容器vector<> 中使用 Eigen库 成员
+    vector<Eigen::Matrix4d>;//会提示出错
+    vector<Eigen::Matrix4d,Eigen::aligned_allocator<Eigen::Matrix4d>>;//aligned_allocator管理C++中的各种数据类型的内存方法是一样的,但是在Eigen中不一样
+     
+     3.函数参数 调用  Eigen库 成员
+     FramedTransformation( int id, Eigen::Matrix4d t );//出错  error C2719: 't': formal parameter with __declspec(align('16')) won't be aligned
+     FramedTransformation( int id, const Eigen::Matrix4d& t );// 把参数t的类型稍加变化即可
+     
+
+
+
+
+
 
 头文件包含
 #include <Eigen/Dense>
