@@ -12,6 +12,13 @@ find_package( OpenCV REQUIRED )
 # 添加头文件
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
+
+# 添加可执行文件
 add_executable( imageBasics imageBasics.cpp )
 # 链接OpenCV库
 target_link_libraries( imageBasics ${OpenCV_LIBS} )
+
+# 添加可执行文件
+add_executable( bleblending_two  blending_two_images.cpp)
+# 链接OpenCV库
+target_link_libraries( bleblending_two ${OpenCV_LIBS} )
