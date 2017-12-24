@@ -2,15 +2,86 @@
 #include <g2o/core/base_vertex.h>
 #include <g2o/core/base_unary_edge.h>
 #include <g2o/core/block_solver.h>
-#include <g2o/core/optimization_algorithm_levenberg.h>
-#include <g2o/core/optimization_algorithm_gauss_newton.h>
+#include <g2o/core/optimization_algorithm_levenberg.h>//莱文贝格－马夸特方法（Levenberg–Marquardt algorithm）能提供数非线性最小化（局部最小）的数值解。
+#include <g2o/core/optimization_algorithm_gauss_newton.h>//高斯牛顿法
 #include <g2o/core/optimization_algorithm_dogleg.h>
 #include <g2o/solvers/dense/linear_solver_dense.h>
-#include <Eigen/Core>
-#include <opencv2/core/core.hpp>
-#include <cmath>
-#include <chrono>
+#include <Eigen/Core>//矩阵库
+#include <opencv2/core/core.hpp>//opencv2
+#include <cmath>//数学库
+#include <chrono>//时间库
+
+// 图优化   http://www.cnblogs.com/gaoxiang12/p/5244828.html
+// http://blog.csdn.net/u012525173/article/details/70332103
+// http://blog.csdn.net/heyijia0327/article/details/47813405
+//数值优化算法
+/*
+ * 原理介绍
+ http://blog.csdn.net/liu14lang/article/details/53991897
+ * eigen3例子
+ * http://blog.csdn.net/caimagic/article/details/51397285
+ 
+###############
+ 牛顿法：
+ 求 f(x)=0
+ f(x+det) = f(x)  + f'(x)*det=0  一阶泰勒展开
+ det = x - x0 = -f(x0)/f'(x0)    
+ 迭代公式：
+ 
+ xn  =  xn-1 -  f(xn-1)/f'(xn-1)          通过迭代将零点邻域内一个任选的点收敛至该零点 
+#################### 
+ 牛顿下山法：
+ xn  =  xn-1 -  w * f(xn-1)/f'(xn-1)    w =1,. 逐次减半..，0    调整步长逐步降低  避免跳过最优接
+ 
+#####################
+ 最优化问题
+ min(f(x))     求 f'(x)=0
+ xn =  xn-1 -  f'(xn-1)/f''(xn-1)      迭代公式   
+ 
+######################
+高斯牛顿法
+在讲牛顿法的时候，我们举的例子x是一维的，若如果我们遇到多维的x该如何办呢？
+这时我们就可以利用雅克比，海赛矩阵之类的来表示高维求导函数了。
+比如
+f(X)=0,其中X=[x0,x1,...,xn]
+所以我们有雅克比矩阵 Jf：  n*n   第一列 f对x0偏导   第n列 f对xn求偏导      一阶偏导数
+有海赛矩阵 Hf：                       n*n  对应行列位置ij   f对xi 和 xj 的偏导             二阶偏导
+
+所以高维牛顿法解最优化问题又可写成：
+Xn+1=Xn −  (Hf(xn))逆 * Jf * f(xn)
+
+梯度 ∇ Jf   代替了低维情况中的一阶导   
+Hessian矩阵代替了二阶导
+求逆代替了除法
+xn  =  xn-1 -  1/f'(xn-1) * f(xn-1)
+而近似下有  Hf(xn)  = Jf 转置 * Jf 
+#######################
+xn  =  xn-1 -   ( Jf 转置 * Jf )逆 * Jf * f(xn-1)
+
+###########################
+Levenberg-Marquardt算法
+莱文贝格－马夸特方法（Levenberg–Marquardt algorithm）能提供数非线性最小化（局部最小）的数值解。
+此算法能借由执行时修改参数达到结合高斯-牛顿算法以及梯度下降法的优点，
+并对两者之不足作改善（比如高斯-牛顿算法之反矩阵不存在或是初始值离局部极小值太远）
+
+在我看来，就是在高斯牛顿基础上修改了一点。
+在高斯牛顿迭代法中，我们已经知道
+xn  =  xn-1 -   ( Jf 转置 * Jf )逆 * Jf * f(xn-1)
+
+在莱文贝格－马夸特方法算法中则是
+xn  =  xn-1 -   ( Jf 转置 * Jf + lamd * 单位矩阵  )逆 * Jf * f(xn-1)
+
+然后Levenberg-Marquardt方法的好处就是在于可以调节:
+如果下降太快，使用较小的λ，使之更接近高斯牛顿法
+如果下降太慢，使用较大的λ，使之更接近梯度下降法
+
+
+ */
+
 using namespace std; 
+/*
+ g2o全称general graph optimization，是一个用来优化非线性误差函数的c++框架。
+ */
 
 // 待优化变量——曲线模型的顶点，模板参数：优化变量维度　和　数据类型
 class CurveFittingVertex: public g2o::BaseVertex<3, Eigen::Vector3d>
@@ -26,12 +97,12 @@ public:
     {
         _estimate += Eigen::Vector3d(update);
     }
-    // 存盘和读盘：留空
+    //虚函数  存盘和读盘：留空
     virtual bool read( istream& in ) {}
     virtual bool write( ostream& out ) const {}
 };
 
-// 误差模型—— 曲线模型的边, 模板参数：观测值维度，类型，连接顶点类型
+// 误差模型—— 曲线模型的边, 模板参数：观测值维度，类型，连接顶点类型(创建的顶点)
 class CurveFittingEdge: public g2o::BaseUnaryEdge<1,double,CurveFittingVertex>
 {
 public:
