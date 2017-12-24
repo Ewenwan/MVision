@@ -1,7 +1,38 @@
 
+
+###########################################
 1最小二成问题求解算法库　Cress安装
+
+Ceres Solver是谷歌2010就开始用于解决优化问题的C++库，2014年开源．
+在Google地图，Tango项目，以及著名的SLAM系统OKVIS和Cartographer的优化模块中均使用了Ceres Solver.
+http://ceres-solver.org/installation.html
+
+
 安装依赖
 sudo apt-get install liblapack-dev libsuitesparse-dev libcxsparse3.1.2 libgflags-dev libgoogle-glog-dev libgtest-dev
+
+# CMake
+sudo apt-get install cmake
+# google-glog + gflags
+sudo apt-get install libgoogle-glog-dev
+# BLAS & LAPACK
+sudo apt-get install libatlas-base-dev
+# Eigen3
+sudo apt-get install libeigen3-dev
+# SuiteSparse and CXSparse (optional)
+# - If you want to build Ceres as a *static* library (the default)
+#   you can use the SuiteSparse package in the main Ubuntu package
+#   repository:
+sudo apt-get install libsuitesparse-dev
+
+
+# - However, if you want to build Ceres as a *shared* library, you must
+#   add the following PPA:
+sudo add-apt-repository ppa:bzindovic/suitesparse-bugfix-1319687
+sudo apt-get update
+sudo apt-get install libsuitesparse-dev
+
+
 可以去github上下载
 https://github.com/ceres-solver/ceres-solver
 
