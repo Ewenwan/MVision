@@ -1,17 +1,18 @@
 #include <iostream>
-#include <g2o/core/base_vertex.h>
-#include <g2o/core/base_unary_edge.h>
-#include <g2o/core/block_solver.h>
+#include <g2o/core/base_vertex.h>// 顶点类型
+#include <g2o/core/base_unary_edge.h>//一元边类型
+#include <g2o/core/block_solver.h>//求解器的实现。主要来自choldmod, csparse。在使用g2o时要先选择其中一种。
 #include <g2o/core/optimization_algorithm_levenberg.h>//莱文贝格－马夸特方法（Levenberg–Marquardt algorithm）能提供数非线性最小化（局部最小）的数值解。
 #include <g2o/core/optimization_algorithm_gauss_newton.h>//高斯牛顿法
-#include <g2o/core/optimization_algorithm_dogleg.h>
-#include <g2o/solvers/dense/linear_solver_dense.h>
+#include <g2o/core/optimization_algorithm_dogleg.h>//Dogleg（狗腿方法）
+#include <g2o/solvers/dense/linear_solver_dense.h>//
 #include <Eigen/Core>//矩阵库
 #include <opencv2/core/core.hpp>//opencv2
 #include <cmath>//数学库
 #include <chrono>//时间库
 
 // 图优化   http://www.cnblogs.com/gaoxiang12/p/5244828.html
+// 代码  https://github.com/RainerKuemmerle/g2o
 // http://blog.csdn.net/u012525173/article/details/70332103
 // http://blog.csdn.net/heyijia0327/article/details/47813405
 //数值优化算法
@@ -76,44 +77,75 @@ xn  =  xn-1 -   ( Jf 转置 * Jf + lamd * 单位矩阵  )逆 * Jf * f(xn-1)
 如果下降太慢，使用较大的λ，使之更接近梯度下降法
 
 
+#####
+Dogleg（狗腿方法）
+http://blog.csdn.net/xyz599/article/details/54344354
+
  */
 
 using namespace std; 
 /*
+ * 详解 https://www.cnblogs.com/gaoxiang12/p/5304272.html
+ * 代码 双目BA实例 https://github.com/gaoxiang12/g2o_ba_example
  g2o全称general graph optimization，是一个用来优化非线性误差函数的c++框架。
+ SparseOptimizer 是我们最终要维护的东东。它是一个Optimizable Graph，从而也是一个Hyper Graph。
+ 一个 SparseOptimizer 含有很多个顶点 （都继承自 Base Vertex）和
+ 很多个边（继承自 BaseUnaryEdge, BaseBinaryEdge或BaseMultiEdge）。
+ 这些 Base Vertex 和 Base Edge 都是抽象的基类，而实际用的顶点和边，都是它们的派生类。
+ 我们用 SparseOptimizer.addVertex 和 
+ SparseOptimizer.addEdge 向一个图中添加顶点和边，
+ 最后调用 SparseOptimizer.optimize 完成优化。
+ 
+ 在优化之前，需要指定我们用的求解器和迭代算法。
+ 一个 SparseOptimizer 拥有一个 迭代算法 Optimization Algorithm，
+ 继承自Gauss-Newton, 
+ Levernberg-Marquardt, 
+ Powell's dogleg 三者之一（我们常用的是GN或LM）。
+ 
+ 同时，这个 Optimization Algorithm 拥有一个 求解器 Solver，它含有两个部分。
+ 一个是 SparseBlockMatrix ，用于计算稀疏的雅可比和海塞；
+ 一个是用于计算迭代过程中最关键的一步 
+      HΔx=−b
+ 这就需要一个线性方程的求解器。而这个求解器，可以从 PCG, CSparse, Choldmod 三者选一。
+ 
+ 综上所述，在g2o中选择优化方法一共需要三个步骤：
+    选择一个线性方程求解器，从 PCG, CSparse, Choldmod中选，实际则来自 g2o/solvers 文件夹中定义的东东。
+    选择一个 BlockSolver 。
+    选择一个迭代策略，从GN, LM, Doglog中选。
+这样一来，读者是否对g2o就更清楚的认识了呢？
+ 
  */
 
 // 待优化变量——曲线模型的顶点，模板参数：优化变量维度　和　数据类型
-class CurveFittingVertex: public g2o::BaseVertex<3, Eigen::Vector3d>
+class CurveFittingVertex: public g2o::BaseVertex<3, Eigen::Vector3d>//定点类型  a b c三维变量
 {
 public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    virtual void setToOriginImpl() // 重置
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW // 类成员 有Eigen  变量时需要 显示 加此句话 宏定义
+    virtual void setToOriginImpl() // 虚函数 重置
     {
-        _estimate << 0,0,0;
-    }
-    
+        _estimate << 0,0,0;// 初始化定点  优化变量值初始化
+    }  
     virtual void oplusImpl( const double* update ) // 更新
     {
-        _estimate += Eigen::Vector3d(update);
+        _estimate += Eigen::Vector3d(update);//迭代更新 变量
     }
     //虚函数  存盘和读盘：留空
     virtual bool read( istream& in ) {}
     virtual bool write( ostream& out ) const {}
 };
 
-// 误差模型—— 曲线模型的边, 模板参数：观测值维度，类型，连接顶点类型(创建的顶点)
-class CurveFittingEdge: public g2o::BaseUnaryEdge<1,double,CurveFittingVertex>
+// 误差模型—— 曲线模型的边, 模板参数：观测值维度(输入的参数维度)，类型，连接顶点类型(创建的顶点)
+class CurveFittingEdge: public g2o::BaseUnaryEdge<1,double,CurveFittingVertex>//基础一元 边类型
 {
 public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    CurveFittingEdge( double x ): BaseUnaryEdge(), _x(x) {}
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW// 类成员 有Eigen  变量时需要 显示 加此句话 宏定义
+    CurveFittingEdge( double x ): BaseUnaryEdge(), _x(x) {}//初始化函数   直接赋值  _x = x
     // 计算曲线模型误差
     void computeError()
     {
-        const CurveFittingVertex* v = static_cast<const CurveFittingVertex*> (_vertices[0]);
-        const Eigen::Vector3d abc = v->estimate();
-        _error(0,0) = _measurement - std::exp( abc(0,0)*_x*_x + abc(1,0)*_x + abc(2,0) ) ;
+        const CurveFittingVertex* v = static_cast<const CurveFittingVertex*> (_vertices[0]);//顶点
+        const Eigen::Vector3d abc = v->estimate();//获取顶点的优化变量
+        _error(0,0) = _measurement - std::exp( abc(0,0)*_x*_x + abc(1,0)*_x + abc(2,0) ) ;//一个误差项
     }
     // 存盘和读盘：留空
     virtual bool read( istream& in ) {}
@@ -147,37 +179,37 @@ int main( int argc, char** argv )
     Block::LinearSolverType* linearSolver = new g2o::LinearSolverDense<Block::PoseMatrixType>(); // 线性方程求解器
     // 矩阵块求解器
     Block* solver_ptr = new Block( linearSolver );      // 矩阵块求解器
-    // 梯度下降方法，从GN, LM, DogLeg 中选
+    // 迭代算法    梯度下降方法，从高斯牛顿GN,  莱文贝格－马夸特方法LM, 狗腿法DogLeg 中选
     g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg( solver_ptr );
     // g2o::OptimizationAlgorithmGaussNewton* solver = new g2o::OptimizationAlgorithmGaussNewton( solver_ptr );
     // g2o::OptimizationAlgorithmDogleg* solver = new g2o::OptimizationAlgorithmDogleg( solver_ptr );
-    g2o::SparseOptimizer optimizer;     // 图模型
+    g2o::SparseOptimizer optimizer;     //稀疏 优化模型
     optimizer.setAlgorithm( solver );   // 设置求解器
     optimizer.setVerbose( true );       // 打开调试输出
     
     // 往图中增加顶点
-    CurveFittingVertex* v = new CurveFittingVertex();
+    CurveFittingVertex* v = new CurveFittingVertex();//曲线拟合 新建 顶点类型
     v->setEstimate( Eigen::Vector3d(0,0,0) );
-    v->setId(0);
+    v->setId(0);//id
     optimizer.addVertex( v );
     
     // 往图中增加边
     for ( int i=0; i<N; i++ )
     {
-        CurveFittingEdge* edge = new CurveFittingEdge( x_data[i] );
-        edge->setId(i);
+        CurveFittingEdge* edge = new CurveFittingEdge( x_data[i] );//新建 边 带入 观测数据
+        edge->setId(i);//id
         edge->setVertex( 0, v );                // 设置连接的顶点
-        edge->setMeasurement( y_data[i] );      // 观测数值
-        edge->setInformation( Eigen::Matrix<double,1,1>::Identity()*1/(w_sigma*w_sigma) ); // 信息矩阵：协方差矩阵之逆
-        optimizer.addEdge( edge );
+        edge->setMeasurement( y_data[i] ); // 观测数值
+        edge->setInformation( Eigen::Matrix<double,1,1>::Identity()*1/(w_sigma*w_sigma) ); // 信息矩阵：单位阵协方差矩阵之逆 (个误差项权重)  就一个误差项_error(0,0) 
+        optimizer.addEdge( edge );//添加边
     }
     
     // 执行优化
     cout<<"start optimization"<<endl;
-    chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-    optimizer.initializeOptimization();
-    optimizer.optimize(100);
-    chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
+    chrono::steady_clock::time_point t1 = chrono::steady_clock::now();//计时
+    optimizer.initializeOptimization();//初始化优化器
+    optimizer.optimize(100);//优化次数
+    chrono::steady_clock::time_point t2 = chrono::steady_clock::now();//结束计时
     chrono::duration<double> time_used = chrono::duration_cast<chrono::duration<double>>( t2-t1 );
     cout<<"solve time cost = "<<time_used.count()<<" seconds. "<<endl;
     
