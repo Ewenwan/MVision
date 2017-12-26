@@ -34,7 +34,7 @@ sudo apt-get install libsuitesparse-dev
 
 
 可以去github上下载
-https://github.com/ceres-solver/ceres-solver
+git clone https://github.com/ceres-solver/ceres-solver.git
 
 进入主目录
 mkdir build
@@ -45,12 +45,45 @@ sudo make install 安装
 
 
 
-2图优化方法
+
+############################
+2图优化方法  g2o库
+General Graphic Optimization 
+一个基于图优化的库，图优化是一种将 非线性优化 与图论结合起来的理论
+
+图 Graph 有 顶点Vertex  和 边Edge 组成
+顶点为 优化变量   边为  变量间的约束关系 左右相减 即为 误差项
+记一个图为G={V,E}，其中V为顶点集，E为边集。
+边也可以连接一个顶点（Unary Edge，一元边）、
+两个顶点（Binary Edge，二元边）或多个顶点（Hyper Edge，多元边）。
+最常见的边连接两个顶点。当一个图中存在连接两个以上顶点的边时，
+称这个图为超图（Hyper Graph）。而SLAM问题就可以表示成一个超图
+
+ g2o全称general graph optimization，是一个用来优化非线性误差函数的c++框架。
+ SparseOptimizer 是我们最终要维护的东东。它是一个Optimizable Graph，从而也是一个Hyper Graph。
+ 一个 SparseOptimizer 含有很多个顶点 （都继承自 Base Vertex）和
+ 很多个边（继承自 BaseUnaryEdge, BaseBinaryEdge或BaseMultiEdge）。
+ 这些 Base Vertex 和 Base Edge 都是抽象的基类，而实际用的顶点和边，都是它们的派生类。
+ 我们用 SparseOptimizer.addVertex 和 
+ SparseOptimizer.addEdge 向一个图中添加顶点和边，
+ 最后调用 SparseOptimizer.optimize 完成优化。
+
+
+
 sudo apt-get install libeigen3-dev libsuitesparse-dev libqt4-dev qt4-qmake libqglviewer-qt4-dev　libcxsparse3.1.2
 
+下载
+git clone https://github.com/RainerKuemmerle/g2o.git
+
+库分析
+https://www.cnblogs.com/gaoxiang12/p/5304272.html
+
 进入主目录
 mkdir build
 cd build
 cmake ..
 make
 sudo make install 安装
+
+
+
