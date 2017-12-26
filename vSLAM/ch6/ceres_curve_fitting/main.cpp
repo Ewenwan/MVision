@@ -2,6 +2,7 @@
 #include <opencv2/core/core.hpp>
 #include <ceres/ceres.h>//最小二成非线性优化
 #include <chrono>//计时
+#include <fstream>//文件流
 /*
  * https://www.cnblogs.com/shang-slam/p/6821560.html
  * http://blog.csdn.net/liminlu0314/article/details/16808239
@@ -9,8 +10,8 @@
  　Ceres Solver是谷歌2010就开始用于解决优化问题的C++库，2014年开源．
  　在Google地图，Tango项目，以及著名的SLAM系统OKVIS和Cartographer的优化模块中均使用了Ceres Solver.
  　
- 　众所周知，最大似然估计（Maximum likelihood estimation, MLE）是许多机器人和计算机视觉应用中使用的估计方法。 
- 　在高斯假设下，MLE转换为非线性最小二乘（Nonlinear least squares,NLS）问题。
+ 　众所周知，最大似然估计（MLE）是许多机器人和计算机视觉应用中使用的估计方法。 
+ 　在高斯假设下，MLE转换为非线性最小二乘（NLS）问题。
  　存在有效的NLS解决方案，它们是基于迭代求解稀疏线性系统直到收敛。
  　
  　在SLAM领域优化问题还可以使用g2o来求解．不过Ceres提供了自动求导功能，虽然是数值求导，
@@ -55,7 +56,7 @@ struct CURVE_FITTING_COST//曲线拟合代价函数
         T* residual ) const      // 残差
     { // T ( _y )  T ( _x ) 强制类型转换
         residual[0] = T ( _y ) - ceres::exp ( abc[0] * T ( _x )  * T ( _x ) + abc[1] * T ( _x ) + abc[2] ); 
-        // y-exp(a * x^2+b * x + c)
+	    // y-exp(a * x^2+b * x + c)
         return true;//必须返回ture
     }
      private:   //自添加
@@ -73,6 +74,8 @@ int main ( int argc, char** argv )
 
     vector<double> x_data, y_data;      // 数据 容器
 
+    stringstream ss;//字符串流
+    
     cout<<"生成数据 generating data: "<<endl;
     for ( int i=0; i<N; i++ )
     {
@@ -82,13 +85,16 @@ int main ( int argc, char** argv )
             exp ( a * x * x + b * x  + c ) + rng.gaussian ( w_sigma )//加上高斯噪声
         );
         cout<<x_data[i]<<"\t"<<y_data[i]<<endl;
+	ss << x_data[i] << " " << y_data[i] << endl;//定向到 字符串流
     }
-
+    
+    //将生成的点坐标保存到points.txt
+    ofstream file("points.txt"); 
+    file << ss.str();
+    
     // 构建最小二乘问题
     //声明一个残差方程，CostFunction通过模板类AutoDiffCostFunction来进行构造，
-    //第一个模板参数为残差对象，也就是最开始写的那个那个带有重载()运算符的结构体，
-    //第二个模板参数为残差个数，
-    //第三个模板参数为未知数个数，最后参数是结构体对象。
+    //第一个模板参数为残差对象，也就是最开始写的那个那个带有重载()运算符的结构体，第二个模板参数为残差个数，第三个模板参数为未知数个数，最后参数是结构体对象。
     ceres::Problem problem;
     for ( int i=0; i<N; i++ )
     {
@@ -104,6 +110,7 @@ int main ( int argc, char** argv )
     }
 
     // 配置求解器
+    // 这个类有许多字段，每个字段都提供了一些枚举值供用户选择。所以需要时只要查一查文档就知道怎么设置了。
     ceres::Solver::Options options;     // 这里有很多配置项可以填
     options.linear_solver_type = ceres::DENSE_QR;  // QR分解  增量方程如何求解
     options.minimizer_progress_to_stdout = true;   // 优化过程信息 输出到 标志输出
