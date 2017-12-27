@@ -88,29 +88,29 @@ using namespace std;
  * 详解 https://www.cnblogs.com/gaoxiang12/p/5304272.html
  * 代码 双目BA实例 https://github.com/gaoxiang12/g2o_ba_example
  g2o全称general graph optimization，是一个用来优化非线性误差函数的c++框架。
- SparseOptimizer 是我们最终要维护的东东。它是一个Optimizable Graph，从而也是一个Hyper Graph。
- 一个 SparseOptimizer 含有很多个顶点 （都继承自 Base Vertex）和
- 很多个边（继承自 BaseUnaryEdge, BaseBinaryEdge或BaseMultiEdge）。
- 这些 Base Vertex 和 Base Edge 都是抽象的基类，而实际用的顶点和边，都是它们的派生类。
+ SparseOptimizer 是我们最终要维护的东东。它是一个Optimizable Graph 优化图，从而也是一个 Hyper Graph 超图。
+ 一个 SparseOptimizer 含有很多个顶点(HyperGraph::Vertex) （都继承自 BaseVertex<D,T> --> OptimizableGraph::Vertex ）和
+ 很多个边(HyperGraph::Edge)（继承自 一元边BaseUnaryEdge, 二元边BaseBinaryEdge 或 多元边BaseMultiEdge —-> OptimizableGraph::Edge）。
+ 这些 BaseVertex 和 Base Edge 都是抽象的基类，而实际用的顶点和边，都是它们的派生类。
  我们用 SparseOptimizer.addVertex 和 
  SparseOptimizer.addEdge 向一个图中添加顶点和边，
  最后调用 SparseOptimizer.optimize 完成优化。
  
  在优化之前，需要指定我们用的求解器和迭代算法。
- 一个 SparseOptimizer 拥有一个 迭代算法 Optimization Algorithm，
- 继承自Gauss-Newton, 
- Levernberg-Marquardt, 
- Powell's dogleg 三者之一（我们常用的是GN或LM）。
+ 一个 SparseOptimizer 拥有一个 迭代算法 OptimizationAlgorithm，
+ 继承自Gauss-Newton,   (OptimizationAlgorithmGaussNewto)
+ Levernberg-Marquardt,(OptimizationAlgorithmLevenberg)
+ Powell's dogleg      ( OptimizationAlgorithmDogleg )三者之一（我们常用的是GN或LM）。
  
  同时，这个 Optimization Algorithm 拥有一个 求解器 Solver，它含有两个部分。
  一个是 SparseBlockMatrix ，用于计算稀疏的雅可比和海塞；
  一个是用于计算迭代过程中最关键的一步 
-      HΔx=−b
+      H * Δx = −b
  这就需要一个线性方程的求解器。而这个求解器，可以从 PCG, CSparse, Choldmod 三者选一。
  
  综上所述，在g2o中选择优化方法一共需要三个步骤：
     选择一个线性方程求解器，从 PCG, CSparse, Choldmod中选，实际则来自 g2o/solvers 文件夹中定义的东东。
-    选择一个 BlockSolver 。
+    选择一个 BlockSolver 求解 雅克比和海塞矩阵 。
     选择一个迭代策略，从GN, LM, Doglog中选。
 这样一来，读者是否对g2o就更清楚的认识了呢？
  
@@ -175,9 +175,9 @@ int main( int argc, char** argv )
     
     // 构建图优化解决方案，先设定g2o
     typedef g2o::BlockSolver< g2o::BlockSolverTraits<3,1> > Block;  // 每个误差项优化变量维度为3，误差值维度为1
-    // 线性方程求解器
+    // 线性方程求解器   H * Δx = −b
     Block::LinearSolverType* linearSolver = new g2o::LinearSolverDense<Block::PoseMatrixType>(); // 线性方程求解器
-    // 矩阵块求解器
+    // 稀疏矩阵块求解器 用于求解 雅克比J ( 得到右边 b = e转置 *  Ω * J ) 和  海塞矩阵 H  左边 H = J转置* Ω * J   
     Block* solver_ptr = new Block( linearSolver );      // 矩阵块求解器
     // 迭代算法    梯度下降方法，从高斯牛顿GN,  莱文贝格－马夸特方法LM, 狗腿法DogLeg 中选
     g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg( solver_ptr );
