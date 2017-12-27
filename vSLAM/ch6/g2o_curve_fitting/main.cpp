@@ -134,7 +134,11 @@ public:
     virtual bool write( ostream& out ) const {}
 };
 
+
 // 误差模型—— 曲线模型的边, 模板参数：观测值维度(输入的参数维度)，类型，连接顶点类型(创建的顶点)
+// 一元边 BaseUnaryEdge<1,double,CurveFittingVertex> 
+// 二元边 BaseBinaryEdge<2,double,CurveFittingVertex>
+// 多元边 BaseMultiEdge<>
 class CurveFittingEdge: public g2o::BaseUnaryEdge<1,double,CurveFittingVertex>//基础一元 边类型
 {
 public:
@@ -145,7 +149,7 @@ public:
     {
         const CurveFittingVertex* v = static_cast<const CurveFittingVertex*> (_vertices[0]);//顶点
         const Eigen::Vector3d abc = v->estimate();//获取顶点的优化变量
-        _error(0,0) = _measurement - std::exp( abc(0,0)*_x*_x + abc(1,0)*_x + abc(2,0) ) ;//一个误差项
+        _error(0,0) = _measurement - std::exp( abc(0,0)*_x*_x + abc(1,0)*_x + abc(2,0) ) ;//一个误差项 _measurement为测量值
     }
     // 存盘和读盘：留空
     virtual bool read( istream& in ) {}
@@ -157,10 +161,10 @@ public:
 int main( int argc, char** argv )
 {
     double a=1.0, b=2.0, c=1.0;         // 真实参数值
-    int N=100;                                     // 数据点
-    double w_sigma=1.0;                  // 噪声Sigma值
-    cv::RNG rng;                                 // OpenCV随机数产生器
-    double abc[3] = {0,0,0};              // abc参数的估计值
+    int N=100;                          // 数据点
+    double w_sigma=1.0;                 // 噪声Sigma值
+    cv::RNG rng;                        // OpenCV随机数产生器
+    double abc[3] = {0,0,0};            // abc参数的估计值
 
     vector<double> x_data, y_data;      // 数据
     
@@ -198,7 +202,7 @@ int main( int argc, char** argv )
     {
         CurveFittingEdge* edge = new CurveFittingEdge( x_data[i] );//新建 边 带入 观测数据
         edge->setId(i);//id
-        edge->setVertex( 0, v );                // 设置连接的顶点
+        edge->setVertex( 0, v );           // 设置连接的顶点
         edge->setMeasurement( y_data[i] ); // 观测数值
         edge->setInformation( Eigen::Matrix<double,1,1>::Identity()*1/(w_sigma*w_sigma) ); // 信息矩阵：单位阵协方差矩阵之逆 (个误差项权重)  就一个误差项_error(0,0) 
         optimizer.addEdge( edge );//添加边
