@@ -1,5 +1,7 @@
 /*
- *三角测量法 求解 两组单目相机 2D图像
+ *三角测量法 求解 两组单目相机  图像点深度
+ * // s1 * x2 = s2 * x1 * R  + t
+ * // s1  和 s2为深度 误差存在，x1 和 x2 可能不同
  */
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -163,19 +165,19 @@ void pose_estimation_2d2d (
         points2.push_back ( keypoints_2[matches[i].trainIdx].pt );
     }
 
-    //-- 计算基础矩阵
+    //-- 计算基础矩阵   F
     Mat fundamental_matrix;
     fundamental_matrix = findFundamentalMat ( points1, points2, CV_FM_8POINT );
     cout<<"fundamental_matrix is "<<endl<< fundamental_matrix<<endl;
 
-    //-- 计算本质矩阵
+    //-- 计算本质矩阵   E
     Point2d principal_point ( 325.1, 249.7 );				//相机主点, TUM dataset标定值
     int focal_length = 521;						//相机焦距, TUM dataset标定值
     Mat essential_matrix;
     essential_matrix = findEssentialMat ( points1, points2, focal_length, principal_point );
     cout<<"essential_matrix is "<<endl<< essential_matrix<<endl;
 
-    //-- 计算单应矩阵
+    //-- 计算单应矩阵  H
     Mat homography_matrix;
     homography_matrix = findHomography ( points1, points2, RANSAC, 3 );
     cout<<"homography_matrix is "<<endl<<homography_matrix<<endl;
@@ -187,6 +189,8 @@ void pose_estimation_2d2d (
 }
 
 //三角测量
+// s1 * x2 = s2 * x1 * R  + t
+// s1  和 s2为深度 误差存在，x1 和 x2 可能不同
 void triangulation ( 
     const vector< KeyPoint >& keypoint_1, 
     const vector< KeyPoint >& keypoint_2, 
@@ -195,17 +199,23 @@ void triangulation (
 //对极几何
     vector< Point3d >& points )
 {
+  // 变换矩阵 在第一幅图像下 的变换矩阵  Pc1  =   Pw  =  T1 * Pw
     Mat T1 = (Mat_<float> (3,4) <<
         1,0,0,0,
         0,1,0,0,
         0,0,1,0);
+   // Pc2  =  T2 * Pw  =  [ R  t] * Pw
     Mat T2 = (Mat_<float> (3,4) <<
         R.at<double>(0,0), R.at<double>(0,1), R.at<double>(0,2), t.at<double>(0,0),
         R.at<double>(1,0), R.at<double>(1,1), R.at<double>(1,2), t.at<double>(1,0),
         R.at<double>(2,0), R.at<double>(2,1), R.at<double>(2,2), t.at<double>(2,0)
     );
     
-    Mat K = ( Mat_<double> ( 3,3 ) << 520.9, 0, 325.1, 0, 521.0, 249.7, 0, 0, 1 );// 相机内参,TUM Freiburg2
+  // 相机内参,TUM Freiburg2   
+    //   [fx 0 cx
+    //     0 fy cy
+    //     0 0  1]
+    Mat K = ( Mat_<double> ( 3,3 ) << 520.9, 0, 325.1, 0, 521.0, 249.7, 0, 0, 1 );
     vector<Point2f> pts_1, pts_2;
     for ( DMatch m:matches )
     {
