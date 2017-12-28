@@ -7,7 +7,7 @@
 #include "g2o/types/slam3d/vertex_se3.h"
 //#include "g2o/types/slam3d/edge_se3.h"
 // 使用 宏函数 声明边和顶点类型，注意注释掉了上面两个头文件 
-G2O_USE_TYPE_GROUP(slam3d);
+G2O_USE_TYPE_GROUP(slam3d);// 3d 曲面 优化 g2o 
 //G2O_USE_TYPE_GROUP(slam2d); //2d平面
 
 #include <iostream>
