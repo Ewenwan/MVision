@@ -5,7 +5,7 @@
  */
 #include <iostream>
 #include <opencv2/core/core.hpp>
-#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/features2d/features2d.hpp>//二维特征提取
 #include <opencv2/highgui/highgui.hpp>
 
 using namespace std;//标准库　命名空间
@@ -15,7 +15,7 @@ int main ( int argc, char** argv )
 {
     if ( argc != 3 )//命令行参数　 1.png 　2.png
     {
-        cout<<"usage: feature_extraction img1 img2"<<endl;
+        cout<<"用法:  feature_extraction img1 img2"<<endl;
         return 1;
     }
     //-- 读取图像
@@ -23,16 +23,17 @@ int main ( int argc, char** argv )
     Mat img_2 = imread ( argv[2], CV_LOAD_IMAGE_COLOR );
 
     //-- 初始化
-    std::vector<KeyPoint> keypoints_1, keypoints_2;//关键点
+    std::vector<KeyPoint> keypoints_1, keypoints_2;//关键点容器  二维点
     Mat descriptors_1, descriptors_2;			      //关键点对应的描述子
-    Ptr<FeatureDetector> detector = ORB::create();  //cv3下　特征检测
-    Ptr<DescriptorExtractor> descriptor = ORB::create();//cv3下　描述子
+    Ptr<FeatureDetector> detector = ORB::create();  //cv3下　ORB特征检测    其他 BRISK   FREAK   
+    Ptr<DescriptorExtractor> descriptor = ORB::create();//cv3下　ORB描述子
     // Ptr<FeatureDetector> detector = FeatureDetector::create(detector_name);
     // Ptr<DescriptorExtractor> descriptor = DescriptorExtractor::create(descriptor_name);
    // use this if you are in OpenCV2 
     // Ptr<FeatureDetector> detector = FeatureDetector::create ( "ORB" );
     // Ptr<DescriptorExtractor> descriptor = DescriptorExtractor::create ( "ORB" );
-    Ptr<DescriptorMatcher> matcher  = DescriptorMatcher::create ( "BruteForce-Hamming" );//汉明点对匹配
+    Ptr<DescriptorMatcher> matcher  = DescriptorMatcher::create ( "BruteForce-Hamming" );
+    //二进制描述子汉明距离  匹配
 
     //-- 第一步:检测 Oriented FAST 角点位置
     detector->detect ( img_1,keypoints_1 );
@@ -47,7 +48,7 @@ int main ( int argc, char** argv )
     imshow("ORB特征点",outimg1);//显示画上特征点的图像
 
     //-- 第三步:对两幅图像中的BRIEF描述子进行匹配，使用 Hamming 距离 字符串距离  删除 插入 替换次数
-    vector<DMatch> matches;//default默认汉明匹配
+    vector<DMatch> matches;//default默认汉明匹配  容器
     //BFMatcher matcher ( NORM_HAMMING );
     matcher->match ( descriptors_1, descriptors_2, matches );//对两幅照片的特征描述子进行匹配
 
@@ -69,11 +70,12 @@ int main ( int argc, char** argv )
     printf ( "-- Max dist : %f \n", max_dist );
     printf ( "-- Min dist : %f \n", min_dist );
 
-    //当描述子之间的距离大于两倍的最小距离时,即认为匹配有误.但有时候最小距离会非常小,设置一个经验值30作为下限.
+    //当描述子之间的距离大于两倍的最小距离时,即认为匹配有误.
+    //但有时候最小距离会非常小,设置一个经验值30作为下限.
     std::vector< DMatch > good_matches;//两幅图像好的特征匹配 点对
     for ( int i = 0; i < descriptors_1.rows; i++ )
     {
-        if ( matches[i].distance <= max ( 2*min_dist, 30.0 ) )
+        if ( matches[i].distance <= max ( 2*min_dist, 30.0 ) )//最大距离
         {
             good_matches.push_back ( matches[i] );
         }
