@@ -1,4 +1,36 @@
-/*Pnp+g2o_BundleAdjustment*/
+/*Pnp+g2o_BundleAdjustment
+ *单目相机 经过对极几何初始化(八点法 、单应矩阵)求解一些3D点后
+ * 或则 双目相机 深度相机可以直接得到 三维点 不需要初始化得到最开始的三维点
+ *可使用3D点-2D点对 使用 直接线性变换DLT(Direct Linear Transform) n点透视问题(PnP)  最小二乘最小化重投影误差   非线性优化算法G2O
+ * 
+ * 【1】直接线性变换DLT    6个 3D - 2D 点对 
+ * 2D点  s1 * (u，v，1) = T * (X, Y, Z, 1)  = T * P 齐次表示  T = [R t] 为 3*4的矩阵
+ * T = [t1 t2 t3 t4; t5 t6 t7 t8; t9 t10 t11 t12]=[T1; T2; T3]
+ * 可得到 u = T1 × P/(T3 * P)   v =  T2 × P/(T3 * P) 
+ * 可得 T3 * P *u - T1 * P =0  以及 T3 * P *v - T2 * P =0   每个3D - 2D 点对 可提供 两个约束
+ * T有 12个变量 至少需要6个 3D - 2D 点对 
+ * 求解的 T的 左大半部分 不一定满足旋转矩阵R的约束关系，得到 T后需要使用QR分解 使得得到的 T 满足 SE3
+ * 相当于 对 求出的 T重新映射到 SE3流形上  矩阵空间重映射 
+ * 
+ * 【2】 PnP 求解   只利用3个 3D - 2D 点对   多余点对 无用 噪声影响下 方法无效
+ *   用于估计初始相机位置  再 构建最小二乘优化问题 进行调整
+ *  世界坐标系下     三个点  A  B   C 
+ *  对应图像坐标系 三个点  a   b   c 
+ *  利用相似三角形    余弦定理 得到 世界坐标系下     三个点  A  B   C  对应 的 相机坐标系下的 x y z
+ *   及转化为 3D - 3D 点对
+ * 
+ * 【3】bundle adjustment  重投影误差  
+ *  三维点  Pi = (Xi, Yi, Zi)   相机坐标 pi = (xi, yi, 1)  像素坐标 c = (ui, vi)  
+ * 相机相对于  世界坐标系(第一帧图像相机) 的 旋转 平移矩阵 R t (变换矩阵 T) 的 李代数形式 f   李群形式为 exp(f)
+ * si * pi = K * T * Pi = K * exp(f) * Pi      这里 exp(f) * Pi  为 4*1维的需要为齐次表示 需要转换为 非齐次表示
+ * 重投影误差  e =  sum( pi - 1/si * K * exp(f) * Pi )^2  ；   K * exp(f) * Pi 为三维点的重投影坐标
+ * 最小化重投影误差 得到 变换矩阵李代数形式 f  
+ * 由于  pi 最后一个为1  误差约束e 为两个方程   而 f  为6个自由度  x1 x2 x3 x4 x5 x6
+ * 最小二乘优化 用于最小化一个函数   e(x + ∇x) = e(x)  +  J * ∇x
+ * 所以 雅克比矩阵 J 为 2*6的矩阵
+ * 雅克比J的推导：
+ * 
+ */
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
