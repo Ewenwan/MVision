@@ -1,7 +1,11 @@
 /*
  *三角测量法 求解 两组单目相机  图像点深度
- * // s1 * x2 = s2 * x1 * R  + t
- * // s1  和 s2为深度 误差存在，x1 和 x2 可能不同
+ * s1 * x1 = s2  * R * x2 + t
+ * x1 x2 为两帧图像上 两点对 在归一化坐标平面上的坐标
+ * s1  和 s2为两个特征点的深度 ，由于误差存在， s1 * x1 = s2  * R * x2 + t不精确相等
+ * 常见的是求解最小二乘解，而不是零解
+ *  s1 * x1叉乘x1 = s2 * x1叉乘* R * x2 + x1叉乘 t=0 可以求得x2
+ * 
  */
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -46,23 +50,26 @@ int main ( int argc, char** argv )
 {
     if ( argc != 3 )//命令行参数　 1.png 　2.png
     {
-        cout<<"usage: triangulation img1 img2"<<endl;
+        cout<<"用法: ./triangulation img1 img2"<<endl;
         return 1;
     }
     //-- 读取图像
     Mat img_1 = imread ( argv[1], CV_LOAD_IMAGE_COLOR );//彩色图模式
     Mat img_2 = imread ( argv[2], CV_LOAD_IMAGE_COLOR );
 
-    vector<KeyPoint> keypoints_1, keypoints_2;//关键点
-    vector<DMatch> matches;//特征点匹配对
+    //求取特征匹配点对
+    vector<KeyPoint> keypoints_1, keypoints_2;//关键点初始化
+    vector<DMatch> matches;//特征点匹配对初始化
     find_feature_matches ( img_1, img_2, keypoints_1, keypoints_2, matches );
     cout<<"一共找到了"<<matches.size() <<"组匹配点"<<endl;
 
-    //-- 估计两张图像间运动
+    //-- 估计两张图像间运动 R   t
     Mat R,t;//旋转和平移  第一张图 到第二章图的坐标变换矩阵和平移矩阵
     pose_estimation_2d2d ( keypoints_1, keypoints_2, matches, R, t );
 
-    //-- 三角化
+    //-- 三角化  由运动变换矩阵 R t 以及三角测量法 得到 特征点的深度
+    // s1 * x1 = s2  * R * x2 + t
+    // s1 * x1叉乘x1 = s2 * x1叉乘* R * x2 + x1叉乘 t=0 可以求得x2
     vector<Point3d> points;
     triangulation( keypoints_1, keypoints_2, matches, R, t, points );
     
@@ -71,20 +78,16 @@ int main ( int argc, char** argv )
     for ( int i=0; i<matches.size(); i++ )
     {
         Point2d pt1_cam = pixel2cam( keypoints_1[ matches[i].queryIdx ].pt, K );
-        Point2d pt1_cam_3d(
-            points[i].x/points[i].z, 
-            points[i].y/points[i].z 
-        );
-        
-        cout<<"point in the first camera frame: "<<pt1_cam<<endl;
-        cout<<"point projected from 3D "<<pt1_cam_3d<<", d="<<points[i].z<<endl;
+        Point2d pt1_cam_3d(points[i].x/points[i].z, points[i].y/points[i].z ); //归一化
+        cout<<"第一帧图像中的特征点:  "<<pt1_cam<<endl;
+        cout<<"从三角计算得到的3D点重投影得到的二维点： "<<pt1_cam_3d<<", d="<<points[i].z<<endl;
         
         // 第二个图
         Point2f pt2_cam = pixel2cam( keypoints_2[ matches[i].trainIdx ].pt, K );
         Mat pt2_trans = R*( Mat_<double>(3,1) << points[i].x, points[i].y, points[i].z ) + t;
-        pt2_trans /= pt2_trans.at<double>(2,0);
-        cout<<"point in the second camera frame: "<<pt2_cam<<endl;
-        cout<<"point reprojected from second frame: "<<pt2_trans.t()<<endl;
+        pt2_trans /= pt2_trans.at<double>(2,0);//归一化
+        cout<<"第二帧图像中的特征点: "<<pt2_cam<<endl;
+        cout<<"从三角计算得到的3D点重投影得到的二维点： "<<pt2_trans.t()<<endl;
         cout<<endl;
     }
     
@@ -216,7 +219,7 @@ void triangulation (
     //     0 fy cy
     //     0 0  1]
     Mat K = ( Mat_<double> ( 3,3 ) << 520.9, 0, 325.1, 0, 521.0, 249.7, 0, 0, 1 );
-    vector<Point2f> pts_1, pts_2;
+    vector<Point2f> pts_1, pts_2;//相机坐标下点坐标
     for ( DMatch m:matches )
     {
         // 将像素坐标转换至相机坐标
@@ -224,7 +227,7 @@ void triangulation (
         pts_2.push_back ( pixel2cam( keypoint_2[m.trainIdx].pt, K) );
     }
     
-    Mat pts_4d;
+    Mat pts_4d;//三角测量得到的 三维空间点 其次坐标
     cv::triangulatePoints( T1, T2, pts_1, pts_2, pts_4d );
     
     // 转换成非齐次坐标
