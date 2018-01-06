@@ -54,16 +54,129 @@
  *            a3  0  -a1; 
  *           -a2  a1  0 ]  
  * 
- * 两者相乘得到 
- * J = - [fx/Z'   0      -fx * X'/Z' ^2   -fx * X'*Y'/Z' ^2      fx + fx * X'^2/Z' ^2    -fx*Y'/Z'
- *         0     fy/Z'   -fy* Y'/Z' ^2    -fy -fy* Y'^2/Z' ^2   fy * X'*Y'/Z' ^2          fy*X'/Z'    ] 
+ * 两者相乘得到  平移在前 旋转在后
+ * J = - [fx/Z'   0      -fx * X'/Z'^2   -fx * X'*Y'/Z' ^2      fx + fx * X'^2/Z'^2    -fx*Y'/Z'
+ *         0     fy/Z'   -fy* Y'/Z'^2    -fy -fy* Y'^2/Z'^2     fy * X'*Y'/Z'^2        fy*X'/Z'    ] 
  * 如果是 旋转在前 平移在后 调换前三列  后三列 
- * 
+ // 旋转在前 平移在后   g2o 
+ * J =  [ fx *X'*Y'/Z'^2       -fx *(1 + X'^2/Z'^2)   fx*Y'/Z'  -fx/Z'   0       fx * X'/Z'^2 
+ *        fy *(1 + Y'^2/Z'^2)  -fy * X'*Y'/Z'^2       -fy*X'/Z'   0     -fy/Z'   fy* Y'/Z'^2     ] 
+ 
  * [2]  
  * e 对P的偏导数   = e 对P'的偏导数 *  P'对P的偏导数 = e 对P'的偏导数 * R
  * P' = R * P + t
  * P'对P的偏导数  = R
  * 
+ *
+ *
+ * G2O使用
+ * 顶点1 相机位姿 变换 T 类型为  g2o::VertexSE3Expmap 李代数位姿 顶点2 相机1 特征点由深度得到的 空间三维点P 类型为 g2o::VertexSBAPointXYZ 
+ * 边图像1 由深度 得到的 三维点 经过 位姿T 重投影在 图像二上 与 图像2上相对应的 特征点 的坐标误差 g2o::EdgeProjectXYZ2UV 投影方程边
+ * 以上类型 为G2O已经定义好的类型  在 g2o/types/sba/types_six_dof_expmap.h
+ *  
+ * 
+ // g2o::VertexSE3Expmap 李代数位姿
+ class G2O_TYPES_SBA_API VertexSE3Expmap : public BaseVertex<6, SE3Quat>{//第一个参数 6 表示6维优化变量 类型为SE3Quat 四元素 + 位移向量表示
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  VertexSE3Expmap();
+
+  bool read(std::istream& is);
+  bool write(std::ostream& os) const;
+
+  virtual void setToOriginImpl() {
+    _estimate = SE3Quat();
+  }
+
+  virtual void oplusImpl(const double* update_)  {
+    Eigen::Map<const Vector6d> update(update_);//更新量
+    setEstimate(SE3Quat::exp(update)*estimate());// 左乘 更新量 指数映射 李代数上的 增量
+  }
+};
+ * 
+ //g2o::EdgeProjectXYZ2UV 投影方程边                  二元边
+ class G2O_TYPES_SBA_API EdgeProjectXYZ2UV : public  BaseBinaryEdge<2, Vector2D, VertexSBAPointXYZ, VertexSE3Expmap>{
+  //观测维度为2 空间点的像素坐标  类型 Vector2D 连接的两个顶点  6维位姿  和 三维点
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    EdgeProjectXYZ2UV();
+    bool read(std::istream& is);
+    bool write(std::ostream& os) const;
+
+    void computeError()  {
+      const VertexSE3Expmap* v1 = static_cast<const VertexSE3Expmap*>(_vertices[1]);// 6维位姿  顶点
+      const VertexSBAPointXYZ* v2 = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);// 三维点 顶点
+      const CameraParameters * cam
+        = static_cast<const CameraParameters *>(parameter(0));
+      Vector2D obs(_measurement);//观测值 
+      _error = obs - cam->cam_map(v1->estimate().map(v2->estimate()));
+      // 位姿 对 三维点 映射 得到 重投影 后的像素点   
+      // 误差 = 观测值 - 重投影 后的像素点
+    }
+
+    virtual void linearizeOplus();// 雅克比矩阵  优化求解析
+    CameraParameters * _cam;
+};
+
+// 雅克比矩阵  优化求解析 
+void EdgeProjectXYZ2UV::linearizeOplus() {
+  VertexSE3Expmap * vj = static_cast<VertexSE3Expmap *>(_vertices[1]);// 6维位姿  顶点
+  SE3Quat T(vj->estimate());// 转化成 变换矩阵形式
+  VertexSBAPointXYZ* vi = static_cast<VertexSBAPointXYZ*>(_vertices[0]);// 三维点 顶点
+  Vector3D xyz = vi->estimate();  // 三维点
+  Vector3D xyz_trans = T.map(xyz);// 三维点 经过 变换矩阵 重投影后的坐标
+
+  double x = xyz_trans[0];
+  double y = xyz_trans[1];
+  double z = xyz_trans[2];
+  double z_2 = z*z;//  对应 Z‘^2  雅克比矩阵求解中 有
+
+  const CameraParameters * cam = static_cast<const CameraParameters *>(parameter(0));
+
+//   
+  Matrix<double,2,3,Eigen::ColMajor> tmp;
+  tmp(0,0) = cam->focal_length;// fx
+  tmp(0,1) = 0;
+  tmp(0,2) = -x/z*cam->focal_length;// -fx * X‘ / Z'
+
+  tmp(1,0) = 0;
+  tmp(1,1) = cam->focal_length;     // fy 默认相等 fy = fx
+  tmp(1,2) = -y/z*cam->focal_length;// - fy * Y'  / Z'
+
+//误差 对 空间点 P的导数 =  e 对P'的偏导数 * R   维度  2*3  =  2*3   *  3*3
+//  * e 对P'的偏导数 = - [ u对X'的偏导数 u对Y'的偏导数 u对Z'的偏导数;
+ *                     v对X'的偏导数 v对Y'的偏导数  v对Z'的偏导数]  = - [ fx/Z'   0        -fx * X'/Z' ^2 
+ *                                                                      0       fy/Z'    -fy* Y'/Z' ^2]
+  _jacobianOplusXi =  -1./z * tmp * T.rotation().toRotationMatrix();
+// 误差 对 位姿 T 的 导数   平移在前 旋转在后
+ * J = - [fx/Z'   0      -fx * X'/Z'^2   -fx * X'*Y'/Z' ^2      fx + fx * X'^2/Z'^2    -fx*Y'/Z'
+ *         0     fy/Z'   -fy* Y'/Z'^2    -fy -fy* Y'^2/Z'^2     fy * X'*Y'/Z'^2        fy*X'/Z'    ] 
+
+
+// 旋转在前 平移在后
+ * J =  [ fx *X'*Y'/Z'^2       -fx *(1 + X'^2/Z'^2)   fx*Y'/Z'  -fx/Z'   0       fx * X'/Z'^2 
+ *        fy *(1 + Y'^2/Z'^2)  -fy * X'*Y'/Z'^2       -fy*X'/Z'   0     -fy/Z'   fy* Y'/Z'^2     ] 
+ 
+  _jacobianOplusXj(0,0) =  x*y/z_2 *cam->focal_length;
+  _jacobianOplusXj(0,1) = -(1+(x*x/z_2)) *cam->focal_length;
+  _jacobianOplusXj(0,2) = y/z * cam->focal_length;
+  _jacobianOplusXj(0,3) = -1./z *cam->focal_length;
+  _jacobianOplusXj(0,4) = 0;
+  _jacobianOplusXj(0,5) = x/z_2 *cam->focal_length;
+
+  _jacobianOplusXj(1,0) = (1+y*y/z_2) *cam->focal_length;
+  _jacobianOplusXj(1,1) = -x*y/z_2 *cam->focal_length;
+  _jacobianOplusXj(1,2) = -x/z *cam->focal_length;
+  _jacobianOplusXj(1,3) = 0;
+  _jacobianOplusXj(1,4) = -1./z *cam->focal_length;
+  _jacobianOplusXj(1,5) = y/z_2 *cam->focal_length;
+}
+
+
+ * 
+ * 
+ *
  */
 #include <iostream>//输入输出流
 // opencv
@@ -80,7 +193,7 @@
 #include <g2o/core/block_solver.h>//矩阵块 分解 求解器  矩阵空间 映射  分解
 #include <g2o/core/optimization_algorithm_levenberg.h>// LM  函数最小化 优化算法
 #include <g2o/solvers/csparse/linear_solver_csparse.h>  // 空间曲面 线性优化 
-#include <g2o/types/sba/types_six_dof_expmap.h>// 定义好的顶点类型  6维度 优化变量  例如 相机 位姿
+#include <g2o/types/sba/types_six_dof_expmap.h>// 定义好的顶点类型  6维度 优化变量  例如 相机 位姿  3维空间点  投影边等
 
 #include <chrono>//时间计时
 
@@ -241,7 +354,7 @@ void bundleAdjustment (
     g2o::SparseOptimizer optimizer;// 稀疏 优化模型
     optimizer.setAlgorithm ( solver ); // 设置求解器
 
-    // 顶点 vertex   优化变量
+    // 顶点1 vertex   优化变量 相机位姿
     g2o::VertexSE3Expmap* pose = new g2o::VertexSE3Expmap(); // camera pose   旋转矩阵 R   平移矩阵 t 的   李代数形式
     Eigen::Matrix3d R_mat;// 3 * 3 矩阵
     R_mat <<
@@ -255,7 +368,7 @@ void bundleAdjustment (
                             Eigen::Vector3d ( t.at<double> ( 0,0 ), t.at<double> ( 1,0 ), t.at<double> ( 2,0 ) )//平移矩阵
                         ) );
     optimizer.addVertex ( pose );//添加顶点
-
+    // 顶点2 空间点
     int index = 1;// 优化 id
     for ( const Point3f p:points_3d )   // 3D 点  landmarks
     {
@@ -271,7 +384,7 @@ void bundleAdjustment (
     //   [fx 0 cx
     //     0 fy cy
     //     0 0  1]
-    g2o::CameraParameters* camera = new g2o::CameraParameters (
+    g2o::CameraParameters* camera = new g2o::CameraParameters (// jacoban need
         K.at<double> ( 0,0 ), Eigen::Vector2d ( K.at<double> ( 0,2 ), K.at<double> ( 1,2 ) ), 0 );// fx, cx, cy, 0
     camera->setId ( 0 );
     optimizer.addParameter ( camera );//相机参数
@@ -280,7 +393,7 @@ void bundleAdjustment (
     index = 1;
     for ( const Point2f p:points_2d )
     {
-        g2o::EdgeProjectXYZ2UV* edge = new g2o::EdgeProjectXYZ2UV();// 3D - 2D 点对 误差项
+        g2o::EdgeProjectXYZ2UV* edge = new g2o::EdgeProjectXYZ2UV();// 3D - 2D 点对 误差项  投影方程
         edge->setId ( index );//  id 
         edge->setVertex ( 0, dynamic_cast<g2o::VertexSBAPointXYZ*> ( optimizer.vertex ( index ) ) );// 边 连接 的 顶点 其一 
         edge->setVertex ( 1, pose );// 相机位姿 T
