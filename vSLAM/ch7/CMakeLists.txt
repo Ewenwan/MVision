@@ -1,4 +1,4 @@
-#
+#版本
 cmake_minimum_required( VERSION 2.8 )
 #工程名
 project( vo1 )
@@ -21,7 +21,7 @@ find_package( CSparse REQUIRED )
 include_directories( 
     ${OpenCV_INCLUDE_DIRS} #opencv
     ${G2O_INCLUDE_DIRS} #G2O
-    ${CSPARSE_INCLUDE_DIR} #CSparse
+    ${CSPARSE_INCLUDE_DIR} #CSparse  稀疏矩阵求解
     "/usr/include/eigen3/" #Eigen3
 )
 # 特征提取
@@ -38,7 +38,9 @@ target_link_libraries( pose_estimation_2d2d ${OpenCV_LIBS} )
 add_executable( triangulation triangulation.cpp )
 target_link_libraries( triangulation ${OpenCV_LIBS} )
 
-# 3D-2D点对 求解 R t
+# 3D-2D点对 求解 R t 
+# 2D-2D点对  其中一个 2D点通过 深度信息 转化成 3D点 和剩余的 一个 2D点组成 3D-2D点对 
+# 透视法 PnP求解初始解 R t  通过 BA最小化重投影误差  优化 R  T 
 add_executable( pose_estimation_3d2d pose_estimation_3d2d.cpp )
 target_link_libraries( pose_estimation_3d2d 
    ${OpenCV_LIBS}
@@ -47,6 +49,9 @@ target_link_libraries( pose_estimation_3d2d
 )
 
 # 3D - 3D点对 求解 R t
+# 1】 线性代数求解  SVD奇异值分解方法 两组 点集的质心位置 p  、 p‘  
+# W= sum(qi * qi转置) = U * 对角矩阵 * V转置   奇异值分解      R= U * V转置  t =  p - R * p'
+# 2】 非线性优化方法 ei = pi -exp(f) * pi'  = P - P‘   e 对 ∇f的导数  = P'对∇f的偏导数  数值优化 迭代更新
 add_executable( pose_estimation_3d3d pose_estimation_3d3d.cpp )
 target_link_libraries( pose_estimation_3d3d 
    ${OpenCV_LIBS}
