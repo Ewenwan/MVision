@@ -42,20 +42,20 @@
                      0       fy/Z   -fy * Y/Z ^2]
  *  Q对∇f的偏导数 = [ I  -Q叉乘矩阵] 3*6大小   平移在前  旋转在后
  *  = [ 1 0  0   0   Z   -Y
- *       0 1  0  -Z   0    X
- *       0 0  1  Y   -X   0]
+ *      0 1  0  -Z   0    X
+ *      0 0  1  Y   -X   0]
  * 有向量 t = [ a1 a2 a3] 其
  * 叉乘矩阵 = [0  -a3  a2;
- *                     a3  0  -a1; 
- *                    -a2 a1  0 ]                   
+ *            a3  0  -a1; 
+ *            -a2 a1  0 ]                   
     u对∇f的偏导数 = u对Q偏导 *    Q对∇f的偏导数  2*6 矩阵  与图像无关
  * =  两者相乘得到 
  * = - [fx/Z   0       -fx * X/Z ^2   -fx * X*Y/Z^2      fx + fx * X^2/Z^2    -fx*Y/Z
- *           0    fy/Z   -fy* Y/Z^2    -fy -fy* Y^2/Z^2   fy * X*Y'/Z^2          fy*X/Z   ] 
+ *       0    fy/Z     -fy* Y/Z^2     -fy -fy* Y^2/Z^2   fy * X*Y'/Z^2          fy*X/Z   ] 
  * 如果是 旋转在前 平移在后 调换前三列  后三列 
  // 旋转在前 平移在后   g2o   负号乘了进去
- *=  [ fx *X*Y/Z^2           -fx *(1 + X^2/Z^2)   fx*Y/Z  -fx/Z   0        fx * X/Z^2 
- *      fy *(1 + Y^2/Z^2)  -fy * X*Y/Z^2           -fy*X/Z   0      -fy/Z   fy* Y/Z^2     ]                  
+ *=  [ fx *X*Y/Z^2         -fx *(1 + X^2/Z^2)   fx*Y/Z  -fx/Z   0        fx * X/Z^2 
+ *      fy *(1 + Y^2/Z^2)  -fy * X*Y/Z^2        -fy*X/Z   0    -fy/Z     fy* Y/Z^2     ]                  
        
      得到 误差e 对李代数的导数  雅克比矩阵
      J = I2对u偏导 * u对 ∇f 偏导   
@@ -147,9 +147,12 @@ class EdgeSE3ProjectDirect: public BaseUnaryEdge< 1, double, VertexSE3Expmap>//�
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // 类成员 有Eigen  变量时需要 显示 加此句话 宏定义
 
-    EdgeSE3ProjectDirect() {}
-
-    EdgeSE3ProjectDirect ( Eigen::Vector3d point, float fx, float fy, float cx, float cy, cv::Mat* image )//成员变量
+    EdgeSE3ProjectDirect() {}//默认构造函数
+    //自定义构造函数，参数为:
+    //一个3d点世界坐标系下坐标
+    //内参矩阵的4个参数
+    //参考图，灰度图
+    EdgeSE3ProjectDirect ( Eigen::Vector3d point, float fx, float fy, float cx, float cy, cv::Mat* image )//成员变量  image 灰度图
         : x_world_ ( point ), fx_ ( fx ), fy_ ( fy ), cx_ ( cx ), cy_ ( cy ), image_ ( image ) {}
         
 //计算误差  覆写 计算误差的 虚函数
@@ -198,8 +201,8 @@ public:
  // jacobian from se3 to u,v
  // NOTE that in g2o the Lie algebra is (\omega, \epsilon), where \omega is so(3) and \epsilon the translation
  // 旋转在前 平移在后   g2o   u对∇f的偏导数  像素坐标 对 变换矩阵李代数增量 的导数 
-// J1=  [ fx *X*Y/Z^2           -fx *(1 + X^2/Z^2)   fx*Y/Z  -fx/Z   0        fx * X/Z^2 
- //         fy *(1 + Y^2/Z^2)  -fy * X*Y/Z^2           -fy*X/Z   0      -fy/Z   fy* Y/Z^2     ]   
+// J1=  [ fx *X*Y/Z^2        -fx *(1 + X^2/Z^2)   fx*Y/Z  -fx/Z   0      fx * X/Z^2 
+ //       fy *(1 + Y^2/Z^2)  -fy * X*Y/Z^2        -fy*X/Z   0    -fy/Z   fy* Y/Z^2     ]   
 // 上面 误差为e =   I(p2) - I2(p1)   原来e =  I(p1) - I2(p2)  所以 雅克比 相差一个 负号 
 	Eigen::Matrix<double, 2, 6> jacobian_uv_ksai;
         jacobian_uv_ksai ( 0,0 ) = - x*y*invz_2 *fx_;
@@ -217,6 +220,7 @@ public:
         jacobian_uv_ksai ( 1,5 ) = -y*invz_2 *fy_;
 
 // I2对u偏导   J2   图像灰度梯度可以得到(x方向梯度 y方向梯度 离散求解 坐标前后灰度值作差/2) 
+ //这里由于各个像素点其实是离散值，其实求的是差分，前一个像素灰度值减后一个像素灰度值，除以2，即认为是这个方向上的梯度
         Eigen::Matrix<double, 1, 2> jacobian_pixel_uv;
         jacobian_pixel_uv ( 0,0 ) = ( getPixelValue ( u+1,v )-getPixelValue ( u-1,v ) ) /2;//灰度梯度  x方向  离散形式
         jacobian_pixel_uv ( 0,1 ) = ( getPixelValue ( u,v+1 )-getPixelValue ( u,v-1 ) ) /2;// 灰度梯度 y方向
@@ -229,12 +233,31 @@ public:
     virtual bool write ( std::ostream& out ) const {}
 
 protected://私有函数
-    // get a gray scale value from reference image (bilinear interpolated)
+// get a gray scale value from reference image (bilinear interpolated)
 // x，y 为浮点数形式  需要得到 整数形式 的 坐标值 对应图像的亮度值 需要进行插值运算 这里使用了 双线性插值
     inline float getPixelValue ( float x, float y )
     {
-        uchar* data = & image_->data[ int ( y ) * image_->step + int ( x ) ];//对应的图像
-        float xx = x - floor ( x );// 计算出来的坐标的 小数部分
+         //这里先说一下各个参数的类型：
+        //image_为Mat*类型，图像指针，所以调用data时用->符号，
+        //data为图像矩阵首地址，支持数组形式访问，data[]就是访问到像素的值了，此处为像素的灰度值，类型为uchar
+        //关于step有点复杂，data[]中括号的式子有点复杂，总的意思就是y行乘上每行内存数，定位到行，然后在加上x，定位到像素
+        //step具体解释在最后面有一些资料
+        //image_->data[int(y)*image_->step + int(x)]这一步读到了x,y处的灰度值，类型为uchar，
+        //但是后面由于线性插值，需要定位这个像素的位置，而不是他的灰度值，所以取其地址，赋值给data_ptr，记住它的位置，后面使用
+      
+        uchar* data_ptr = & image_->data[ int ( y ) * image_->step + int ( x ) ];//对应的 灰度图 的灰度值 的地址   行 *  step + 列 对应的 灰度值
+        uchar* data = data_ptr ;//地址
+        
+         //由于x,y这里有可能带小数，但是像素位置肯定是整数，所以，问题来了，(1.2, 4.5)像素坐标处的灰度值为多少呢?OK,线性插值！
+        //说一下floor(),std中的cmath函数。向下取整,返回不大于x的整数。例floor(4.9)=4
+        //xx和yy，就是取到小数部分。例：x=4.9的话，xx=x-floor(x)就为0.9。y同理
+        //    I(1.2, 4.5) 飞整数的像素值  为周围四点 的 二维线性插值   按距离四点距离大小为权重 
+        //           1-xx       xx
+        //   1-yy   I(1,4)    I(1,5)
+        //    yy    I(2,4)    I(2,5)
+        //
+        //
+        float xx = x - floor ( x );// 计算出来的坐标的 小数部分  
         float yy = y - floor ( y );//
         return float (
                    ( 1-xx ) * ( 1-yy ) * data[0] +
@@ -243,10 +266,11 @@ protected://私有函数
                    xx*yy*data[image_->step+1]
                );
     }
-public:
+    
+public://公开变量
     Eigen::Vector3d x_world_;          // 3D point in world frame
     float cx_=0, cy_=0, fx_=0, fy_=0; // Camera intrinsics 相机内参
-    cv::Mat* image_=nullptr;           // reference image
+    cv::Mat* image_=nullptr;           // reference image  图像  image 灰度图
 };
 
 
@@ -255,10 +279,10 @@ int main ( int argc, char** argv )
 {
     if ( argc != 2 )
     {
-        cout<<"usage: direct_sparse  path_to_dataset"<<endl;
+        cout<<"用法：./direct_sparse  path_to_dataset"<<endl;
         return 1;
     }
-    srand ( ( unsigned int ) time ( 0 ) );
+    srand ( ( unsigned int ) time ( 0 ) );//随机数
     string path_to_dataset = argv[1];
     string associate_file = path_to_dataset + "/associate.txt";
 
@@ -266,18 +290,18 @@ int main ( int argc, char** argv )
 
     string rgb_file, depth_file, time_rgb, time_depth;
     	//rgb图像对应时间 rgb图像 深度图像对应时间 深度图像
-    cv::Mat color, depth, gray;
+    cv::Mat color, depth, gray;// 彩色图 深度图  灰度图
     vector<Measurement> measurements;
     // 相机内参
     float cx = 325.5;
     float cy = 253.5;
     float fx = 518.0;
     float fy = 519.0;
-    float depth_scale = 1000.0;
+    float depth_scale = 1000.0;// mm  变成 m  
     Eigen::Matrix3f K;
     K<<fx,0.f,cx,0.f,fy,cy,0.f,0.f,1.0f;
 
-    Eigen::Isometry3d Tcw = Eigen::Isometry3d::Identity();//相机位姿
+    Eigen::Isometry3d Tcw = Eigen::Isometry3d::Identity();//相机位姿 [R t] 的齐次表示 4*4
 
     cv::Mat prev_color;
     // 我们以第一个图像为参考，对后续图像和参考图像做直接法
@@ -285,39 +309,40 @@ int main ( int argc, char** argv )
     {
         cout<<"*********** loop "<<index<<" ************"<<endl;
         fin>>time_rgb>>rgb_file>>time_depth>>depth_file;
-        color = cv::imread ( path_to_dataset+"/"+rgb_file );
-        depth = cv::imread ( path_to_dataset+"/"+depth_file, -1 );
+        color = cv::imread ( path_to_dataset+"/"+rgb_file );// rgb 图像
+        depth = cv::imread ( path_to_dataset+"/"+depth_file, -1 );// 深度图
         if ( color.data==nullptr || depth.data==nullptr )
             continue; 
         cv::cvtColor ( color, gray, cv::COLOR_BGR2GRAY );//彩色图到灰度图
+	
         if ( index ==0 )//第一帧
         {
             // 对第一帧提取FAST特征点
             vector<cv::KeyPoint> keypoints;
             cv::Ptr<cv::FastFeatureDetector> detector = cv::FastFeatureDetector::create();
-            detector->detect ( color, keypoints );
+            detector->detect ( color, keypoints );//检测 特征点
             for ( auto kp:keypoints )
             {
-                // 去掉邻近边缘处的点
+                // 去掉邻近图像边缘处的点
                 if ( kp.pt.x < 20 || kp.pt.y < 20 || ( kp.pt.x+20 ) >color.cols || ( kp.pt.y+20 ) >color.rows )
-                    continue;
-                ushort d = depth.ptr<ushort> ( cvRound ( kp.pt.y ) ) [ cvRound ( kp.pt.x ) ];
+                    continue;//跳过以下
+                ushort d = depth.ptr<ushort> ( cvRound ( kp.pt.y ) ) [ cvRound ( kp.pt.x ) ];//对于特征点的深度
                 if ( d==0 )
-                    continue;
-                Eigen::Vector3d p3d = project2Dto3D ( kp.pt.x, kp.pt.y, d, fx, fy, cx, cy, depth_scale );
-                float grayscale = float ( gray.ptr<uchar> ( cvRound ( kp.pt.y ) ) [ cvRound ( kp.pt.x ) ] );
-                measurements.push_back ( Measurement ( p3d, grayscale ) );
+                    continue;//跳过
+                Eigen::Vector3d p3d = project2Dto3D ( kp.pt.x, kp.pt.y, d, fx, fy, cx, cy, depth_scale );//2D像素坐标   转换成 相机坐标系下的 三维点 3D
+                float grayscale = float ( gray.ptr<uchar> ( cvRound ( kp.pt.y ) ) [ cvRound ( kp.pt.x ) ] );//特征点 对应的灰度值   坐标值为整数 需要取整
+                measurements.push_back ( Measurement ( p3d, grayscale ) );//测量值为 三维点 和 对应图像的灰度值
             }
-            prev_color = color.clone();
-            continue;
+            prev_color = color.clone();//赋值 图像
+            continue;//第一幅图 跳过 以下
         }
         // 使用直接法计算相机运动
-        chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
-        poseEstimationDirect ( measurements, &gray, K, Tcw );
-        chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
+        chrono::steady_clock::time_point t1 = chrono::steady_clock::now();//计时开始
+        poseEstimationDirect ( measurements, &gray, K, Tcw );//测量值
+        chrono::steady_clock::time_point t2 = chrono::steady_clock::now();//计时结束
         chrono::duration<double> time_used = chrono::duration_cast<chrono::duration<double>> ( t2-t1 );
-        cout<<"direct method costs time: "<<time_used.count() <<" seconds."<<endl;
-        cout<<"Tcw="<<Tcw.matrix() <<endl;
+        cout<<"直接法耗时 direct method costs time: "<<time_used.count() <<" seconds."<<endl;
+        cout<<"转换矩阵 Tcw="<<Tcw.matrix() <<endl;
 
         // 画特征点 plot the feature points
         cv::Mat img_show ( color.rows*2, color.cols, CV_8UC3 );
@@ -327,14 +352,14 @@ int main ( int argc, char** argv )
         {
             if ( rand() > RAND_MAX/5 )
                 continue;
-            Eigen::Vector3d p = m.pos_world;
-            Eigen::Vector2d pixel_prev = project3Dto2D ( p ( 0,0 ), p ( 1,0 ), p ( 2,0 ), fx, fy, cx, cy );
-            Eigen::Vector3d p2 = Tcw*m.pos_world;
-            Eigen::Vector2d pixel_now = project3Dto2D ( p2 ( 0,0 ), p2 ( 1,0 ), p2 ( 2,0 ), fx, fy, cx, cy );
-            if ( pixel_now(0,0)<0 || pixel_now(0,0)>=color.cols || pixel_now(1,0)<0 || pixel_now(1,0)>=color.rows )
+            Eigen::Vector3d p = m.pos_world;//测量值的 三维点 p
+            Eigen::Vector2d pixel_prev = project3Dto2D ( p ( 0,0 ), p ( 1,0 ), p ( 2,0 ), fx, fy, cx, cy );//转换成 2d像素坐标
+            Eigen::Vector3d p2 = Tcw*m.pos_world;//变换到 第二帧图像的坐标系下   
+            Eigen::Vector2d pixel_now = project3Dto2D ( p2 ( 0,0 ), p2 ( 1,0 ), p2 ( 2,0 ), fx, fy, cx, cy );//转化成 2d像素坐标
+            if ( pixel_now(0,0)<0 || pixel_now(0,0)>=color.cols || pixel_now(1,0)<0 || pixel_now(1,0)>=color.rows )// 超出范围的 跳过
                 continue;
 
-            float b = 255*float ( rand() ) /RAND_MAX;
+            float b = 255*float ( rand() ) /RAND_MAX;//随机颜色 分量
             float g = 255*float ( rand() ) /RAND_MAX;
             float r = 255*float ( rand() ) /RAND_MAX;
             cv::circle ( img_show, cv::Point2d ( pixel_prev ( 0,0 ), pixel_prev ( 1,0 ) ), 8, cv::Scalar ( b,g,r ), 2 );
@@ -351,37 +376,38 @@ int main ( int argc, char** argv )
 bool poseEstimationDirect ( const vector< Measurement >& measurements, cv::Mat* gray, Eigen::Matrix3f& K, Eigen::Isometry3d& Tcw )
 {
     // 初始化g2o
-    typedef g2o::BlockSolver<g2o::BlockSolverTraits<6,1>> DirectBlock;  // 求解的向量是6＊1的
+    typedef g2o::BlockSolver<g2o::BlockSolverTraits<6,1>> DirectBlock;  // 求解的向量 顶点(姿态) 是6＊1的
     DirectBlock::LinearSolverType* linearSolver = new g2o::LinearSolverDense< DirectBlock::PoseMatrixType > ();
     DirectBlock* solver_ptr = new DirectBlock ( linearSolver );
-    // g2o::OptimizationAlgorithmGaussNewton* solver = new g2o::OptimizationAlgorithmGaussNewton( solver_ptr ); // G-N
-    g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg ( solver_ptr ); // L-M
-    g2o::SparseOptimizer optimizer;
+    // g2o::OptimizationAlgorithmGaussNewton* solver = new g2o::OptimizationAlgorithmGaussNewton( solver_ptr ); // G-N  高斯牛顿
+    g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg ( solver_ptr ); // L-M                 
+    g2o::SparseOptimizer optimizer;  
     optimizer.setAlgorithm ( solver );
     optimizer.setVerbose( true );
 
-    g2o::VertexSE3Expmap* pose = new g2o::VertexSE3Expmap();
-    pose->setEstimate ( g2o::SE3Quat ( Tcw.rotation(), Tcw.translation() ) );
-    pose->setId ( 0 );
-    optimizer.addVertex ( pose );
+    // 添加顶点
+    g2o::VertexSE3Expmap* pose = new g2o::VertexSE3Expmap();//位姿
+    pose->setEstimate ( g2o::SE3Quat ( Tcw.rotation(), Tcw.translation() ) );//旋转矩阵 和 平移向量
+    pose->setId ( 0 );//id
+    optimizer.addVertex ( pose );//添加顶点
 
     // 添加边
     int id=1;
     for ( Measurement m: measurements )
     {
         EdgeSE3ProjectDirect* edge = new EdgeSE3ProjectDirect (
-            m.pos_world,
-            K ( 0,0 ), K ( 1,1 ), K ( 0,2 ), K ( 1,2 ), gray
+            m.pos_world,//3D 位置
+            K ( 0,0 ), K ( 1,1 ), K ( 0,2 ), K ( 1,2 ), gray//相机内参数   灰度图
         );
-        edge->setVertex ( 0, pose );
-        edge->setMeasurement ( m.grayscale );
-        edge->setInformation ( Eigen::Matrix<double,1,1>::Identity() );
+        edge->setVertex ( 0, pose );//顶点
+        edge->setMeasurement ( m.grayscale );//测量值为真是灰度值
+        edge->setInformation ( Eigen::Matrix<double,1,1>::Identity() );//误差 权重 信息矩阵
         edge->setId ( id++ );
         optimizer.addEdge ( edge );
     }
-    cout<<"edges in graph: "<<optimizer.edges().size() <<endl;
-    optimizer.initializeOptimization();
-    optimizer.optimize ( 30 );
-    Tcw = pose->estimate();
+    cout<<"边的数量 edges in graph: "<<optimizer.edges().size() <<endl;
+    optimizer.initializeOptimization();//优化初始化
+    optimizer.optimize ( 30 );//最大优化次数
+    Tcw = pose->estimate();// 变换矩阵
 }
 
