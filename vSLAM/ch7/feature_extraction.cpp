@@ -25,7 +25,8 @@ int main ( int argc, char** argv )
     //-- 初始化
     std::vector<KeyPoint> keypoints_1, keypoints_2;//关键点容器  二维点
     Mat descriptors_1, descriptors_2;			      //关键点对应的描述子
-    Ptr<FeatureDetector> detector = ORB::create();  //cv3下　ORB特征检测    其他 BRISK   FREAK   
+    Ptr<FeatureDetector> detector = ORB::create();  //cv3下　ORB特征检测    其他 BRISK   FREAK
+    //  cv::Ptr<cv::FastFeatureDetector> detector = cv::FastFeatureDetector::create();
     Ptr<DescriptorExtractor> descriptor = ORB::create();//cv3下　ORB描述子
     // Ptr<FeatureDetector> detector = FeatureDetector::create(detector_name);
     // Ptr<DescriptorExtractor> descriptor = DescriptorExtractor::create(descriptor_name);
