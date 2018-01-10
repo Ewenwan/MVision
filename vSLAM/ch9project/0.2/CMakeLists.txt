@@ -9,9 +9,11 @@ set( CMAKE_BUILD_TYPE "Release" )
 # 添加c++ 11标准支持
 set( CMAKE_CXX_FLAGS "-std=c++11 -march=native -O3" )
 
+#包含 cmake_modules
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules )
-set( EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin )
-set( LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib )
+#设置变量
+set( EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin ) #编译后的可执行 二进制文件
+set( LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib ) # 编译的库 存放地址
 
 ############### dependencies ######################
 # Eigen
@@ -33,7 +35,6 @@ set( THIRD_PARTY_LIBS
 )
 ############### source and test ######################
 include_directories( ${PROJECT_SOURCE_DIR}/include )
-add_subdirectory( src )
-add_subdirectory( test )
-
+add_subdirectory( src )# 子目录 包含 CMakeList.txt文件
+add_subdirectory( test )# 子目录 包含 CMakeList.txt文件
 
