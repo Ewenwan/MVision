@@ -1,19 +1,5 @@
 /*
- * <one line to give the program's name and a brief idea of what it does.>
- * Copyright (C) 2016  <copyright holder> <email>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * myslam::MapPoint  路标点   标号+位置+方向
  *
  */
 
@@ -22,25 +8,19 @@
 
 namespace myslam//命令空间下 防止定义的出其他库里的同名函数
 {
-
-MapPoint::MapPoint()
-: id_(-1), pos_(Vector3d(0,0,0)), norm_(Vector3d(0,0,0)), observed_times_(0), correct_times_(0)
-{
-
-}
-
-MapPoint::MapPoint ( long id, Vector3d position, Vector3d norm )
-: id_(id), pos_(position), norm_(norm), observed_times_(0), correct_times_(0)
-{
-
-}
-
-MapPoint::Ptr MapPoint::createMapPoint()
-{
-    static long factory_id = 0;
-    return MapPoint::Ptr( 
-        new MapPoint( factory_id++, Vector3d(0,0,0), Vector3d(0,0,0) )//标号+位置+方向
-    );
-}
+// 【1】默认构造函数
+    MapPoint::MapPoint()
+    : id_(-1), pos_(Vector3d(0,0,0)), norm_(Vector3d(0,0,0)), observed_times_(0), correct_times_(0)  {  }
+// 【2】自定义构造函数    标号    坐标   位姿方向
+    MapPoint::MapPoint ( long id, Vector3d position, Vector3d norm )
+    : id_(id), pos_(position), norm_(norm), observed_times_(0), correct_times_(0) {  }
+// 【3】factory function 工厂函数
+    MapPoint::Ptr MapPoint::createMapPoint()
+    {
+	static long factory_id = 0;
+	return MapPoint::Ptr( 
+	    new MapPoint( factory_id++, Vector3d(0,0,0), Vector3d(0,0,0) )//标号+位置+方向
+	);
+    }
 
 }
