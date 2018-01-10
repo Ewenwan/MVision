@@ -23,6 +23,10 @@ public:
     
     // 读取一个参数文件 set a new config file 
     static void setParameterFile( const std::string& filename ); 
+    // 比如参数文件中 加入 Camera.fx: 500
+    // myslam::Config::setParameterFile("paramter.yaml");
+    // double fx = myslam::Config::get<double> ("Camera.fx")
+    
     
     // access the parameter values
     //获取参数的值
