@@ -1,4 +1,5 @@
-// -------------- test the visual odometry -------------
+// -------------- test the visual odometry
+//
 #include <fstream>
 #include <boost/timer.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -12,10 +13,13 @@ int main ( int argc, char** argv )
 {
     if ( argc != 2 )// 命令行参数为 参数文件名
     {
-        cout<<"usage: run_vo parameter_file"<<endl;
+        cout<<"用法: run_vo parameter_file"<<endl;
         return 1;
     }
-
+/*
+ # the tum dataset directory, change it to yours! 
+dataset_dir: /home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch8/data
+ */
     myslam::Config::setParameterFile ( argv[1] );//读取参数文件
     myslam::VisualOdometry::Ptr vo ( new myslam::VisualOdometry );//视觉里程计对象
 
@@ -28,8 +32,8 @@ int main ( int argc, char** argv )
         return 1;
     }
 
-    vector<string> rgb_files, depth_files;
-    vector<double> rgb_times, depth_times;
+    vector<string> rgb_files, depth_files;//rgb图像  深度图像
+    vector<double> rgb_times, depth_times;//时间
     while ( !fin.eof() )
     {
         string rgb_time, rgb_file, depth_time, depth_file;
@@ -48,23 +52,23 @@ int main ( int argc, char** argv )
     
     // visualization
     cv::viz::Viz3d vis("Visual Odometry");//可视化
-    cv::viz::WCoordinateSystem world_coor(1.0), camera_coor(0.5);
+    cv::viz::WCoordinateSystem world_coor(1.0), camera_coor(0.5);//
     cv::Point3d cam_pos( 0, -1.0, -1.0 ), cam_focal_point(0,0,0), cam_y_dir(0,1,0);
     cv::Affine3d cam_pose = cv::viz::makeCameraPose( cam_pos, cam_focal_point, cam_y_dir );
-    vis.setViewerPose( cam_pose );
-    
+    vis.setViewerPose( cam_pose );   
     world_coor.setRenderingProperty(cv::viz::LINE_WIDTH, 2.0);
     camera_coor.setRenderingProperty(cv::viz::LINE_WIDTH, 1.0);
     vis.showWidget( "World", world_coor );
     vis.showWidget( "Camera", camera_coor );
 
+    
     cout<<"read total "<<rgb_files.size() <<" entries"<<endl;
     for ( int i=0; i<rgb_files.size(); i++ )
     {
         Mat color = cv::imread ( rgb_files[i] );
         Mat depth = cv::imread ( depth_files[i], -1 );
         if ( color.data==nullptr || depth.data==nullptr )
-            break;
+            break;//图像不存在
         myslam::Frame::Ptr pFrame = myslam::Frame::createFrame();
         pFrame->camera_ = camera;
         pFrame->color_ = color;
@@ -81,11 +85,13 @@ int main ( int argc, char** argv )
         
         // show the map and the camera pose 
         cv::Affine3d M(
+	  //旋转矩阵  射影变换 Affine3d
             cv::Affine3d::Mat3( 
                 Tcw.rotation_matrix()(0,0), Tcw.rotation_matrix()(0,1), Tcw.rotation_matrix()(0,2),
                 Tcw.rotation_matrix()(1,0), Tcw.rotation_matrix()(1,1), Tcw.rotation_matrix()(1,2),
                 Tcw.rotation_matrix()(2,0), Tcw.rotation_matrix()(2,1), Tcw.rotation_matrix()(2,2)
             ), 
+	    //平移矩阵 
             cv::Affine3d::Vec3(
                 Tcw.translation()(0,0), Tcw.translation()(1,0), Tcw.translation()(2,0)
             )
