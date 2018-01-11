@@ -1,20 +1,11 @@
-/*
- * <one line to give the program's name and a brief idea of what it does.>
- * Copyright (C) 2016  <copyright holder> <email>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+/* myslam::VisualOdometry
+ * ORB特征点 描述子 汉明字符串距离匹配得到 特征点对
+ * 其中 一幅图像的2D像素点 根据 深度信息和 相机内参数 转化成 3D点，组成2D-3D点对
+ * 使用随机采样序列的 PnP算法求解 转换矩阵 根据 符合 转换矩阵的内点数量判断 求解得到的 转换矩阵的好坏
+ * 把第一帧图像设为  世界坐标系原点
+ * 以后的每一帧通过 与上一帧的转换矩阵 转换到世界坐标系下
+ * 根据得到的 转换矩阵，若 旋转向量 和 平移矩阵 的大小都超过一定限度，则认为该帧是一个关键帧
+ * 保存3D坐标 和 对应的描述子
  */
 /*视觉里程记*/
 #ifndef VISUALODOMETRY_H//防止头文件重复引用
@@ -49,17 +40,17 @@ public:
     Mat                     descriptors_ref_;            // 参考帧中的描述子 descriptor in reference frame 
     vector<cv::DMatch>      feature_matches_;//特征点的匹配 特征点对于描述子 之间的 字符串距离
     
-    SE3 T_c_r_estimated_;  // 估计的坐标转换   the estimated pose of current frame 
-    int num_inliers_;          // 特征数量  number of inlier features in icp
+    SE3 T_c_r_estimated_;       // 估计的坐标转换   the estimated pose of current frame 
+    int num_inliers_;           // 特征数量  number of inlier features in icp
     int num_lost_;              // 丢失次数  number of lost times
     
     // 参数变量 parameters 
     int num_of_features_;   // 每一对帧提取的特征对数量  number of features
-    double scale_factor_;    // 图像金字塔尺度  scale in image pyramid
-    int level_pyramid_;        // 图像金字塔层级数  number of pyramid levels
-    float match_ratio_;        // 选择特征点匹配的阈值 ratio for selecting  good matches
-    int max_num_lost_;       // 连续丢失的最大次数 max number of continuous lost times
-    int min_inliers_;             // 最少内点数量 minimum inliers
+    double scale_factor_;   // 图像金字塔尺度  scale in image pyramid
+    int level_pyramid_;     // 图像金字塔层级数  number of pyramid levels
+    float match_ratio_;     // 选择特征点匹配的阈值 ratio for selecting  good matches
+    int max_num_lost_;      // 连续丢失的最大次数 max number of continuous lost times
+    int min_inliers_;       // 最少内点数量 minimum inliers  随机采样序列   根据 符合 转换矩阵的内点数量判断 求解得到的 转换矩阵的好坏
     
     double key_frame_min_rot;     // 最小的旋转 minimal rotation of two key-frames
     double key_frame_min_trans; // 最小平移     minimal translation of two key-frames
@@ -72,9 +63,9 @@ public: // functions 公有函数  可以改成  私有private  保护protected 
     
 protected:  
     // inner operation  内部函数
-    void extractKeyPoints();       //提取关键点
-    void computeDescriptors();//计算描述子
-    void featureMatching();       //特征匹配
+    void extractKeyPoints();   //提取关键点
+    void computeDescriptors(); //计算描述子
+    void featureMatching();    //特征匹配
     void poseEstimationPnP();  //位姿估计
     void setRef3DPoints();	   //设置参考点 三维坐标
     
