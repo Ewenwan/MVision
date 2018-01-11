@@ -22,8 +22,15 @@ include_directories( "/usr/include/eigen3" )
 find_package( OpenCV 3.1 REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 # Sophus 
-find_package( Sophus REQUIRED )
+find_package( Sophus REQUIRED )# 好像没找到 安装位置？？？
+SET(Sophus_INCLUDE_DIRS
+"/usr/local/include/sophus"
+)
 include_directories( ${Sophus_INCLUDE_DIRS} )
+
+SET(Sophus_LIBRARIES
+"/usr/local/lib/libSophus.so"
+)
 # G2O
 find_package( G2O REQUIRED )
 include_directories( ${G2O_INCLUDE_DIRS} )
@@ -33,8 +40,12 @@ set( THIRD_PARTY_LIBS
     ${Sophus_LIBRARIES}
     g2o_core g2o_stuff g2o_types_sba
 )
+MESSAGE(STATUS "Sophus _include : " ${Sophus_INCLUDE_DIRS} )
+#MESSAGE(SEND_ERROR "Sophus _lib : " ${Sophus_LIBRARIES} )
+
 ############### source and test ######################
 include_directories( ${PROJECT_SOURCE_DIR}/include )
 add_subdirectory( src )# 子目录 包含 CMakeList.txt文件
+
 add_subdirectory( test )# 子目录 包含 CMakeList.txt文件
 
