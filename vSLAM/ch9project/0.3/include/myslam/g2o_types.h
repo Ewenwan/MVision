@@ -1,19 +1,4 @@
 /*
- * <one line to give the program's name and a brief idea of what it does.>
- * Copyright (C) 2016  <copyright holder> <email>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -34,47 +19,51 @@
 /*使用非线性优化求解相机位姿态*/
 namespace myslam//命令空间下 防止定义的出其他库里的同名函数
 {
-  //边
-class EdgeProjectXYZRGBD : public g2o::BaseBinaryEdge<3, Eigen::Vector3d, g2o::VertexSBAPointXYZ, g2o::VertexSE3Expmap>
-{
-public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-    virtual void computeError();//计算误差
-    virtual void linearizeOplus();//雅克比矩阵
-    virtual bool read( std::istream& in ){}
-    virtual bool write( std::ostream& out) const {}
-    
-};
+	//边 3D-3D 点对  更新  pose  and   point
+      class EdgeProjectXYZRGBD : public g2o::BaseBinaryEdge<3, Eigen::Vector3d, g2o::VertexSBAPointXYZ, g2o::VertexSE3Expmap>
+      {
+      public:
+	  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+	  virtual void computeError();//计算误差
+	  virtual void linearizeOplus();//雅克比矩阵
+	  virtual bool read( std::istream& in ){}
+	  virtual bool write( std::ostream& out) const {}
+	  
+      };
 
-// only to optimize the pose, no point
-class EdgeProjectXYZRGBDPoseOnly: public g2o::BaseUnaryEdge<3, Eigen::Vector3d, g2o::VertexSE3Expmap >
-{
-public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    // Error: measure = R*point+t
-    virtual void computeError();
-    virtual void linearizeOplus();
-    
-    virtual bool read( std::istream& in ){}
-    virtual bool write( std::ostream& out) const {}
-    
-    Vector3d point_;
-};
+      // only to optimize the pose, no point
+      // 边 3D-3D 点对  更新  pose 
+      class EdgeProjectXYZRGBDPoseOnly: public g2o::BaseUnaryEdge<3, Eigen::Vector3d, g2o::VertexSE3Expmap >
+      {
+      public:
+	  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	  // Error: measure = R*point+t
+	  virtual void computeError();
+	  virtual void linearizeOplus();
+	  
+	  virtual bool read( std::istream& in ){}
+	  virtual bool write( std::ostream& out) const {}
+	  
+	  Vector3d point_;
+      };
 
-class EdgeProjectXYZ2UVPoseOnly: public g2o::BaseUnaryEdge<2, Eigen::Vector2d, g2o::VertexSE3Expmap >
-{
-public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    
-    virtual void computeError();
-    virtual void linearizeOplus();
-    
-    virtual bool read( std::istream& in ){}
-    virtual bool write(std::ostream& os) const {};
-    
-    Vector3d point_;
-    Camera* camera_;
-};
+      // 边 2D-3D 点对  更新  pose 
+      class EdgeProjectXYZ2UVPoseOnly: public g2o::BaseUnaryEdge<2, Eigen::Vector2d, g2o::VertexSE3Expmap >
+      {
+      public:
+	  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	  
+	  virtual void computeError();
+	  virtual void linearizeOplus();
+	  
+	  virtual bool read( std::istream& in ){}
+	  virtual bool write(std::ostream& os) const {};
+	  
+	  Vector3d point_;
+	  Camera* camera_;
+      };
+      //  // 边 2D-3D 点对  更新  pose  point   g2o 内置函数就有  
+      // g2o::EdgeProjectXYZ2UV();  //也可以自己实现
 
 }
 
