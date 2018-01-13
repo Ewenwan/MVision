@@ -1,4 +1,14 @@
 // -------------- test the visual odometry -------------
+/*
+ *myslam::VisualOdometry
+ * ORB特征点 描述子 汉明字符串距离匹配得到 特征点对
+ * 其中 一幅图像的2D像素点 根据 深度信息和 相机内参数 转化成 3D点，组成2D-3D点对
+ * 使用随机采样序列的 PnP算法求解 转换矩阵 根据 符合 转换矩阵的内点数量判断 求解得到的 转换矩阵的好坏
+ * 把第一帧图像设为  世界坐标系原点
+ * 以后的每一帧通过 与上一帧的转换矩阵 转换到世界坐标系下
+ * 根据得到的 转换矩阵，若 旋转向量 和 平移矩阵 的大小都超过一定限度，则认为该帧是一个关键帧
+ * 保存3D坐标(转化到相机坐标系系下) 和 对应的描述子
+ * */
 #include <fstream>
 #include <boost/timer.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -12,7 +22,7 @@ int main ( int argc, char** argv )
 {
     if ( argc != 2 )
     {
-        cout<<"usage: run_vo parameter_file"<<endl;
+        cout<<"用法: run_vo parameter_file"<<endl;
         return 1;
     }
 
@@ -28,8 +38,8 @@ int main ( int argc, char** argv )
         return 1;
     }
 
-    vector<string> rgb_files, depth_files;
-    vector<double> rgb_times, depth_times;
+    vector<string> rgb_files, depth_files;//文件名
+    vector<double> rgb_times, depth_times;//时间序列 容器 vector 实为 数组实现  内存 连续     
     while ( !fin.eof() )//读取数据集列表
     {
         string rgb_time, rgb_file, depth_time, depth_file;
@@ -64,7 +74,7 @@ int main ( int argc, char** argv )
         Mat depth = cv::imread ( depth_files[i], -1 );//深度图
         if ( color.data==nullptr || depth.data==nullptr )
             break;
-        myslam::Frame::Ptr pFrame = myslam::Frame::createFrame();
+        myslam::Frame::Ptr pFrame = myslam::Frame::createFrame();//帧
         pFrame->camera_ = camera;
         pFrame->color_ = color;
         pFrame->depth_ = depth;
@@ -74,7 +84,7 @@ int main ( int argc, char** argv )
         vo->addFrame ( pFrame );
         cout<<"VO costs time: "<<timer.elapsed()<<endl;
         
-        if ( vo->state_ == myslam::VisualOdometry::LOST )
+        if ( vo->state_ == myslam::VisualOdometry::LOST )//vo视觉里程计
             break;
         SE3 Tcw = pFrame->T_c_w_.inverse();
         
