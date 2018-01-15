@@ -23,11 +23,11 @@ namespace myslam
 	  state_ ( INITIALIZING ), ref_ ( nullptr ), curr_ ( nullptr ), map_ ( new Map ), num_lost_ ( 0 ), num_inliers_ ( 0 ), matcher_flann_ ( new cv::flann::LshIndexParams ( 5,10,2 ) )
       {
 	      num_of_features_    = Config::get<int> ( "number_of_features" );// 特征数量   整型 int
-	      scale_factor_       = Config::get<double> ( "scale_factor" );            // 尺度因子 缩小
-	      level_pyramid_      = Config::get<int> ( "level_pyramid" );              // 层级 
-	      match_ratio_        = Config::get<float> ( "match_ratio" );               // 匹配 参数
-	      max_num_lost_       = Config::get<float> ( "max_num_lost" );       // 最大丢失次数
-	      min_inliers_        = Config::get<int> ( "min_inliers" );       		// 最小内点数量
+	      scale_factor_       = Config::get<double> ( "scale_factor" );   // 尺度因子 缩小
+	      level_pyramid_      = Config::get<int> ( "level_pyramid" );     // 层级 
+	      match_ratio_        = Config::get<float> ( "match_ratio" );     // 匹配 参数
+	      max_num_lost_       = Config::get<float> ( "max_num_lost" );    // 最大丢失次数
+	      min_inliers_        = Config::get<int> ( "min_inliers" );       // 最小内点数量
 	      key_frame_min_rot   = Config::get<double> ( "keyframe_rotation" );//最小的旋转      成为关键帧的条件
 	      key_frame_min_trans = Config::get<double> ( "keyframe_translation" ); // 最小平移  
 	      map_point_erase_ratio_ = Config::get<double> ("map_point_erase_ratio");//
@@ -45,18 +45,18 @@ namespace myslam
 	  {
 		  state_ = OK;//初始化之后切换状态为 OK
 		  curr_ = ref_ = frame;//初始化 参考帧 当前帧 
-		  extractKeyPoints();//提取关键点
+		  extractKeyPoints();  //提取关键点
 		  computeDescriptors();//计算描述子
-		  addKeyFrame();      // the first frame is a key-frame  添加关键帧  到地图中  还有 3D点
+		  addKeyFrame();       // the first frame is a key-frame  添加关键帧  到地图中  还有 3D点
 		  break;
 	  }
 	  case OK:
 	  {
 		  curr_ = frame;
 		  curr_->T_c_w_ = ref_->T_c_w_;
-		  extractKeyPoints();//提取关键点
+		  extractKeyPoints();  //提取关键点
 		  computeDescriptors();//计算描述子
-		    featureMatching();      //特征点匹配 得到 特征点匹配点对
+		    featureMatching(); //特征点匹配 得到 特征点匹配点对
 		    poseEstimationPnP();//位置估计 加入非线性优化算法 根据特征点匹配点对  计算坐标转换 及估计相机位姿
 	      if ( checkEstimatedPose() == true ) // a good estimation
 	      {
@@ -111,22 +111,22 @@ namespace myslam
 	  vector<cv::DMatch> matches;// 描述子匹配
 	  // select the candidates in map 
 	  Mat desp_map;//3D点对于的  描述子 地图
-	  vector<MapPoint::Ptr> candidate;// 路标点
+	  vector<MapPoint::Ptr> candidate;          // 路标点 地图点 
 	  for ( auto& allpoints: map_->map_points_ )// 所有的 地图中的点 已经转换到 第一帧相机坐标系下(世界坐标系)
 	  {
 	      MapPoint::Ptr& p = allpoints.second;
 	      // check if p in curr frame image 
-	      if ( curr_->isInFrame(p->pos_) )
+	      if ( curr_->isInFrame(p->pos_) )// 在当前帧 当前视野下
 	      {
 		  // add to candidate 
-		  p->visible_times_++;
-		  candidate.push_back( p );//地图3D点
+		  p->visible_times_++;                 // 观察到的次数
+		  candidate.push_back( p );            // 地图3D点
 		  desp_map.push_back( p->descriptor_ );// 地图3D点对应的描述子
 	      }
 	  }
       
-	  matcher_flann_.match ( desp_map, descriptors_curr_, matches );
-	  // select the best matches
+	  matcher_flann_.match ( desp_map, descriptors_curr_, matches );// 大规模匹配算法  一帧特征点描述子 和 地图描述子匹配
+	  // select the best matches   匹配对最小的距离
 	  float min_dis = std::min_element (
 			      matches.begin(), matches.end(),
 			      [] ( const cv::DMatch& m1, const cv::DMatch& m2 )
@@ -134,8 +134,8 @@ namespace myslam
 	      return m1.distance < m2.distance;
 	  } )->distance;
 
-	  match_3dpts_.clear();
-	  match_2dkp_index_.clear();
+	  match_3dpts_.clear();// 匹配到的地图三维点 
+	  match_2dkp_index_.clear();//当前帧 特征点 匹配到3D点 的二维点序号
 	  for ( cv::DMatch& m : matches )
 	  {
 	      if ( m.distance < max<float> ( min_dis*match_ratio_, 30.0 ) )
@@ -153,45 +153,46 @@ namespace myslam
       void VisualOdometry::poseEstimationPnP()
       {
 	  // construct the 3d 2d observations
-	  vector<cv::Point3f> pts3d;
-	  vector<cv::Point2f> pts2d;
+	  vector<cv::Point3f> pts3d;// 3D点
+	  vector<cv::Point2f> pts2d;// 2D点
 
 	  for ( int index:match_2dkp_index_ )//匹配 序号 对应的 2维像素坐标点
 	  {
-	      pts2d.push_back ( keypoints_curr_[index].pt );
+	      pts2d.push_back ( keypoints_curr_[index].pt );// 从关键点中提取 有匹配点对的 关键点
 	  }
-	  for ( MapPoint::Ptr pt:match_3dpts_ )
+	  for ( MapPoint::Ptr pt:match_3dpts_ )//对应匹配的 地图3D点
 	  {
 	      pts3d.push_back( pt->getPositionCV() );//转换成 CV格式的 3D点 
 	  }
-
+          // 相机内参数
 	  Mat K = ( cv::Mat_<double> ( 3,3 ) <<
 		    ref_->camera_->fx_, 0, ref_->camera_->cx_,
 		    0, ref_->camera_->fy_, ref_->camera_->cy_,
 		    0,0,1
 		  );
 	  Mat rvec, tvec, inliers;
-		// PnP算法求解  2D-3D点对求解 旋转向量 rvec,  平移矩阵 tvec
+		// 采集采样序列  PnP算法求解  2D-3D点对求解 旋转向量 rvec,  平移矩阵 tvec    符合Rt的点数量 在 回归到的系数方程上（误差范围内）
 	  cv::solvePnPRansac ( pts3d, pts2d, K, Mat(), rvec, tvec, false, 100, 4.0, 0.99, inliers );
 	  num_inliers_ = inliers.rows;
 	  cout<<"pnp inliers: "<<num_inliers_<<endl;
+	      // PnP算法求解到的初始解
 	  T_c_w_estimated_ = SE3 (
 				SO3 ( rvec.at<double> ( 0,0 ), rvec.at<double> ( 1,0 ), rvec.at<double> ( 2,0 ) ),
 				Vector3d ( tvec.at<double> ( 0,0 ), tvec.at<double> ( 1,0 ), tvec.at<double> ( 2,0 ) )
 			    );
 
-	  //在上述PNP求解之后加入图优化
+	  //在上述PNP初始 求解之后加入图优化
 	  // using bundle adjustment to optimize the pose
-	  typedef g2o::BlockSolver<g2o::BlockSolverTraits<6,2>> Block;
+	  typedef g2o::BlockSolver<g2o::BlockSolverTraits<6,2>> Block;// 矩阵块 分解 求解器
 	  Block::LinearSolverType* linearSolver = new g2o::LinearSolverDense<Block::PoseMatrixType>();
 	  Block* solver_ptr = new Block ( linearSolver );
-	  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg ( solver_ptr );
+	  g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg ( solver_ptr );// 迭代优化算法
 	  g2o::SparseOptimizer optimizer;
 	  optimizer.setAlgorithm ( solver );
 	// 添加顶点
 	  g2o::VertexSE3Expmap* pose = new g2o::VertexSE3Expmap();//顶点 位姿 
 	  pose->setId ( 0 );
-	  pose->setEstimate ( g2o::SE3Quat (
+	  pose->setEstimate ( g2o::SE3Quat (// 估计值
 	      T_c_w_estimated_.rotation_matrix(), T_c_w_estimated_.translation()//旋转矩阵 和平移矩阵
 	  ));
 	  optimizer.addVertex ( pose );
@@ -201,10 +202,10 @@ namespace myslam
 	  {
 	      int index = inliers.at<int> ( i,0 );
 	      // 3D -> 2D projection
-	      EdgeProjectXYZ2UVPoseOnly* edge = new EdgeProjectXYZ2UVPoseOnly();//  2D-3D位姿 估计 边 仅仅优化 位姿
-	      edge->setId ( i );
-	      edge->setVertex ( 0, pose );
-	      edge->camera_ = curr_->camera_.get();
+	      EdgeProjectXYZ2UVPoseOnly* edge = new EdgeProjectXYZ2UVPoseOnly();//  2D-3D位姿 估计 边 仅优化 位姿
+	      edge->setId ( i );// id
+	      edge->setVertex ( 0, pose );//连接的顶点
+	      edge->camera_ = curr_->camera_.get();//相机参数
 	      edge->point_ = Vector3d ( pts3d[index].x, pts3d[index].y, pts3d[index].z );//3D点
 	      edge->setMeasurement ( Vector2d ( pts2d[index].x, pts2d[index].y ) );//对应 2维 像素坐标点
 	      edge->setInformation ( Eigen::Matrix2d::Identity() );//误差权重 信息矩阵
