@@ -33,17 +33,18 @@ ORB-SLAM2 是一个实时的 SLAM  库，可用于 **单目Monocular**, **双目
 ## C++11 or C++0x 编译环境 使用最新的线程 thread 和 计时chrono 函数功能
 ## 可视化 和人机接口 [Pangolin](https://github.com/stevenlovegrove/Pangolin) [安装方法]https://github.com/stevenlovegrove/Pangolin.
 
-## OpenCV
+## OpenCV 计算机视觉库
 We use [OpenCV](http://opencv.org) to manipulate images and features. Dowload and install instructions can be found at: http://opencv.org. **Required at leat 2.4.3. Tested with OpenCV 2.4.11 and OpenCV 3.2**.
 
-## Eigen3
+## Eigen3 矩阵运算库
 Required by g2o (see below). Download and install instructions can be found at: http://eigen.tuxfamily.org. **Required at least 3.1.0**.
 
-## DBoW2 and g2o (Included in Thirdparty folder)
+## DBoW2 and g2o (Included in Thirdparty folder)  词典
 We use modified versions of the [DBoW2](https://github.com/dorian3d/DBoW2) library to perform place recognition and [g2o](https://github.com/RainerKuemmerle/g2o) library to perform non-linear optimizations. Both modified libraries (which are BSD) are included in the *Thirdparty* folder.
 
-## ROS (optional)
+## ROS (optional) 机器人系统
 We provide some examples to process the live input of a monocular, stereo or RGB-D camera using [ROS](ros.org). Building these examples is optional. In case you want to use ROS, a version Hydro or newer is needed.
+
 
 # 3. Building ORB-SLAM2 library and examples
 
@@ -61,7 +62,7 @@ chmod +x build.sh
 
 This will create **libORB_SLAM2.so**  at *lib* folder and the executables **mono_tum**, **mono_kitti**, **rgbd_tum**, **stereo_kitti**, **mono_euroc** and **stereo_euroc** in *Examples* folder.
 
-# 4. Monocular Examples
+# 4. 单目相机示例 Monocular Examples
 
 ## TUM Dataset
 
@@ -94,7 +95,7 @@ This will create **libORB_SLAM2.so**  at *lib* folder and the executables **mono
 ./Examples/Monocular/mono_euroc Vocabulary/ORBvoc.txt Examples/Monocular/EuRoC.yaml PATH_TO_SEQUENCE/cam0/data Examples/Monocular/EuRoC_TimeStamps/SEQUENCE.txt 
 ```
 
-# 5. Stereo Examples
+# 5. 双目相机示例 Stereo Examples
 
 ## KITTI Dataset
 
@@ -117,7 +118,7 @@ This will create **libORB_SLAM2.so**  at *lib* folder and the executables **mono
 ./Examples/Stereo/stereo_euroc Vocabulary/ORBvoc.txt Examples/Stereo/EuRoC.yaml PATH_TO_SEQUENCE/cam0/data PATH_TO_SEQUENCE/cam1/data Examples/Stereo/EuRoC_TimeStamps/SEQUENCE.txt
 ```
 
-# 6. RGB-D Example
+# 6. RGB-D 深度相机示例 Example
 
 ## TUM Dataset
 
@@ -135,7 +136,7 @@ This will create **libORB_SLAM2.so**  at *lib* folder and the executables **mono
   ./Examples/RGB-D/rgbd_tum Vocabulary/ORBvoc.txt Examples/RGB-D/TUMX.yaml PATH_TO_SEQUENCE_FOLDER ASSOCIATIONS_FILE
   ```
 
-# 7. ROS Examples
+# 7. ROS 节点 示例  Examples
 
 ### Building the nodes for mono, monoAR, stereo and RGB-D
 1. Add the path including *Examples/ROS/ORB_SLAM2* to the ROS_PACKAGE_PATH environment variable. Open .bashrc file and add at the end the following line. Replace PATH by the folder where you cloned ORB_SLAM2:
@@ -201,9 +202,10 @@ You will need to create a settings file with the calibration of your camera. See
 # 9. SLAM and Localization Modes
 You can change between the *SLAM* and *Localization mode* using the GUI of the map viewer.
 
-### SLAM Mode
+### SLAM Mode  建图模式
 This is the default mode. The system runs in parallal three threads: Tracking, Local Mapping and Loop Closing. The system localizes the camera, builds new map and tries to close loops.
 
-### Localization Mode
+### Localization Mode 重定位模式
 This mode can be used when you have a good map of your working area. In this mode the Local Mapping and Loop Closing are deactivated. The system localizes the camera in the map (which is no longer updated), using relocalization if needed. 
+
 
