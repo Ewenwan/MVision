@@ -14,19 +14,19 @@
 * 绝对矩倒数  sX = 1/mean_x_dev     sY = 1/mean_y_dev 
 * 
 * 标准化后的点坐标
-* u = (ui - mean_x) × sX
-* v =  (vi - mean_y) * sY 
+* u =  (ui - mean_x) × sX
+* v =  (vi - mean_y) × sY 
 * 
 * 标准化矩阵   其逆矩阵×标准化点 得到原始坐标 
 *      用于 计算变换矩阵后  从原始坐标计算对称的转换误差 来计算变换矩阵得分
-* T = sX   0    -mean_x * sX
-*        0   sY   -mean_y * sY
+* T =    sX   0    -mean_x * sX
+*        0    sY   -mean_y * sY
 *        0    0         1
 * 
 * 标准化矩阵  * 点坐标    =   标准化后的的坐标
-*         ui          ui × sX - mean_x * sX  = (ui - mean_x) × sX       u
+*       ui         ui × sX - mean_x * sX   = (ui - mean_x) × sX       u
 *  T ×  vi    =    vi  × sY - mean_y * sY  = (vi - mean_y) × sY   =   v
-*         1               1              							      1
+*       1               1              				      1
 * 
 * 点坐标    =    标准化矩阵 逆矩阵 * 标准化后的的坐标
 * 
@@ -64,9 +64,9 @@
  * SM=∑i( ρM( d2cr(xic,xir,M)   +   ρM( d2rc(xic,xir,M ) )
  *  d2cr 为 2D-2D 点对  通过哦转换矩阵的 对成转换误差
  * 
- * ρM 函数为 ρM(d^2)  = 0                          当  d^2 > 阈值(单应矩阵时 为 5.99  基础矩阵时为 3.84)
- *                                       得分上限  - d^2    当  d^2 < 阈值
- *                                           							得分上限 均为 5.99 
+ * ρM 函数为 ρM(d^2)  = 0                  当  d^2 > 阈值(单应矩阵时 为 5.99  基础矩阵时为 3.84)
+ *                     得分上限  - d^2     当  d^2 < 阈值
+ *                                        得分上限 均为 5.99 
  * 
  *【4】 从两个模型 H F 得分为 Sh   Sf 中选着一个 最优秀的 模型 的方法为
  * 
@@ -78,10 +78,10 @@
  * 
  * 
  * 【5】单应矩阵求解
- *  *  1点 变成 2点   p2   =  H21 * p1
-      u2        h1  h2  h3        u1
-      v2  =    h4  h5  h6    *  v1
-      1          h7  h8  h9       1   
+ *   1点 变成 2点   p2   =  H21 * p1
+      u2         h1  h2  h3        u1
+      v2  =      h4  h5  h6    *   v1
+      1          h7  h8  h9        1   
       
       u2 = (h1*u1 + h2*v1 + h3) /( h7*u1 + h8*v1 + h9)
       v2 = (h4*u1 + h5*v1 + h6) /( h7*u1 + h8*v1 + h9)
@@ -98,12 +98,12 @@
  * 【6】单应变换 求 变化距离误差
  *  * 1点 变成 2点   p2   =  H12 * p1
  u2        h11  h12  h13        u1
- v2  =    h21  h22  h23    *  v1
- 1          h31  h32  h33         1   第三行 
+ v2  =     h21  h22  h23    *   v1
+ 1         h31  h32  h33         1   第三行 
  
  * 2 点 变成 1点  p1   =  H21 * p2
  u1‘        h11inv   h12inv   h13inv         u2
- v1’  =    h21inv   h22inv   h23inv     *  v2
+ v1’  =     h21inv   h22inv   h23inv     *   v2
  1          h31inv   h32inv   h33inv          1    第三行 h31inv*u2+h32inv*v2+h33inv 
  前两行 同除以 第三行 消去非零因子
   p2 由单应转换到 p1
@@ -119,9 +119,9 @@
  
  【8】 基础矩阵 F求解
  *  * p2------> p1
- *                           f1   f2    f3      u1
- *   (u2 v2 1)    *   f4   f5    f6  *  v1    = 0  应该=0 不等于零的就是误差
- * 			      f7   f8    f9	     1
+ *                    f1   f2    f3      u1
+ *   (u2 v2 1)    *   f4   f5    f6  *   v1    = 0  应该=0 不等于零的就是误差
+ * 		      f7   f8    f9	  1
  * 	a1 = f1*u2 + f4*v2 + f7;
 	b1 = f2*u2 + f5*v2 + f8;
 	c1 =  f3*u2 + f6*v2 + f9;
@@ -137,14 +137,21 @@
  
  * 【9】 基础矩阵 F 求变换误差
  *  * p2 ------> p1 
- *                           f11   f12    f13      u1
- *   (u2 v2 1)    *   f21   f22    f23  *  v1    = 0  应该=0 不等于零的就是误差
- * 			      f31   f32    f33 	    1
+ *                    f11   f12    f13      u1
+ *   (u2 v2 1)    *   f21   f22    f23  *   v1    = 0  应该=0 不等于零的就是误差
+ * 		      f31   f32    f33 	    1
+       p2转置 ×F 为 p2投影在 帧1中的极线 li = （a1 b1 c1）
  * 	a1 = f11*u2+f21*v2+f31;
 	b1 = f12*u2+f22*v2+f32;
 	c1 = f13*u2+f23*v2+f33;
+	
+ *  p1 应该在这条极限附近 求p1 到极线 l的距离 可以作为误差
+ * 	 极线l：ax + by + c = 0
+ * 	 (u,v)到l的距离为：d = |au+bv+c| / sqrt(a^2+b^2) 
+ * 	 d^2 = |au+bv+c|^2/(a^2+b^2)	
+ 
 	num1 = a1*u1 + b1*v1+ c1;// 应该等0
-	num1*num1/(a1*a1+b1*b1);// 误差
+	num1*num1/(a1*a1+b1*b1); // 误差(点到直线的距离)
 * 
  【10】  从基本矩阵恢复 旋转矩阵R 和 平移向量t
  计算 本质矩阵 E  =  K转置 * F  * K
@@ -161,8 +168,8 @@
  p = ( x,y,1)
  其叉乘矩阵为
      //  叉乘矩阵 = [0  -1  y;
-    //                       1   0  -x; 
-    //                      -y   x  0 ]  
+    //              1   0  -x; 
+    //              -y   x  0 ]  
   一个方程得到两个约束
   对于第一行 0  -1  y; 会与P的三行分别相乘 得到四个值 与齐次3d点坐标相乘得到 0
   有 (y * P.row(2) - P.row(1) ) * D =0
@@ -324,8 +331,8 @@ namespace ORB_SLAM2
  * 并得到该模型的评分
  * 在最大迭代次数内 保留 最高得分的 单应矩阵
  * @param vbMatchesInliers     返回的 符合 变换的 匹配点 内点 标志
- * @param score                         变换得分
- * @param H21                           单应矩阵
+ * @param score                变换得分
+ * @param H21                  单应矩阵
  */
 	void Initializer::FindHomography(vector<bool> &vbMatchesInliers, float &score, cv::Mat &H21)
 	{
@@ -366,7 +373,7 @@ namespace ORB_SLAM2
 		    int idx = mvSets[it][j];//随机数集合 总匹配点数范围内
 		    vPn1i[j] = vPn1[mvMatches12[idx].first];
 		    vPn2i[j] = vPn2[mvMatches12[idx].second];
-		}                                    //       Hn                     T2逆*Hn*T1
+		}           //       Hn                     T2逆*Hn*T1
 // 步骤4：计算 单应矩阵        T1*p1  ----> T2*p2     p1 ----------------> p2
 		cv::Mat Hn = ComputeH21(vPn1i,vPn2i);//  计算标准化后的点对 的 单应矩阵
 		H21i = T2inv*Hn*T1;// 原始点    p1 ----------------> p2 的单应
@@ -378,9 +385,9 @@ namespace ORB_SLAM2
 		* SM=∑i( ρM( d2cr(xic,xir,M)   +   ρM( d2rc(xic,xir,M ) )
 		*  d2cr 为 2D-2D 点对  通过哦转换矩阵的 对成转换误差
 		* 
-		* ρM 函数为 ρM(d^2)  = 0                  当  d^2 > 阈值(单应矩阵时 为 5.99  基础矩阵时为 3.84)
-		*                                       最高分 - d^2    当  d^2 < 阈值
-		*                                                            				   最高分 均为 5.99 
+		* ρM 函数为 ρM(d^2)  = 0            当  d^2 > 阈值(单应矩阵时 为 5.99  基础矩阵时为 3.84)
+		*                   最高分 - d^2    当  d^2 < 阈值
+		*                                   最高分 均为 5.99 
 		*/
 // 步骤5：计算单应H的得分  有由 对应的匹配点对	的 对称的转换误差 求得	
 		currentScore = CheckHomography(H21i, H12i, vbCurrentInliers, mSigma);
@@ -442,7 +449,7 @@ namespace ORB_SLAM2
 		    vPn1i[j] = vPn1[mvMatches12[idx].first];
 		    vPn2i[j] = vPn2[mvMatches12[idx].second];
 		}
-                                                      //       Fn                     T2逆*Fn*T1
+                             //       Fn                     T2逆*Fn*T1
     // 【4】计算 基础矩阵        T1*p1  ----> T2*p2     p1 ----------------> p2
 		cv::Mat Fn = ComputeF21(vPn1i,vPn2i);
 		F21i = T2t*Fn*T1;
@@ -495,14 +502,14 @@ namespace ORB_SLAM2
 	    cv::Mat A(2*N,9,CV_32F);// 每个点 可以提供两个约束  单应为 3*3 9个 元素
 /*
  *  1点 变成 2点   p2   =  H21 * p1
-      u2        h1  h2  h3        u1
-      v2  =    h4  h5  h6    *  v1
+      u2         h1  h2  h3       u1
+      v2  =      h4  h5  h6    *  v1
       1          h7  h8  h9       1   
       
      或是使用叉乘 得到0    * x = H y ，则对向量 x和Hy 进行叉乘为0，即：
-					* | 0 -1  v2|    |h1 h2 h3|    |u1|     |0|
-					* | 1  0 -u2| * |h4 h5 h6| * |v1| =  |0|
-					* |-v2  u2 0|   |h7 h8 h9|      |1 |     |0|
+					* | 0 -1  v2|    |h1 h2 h3|      |u1|     |0|
+					* | 1  0 -u2| *  |h4 h5 h6| *    |v1| =  |0|
+					* |-v2  u2 0|    |h7 h8 h9|      |1 |     |0|
       
       
       u2 = (h1*u1 + h2*v1 + h3) /( h7*u1 + h8*v1 + h9)
@@ -588,9 +595,9 @@ namespace ORB_SLAM2
 	    cv::Mat A(N,9,CV_32F);
 /*
  *  * p2------> p1
- *                           f1   f2    f3      u1
+ *                    f1   f2    f3     u1
  *   (u2 v2 1)    *   f4   f5    f6  *  v1    = 0  应该=0 不等于零的就是误差
- * 			      f7   f8    f9	     1
+ * 		      f7   f8    f9	 1
  * 	a1 = f1*u2 + f4*v2 + f7;
 	b1 = f2*u2 + f5*v2 + f8;
 	c1 =  f3*u2 + f6*v2 + f9;
@@ -643,8 +650,8 @@ namespace ORB_SLAM2
  *  SM=∑i( ρM( d2cr(xic,xir,M)   +   ρM( d2rc(xic,xir,M ) )
  *  d2cr 为 2D-2D 点对  通过哦转换矩阵的 对成转换误差
  * 
- *  ρM 函数为 ρM(d^2)  = 0                  当  d^2 > 阈值(单应矩阵时 为 5.991  基础矩阵时为 3.84)
- *                                       阈值 - d^2    当  d^2 < 阈值
+ *  ρM 函数为 ρM(d^2)  = 0         当  d^2 > 阈值(单应矩阵时 为 5.991  基础矩阵时为 3.84)
+ *                   阈值 - d^2    当  d^2 < 阈值
  * 
  */
 
@@ -705,14 +712,14 @@ namespace ORB_SLAM2
 /*
  * 
  * 1点 变成 2点
- u2        h11  h12  h13        u1
- v2  =    h21  h22  h23    *  v1
- 1          h31  h32  h33         1   第三行 
+ u2         h11  h12  h13       u1
+ v2  =      h21  h22  h23    *  v1
+ 1          h31  h32  h33        1   第三行 
  
  * 2 点 变成 1点
- u1‘        h11inv   h12inv   h13inv         u2
- v1’  =    h21inv   h22inv   h23inv     *  v2
- 1          h31inv   h32inv   h33inv          1    第三行 h31inv*u2+h32inv*v2+h33inv 
+ u1‘        h11inv   h12inv   h13inv        u2
+ v1’  =     h21inv   h22inv   h23inv     *  v2
+ 1          h31inv   h32inv   h33inv        1    第三行 h31inv*u2+h32inv*v2+h33inv 
  前两行 同除以 第三行 消去非零因子
   p2 由单应转换到 p1
   u1‘ = (h11inv*u2+h12inv*v2+h13inv)* 第三行倒数
@@ -729,8 +736,8 @@ namespace ORB_SLAM2
 		// Reprojection error in first image
 		// x2in1 = H12*x2
 		// 将图像2中的特征点单应到图像1中
-		// |u1|    |h11inv h12inv h13inv||u2|
-		// |v1| = |h21inv h22inv h23inv||v2|
+		// |u1|     |h11inv h12inv h13inv||u2|
+		// |v1| =   |h21inv h22inv h23inv||v2|
 		// |1 |     |h31inv h32inv h33inv||1 |
 		const float w2in1inv = 1.0/(h31inv*u2+h32inv*v2+h33inv);//第三行倒数
 		const float u2in1 = (h11inv*u2+h12inv*v2+h13inv)*w2in1inv;// p2 由单应转换到 p1‘
@@ -770,9 +777,9 @@ namespace ORB_SLAM2
 // p2转置 * F * p1 =  0 
 /*
  * p2 ------> p1 
- *                           f11   f12    f13      u1
+ *                    f11   f12    f13     u1
  *   (u2 v2 1)    *   f21   f22    f23  *  v1    = 0应该=0 不等于零的就是误差
- * 			      f31   f32    f33 	    1
+ * 		      f31   f32    f33 	    1
  * 	a1 = f11*u2+f21*v2+f31;
 	b1 = f12*u2+f22*v2+f32;
 	c1 = f13*u2+f23*v2+f33;
@@ -888,9 +895,9 @@ namespace ORB_SLAM2
  恢复四种假设 并验证
 理论参考 Result 9.19 in Multiple View Geometry in Computer Vision
  */
-//                                         |0 -1  0|
+//                          |0 -1  0|
 // E = U Sigma V'   let W = |1  0  0| 为RZ(90)  绕Z轴旋转 90度（x变成原来的y y变成原来的-x z轴没变）
-//                                         |0  0  1|
+//                          |0  0  1|
 // 得到4个解 E = [R|t]
 // R1 = UWV' R2 = UW'V' t1 = U3 t2 = -U3
 
@@ -1102,19 +1109,19 @@ T =  K 逆 * H21*K
 	    float stheta[] = {aux_stheta, -aux_stheta, -aux_stheta, aux_stheta};
 	    // 计算旋转矩阵 R‘，计算ppt中公式18
 	    //          | ctheta         0   -aux_stheta|         | aux1|
-	    // Rp = |    0               1       0             |  tp = |  0     |
+	    // Rp =     |    0               1       0  |  tp =   |  0     |
 	    //          | aux_stheta  0    ctheta       |         |-aux3|
 
 	    //          | ctheta          0    aux_stheta|          | aux1|
-	    // Rp = |    0                1       0              |  tp = |  0  |
-	    //          |-aux_stheta  0    ctheta         |          | aux3|
+	    // Rp =     |    0            1       0      |  tp =    |  0  |
+	    //          |-aux_stheta  0    ctheta        |          | aux3|
 
 	    //          | ctheta         0    aux_stheta|         |-aux1|
-	    // Rp = |    0               1       0             |  tp = |  0     |
+	    // Rp =     |    0             1       0    |  tp =  |  0     |
 	    //          |-aux_stheta  0    ctheta       |         |-aux3|
 
 	    //          | ctheta         0   -aux_stheta|         |-aux1|
-	    // Rp = |    0               1       0             |  tp = |  0  |
+	    // Rp = |    0               1       0      |  tp =   |  0  |
 	    //          | aux_stheta  0    ctheta       |          | aux3|
 
 	    for(int i=0; i<4; i++)
@@ -1256,8 +1263,8 @@ T =  K 逆 * H21*K
  p = ( x,y,1)
  其叉乘矩阵为
      //  叉乘矩阵 = [0  -1  y;
-    //                       1   0  -x; 
-    //                      -y   x  0 ]  
+    //              1   0  -x; 
+    //              -y   x  0 ]  
   一个方程得到两个约束
   对于第一行 0  -1  y; 会与P的三行分别相乘 得到四个值 与齐次3d点坐标相乘得到 0
   有 (y * P.row(2) - P.row(1) ) * D =0
@@ -1269,24 +1276,24 @@ T =  K 逆 * H21*K
 // Trianularization: 已知匹配特征点对{x x'} 和 各自相机矩阵{P P'}, 估计三维点 X
 // x' = P'X  x = PX
 // 它们都属于 x = aPX模型
-//                                             |X|
-// |x|       |p1 p2   p3  p4   ||Y|          |x|      |--p0--||.|
-// |y| = a |p5 p6   p7  p8   ||Z| ===>|y| = a|--p1--||X|
-// |z|       |p9 p10 p11 p12||1|          |z|      |--p2--||.|
+//                            |X|
+// |x|     |p1 p2   p3  p4|   |Y|     |x|    |--p0--||.|
+// |y| = a |p5 p6   p7  p8|   |Z| ===>|y| = a|--p1--||X|
+// |z|     |p9 p10 p11 p12|   |1|     |z|    |--p2--||.|
 // 采用DLT的方法：x叉乘PX = 0
-// |yp2 -  p1|        |0|
+// |yp2 -  p1|      |0|
 // |p0  -  xp2| X = |0|
-// |xp1 - yp0|       |0|
+// |xp1 - yp0|      |0|
 // 两个点:
-// |yp2   -  p1  |       |0|
+// |yp2   -  p1  |     |0|
 // |p0    -  xp2 | X = |0| ===> AX = 0
-// |y'p2' -  p1' |        |0|
-// |p0'   - x'p2'|        |0|
+// |y'p2' -  p1' |     |0|
+// |p0'   - x'p2'|     |0|
 // 变成程序中的形式：
-// |xp2  - p0 |       |0|
+// |xp2  - p0 |     |0|
 // |yp2  - p1 | X = |0| ===> AX = 0
-// |x'p2'- p0'|        |0|
-// |y'p2'- p1'|        |0|
+// |x'p2'- p0'|     |0|
+// |y'p2'- p1'|     |0|
 /**
  * @brief 给定投影矩阵P1,P2和图像上的点kp1,kp2，从而恢复3D坐标
  *
@@ -1332,13 +1339,13 @@ T =  K 逆 * H21*K
 * 标准化矩阵   其逆矩阵×标准化点 得到原始坐标 
 *      用于 计算变换矩阵后  从原始坐标计算对称的转换误差 来计算变换矩阵得分
 * T = sX   0    -mean_x * sX
-*        0   sY   -mean_y * sY
-*        0    0         1
+*     0   sY   -mean_y * sY
+*     0    0         1
 * 
 * 标准化矩阵  * 点坐标    =   标准化后的的坐标
-*         ui          ui × sX - mean_x * sX  = (ui - mean_x) × sX       u
+*       ui         ui × sX - mean_x * sX  = (ui - mean_x) × sX       u
 *  T ×  vi    =    vi  × sY - mean_y * sY  = (vi - mean_y) × sY   =   v
-*         1               1              							      1
+*       1               1              				      1
 * 
 * * 点坐标    =    标准化矩阵 逆矩阵 * 标准化后的的坐标
 * 
@@ -1395,7 +1402,7 @@ T =  K 逆 * H21*K
 	    }
     // |sX  0  -meanx*sX|
     // |0   sY -meany*sY|
-    // |0   0          1         |	    
+    // |0   0       1   |	    
             // 标准化矩阵
             // 标准化矩阵  * 点坐标    =   标准化后的的坐标
             //  点坐标    =    标准化矩阵 逆矩阵 * 标准化后的的坐标
@@ -1592,13 +1599,13 @@ T =  K 逆 * H21*K
 // 沿着Z轴旋转 90度得到的旋转矩阵（逆时针为正方向）
 // z 轴还是 原来的z轴   y轴变成原来的 x 轴的负方向   x轴变成原来的y轴
 // 所以 旋转矩阵  为 0  -1   0
-//				   1   0   0
-//				   0   0   1
+//		    1   0   0
+//		    0   0   1
 // 沿着Z轴旋转- 90度	  
 // z 轴还是 原来的z轴   y轴变成原来的 x 轴   x轴变成原来的y轴的负方向
 // 所以 旋转矩阵  为 0   1   0  为上 旋转矩阵的转置矩阵
-//				 -1    0   0
-//				   0   0   1    
+//		    -1    0   0
+//		    0   0   1    
 	    cv::Mat W(3,3,CV_32F,cv::Scalar(0));
 	    W.at<float>(0,1)=-1;
 	    W.at<float>(1,0)=1;
