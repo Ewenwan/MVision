@@ -19,8 +19,8 @@ pass.filter (*cloud_filtered); //执行滤波，保存过滤结果在cloud_filte
 */
 #include <iostream>
 #include <pcl/point_types.h>
-#include <pcl/filters/passthrough.h>
-
+#include <pcl/filters/passthrough.h>//直通滤波器 PassThrough　
+#include <pcl/visualization/cloud_viewer.h>//点云可视化
 // 别名
 typedef pcl::PointCloud<pcl::PointXYZ>  Cloud;
 
@@ -44,7 +44,7 @@ int
     cloud_ptr->points[i].z = 1024 * rand () / (RAND_MAX + 1.0f);
   }
 
-  std::cerr << "Cloud before filtering: " << std::endl;
+  std::cerr << "Cloud before filtering滤波前: " << std::endl;
   for (size_t i = 0; i < cloud_ptr->points.size (); ++i)
     std::cerr << "    " << cloud_ptr->points[i].x << " " 
                         << cloud_ptr->points[i].y << " " 
@@ -55,14 +55,22 @@ int
   pass.setInputCloud (cloud_ptr);//设置输入点云
   pass.setFilterFieldName ("z");// 定义轴
   pass.setFilterLimits (0.0, 1.0);//　范围
-  //pass.setFilterLimitsNegative (true);//标志为false时保留范围内的点
+  pass.setFilterLimitsNegative (true);//标志为false时保留范围内的点
   pass.filter (*cloud_filtered_ptr);
 
-  std::cerr << "Cloud after filtering: " << std::endl;
+  // 输出滤波后的点云
+  std::cerr << "Cloud after filtering滤波后: " << std::endl;
   for (size_t i = 0; i < cloud_filtered_ptr->points.size (); ++i)
     std::cerr << "    " << cloud_filtered_ptr->points[i].x << " " 
                         << cloud_filtered_ptr->points[i].y << " " 
                         << cloud_filtered_ptr->points[i].z << std::endl;
+  // 程序可视化
+  pcl::visualization::CloudViewer viewer("pcd　viewer");// 显示窗口的名字
+  viewer.showCloud(cloud_filtered_ptr);
+  while (!viewer.wasStopped())
+    {
+        // Do nothing but wait.
+    }
 
   return (0);
 }
