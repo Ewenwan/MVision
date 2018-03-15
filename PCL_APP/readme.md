@@ -103,7 +103,7 @@
         -----------------------------------------------------------------
 
 ### a. 直通滤波器 PassThrough　　　　　　　　　　　直接指定保留哪个轴上的范围内的点
-
+[直通滤波器 PassThrough](Basic/Filtering/PassThroughfilter.cpp)
 
         #include <pcl/filters/passthrough.h>
         如果使用线结构光扫描的方式采集点云，必然物体沿z向分布较广，
@@ -126,6 +126,7 @@
         ----------------------------------------------------------------------------
 
 ### b.体素格滤波器VoxelGrid　　在网格内减少点数量保证重心位置不变　PCLPointCloud2()
+[体素格滤波器VoxelGrid](Basic/Filtering/VoxelGrid_filter.cpp)
 
         注意此点云类型为　pcl::PCLPointCloud2　类型  blob　格子类型
         #include <pcl/filters/voxel_grid.h>
@@ -164,6 +165,7 @@
         -------------------------------------------------------------------------------
 
 ### c.统计滤波器 StatisticalOutlierRemoval
+[统计滤波器 StatisticalOutlierRemoval](Basic/Filtering/statistical_removal_filter.cpp)
 
         #include <pcl/filters/statistical_outlier_removal.h>
 
@@ -200,6 +202,7 @@
         ----------------------------------------------------------------------
         ------------------------------------------------------------------------------
 ### d.球半径滤波器
+[球半径滤波器 radius ](Basic/Filtering/radius_outlier_filter.cpp)
 
         #include <pcl/filters/radius_outlier_removal.h>
 
@@ -227,6 +230,7 @@
         -------------------------------------------------------------------------------------
         ------------------------------------------------------
 ### e. 条件滤波器
+[条件滤波器 conditional_removal_filter ](Basic/Filtering/conditional_removal_filter.cpp)
 
             可以一次删除满足对输入的点云设定的一个或多个条件指标的所有的数据点
             删除点云中不符合用户指定的一个或者多个条件的数据点
@@ -263,6 +267,7 @@
         -----------------------------------------------------------------------
         -------------------------------------------
 ###f. 投影滤波　
+[投影滤波　project_inliers_filter](Basic/Filtering/project_inliers_filter.cpp)
 
          使用参数化模型投影点云
         如何将点投影到一个参数化模型上（平面或者球体等），
