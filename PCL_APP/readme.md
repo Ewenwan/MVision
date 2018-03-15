@@ -1,5 +1,6 @@
-＃　机器人三维视觉
-## 使用PCL点云库
+        # 机器人三维视觉
+        ## 使用PCL点云库
+
 
         命令行安装　　编译好的二进制文件
         仓库
@@ -121,8 +122,11 @@
         ----------------------------------------------------------------------------
 
         b.体素格滤波器VoxelGrid　　在网格内减少点数量保证重心位置不变　PCLPointCloud2()
-
+        注意此点云类型为　pcl::PCLPointCloud2　类型  blob　格子类型
         #include <pcl/filters/voxel_grid.h>
+
+          // 转换为模板点云 pcl::PointCloud<pcl::PointXYZ>
+          pcl::fromPCLPointCloud2 (*cloud_filtered_blob, *cloud_filtered);
 
         如果使用高分辨率相机等设备对点云进行采集，往往点云会较为密集。
         过多的点云数量会对后续分割工作带来困难。
@@ -146,6 +150,8 @@
           sor.setInputCloud (cloud);            　　　　//设置需要过滤的点云(指针)　给滤波对象
           sor.setLeafSize (0.01f, 0.01f, 0.01f);  　　//设置滤波时创建的体素体积为1cm的立方体
           sor.filter (*cloud_filtered);           　　//执行滤波处理，存储输出
+
+
 
 
 
