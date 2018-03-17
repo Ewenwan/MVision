@@ -53,7 +53,14 @@
         locate eigen3
         sudo updatedb
 
+        //注意　PCL_ROS 其实引用了PCL库，不要随意编译PCL库，可能导致PCL-ROS不能使用！    
+        // PCL自动安装的时候与C11不兼容，如果想使用C11,需要自己编译PCL库，
+        //并在PCL编译之前的CMakelist.txt中加入C11的编译项！
 
+        //所以　ros项目中如果使用　支持　c++11　
+        // 那么使用pcl时pcl必须源码编译，并且需要修改pcl源码的　CMakelist.txt　 加入支持c++11的选项
+        //# 添加c++ 11标准支持
+        //set( CMAKE_CXX_FLAGS "-std=c++11" )
         下载源码
         git clone https://github.com/PointCloudLibrary/pcl pcl-trunk
 
