@@ -94,7 +94,15 @@
         统计滤波器    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;、
         半径滤波器    pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;
         双边滤波  pcl::BilateralFilter<pcl::PointXYZ> bf;
+            该类的实现利用的并非XYZ字段的数据进行，
+        而是利用强度数据进行双边滤波算法的实现，所以在使用该类时点云的类型必须有强度字段，否则无法进行双边滤波处理，
 
+
+        立方体滤波 pcl::CropBox< PointT>    
+           过滤掉在用户给定立方体内的点云数据
+
+        封闭曲面滤波 pcl::CropHull< PointT>   
+            过滤在给定三维封闭曲面或二维封闭多边形内部或外部的点云数据
         空间剪裁：
         pcl::Clipper3D<pcl::PointXYZ>
         pcl::BoxClipper3D<pcl::PointXYZ>
@@ -135,6 +143,7 @@
 ### b.体素格滤波器VoxelGrid　　在网格内减少点数量保证重心位置不变　PCLPointCloud2()
 [体素格滤波器VoxelGrid](Basic/Filtering/VoxelGrid_filter.cpp)
 
+        下采样 同时去除 NAN点
         注意此点云类型为　pcl::PCLPointCloud2　类型  blob　格子类型
         #include <pcl/filters/voxel_grid.h>
 
@@ -396,6 +405,45 @@
           在flann前面加上全局命名空间 ::flann
           在要使用opencv中flann的地方，使用cv::flann这样可以避免冲突
 
+        ----------------------------------------------------------------
+        ------------------------------------------------------------------
+
+        e. 去除NAN点
+        // STL
+        #include <iostream>
+        #include <limits>
+
+        // PCL
+        #include <pcl/point_cloud.h>
+        #include <pcl/point_types.h>
+        #include <pcl/filters/filter.h>
+
+        int
+        main (int, char**)
+        {
+          typedef pcl::PointCloud<pcl::PointXYZ> CloudType;
+          CloudType::Ptr cloud (new CloudType);
+          cloud->is_dense = false;
+          CloudType::Ptr output_cloud (new CloudType);
+
+          CloudType::PointType p_nan;
+          p_nan.x = std::numeric_limits<float>::quiet_NaN();
+          p_nan.y = std::numeric_limits<float>::quiet_NaN();
+          p_nan.z = std::numeric_limits<float>::quiet_NaN();
+          cloud->push_back(p_nan);
+
+          CloudType::PointType p_valid;
+          p_valid.x = 1.0f;
+          cloud->push_back(p_valid);
+
+          std::cout << "size: " << cloud->points.size () << std::endl;
+
+          std::vector<int> indices;//索引
+          pcl::removeNaNFromPointCloud(*cloud, *output_cloud, indices);//去除NAN点
+          std::cout << "size: " << output_cloud->points.size () << std::endl;
+
+          return 0;
+        }
         ----------------------------------------------------------------
 
 
