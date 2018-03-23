@@ -3,6 +3,10 @@
     ############################################################################
 
     简单下采样得到关键点 ：搜索半价内 下采样保留部分点 得到关键点（省时）
+    pcl::UniformSampling<PointType> uniform_sampling;//下采样滤波模型
+    uniform_sampling.setInputCloud (model);//模型点云
+    uniform_sampling.setRadiusSearch (model_ss_);//模型点云搜索半径
+    uniform_sampling.filter (*model_keypoints);//下采样得到的关键点
     
     我们都知道在二维图像上，有Harris、SIFT、SURF、KAZE这样的关键点提取算法，
     这种特征点的思想可以推广到三维空间。
