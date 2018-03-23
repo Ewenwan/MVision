@@ -22,8 +22,9 @@ https://raw.github.com/PointCloudLibrary/data/master/tutorials/table_scene_lms40
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>//点云文件pcd 读写
 #include <pcl/visualization/cloud_viewer.h>//点云可视化
+#include <pcl/visualization/pcl_visualizer.h>// 高级可视化点云类
 #include <pcl/features/normal_3d.h>//法线特征
-
+#include <boost/thread/thread.hpp>
 using namespace std;
 // 别名
 typedef pcl::PointCloud<pcl::PointXYZ>  Cloud;
@@ -73,22 +74,39 @@ computeCovarianceMatrix(cloud,xyz_centroid,covariance_matrix);
   pcl::PointCloud<pcl::Normal>::Ptr cloud_normals_ptr (new pcl::PointCloud<pcl::Normal>);
   pcl::PointCloud<pcl::Normal>& cloud_normals = *cloud_normals_ptr;
   // Use all neighbors in a sphere of radius 3cm
-  ne.setRadiusSearch (0.03);//半价内搜索临近点
+  ne.setRadiusSearch (0.03);//半径内搜索临近点
+  //ne.setKSearch(8);       //其二 指定临近点数量
 
   // 计算表面法线特征
   ne.compute (cloud_normals);
-  // 点云+法线 可视化
-  pcl::visualization::PCLVisualizer viewer("pcd　viewer");// 显示窗口的名字
-  viewer.setBackgroundColor(0.0, 0.0, 0.0);//背景黑色
-  //viewer.setBackgroundColor (1, 1, 1);//白色
-  viewer.addCoordinateSystem (1.0f, "global");//坐标系
-  viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal>(cloud_ptr, cloud_normals_ptr);
-  pcl::visualization::PointCloudColorHandlerCustom<PointType> cloud_color_handler (cloud_ptr, 1, 0, 0);//红色
-  viewer.addPointCloud (cloud_ptr, cloud_color_handler, "original point cloud");
 
-  while (!viewer.wasStopped())
+  // 点云+法线 可视化
+  //pcl::visualization::PCLVisualizer viewer("pcd　viewer");// 显示窗口的名字
+ boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer_ptr (new pcl::visualization::PCLVisualizer ("3D Viewer"));  
+//设置一个boost共享对象，并分配内存空间
+  viewer_ptr->setBackgroundColor(0.0, 0.0, 0.0);//背景黑色
+  //viewer.setBackgroundColor (1, 1, 1);//白色
+  viewer_ptr->addCoordinateSystem (1.0f, "global");//坐标系
+  // pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(cloud); 
+  //pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZ> rgb(cloud);
+ // pcl::visualization::PointCloudColorHandlerRandom<PointType> cloud_color_handler(cloud_ptr);  
+ //该句的意思是：对输入的点云着色，Random表示的是随机上色，以上是其他两种渲染色彩的方式.
+  pcl::visualization::PointCloudColorHandlerCustom<PointType> cloud_color_handler (cloud_ptr, 255, 0, 0);//红色
+  //viewer->addPointCloud<pcl::PointXYZRGB>(cloud_ptr,cloud_color_handler,"sample cloud");//PointXYZRGB 类型点
+  viewer_ptr->addPointCloud<PointType>(cloud_ptr, cloud_color_handler, "original point cloud");//点云标签
+
+  viewer_ptr->addPointCloudNormals<pcl::PointXYZ, pcl::Normal>(cloud_ptr, cloud_normals_ptr, 5,0.02,"normal");//法线标签
+//其中，参数5表示整个点云中每5各点显示一个法向量（若全部显示，可设置为1，  0.02表示法向量的长度，最后一个参数暂时还不知道 如何影响的）);
+  viewer_ptr->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "original point cloud");
+  //渲染属性，可视化工具，3维数据， 其中PCL_VISUALIZER_POINT_SIZE表示设置点的大小为3
+
+  //viewer_ptr->addCoordinateSystem(1.0);//建立空间直角坐标系
+  //viewer_ptr->setCameraPosition(0,0,200); //设置坐标原点
+  viewer_ptr->initCameraParameters();//初始化相机参数
+
+  while (!viewer_ptr->wasStopped())
     {
-       viewer.spinOnce ();
+        viewer_ptr->spinOnce ();
         pcl_sleep(0.01);
     }
 
