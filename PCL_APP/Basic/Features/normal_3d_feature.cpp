@@ -24,6 +24,7 @@ https://raw.github.com/PointCloudLibrary/data/master/tutorials/table_scene_lms40
 #include <pcl/visualization/cloud_viewer.h>//点云可视化
 #include <pcl/visualization/pcl_visualizer.h>// 高级可视化点云类
 #include <pcl/features/normal_3d.h>//法线特征
+#include <pcl/kdtree/kdtree_flann.h>//搜索方法
 #include <boost/thread/thread.hpp>
 using namespace std;
 // 别名
@@ -46,6 +47,7 @@ int
 
 // 创建法线估计类====================================
   pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
+//pcl::NormalEstimationOMP<pcl::PointXYZ, pcl::Normal> ne;//多核 计算法线模型 OpenMP
   ne.setInputCloud (cloud_ptr);
 /*
  法线估计类NormalEstimation的实际计算调用程序内部执行以下操作：
