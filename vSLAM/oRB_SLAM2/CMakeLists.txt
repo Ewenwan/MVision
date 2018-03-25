@@ -119,6 +119,12 @@ add_executable(stereo_euroc # EuRoC数据集
 Examples/Stereo/stereo_euroc.cc)
 target_link_libraries(stereo_euroc ${PROJECT_NAME})
 
+# my stereo on_line
+add_executable(my_stereo # stereo_on_line
+Examples/Stereo/my_stereo.cc)
+target_link_libraries(my_stereo ${PROJECT_NAME})
+
+
 #单目相机示例 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/Monocular)
 add_executable(mono_tum # TUM数据集
