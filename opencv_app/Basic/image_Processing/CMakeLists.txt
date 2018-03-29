@@ -93,5 +93,42 @@ target_link_libraries(histogram_Calc ${OpenCV_LIBS})
 add_executable(back_Projection back_Projection.cpp)
 target_link_libraries(back_Projection ${OpenCV_LIBS})
 
+# 在图像中寻找轮廓  candy边缘检测  再找物体轮廓
+add_executable( findContours findContours.cpp)
+target_link_libraries( findContours ${OpenCV_LIBS})
+# 计算物体的凸包  边缘包围圈
+#对图像进行二值化     candy边缘检测也得到 二值图
+#寻找轮廓 
+#对每个轮廓计算其凸包
+#绘出轮廓及其凸包
+add_executable(convex_Hull  convex_Hull.cpp)
+target_link_libraries( convex_Hull ${OpenCV_LIBS})
+
+#创建包围轮廓的矩形和圆形边界框
+#使用Threshold检测边缘  二值化 阈值 thresh
+#找到轮廓  findContours
+# 对每个找到的轮廓创建边界框和圆
+add_executable(bounding_boxes_circles creating_Bounding_boxes_circles.cpp)
+target_link_libraries( bounding_boxes_circles  ${OpenCV_LIBS})
+
+# 为轮廓创建可倾斜的边界框和椭圆
+#使用Threshold检测边缘  二值化 阈值 thresh
+#找到轮廓  findContours
+# 对每个找到的轮廓创建可倾斜的边界框和椭圆
+add_executable(bounding_rotated_boxe_ell  bounding_rotated_boxe_ellipses.cpp)
+target_link_libraries( bounding_rotated_boxe_ell  ${OpenCV_LIBS})
+
+# 轮廓矩
+add_executable(contours_moments contours_moments.cpp)
+target_link_libraries( contours_moments  ${OpenCV_LIBS})
+
+# 基于距离变换和分水岭算法的图像分割
+add_executable(template_Matching  template_Matching.cpp)
+target_link_libraries( template_Matching ${OpenCV_LIBS})
+# 模板匹配
+add_executable(image_seg  image_seg.cpp)
+target_link_libraries( image_seg ${OpenCV_LIBS})
+
+#
 
 
