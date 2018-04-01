@@ -35,8 +35,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/features2d/features2d.hpp>
-
-// PnP Tutorial
+// PnP 
 #include "Mesh.h"// 物体模型 读取  ply 文件   顶点坐标和 平面的顶点组成关系
 #include "Model.h"// 物体网格模型  物体的 三维纹理 模型文件，包含：2d-3d点对 特征点 特征点描述子
 #include "PnPProblem.h"// 2d-3d点对匹配 Rt变换求解器
@@ -67,7 +66,7 @@ string write_path = tutorial_path + "Data/cookies_ORB.yml";
 // 手动指定二位点 2d-3d 点对 配准是否完成标志  
 bool end_registration = false;
 
-// 相机内参数  K Intrinsic camera parameters: UVC WEBCAM
+// 相机内参数  K  
 double f = 45; // 焦距 毫米单位 focal length in mm
 double sx = 22.3, sy = 14.9; 
 double width = 2592, height = 1944;//图像尺寸
@@ -94,8 +93,6 @@ PnPProblem pnp_registration(params_CANON);// 2D-3D 点对匹配 Rt变换求解�
 
 // 帮助函声明
 void help();
-
-
 
 // 鼠标点击响应 回调函数 模型配置 
 // 手动指定 图像中 物体顶点的位置（得到二维像素值位置）
