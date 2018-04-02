@@ -24,12 +24,12 @@
       以与膨胀相同的图像作为样本,我们使用腐蚀操作。
       从下面的结果图我们看到亮区(背景)变细，而黑色区域(字母)则变大了。
       
-[膨胀 腐蚀](/shape_oper_eroding_dilating.cpp)
+[膨胀 腐蚀](shape_oper_eroding_dilating.cpp)
 
 ## 开闭运算提取线特征  水平线 垂直线
     利用形态学操作提取水平线和垂直线
     腐蚀膨胀来提取线特征
-[开闭运算提取线特征](/extract_horizontal_vertical_lines.cpp)
+[开闭运算提取线特征](extract_horizontal_vertical_lines.cpp)
 
 ## 图像阈值处理  阈值二值化
     图像阈值操作
@@ -57,7 +57,7 @@
         大于阈值的 保持原来的值 其余设置为0
     【5】阈值类型5：反阈值化为0 
         大于阈值的 设置为0  其余保持原来的值 
-[图像阈值操作](/threshold.cpp)
+[图像阈值操作](threshold.cpp)
 
 ## 图像卷积操作  平滑滤波  自定义滤波器算子  sobel求梯度算子
       Sobel 算子x方向、y方向导数 合成导数
@@ -90,7 +90,7 @@
           G_{y} = [-3 -10 -3
               0  0  0
              +3 +10 +3]
-[Sobel 算子](/Sobel_ker.cpp)
+[Sobel 算子](Sobel_ker.cpp)
 
 ## 图像金字塔  下采样 + 高斯核卷积
       图像金字塔
@@ -123,7 +123,7 @@
           使用先前同样的内核(乘以4)与放大后的图像卷积，获得 “新增像素” 的近似值。
       这两个步骤(向下和向上采样) 分别通过OpenCV函数 pyrUp 和 pyrDown 实现, 
 
-[图像金字塔](/pyramid.cpp)
+[图像金字塔](pyramid.cpp)
 
 ## Laplacian 算子 的离散模拟。 图像二阶倒数  梯度的梯度 0值的话 边缘概率较大
 
@@ -142,7 +142,7 @@
           OpenCV函数 Laplacian 实现了Laplacian算子。 
           实际上，由于 Laplacian使用了图像梯度，它内部调用了 Sobel 算子。
           
-[ Laplacian ](/laplacian.cpp)
+[ Laplacian ](laplacian.cpp)
 
 
 ## candy边缘检测  消除噪声  计算梯度幅值和方向   非极大值 抑制  滞后阈值
@@ -184,12 +184,12 @@
           如果某一像素位置的幅值在两个阈值之间,该像素在连接到一个高于 高阈值的像素时被保留。
       Canny 推荐的 高:低 阈值比在 2:1 到3:1之间。
 
-[candy边缘检测](/canny_Edge_Detector.cpp)
+[candy边缘检测](canny_Edge_Detector.cpp)
 
 
 ## 霍夫线变换 霍夫圆变换  先candy边缘检测 再找圆  再找直线
     霍夫 圆变换   在图像中检测圆. 
-[霍夫圆变换](/hough_Circle_Transform.cpp)
+[霍夫圆变换](hough_Circle_Transform.cpp)
 
     霍夫线变换  检测图像中的直线 先candy边缘检测 在找直线
     使用OpenCV的以下函数 HoughLines 和 HoughLinesP 来检测图像中的直线.
@@ -216,7 +216,7 @@
             它输出检测到的直线的端点 (x_{0}, y_{0}, x_{1}, y_{1})
             在OpenCV 中它通过函数 HoughLinesP 来实现
 
-[霍夫线变换](/hough_Line_Transform.cpp)
+[霍夫线变换](hough_Line_Transform.cpp)
 
 
 ## 图像像素重映射 remapping  随机矩阵空间映射  仿射变换  
@@ -228,7 +228,7 @@
         我们通过重映射来表达每个像素的位置 (x,y) :
        goal(x,y) = f(s(s,y))
 
-[霍夫线变换](/remapping.cpp)
+[霍夫线变换](remapping.cpp)
 
 
 ## 求得对直方图均衡化的映射矩阵 在对原图像进行映射 图像直方图计算  反向投影 利用直方图模型 搜索 对应的 图像区域
@@ -246,7 +246,7 @@
         均衡化指的是把一个分布 (给定的直方图) 映射 
         到另一个分布 (一个更宽更统一的强度值分布), 所以强度值分布会在整个范围内展开.
         要想实现均衡化的效果, 映射函数应该是一个 累积分布函数 (cdf) 
-[直方图均衡化](/histogram_Equalization.cpp)
+[直方图均衡化](histogram_Equalization.cpp)
 
     图像的直方图计算
     单个通道内的像素值进行统计 
@@ -257,7 +257,7 @@
         先看一个例子吧。 假设有一个矩阵包含一张图像的信息 (灰度值 0-255):
     OpenCV提供了一个简单的计算数组集(通常是图像或分割后的通道)
     的直方图函数 calcHist 。 支持高达 32 维的直方图。
-[直方图计算](/histogram_Calculation.cpp)
+[直方图计算](histogram_Calculation.cpp)
 
     直方图对比
         如何使用OpenCV函数 compareHist 产生一个表达两个直方图的相似度的数值。
@@ -277,7 +277,7 @@
         计算所有图像的H-S直方图，并归一化以便对比。
         将 基准图像 直方图与 两张测试图像直方图，基准图像半身像直方图，以及基准图像本身的直方图分别作对比。
         显示计算所得的直方图相似度数值。
-[直方图对比](/histogram_Comparison.cpp)
+[直方图对比](histogram_Comparison.cpp)
 
 
 ## 在图像中寻找轮廓  candy边缘检测  再找物体轮廓
@@ -291,20 +291,20 @@
     对每个轮廓计算其凸包
     绘出轮廓及其凸包
     
-[计算物体的凸包  边缘包围圈](/convex_Hull.cpp)
+[计算物体的凸包  边缘包围圈](convex_Hull.cpp)
 
 ## 创建包围轮廓的矩形和圆形边界框
     创建包围轮廓的矩形和圆形边界框
     使用Threshold检测边缘  二值化 阈值 thresh
     找到轮廓  findContours
     
-[创建包围轮廓的矩形和圆形边界框](/creating_Bounding_boxes_circles.cpp)
+[创建包围轮廓的矩形和圆形边界框](creating_Bounding_boxes_circles.cpp)
 
 
 ## 为轮廓创建可倾斜的边界框和椭圆
 
     为轮廓创建可倾斜的边界框和椭圆
-[为轮廓创建可倾斜的边界框和椭圆](/bounding_rotated_boxe_ellipses.cpp)    
+[为轮廓创建可倾斜的边界框和椭圆](bounding_rotated_boxe_ellipses.cpp)    
 
 ## 轮廓矩
       轮廓矩
@@ -328,7 +328,7 @@
       后者衡量偏离程度，与均值、方差的关系类似。换句话说，
       假如我们能把前四阶矩都给「标准化」了，那么五阶、六阶的矩就会比较重要了吧。
       
-[轮廓矩](/ccontours_moments.cpp)
+[轮廓矩](ccontours_moments.cpp)
 
 ## 基于距离变换和分水岭算法的图像匹配
     图像 模板匹配  是一项在一幅图像中寻找与另一幅模板图像最匹配(相似)部分的技术.
