@@ -30,5 +30,21 @@ target_link_libraries( creating_corner ${OpenCV_LIBS} )
 add_executable(subpixeles_corner subpixeles_corner.cpp)
 target_link_libraries( subpixeles_corner ${OpenCV_LIBS} )
 
+# sift surf 关键点检测器
+#add_executable(featureDetection featureDetection.cpp)
+#target_link_libraries( featureDetection ${OpenCV_LIBS} )
+
+# 使用 orb 特征检测 匹配 
+# 使用二维特征点(Features2D)和单映射(Homography)寻找已知物体
+add_executable(orbHomography orb_det_desc_match.cpp)
+target_link_libraries( orbHomography ${OpenCV_LIBS} )
+
+# 非线性尺度空间的KAZE特征提取 匹配
+add_executable(aKAZEmatching aKAZE_local_features_matching.cpp stats.h utils.h)
+target_link_libraries( aKAZEmatching ${OpenCV_LIBS} )
+
+# KAZE ORB 实时 平面物体跟踪
+add_executable(aKAZEtracking aKAZE_ORB_planar_tracking.cpp)
+target_link_libraries( aKAZEtracking ${OpenCV_LIBS} )
 
 
