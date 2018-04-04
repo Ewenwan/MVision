@@ -113,7 +113,7 @@ int main()
     cout << "Starting training process" << endl;
     Ptr<SVM> svm = SVM::create();
     svm->setType(SVM::C_SVC);// SVM类型.  C_SVC 该类型可以用于n-类分类问题 (n \geq 2)
-    svm->setC(0.1);
+    svm->setC(0.1);//  错分类样本离同类区域的距离 的权重
     svm->setKernel(SVM::LINEAR);// SVM 核类型.  将训练样本映射到更有利于可线性分割的样本集
     // 算法终止条件.   最大迭代次数和容许误差
     svm->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, (int)1e7, 1e-6));
