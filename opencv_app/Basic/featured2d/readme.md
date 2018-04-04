@@ -54,6 +54,8 @@
         >特征值都比较小，窗口处在平坦区域
 
         https://blog.csdn.net/woxincd/article/details/60754658
+	
+[Harris角点 ](harris_corner_detector.cpp)
 
 # 【2】 Shi-Tomasi 算法 goodFeaturesToTrack()
         是Harris 算法的改进。
@@ -65,7 +67,7 @@
         M 对角化>>> M的两个特征值为 lamd1  lamd2
 
         R = mini(lamd1,lamd2) > 阈值 认为是角点
-
+[Shi-Tomasi角点 ](shi_Tomasi_corner_detector.cpp)
 
 # 【3】FAST角点检测算法  ORB特征检测中使用的就是这种角点检测算法
               FAST(src_gray, keyPoints,thresh);
@@ -89,6 +91,8 @@
         std::vector<KeyPoint> keyPoints; 
         //fast.detect(src_gray, keyPoints);  // 检测角点
         FAST(src_gray, keyPoints,thresh);
+	
+[FAST角点](fast_corner_detector.cpp)
 
 # 【4】 使用cornerEigenValsAndVecs()函数和cornerMinEigenVal()函数自定义角点检测函数。
         过自定义 R的计算方法和自适应阈值 来定制化检测角点
@@ -101,6 +105,7 @@
         阈值大小为 判断矩阵 最小值和最大值之间 百分比
         阈值为 最小值 + （最大值-最小值）× 百分比
         百分比 = myHarris_qualityLevel/max_qualityLevel
+[自定义角点检测函数](creating_corner_detector.cpp)	
 
 # 【5】亚像素级的角点检测
         如果对角点的精度有更高的要求，可以用cornerSubPix()函数将角点定位到子像素，
@@ -132,6 +137,8 @@
           对窗口内的像素点 使用最小二乘拟合 得到上述 n0 n1 n2 n3
             则 x0 = - n1/(2*n3)
                y0 = - n2/(2*n3)
+	       
+[亚像素级的角点](subpixeles_corner.cpp)	
 
 
 # 【6】斑点检测原理 SIFT  SURF
@@ -217,7 +224,8 @@
 	    包含opencv2/xfeatures2d.hpp
 	    using namepsace cv::xfeatures2d
 	    使用create(),detect(),compute(),detectAndCompute()
-
+	    
+[ SURF ](featureDetection.cpp)
 
 # 【7】二进制字符串特征描述子
 	注意到在两种角点检测算法里，我们并没有像SIFT或SURF那样提到特征点的描述问题。
@@ -298,6 +306,19 @@
 		42个感受野，一千对点的组合，找前512个即可。这512个分成4组，
 		前128对相关性更小，可以代表粗的信息，后面越来越精。匹配的时候可以先看前16bytes，
 		即代表精信息的部分，如果距离小于某个阈值，再继续，否则就不用往下看了。
+		
+		
+## 使用 orb 特征检测 匹配 
+	使用二维特征点(orb  Features2D )和单映射(Homography)寻找已知物体
+	【1】 创建新的控制台(console)项目。读入两个输入图像。
+	【2】 检测两个图像的关键点（尺度旋转都不发生变化的关键点）
+	【3】 计算每个关键点的描述向量(Descriptor)
+	【4】 计算两幅图像中的关键点对应的描述向量距离，寻找两图像中距离最近的描述向量对应的关键点，即为两图像中匹配上的关键点:
+	【5】 寻找两个点集合中的单映射变换（homography transformation）:
+	【6】 创建内匹配点集合同时绘制出匹配上的点。用perspectiveTransform函数来通过单映射来映射点:
+	【7】 用 drawMatches 来绘制内匹配点.
+
+[  orb 特征检测 匹配 ](orb_det_desc_match.cpp)
 
 # 【8】KAZE非线性尺度空间 特征
 
@@ -334,3 +355,5 @@
 
 	特征点检测
 	KAZE的特征点检测与SURF类似，是通过寻找不同尺度归一化后的Hessian局部极大值点来实现的。
+[非线性尺度空间的KAZE特征提取 匹配](aKAZE_local_features_matching.cpp)
+[KAZE ORB 实时 平面物体  匹配跟踪](aKAZE_ORB_planar_tracking.cpp)
