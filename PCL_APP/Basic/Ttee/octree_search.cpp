@@ -1,4 +1,6 @@
 /*
+https://blog.csdn.net/u013019296/article/details/70052311
+
 基于Octree的空间划分及搜索操作
 pcl::octree::OctreePointCloudSearch  octree
 octree.voxelSearch
@@ -13,10 +15,14 @@ octree是一种用于管理稀疏3D数据的树状数据结构，
 “K近邻搜索(K Nearest Neighbor Search)”和
 “半径内近邻搜索(Neighbors within Radius Search)”。
 
+所谓K近邻算法，即是给定一个训练数据集，对新的输入实例，
+在训练数据集中找到与该实例最邻近的K个实例（也就是上面所说的K个邻居），
+ 这K个实例的多数属于某个类，就把该输入实例分类到这个类中。
+
 
 */
-#include <pcl/point_cloud.h>
-#include <pcl/octree/octree_search.h>
+#include <pcl/point_cloud.h>   //点云头文件
+#include <pcl/octree/octree.h>  //八叉树头文件
 
 #include <iostream>
 #include <vector>
@@ -25,6 +31,7 @@ octree是一种用于管理稀疏3D数据的树状数据结构，
 int
 main (int argc, char** argv)
 {
+  //用系统时间初始化随机种子与 srand (time (NULL))的区别
   srand ((unsigned int) time (NULL));//随机数种子
 
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_ptr (new pcl::PointCloud<pcl::PointXYZ>);
@@ -35,13 +42,13 @@ main (int argc, char** argv)
   cloud.height = 1;
   cloud.points.resize (cloud.width * cloud.height);
 
-  for (size_t i = 0; i < cloud.points.size (); ++i)
+  for (size_t i = 0; i < cloud.points.size (); ++i)//随机循环产生点云的坐标值
   {
     cloud.points[i].x = 1024.0f * rand () / (RAND_MAX + 1.0f);
     cloud.points[i].y = 1024.0f * rand () / (RAND_MAX + 1.0f);
     cloud.points[i].z = 1024.0f * rand () / (RAND_MAX + 1.0f);
   }
-/*
+/********************************
 然后创建一个octree实例，
 用设置分辨率进行初始化，
 该octree用它的叶节点存放点索引向量，
@@ -50,7 +57,7 @@ main (int argc, char** argv)
 如果知道点云的边界框，
 应该用defineBoundingBox方法把它分配给octree，
 然后通过点云指针把所有点增加到octree中。
-*/
+********************************/
   float resolution = 128.0f;//八叉树分辨率即体素(长宽高)的大小
   //初始化octree
   pcl::octree::OctreePointCloudSearch<pcl::PointXYZ> octree (resolution);
@@ -62,8 +69,11 @@ main (int argc, char** argv)
   searchPoint.y = 1024.0f * rand () / (RAND_MAX + 1.0f);
   searchPoint.z = 1024.0f * rand () / (RAND_MAX + 1.0f);
 
-  // ====【1】==体素内近邻搜索 Neighbors within voxel search
-
+ /*************************************************************************************
+  一旦PointCloud和octree联系一起，就能进行搜索操作，这里使用的是“体素近邻搜索”，把查询点所在体素中
+   其他点的索引作为查询结果返回，结果以点索引向量的形式保存，因此搜索点和搜索结果之间的距离取决于octree的分辨率参数
+*****************************************************************************************/
+  // ====【1】==体素内近邻搜索 Neighbors within voxel search   方块内
 	  std::vector<int> pointIdxVec;//存储体素近邻搜索的结果向量
 	  if(octree.voxelSearch(searchPoint,pointIdxVec))    //执行搜索，返回结果到pointIdxVe
 	  {
@@ -80,7 +90,11 @@ main (int argc, char** argv)
 	       	     << " " << cloud.points[pointIdxVec[i]].z << std::endl;
 	  }
 
-  // 【2】==== K近邻搜索 ==K nearest neighbor search
+/**********************************************************************************
+  K 被设置为10 ，K近邻搜索  方法把搜索结果写到两个分开的向量，第一个pointIdxNKNSearch包含搜索结果
+   （结果点的索引的向量）  第二个向量pointNKNSquaredDistance存储搜索点与近邻之间的距离的平方。
+*************************************************************************************/
+  // 【2】==== K近邻搜索 ==K nearest neighbor search 
 
 	  int K = 10;//搜寻点 附近的 点数
 	  std::vector<int> pointIdxNKNSearch;//存储k近邻搜索 点索引结果
@@ -102,7 +116,7 @@ main (int argc, char** argv)
 		        << pointNKNSquaredDistance[i] << ")" << std::endl;
 	  }
 
-  //====【3】=====半径内近邻搜索====Neighbors within radius search
+  //====【3】=====半径内近邻搜索====Neighbors within radius search   球半径内
 
 	  std::vector<int> pointIdxRadiusSearch;//半径内近邻搜索 点索引结果
 	  std::vector<float> pointRadiusSquaredDistance;//与上面对应的平方距离
@@ -127,4 +141,3 @@ main (int argc, char** argv)
 	  }
   return 0;
 }
-
