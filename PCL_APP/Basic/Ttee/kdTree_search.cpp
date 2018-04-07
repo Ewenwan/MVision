@@ -35,7 +35,7 @@ http://www.cnblogs.com/21207-iHome/p/6084670.html
 int
 main (int argc, char** argv)
 {
-  srand (time (NULL));//随机数
+  srand (time (NULL));//随机数  用系统时间初始化随机种子
 
   time_t begin,end;
   begin = clock();  //开始计时
@@ -58,7 +58,7 @@ main (int argc, char** argv)
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
   // 输入点云
   kdtree.setInputCloud (cloud_ptr);
-  // 随机定义一个 需要搜寻的点
+  // 随机定义一个 需要搜寻的点  创建一个searchPoint变量作为查询点
   pcl::PointXYZ searchPoint;
   searchPoint.x = 1024.0f * rand () / (RAND_MAX + 1.0f);
   searchPoint.y = 1024.0f * rand () / (RAND_MAX + 1.0f);
@@ -66,7 +66,7 @@ main (int argc, char** argv)
 
   // K 个最近点去搜索 nearest neighbor search
   int K = 10;
-
+  // 两个向量来存储搜索到的K近邻，两个向量中，一个存储搜索到查询点近邻的索引，另一个存储对应近邻的距离平方
   std::vector<int> pointIdxNKNSearch(K);//最近临搜索得到的索引
   std::vector<float> pointNKNSquaredDistance(K);//平方距离
 
@@ -85,11 +85,12 @@ main (int argc, char** argv)
                                                         )  const [pure virtual] 
 
     Search for k-nearest neighbors for the given query point. 
+   纯虚函数，具体实现在其子类KdTreeFLANN中，其用来进行K 领域搜索
     Parameters:
         [in] the given query point 
         [in] k the number of neighbors to search for  
         [out] the resultant indices of the neighboring points
-        [out] the resultant squared distances to the neighboring points
+        [out] the resultant squared distances to the neighboring points 为搜索完成后每个邻域点与查询点的欧式距
     Returns:
         number of neighbors found 
     ********************************************************************************************/
@@ -105,10 +106,16 @@ main (int argc, char** argv)
 		<< std::endl;
   }
 
+  /**********************************************************************************
+   下面的代码展示查找到给定的searchPoint的某一半径（随机产生）内所有近邻，重新定义两个向量
+   pointIdxRadiusSearch  pointRadiusSquaredDistance来存储关于近邻的信息
+   ********************************************************************************/
+
   // 半径内最近领搜索 Neighbors within radius search
-  std::vector<int> pointIdxRadiusSearch;//半价搜索得到的索引
-  std::vector<float> pointRadiusSquaredDistance;//平方距离
-  float radius = 256.0f * rand () / (RAND_MAX + 1.0f);//随机产生一个半价
+  std::vector<int> pointIdxRadiusSearch;//存储查询点近邻索引
+  std::vector<float> pointRadiusSquaredDistance;//存储近邻点对应距离平方
+  float radius = 256.0f * rand () / (RAND_MAX + 1.0f);//随机产生一个半径
+  //打印相关信息
   std::cout << "Neighbors within radius search at (" << searchPoint.x 
             << " " << searchPoint.y 
             << " " << searchPoint.z
@@ -118,6 +125,7 @@ main (int argc, char** argv)
   if ( kdtree.radiusSearch (searchPoint, radius, pointIdxRadiusSearch, pointRadiusSquaredDistance) > 0 )
   {
     for (size_t i = 0; i < pointIdxRadiusSearch.size (); ++i)
+      //打印所有近邻坐标
       std::cout << " " << cloud.points[ pointIdxRadiusSearch[i] ].x 
                 << " " << cloud.points[ pointIdxRadiusSearch[i] ].y 
                 << " " << cloud.points[ pointIdxRadiusSearch[i] ].z 
@@ -131,5 +139,4 @@ main (int argc, char** argv)
 
   return 0;
 }
-
 
