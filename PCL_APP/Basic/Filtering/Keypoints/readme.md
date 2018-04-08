@@ -1,6 +1,105 @@
     ######################################################################
 # D点云关键点  /Keypoints   ISS3D、 Harris3D、 NARF、SIFT3D 、简单下采样得到关键点
     ############################################################################
+    关键点也称为兴趣点，它是2D图像或是3D点云或者曲面模型上，
+    可以通过定义检测标准来获取的具有稳定性，
+    区别性的点集。
+    
+    PCL中keypoints模块及类的介绍:
+    （1）class pcl::Keypoint<PointInT,PointOutT>  类keypoint是所有关键点检测相关类的基类，
+    定义基本接口，具体实现由子类来完成，
+    其继承关系时下图：
+
+    pcl::PCLBase<PointInT>
+        |
+        |___-> pcl::Keypoint<PointInT,PointOutT>
+            |
+            |
+            |
+            |___->pcl::AgastKeypoint2DBase<PointInT,PointOutT, pcl::common::IntensityFieldAccessor<PointInT >>
+                ->pcl::AgastKeypoint2DBase<PointInT,PointOutT, IntensityT >
+                ->pcl::BriskKeypoint2D<PointInT,PointOutT, IntensityT >
+                ->pcl::HarrisKeypoint2D<PointInT,PointOutT, IntensityT >
+                ->pcl::HarrisKeypoint3D<PointInT,PointOutT, IntensityT >
+                ->pcl::HarrisKeypoint6D<PointInT,PointOutT, IntensityT >
+                ->pcl::ISSKeypoint3D<PointInT,PointOutT, IntensityT >
+                ->pcl::SIFTKeypoint<PointInT,PointOutT >
+                ->pcl::SUSANKeypoint<PointInT,PointOutT, NormalT, IntensityT >
+                ->pcl::TrajkovicKeypoint2D<PointInT,PointOutT, IntensityT >
+                ->pcl::TrajkovicKeypoint3D<PointInT,PointOutT, IntensityT >
+
+    方法：
+    virtual void setSearchSurface (const PointCloudInConstPtr &cloud)
+        设置搜索时所用搜索点云，cloud为指向点云对象的指针引用
+    void  	setSearchMethod (const KdTreePtr &tree)  
+        设置内部算法实现时所用的搜索对象，tree为指向kdtree或者octree对应的指针
+    void  	setKSearch (int k)   
+        设置K近邻搜索时所用的K参数
+    void  	setRadiusSearch (double radius)   
+        设置半径搜索的半径的参数
+    int  	searchForNeighbors (int index, double parameter, std::vector< int > &indices, std::vector< float > &distances) const
+        采用setSearchMethod设置搜索对象，以及setSearchSurface设置搜索点云，进行近邻搜索，返回近邻在点云中的索引向量，
+        indices以及对应的距离向量distance其中为查询点的索引，parameter为搜索时所用的参数半径或者K
+
+
+
+    1. class  pcl::HarrisKeypoint2D<PointInT,PointOutT,IntensityT>
+         类HarrisKeypoint2D实现基于点云的强度字段的harris关键点检测子，其中包括多种不同的harris关键点检测算法的变种，其关键函数的说明如下：
+        HarrisKeypoint2D (ResponseMethod method=HARRIS, 
+                  int window_width=3, 
+                  int window_height=3, 
+                  int min_distance=5, 
+                  float threshold=0.0)
+
+        重构函数，method需要设置采样哪种关键点检测方法，有HARRIS，NOBLE，LOWE，WOMASI四种方法，默认为HARRIS，
+            window_width  window_height为检测窗口的宽度和高度
+            min_distance 为两个关键点之间 容许的最小距离，
+            threshold为判断是否为关键点的感兴趣程度的阀值，小于该阀值的点忽略，大于则认为是关键点
+
+    void  	setMethod (ResponseMethod type)     设置检测方式
+    void  	setWindowWidth (int window_width)   设置检测窗口的宽度
+    void  	setWindowHeight (int window_height) 设置检测窗口的高度
+    void  	setSkippedPixels (int skipped_pixels)   设置在检测时每次跳过的像素的数目
+    void  	setMinimalDistance (int min_distance)   设置候选关键点之间的最小距离
+    void  	setThreshold (float threshold)  	设置感兴趣的阀值
+    void  	setNonMaxSupression (bool=false)  	设置是否对小于感兴趣阀值的点进行剔除，如果是true则剔除,否则返回这个点
+    void  	setRefine (bool do_refine)		设置是否对所得的关键点结果进行优化，
+    void  	setNumberOfThreads (unsigned int nr_threads=0)  设置该算法如果采用openMP并行机制，能够创建线程数目
+
+    2.  pcl::HarrisKeypoint3D< PointInT, PointOutT, NormalT >
+            类HarrisKeypoint3D和HarrisKeypoint2D类似，但是没有在点云的强度空间检测关键点，
+            而是利用点云的3D空间的信息表面法线向量来进行关键点检测，
+            关于HarrisKeypoint3D的类与HarrisKeypoint2D相似，除了
+
+        HarrisKeypoint3D (ResponseMethod method=HARRIS, float radius=0.01f, float threshold=0.0f) 
+
+        重构函数，method需要设置采样哪种关键点检测方法，有HARRIS，NOBLE，LOWE，WOMASI四种方法，
+        默认为HARRIS，radius为法线估计的搜索半径，
+        threshold为判断是否为关键点的感兴趣程度的阀值，小于该阀值的点忽略，大于则认为是关键点。
+
+    3. pcl::HarrisKeypoint6D< PointInT, PointOutT, NormalT >
+            类HarrisKeypoint6D和HarrisKeypoint2D类似，只是利用了欧式空间域XYZ或者强度域来候选关键点，
+        或者前两者的交集，即同时满足XYZ域和强度域的关键点为候选关键点，
+
+        HarrisKeypoint6D (float radius=0.01, float threshold=0.0)  
+        重构函数，此处并没有方法选择的参数，而是默认采用了Tomsai提出的方法实现关键点的检测，
+        radius为法线估计的搜索半径，
+        threshold为判断是否为关键点的感兴趣程度的阀值，小于该阀值的点忽略，大于则认为是关键点。
+
+    4. pcl::SIFTKeypoint< PointInT, PointOutT >
+
+            类SIFTKeypoint是将二维图像中的SIFT算子调整后移植到3D空间的SIFT算子的实现，
+        输入带有XYZ坐标值和强度的点云，输出为点云中的SIFT关键点，其关键函数的说明如下：
+
+        void  	setScales (float min_scale, int nr_octaves, int nr_scales_per_octave)
+            设置搜索时与尺度相关的参数，
+            min_scale在点云体素尺度空间中标准偏差，点云对应的体素栅格中的最小尺寸
+            int nr_octaves是检测关键点时体素空间尺度的数目，
+            nr_scales_per_octave为在每一个体素空间尺度下计算高斯空间的尺度所需要的参数
+
+        void  	setMinimumContrast (float min_contrast)   设置候选关键点对应的对比度下限
+
+
 
 ## 简单下采样得到关键点 ：搜索半价内 下采样保留部分点 得到关键点（省时）
     pcl::UniformSampling<PointType> uniform_sampling;//下采样滤波模型
@@ -101,7 +200,7 @@
     4.依据3中条件选出角点
 
     1.两个特征值都很大==========>角点（两个响应方向）
-    2.一个特征值很大，一个很小=====>边缘（只有一个响应方向）
+    2.一个特征值很大，一个很小===>边缘（只有一个响应方向）
     3.两个特征值都小============>平原地区（响应都很微弱）
     ---------------------------------------------------------------------------
 ##   3DHarris　 方块体内点数量变化确定角点
@@ -124,6 +223,9 @@
     r小，则对应的角点越尖锐（对噪声更敏感）
     r大，则可能在平缓的区域也检测出角点
 
+
+
+
     ----------------------------------------------------------------------
 ##  NARF　
     1. 边缘提取
@@ -139,12 +241,12 @@
     所谓的横向比较就是和 某点周围的点相比较。 这个周围有多大？不管多大，
     反正就是在某点pi的rangeImage 上取一个方窗。
     假设像素边长为s. 那么一共就取了s^2个点。
+    
     接下来分三种情况来讨论所谓的边缘：
-
-
-    1.这个点在某个平面上，边长为 s 的方窗没有涉及到边缘
-    2.这个点恰好在某条边缘上，边长 s 的方窗一半在边缘左边，一半在右边
-    3.这个点恰好处于某个角点上，边长 s 的方窗可能只有 1/4 与 pi 处于同一个平面
+        1.这个点在某个平面上，边长为 s 的方窗没有涉及到边缘
+        2.这个点恰好在某条边缘上，边长 s 的方窗一半在边缘左边，一半在右边
+        3.这个点恰好处于某个角点上，边长 s 的方窗可能只有 1/4 与 pi 处于同一个平面
+        
     如果将 pi 与不同点距离进行排序，得到一系列的距离，d0 表示与 pi 距离最近的点，显然是 pi 自己。
 
     ds^2 是与pi 最远的点，这就有可能是跨越边缘的点了。 
@@ -160,9 +262,16 @@
       在提取关键点时，边缘应该作为一个重要的参考依据。
     但一定不是唯一的依据。对于某个物体来说关键点应该是表达了某些特征的点，而不仅仅是边缘点。
     所以在设计关键点提取算法时，需要考虑到以下一些因素：
-    边缘和曲面结构都要考虑进去；
-    关键点要能重复；
-    关键点最好落在比较稳定的区域，方便提取法线。
+        1.边缘和曲面结构都要考虑进去，提取的过程考虑边缘以及物体表面变化信息；
+        2.关键点要能重复,在不同视角关键点可以被重复探测；
+        3.关键点最好落在比较稳定的区域，方便提取法线，关键点所在位置有足够的支持区域，可以计算描述子和进行唯一的估计法向量。
+
+    其对应的探测步骤如下：
+          (1) 遍历每个深度图像点，通过寻找在近邻区域有深度变化的位置进行边缘检测。
+          (2) 遍历每个深度图像点，根据近邻区域的表面变化决定一-测度表面变化的系数，及变化的主方向。
+          (3) 根据step(2)找到的主方向计算兴趣点，表征该方向和其他方向的不同，以及该处表面的变化情况，即该点有多稳定。
+          (4) 对兴趣值进行平滑滤波。
+          (5) 进行无最大值压缩找到的最终关键点，即为NARF关键点。
 
     对于点云构成的曲面而言，某处的曲率无疑是一个非常重要的结构描述因素。
     某点的曲率越大，则该点处曲面变化越剧烈。
@@ -175,4 +284,13 @@
     平面 p 垂直于 pi 与原点连线。
     到此位置，每个点都有了两个量，一个权重，一个方向。
     将权重与方向带入下列式子 I 就是某点 为特征点的可能性。
+
+    点云的特征点提取应该与后面的特征描述是松耦合的。
+    确实不得不承认，针对不同的点云：稀疏的，致密的，有序的，无序的，有遮挡的，高精测量的.......
+    设计不同的关键点提取算法也无可厚非。
+    总结出的关键点提取算法原则就是要尺度不变，鲁棒性好，至于是否一定要存在于平坦区域，我觉得并不一定。
+    不同的关键点提取算法可以和不同的特征描述算法进行组合，最终得到一个较好的效果。
+    如果非要把关键点提取算法和特征描述算法紧耦合，那势必会失去一部分灵活性。
+
+
 
