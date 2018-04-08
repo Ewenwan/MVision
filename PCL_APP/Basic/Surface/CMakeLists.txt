@@ -35,5 +35,15 @@ target_link_libraries (greedy_projection  ${PCL_LIBRARIES})
 #add_executable (bspline_fitting bspline_fitting.cpp)
 #target_link_libraries (bspline_fitting  ${PCL_LIBRARIES})
 
+# 三维重构之泊松重构
+add_executable (recon_poisson recon_poisson.cpp)
+target_link_libraries (recon_poisson  ${PCL_LIBRARIES})
+
+
+# 三维重构之移动立方体算法
+add_executable (marchingCubes recon_marchingCubes.cpp)
+target_link_libraries (marchingCubes  ${PCL_LIBRARIES})
+
+
 
 
