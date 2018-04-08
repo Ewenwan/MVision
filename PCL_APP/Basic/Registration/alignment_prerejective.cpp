@@ -78,6 +78,11 @@ main (int argc, char **argv)
   nest.setInputCloud (scene);//　输入场景点云
   nest.compute (*scene);//　计算法线
   
+  nest.setInputCloud (object);//　输入物体点云
+  nest.compute (*object);//　计算法线
+
+  
+  
   // 估计物体点云　和　场景点云　fphf特征　Estimate features
   pcl::console::print_highlight ("Estimating features...\n");
   FeatureEstimationT fest;//　fphf特征估计
