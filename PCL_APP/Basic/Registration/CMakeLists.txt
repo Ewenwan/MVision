@@ -25,13 +25,17 @@ target_link_libraries (iterative_closest_point ${PCL_LIBRARIES})
 add_executable (pairwise_icp pairwise_incremental_registration.cpp)
 target_link_libraries (pairwise_icp ${PCL_LIBRARIES})
 
-# 
+# 交互式ICP可视化的程序
 add_executable (interactive_icp interactive_icp.cpp)
 target_link_libraries (interactive_icp  ${PCL_LIBRARIES})
 
 # 使用正态分布变换进行配准的实验 
 add_executable (ndt normal_distributions_transform.cpp)
 target_link_libraries (ndt  ${PCL_LIBRARIES})
+
+# 刚体的鲁棒位置估计 刚体　在场景点云中　匹配出位姿
+add_executable (alignment_prerejective alignment_prerejective.cpp)
+target_link_libraries (alignment_prerejective ${PCL_LIBRARIES})
 
 
 
