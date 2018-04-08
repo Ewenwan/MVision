@@ -1,5 +1,5 @@
     ##########################################################
-    F 点云配准 Registration 
+# F 点云配准 Registration 
     #################################################
 
     在逆向工程，计算机视觉，文物数字化等领域中，由于点云的不完整，旋转错位，平移错位等，
@@ -14,30 +14,32 @@
     目前配准算法按照过程可以分为整体配准和局部配准。
     PCL中有单独的配准模块，实现了配准相关的基础数据结构，和经典的配准算法如ICP。 
 
-
     给定两个来自不同坐标系的三维数据点集，找到两个点集空间的变换关系，
     使得两个点集能统一到同一坐标系统中，即配准过程
+    
     求得旋转和平移矩阵
     P2 = R*P1  + T　　　　[R t]
+    
     点云配准的概念也可以类比于二维图像中的配准，
+    
     只不过二维图像配准获取得到的是x，y，alpha，beta等放射变化参数
 
     三维点云配准可以模拟三维点云的移动和对其，也就是会获得一个旋转矩阵和一个平移向量，
     通常表达为一个4×3的矩阵，其中3×3是旋转矩阵，1*3是平移向量。
     严格说来是6个参数，因为旋转矩阵也可以通过罗格里德斯变换转变成1*3的旋转向量。
 
-    常用的点云配准算法有两种：
-    正态分布变换方法  NDT  正态分布变换进行配准（normal Distributions Transform） 
-    和著名的ICP点云配准，此外还有许多其它算法，列举如下：
-    ICP：稳健ICP、point to plane ICP、point to line ICP、MBICP、GICP
+## 常用的点云配准算法有两种：
+        正态分布变换方法  NDT  正态分布变换进行配准（normal Distributions Transform） 
+        和著名的ICP点云配准，
+        
+        此外还有许多其它算法       
+## 列举如下：
+        ICP：稳健ICP、point to plane ICP、point to line ICP、MBICP、GICP
+        NDT 3D、Multil-Layer NDT
+        FPCS、KFPSC、SAC-IA
+        Line Segment Matching、ICL
 
-    NDT 3D、Multil-Layer NDT
-
-    FPCS、KFPSC、SAC-IA
-
-    Line Segment Matching、ICL
-
-    两个数据集的计算步骤：
+## 两个数据集的计算步骤：
       1. 识别最能代表两个数据集中的场景的兴趣点（interest points）（即关键点 keypoints）
       2. 在每个关键点处，计算特征描述符;
       3. 从特征描述符集合以及它们在两个数据集中的x,y,z位置，基于特征和位置之间的相似性来估计对应关系;
@@ -45,67 +47,67 @@
          所以舍弃对配准过程产生负面影响的那些负影响对应关系;
       5. 利用剩余的正确的对应关系来估算刚体变换，完整配准。
 
-    迭代最近点 Iterative Closest Point （ICP）
+##  迭代最近点 Iterative Closest Point （ICP）
     ICP算法本质上是基于最小二乘法的最优配准方法。
     该算法重复进行选择对应关系点对，计算最优刚体变换这一过程，直到满足正确配准的收敛精度要求。
     算法的输入：参考点云和目标点云，停止迭代的标准。
     算法的输出：旋转和平移矩阵，即转换矩阵。
 
     使用点匹配时，使用点的XYZ的坐标作为特征值，针对有序点云和无序点云数据的不同的处理策略：
-      1. 穷举配准（brute force matching）;
-      2. kd树最近邻查询（FLANN）;
-      3. 在有序点云数据的图像空间中查找;
-      4. 在无序点云数据的索引空间中查找.
+          1. 穷举配准（brute force matching）;
+          2. kd树最近邻查询（FLANN）;
+          3. 在有序点云数据的图像空间中查找;
+          4. 在无序点云数据的索引空间中查找.
     特征描述符匹配：
-      1. 穷举配准（brute force matching）;
-      2. kd树最近邻查询（FLANN）。
+          1. 穷举配准（brute force matching）;
+          2. kd树最近邻查询（FLANN）。
 
     in cloud B for every point in cloud A .
 
-
-    错误对应关系的去除（correspondence rejection）:
+## 错误对应关系的去除（correspondence rejection）:
 
       由于噪声的影响，通常并不是所有估计的对应关系都是正确的，
       由于错误的对应关系对于最终的刚体变换矩阵的估算会产生负面的影响，
       所以必须去除它们，可以采用随机采样一致性估计，或者其他方法剔除错误的对应关系，
       最终只使用一定比例的对应关系，这样既能提高变换矩阵的估计京都也可以提高配准点的速度。
 
-    变换矩阵的估算（transormation estimation）的步骤如下:
+## 变换矩阵的估算（transormation estimation）的步骤如下:
 
-      1. 在对应关系的基础上评估一些错误的度量标准
-      2. 在摄像机位姿（运动估算）和最小化错误度量标准下估算一个刚体变换(  rigid  transformation )
-      3. 优化点的结构  (SVD奇异值分解 运动估计;使用Levenberg-Marquardt 优化 运动估计;)
-      4. 使用刚体变换把源旋转/平移到与目标所在的同一坐标系下，用所有点，点的一个子集或者关键点运算一个内部的ICP循环
-      5. 进行迭代，直到符合收敛性判断标准为止。
+          1. 在对应关系的基础上评估一些错误的度量标准
+          2. 在摄像机位姿（运动估算）和最小化错误度量标准下估算一个刚体变换(  rigid  transformation )
+          3. 优化点的结构  (SVD奇异值分解 运动估计;使用Levenberg-Marquardt 优化 运动估计;)
+          4. 使用刚体变换把源旋转/平移到与目标所在的同一坐标系下，用所有点，点的一个子集或者关键点运算一个内部的ICP循环
+          5. 进行迭代，直到符合收敛性判断标准为止。
 
 
     ===================================================
 
-    迭代最近点算法（Iterative CLosest Point简称ICP算法）:
+## 迭代最近点算法（Iterative CLosest Point简称ICP算法）:
     ICP算法对待拼接的2片点云，首先根据一定的准则确立对应点集P与Q，
     其中对应点对的个数，然后通过最小二乘法迭代计算最优的坐标变换，
     即旋转矩阵R和平移矢量t，使得误差函数最小，
-    ICP处理流程分为四个主要的步骤：
+    
+### ICP处理流程分为四个主要的步骤：
 
-      1. 对原始点云数据进行采样(关键点 keypoints(NARF, SIFT 、FAST、均匀采样 UniformSampling)、
+        1. 对原始点云数据进行采样(关键点 keypoints(NARF, SIFT 、FAST、均匀采样 UniformSampling)、
          特征描述符　descriptions，NARF、 FPFH、BRIEF 、SIFT、ORB )
-      2. 确定初始对应点集(匹配 matching )
-      3. 去除错误对应点对(随机采样一致性估计 RANSAC )
-      4. 坐标变换的求解
+        2. 确定初始对应点集(匹配 matching )
+        3. 去除错误对应点对(随机采样一致性估计 RANSAC )
+        4. 坐标变换的求解
 
-    Feature based registration
+### Feature based registration
         1. SIFT 关键点 (pcl::SIFT…something)
         2. FPFH 特征描述符  (pcl::FPFHEstimation)  
         3. 估计对应关系 (pcl::CorrespondenceEstimation)
         4. 错误对应关系的去除( pcl::CorrespondenceRejectionXXX )  
         5. 坐标变换的求解
 
-    PCL类的相关的介绍:
+###  PCL类的相关的介绍:
     对应关系基类　　   pcl::CorrespondenceGrouping< PointModelT, PointSceneT >
     几何相似性对应　   pcl::GeometricConsistencyGrouping< PointModelT, PointSceneT >
     相似性度量　　　   pcl::recognition::HoughSpace3D
     多实例对应关系　   pcl::Hough3DGrouping< PointModelT, PointSceneT, PointModelRfT, PointSceneRfT >
-    CRH直方图　　　    pcl::CRHAlignment< PointT, nbins_ >
+    CRH直方图　　　   pcl::CRHAlignment< PointT, nbins_ >
     随机采样一致性估计 pcl::recognition::ObjRecRANSAC::Output
           pcl::recognition::ObjRecRANSAC::OrientedPointPair
           pcl::recognition::ObjRecRANSAC::HypothesisCreator
@@ -115,7 +117,8 @@
           pcl::recognition::ORROctree::Node
           pcl::recognition::ORROctree
           pcl::recognition::RotationSpace
-    ICP迭代最近点算法  pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+          
+### ICP迭代最近点算法  pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
     ===========================================================
       pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;//创建IterativeClosestPoint的对象
       icp.setInputCloud(cloud_in);                 //cloud_in设置为点云的源点
@@ -127,11 +130,11 @@
       icp.getFitnessScore()
       icp.getFinalTransformation()
     ===========================================================
-
+    
+### 非线性ICP 配准对象
     pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg;   // 非线性ICP 配准对象
 
     逐步匹配多幅点云
-
     本实例是使用迭代最近点算法，逐步实现地对一系列点云进行两两匹配，
     他的思想是对所有的点云进行变换，使得都与第一个点云统一坐标系 ，
     在每个连贯的有重叠的点云之间找出最佳的变换，并积累这些变换到全部的点云，
@@ -145,7 +148,7 @@
     在迭代次数小于设定的次数之前，右边会不断刷新最新的配准结果，
     直到收敛，迭代次数30次完成整个匹配的过程，再次按下Q后会看到存储的1.pcd文件，
     此文件为第一个和第二个点云配准后与第一个输入点云在同一个坐标系下的点云。
-    [data](https://github.com/PointCloudLibrary/data/tree/master/tutorials/pairwise)
+[数据](https://github.com/PointCloudLibrary/data/tree/master/tutorials/pairwise)
 
       Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity (), prev, targetToSource;// Ti Source to target
       PointCloudWithNormals::Ptr reg_result = points_with_normals_src;
@@ -179,7 +182,7 @@
 
     ==============================================
 
-    正态分布变换进行配准（normal Distributions Transform）
+＃＃　正态分布变换进行配准（normal Distributions Transform）
 
     介绍关于如何使用正态分布算法来确定两个大型点云之间的刚体变换，
     正态分布变换算法是一个配准算法，它应用于三维点的统计模型，
@@ -190,7 +193,7 @@
 
     ===================================
 
-    3d scanner for small objects
+## 物体三维模型重建　3d scanner for small objects
 
     1. 输入数据处理：
       计算法线、分割
