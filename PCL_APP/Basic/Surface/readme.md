@@ -91,4 +91,66 @@
     SDM (squared-distance-minimization　平方距离最小化. 
 [无序点云的B曲线拟合](bspline_fitting.cpp) 
 
+=================================================
+
+## 三维重构之泊松重构
+    pcl::Poisson<pcl::PointNormal> pn ;
+    通过本教程，我们将会学会：
+        如果通过泊松算法进行三维点云重构。
+        程序支持两种文件格式：*.pcd和*.ply
+        程序先读取点云文件，然后计算法向量，
+        接着使用泊松算法进行重构，最后显示结果。
+
+    #include <pcl/surface/poisson.h>// 泊松算法进行重构
+    ======================================================
+    //创建Poisson对象，并设置参数
+        pcl::Poisson<pcl::PointNormal> pn;
+        pn.setConfidence(false); //是否使用法向量的大小作为置信信息。如果false，所有法向量均归一化。
+        pn.setDegree(2); //设置参数degree[1,5],值越大越精细，耗时越久。
+        pn.setDepth(8); 
+         //树的最大深度，求解2^d x 2^d x 2^d立方体元。
+         // 由于八叉树自适应采样密度，指定值仅为最大深度。
+
+        pn.setIsoDivide(8); //用于提取ISO等值面的算法的深度
+        pn.setManifold(false); //是否添加多边形的重心，当多边形三角化时。 
+    // 设置流行标志，如果设置为true，则对多边形进行细分三角话时添加重心，设置false则不添加
+        pn.setOutputPolygons(false); //是否输出多边形网格（而不是三角化移动立方体的结果）
+        pn.setSamplesPerNode(3.0); //设置落入一个八叉树结点中的样本点的最小数量。无噪声，[1.0-5.0],有噪声[15.-20.]平滑
+        pn.setScale(1.25); //设置用于重构的立方体直径和样本边界立方体直径的比率。
+        pn.setSolverDivide(8); //设置求解线性方程组的Gauss-Seidel迭代方法的深度
+        //pn.setIndices();
+
+        //设置搜索方法和输入点云
+        pn.setSearchMethod(tree2);
+        pn.setInputCloud(cloud_with_normals);
+        //创建多变形网格，用于存储结果
+        pcl::PolygonMesh mesh;
+        //执行重构
+        pn.performReconstruction(mesh);
+
+======================================
+[三维重构之泊松重构](recon_poisson.cpp) 
+
+## 三维重构之移动立方体算法
+
+    #include <pcl/surface/marching_cubes_hoppe.h>// 移动立方体算法
+    #include <pcl/surface/marching_cubes_rbf.h>
+    ====================================
+      //初始化 移动立方体算法 MarchingCubes对象，并设置参数
+      pcl::MarchingCubes<pcl::PointNormal> *mc;
+      mc = new pcl::MarchingCubesHoppe<pcl::PointNormal> ();
+      //创建多变形网格，用于存储结果
+      pcl::PolygonMesh mesh;
+
+      //设置MarchingCubes对象的参数
+      mc->setIsoLevel (0.0f);
+      mc->setGridResolution (50, 50, 50);
+      mc->setPercentageExtendGrid (0.0f);
+
+      //设置搜索方法
+      mc->setInputCloud (cloud_with_normals);
+
+      //执行重构，结果保存在mesh中
+      mc->reconstruct (mesh);
+[三维重构之移动立方体算法重构](recon_marchingCubes.cpp) 
 
