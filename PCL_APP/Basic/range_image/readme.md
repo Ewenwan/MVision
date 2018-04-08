@@ -18,6 +18,66 @@
     下面的程序，首先是生成一个矩形点云，然后基于该点云创建深度图像。
     在3D视窗中以点云形式进行可视化（深度图像来自于点云），
     另一种是将深度值映射为颜色，从而以彩色图像方式可视化深度图像， 
+    
+# 范围图像 深度图像 
+## 目前深度图像的获取方法有：
+	激光雷达深度成像法，
+	计算机立体视觉成像，
+	坐标测量机法，
+	莫尔条纹法，
+	结构光法等等。
+## 针对深度图像的研究重点主要集中在以下几个方面：
+	深度图像的分割技术 ，
+	深度图像的边缘检测技术 ，
+	基于不同视点的多幅深度图像的配准技术，
+	基于深度数据的三维重建技术，
+	基于三维深度图像的三维目标识别技术，
+	深度图像的多分辨率建模和几何压缩技术等等。
+
+## 在PCL 中深度图像与点云最主要的区别在于  其近邻的检索方式的不同，并且可以互相转换。 
+
+
+## 模块RangeImage相关概念以及算法的介绍
+	深度图像（Depth Images）也被称为距离影像（Range Image），
+	是指将从图像采集器到场景中各点的距离值作为像素值的图像，
+	它直接反应了景物可见表面的几何形状，
+	利用它可以很方便的解决3D目标描述中的许多问题，
+	深度图像经过点云变换可以计算为点云数据，
+	有规则及有必要信息的点云数据可以反算为深度图像数据。
+
+## 1）PCL中的模块RangeImage相关类的介绍
+        pcl_range_image库中包含两个表达深度图像和对深度图像进行操作的类，
+	其依赖于pcl::common模块，深度图像（距离图像）的像素值代表从传感器到物体的距离以及深度，  
+	深度图像是物体的三维表示形式，
+	一般通过立体照相机或者ToF照相机获取，
+	如果具备照相机的内标定参数，就可以将深度图像转换为点云
+
+
+    void  	createFromPointCloud (	const PointCloudType &point_cloud, 
+				float angular_resolution=pcl::deg2rad(0.5f), 
+				float max_angle_width=pcl::deg2rad(360.0f), 
+				float max_angle_height=pcl::deg2rad(180.0f), 
+				const Eigen::Affine3f &sensor_pose=Eigen::Affine3f::Identity(), 
+				CoordinateFrame coordinate_frame=CAMERA_FRAME, 
+				float noise_level=0.0f, 
+				float min_range=0.0f, 
+				int border_size=0)
+
+  	从点云创建深度图像，
+	point_cloud        为指向创建深度图像所需要的点云的引用，
+	angular_resolution 为模拟的深度传感器的角度分辨率，即深度图像中一个像素对应的角度大小，
+	max_angle_width    为模拟的深度传感器的水平最大采样角度，
+	max_angle_height   为模拟传感器的垂直方向最大采样角度，
+	sensor_pose        设置模拟的深度传感器的位姿是一个仿射变换矩阵，默认为4*4的单位矩阵变换，
+	coordinate_frame   定义按照那种坐标系统的习惯默认为CAMERA_FRAME，
+	noise_level        获取深度图像深度时，近邻点对查询点距离值的影响水平，
+	min_range          设置最小的获取距离，小于最小获取距离的位置为传感器的盲区，
+	border_size        获得深度图像的边缘的宽度 默认为0 该函数中涉及的角度的单位都是弧度。
+
+[参考](https://blog.csdn.net/u013019296/article/details/70052332)
+
+    
+    
 # 生成深度图像（范围图像）提取边界（根据深度信息映射到像素 再分割）
 
     如何从深度图像中提取边界（从前景跨越到背景的位置定义为边界）
