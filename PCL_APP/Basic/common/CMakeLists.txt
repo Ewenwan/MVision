@@ -29,7 +29,13 @@ target_link_libraries (concatenate_cloud ${PCL_LIBRARIES})
 add_executable (openni_grabber openni_grabber.cpp)
 target_link_libraries (openni_grabber ${PCL_LIBRARIES})
 
+# 计算 点云中心
+add_executable (compute_cent compute_centroid.cpp)
+target_link_libraries (compute_cent ${PCL_LIBRARIES})
 
+# .pcd文件到.ply文件的转换
+add_executable (pcd2ply pcd2ply.cpp)
+target_link_libraries (pcd2ply ${PCL_LIBRARIES})
 
 
 
