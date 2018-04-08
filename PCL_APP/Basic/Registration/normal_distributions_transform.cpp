@@ -3,6 +3,16 @@
 使用正态分布变换进行配准的实验 。
 其中room_scan1.pcd  room_scan2.pcd这些点云包含同一房间360不同视角的扫描数据
 [download](http://pointclouds.org/documentation/tutorials/normal_distributions_transform.php#normal-distributions-transform)
+
+正态分布变换进行配准（normal Distributions Transform）
+
+介绍关于如何使用正态分布算法来确定两个大型点云之间的刚体变换，
+正态分布变换算法是一个配准算法，它应用于三维点的统计模型，
+使用标准最优化技术来确定两个点云间的最优匹配，
+因为其在配准的过程中不利用对应点的特征计算和匹配，
+所以时间比其他方法比较快.
+
+
 */
 #include <iostream>
 #include <pcl/io/pcd_io.h>
