@@ -37,6 +37,12 @@ main (int, char**)
   pcl::PointCloud<pcl::PointXYZ>::Ptr output (new pcl::PointCloud<pcl::PointXYZ>);
   extract_indices.filter (*output);//提取对于索引的点云
 
+//　外点　绿色
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_other(new pcl::PointCloud<pcl::PointXYZ>);
+// *cloud_other = *cloud - *output;
+  // 移去平面局内点，提取剩余点云
+  extract_indices.setNegative (true);
+  extract_indices.filter (*cloud_other);
   std::cout << "Output has " << output->points.size () << " points." << std::endl;
   return (0);
 }
