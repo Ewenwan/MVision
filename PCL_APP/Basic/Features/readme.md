@@ -16,7 +16,7 @@
     比如法线方向、曲率、文理特征、颜色、领域中心距、协方差矩阵、熵等等。
     如同图像的特征（sifi surf orb）一样，我们需要使用类似的方式来描述三维点云的特征。
     
-    常用的特征描述算法有：
+## 常用的特征描述算法有：
     
         1. 法线和曲率计算 normal_3d_feature 、
         2. 特征值分析、
@@ -44,7 +44,7 @@
     或几何特征（geometric features）,
     文本中剩余部分都统称为点特征表示。
 
-    下面几个条件，通过能否获得相同的局部表面特征值，可以判定点特征表示方式的优劣：
+## 下面几个条件，通过能否获得相同的局部表面特征值，可以判定点特征表示方式的优劣：
         （1）刚体变换-----即三维旋转和三维平移变化 不会影响特征向量F估计，
             即特征向量具有平移选转不变性。
 
@@ -87,8 +87,7 @@
 [参考理解](http://geometryhub.net/notes/pointcloudnormal)
 [PCA降维到 二维平面去法线](http://blog.codinglabs.org/articles/pca-tutorial.html)
 
-
-    点云法线有什么用
+### 点云法线有什么用
     点云渲染：法线信息可以用于光照渲染，有些地方也称着色（立体感）。
     如下图所示，左边的点云没有法线信息，右边的点云有法线信息。
     比如Phone光照模型里，
@@ -105,6 +104,7 @@
     可以想象得到这个平面一定是它的切平面(在切平面上才可以尽可能分散）
     3）切平面的法线就是该点的法线了，而这样的法线有两个，
     取哪个还需要考虑临近点的凸包方向
+### code
     #include <pcl/features/normal_3d.h>//法线特征
     --------------------------------------------------------------
     // 创建法线估计类====================================
@@ -120,7 +120,7 @@
       //ne.setKSearch(8);       //其二 指定临近点数量
       // 计算表面法线特征
       ne.compute (cloud_normals);
-
+[法线曲率特征 NormalEstimation](normal_3d_feature.cpp) 
     -------------------------------------------------------------
 ## 【2】积分图计算一个有序点云的法线 pcl::IntegralImageNormalEstimation
     使用积分图计算一个有序点云的法线，注意该方法只适用于有序点云
@@ -151,10 +151,12 @@
       ne.setNormalSmoothingSize(10.0f);
       ne.setInputCloud(cloud_ptr);
       ne.compute(normals);
-
+[积分图计算一个有序点云的法线 IntegralImageNormalEstimation ](normal_estimation_using_integral_images.cpp)
     --------------------------------------------
 
-##  【3】 点特征直方图(PFH)描述子 临近k个点之间 k×k个点对 法线角度差(r p y) + 距离
+##  【3】 点特征直方图(PFH)描述子  pcl::PFHEstimation
+> 临近k个点之间 k×k个点对 法线角度差(r p y) + 距离
+    
     计算法线---计算临近点对角度差值-----直方图--
     点特征直方图(PFH)描述子
     点特征直方图(Point Feature Histograms)
@@ -179,7 +181,7 @@
     这样就组成了一个125浮点数元素的特征向量（15），
     其保存在一个pcl::PFHSignature125的点类型中。
 
-    头文件
+### 头文件
     #include <pcl/features/pfh.h>
     #include <pcl/features/normal_3d.h>//法线特征
     ---------------------------------------------------
@@ -215,8 +217,11 @@
       pfh.setRadiusSearch (0.05);
       //计算pfh特征值
       pfh.compute (*pfh_fe_ptr);
+[点特征直方图(PFH)描述子 PFHEstimation](PFH_features.cpp)
     ----------------------------------------------------------------------
-## 【4】快速点特征直方图(FPFH)描述子 当前点 和周围k个点之间 k对点对 法线角度差(r p y) + 距离
+## 【4】快速点特征直方图(FPFH)描述子  pcl::FPFHEstimation
+> 当前点 和周围k个点之间 k对点对 法线角度差(r p y) + 距离
+
     phf点特征直方图 计算复杂度还是太高 
     计算法线---计算临近点对角度差值-----直方图--
     因此存在一个O(nk^2) 的计算复杂性。
@@ -255,9 +260,7 @@
     3. 把所有结果统计输出到一个SPFH直方图
     4. 得到 p 的邻域元素
     5. 使用 p 的每一个SPFH和一个权重计算式，来计算最终 p 的FPFH
-
-
-
+    
     头文件
     #include <pcl/features/fpfh.h>
     #include <pcl/features/normal_3d.h>//法线特征
@@ -313,10 +316,14 @@
       fpfh.setRadiusSearch (0.05);
         //计算pfh特征值
       fpfh.compute (*fpfh_fe_ptr);
+      
+[快速点特征直方图(FPFH)描述子 FPFHEstimation](fasterPFH_features.cpp)      
     ---------------------------------------------------------------
 
 
-## 【5】视点特征直方图VFH(Viewpoint Feature Histogram)描述子 视角向量和点法线夹角
+## 【5】视点特征直方图  pcl::VFHEstimation
+> VFH(Viewpoint Feature Histogram)描述子 视角向量和点法线夹角
+
     它是一种新的特征表示形式，应用在点云聚类识别和六自由度位姿估计问题。
 
     视点特征直方图（或VFH）是源于FPFH描述子.
@@ -324,16 +331,16 @@
     但是为了使构造的特征保持缩放不变性的性质同时，
     还要区分不同的位姿，计算时需要考虑加入视点变量。
 
-    我们做了以下两种计算来构造特征，以应用于目标识别问题和位姿估计：
-    1.扩展FPFH，使其利用整个点云对象来进行计算估计（如2图所示），
-    在计算FPFH时以物体中心点与物体表面其他所有点之间的点对作为计算单元。
+### 我们做了以下两种计算来构造特征，以应用于目标识别问题和位姿估计：
+        1.扩展FPFH，使其利用整个点云对象来进行计算估计（如2图所示），
+            在计算FPFH时以物体中心点与物体表面其他所有点之间的点对作为计算单元。
 
-    2.添加视点方向与每个点估计法线之间额外的统计信息，为了达到这个目的，
-    我们的关键想法是在FPFH计算中将视点方向变量直接融入到相对法线角计算当中。
+        2.添加视点方向与每个点估计法线之间额外的统计信息，为了达到这个目的，
+            我们的关键想法是在FPFH计算中将视点方向变量直接融入到相对法线角计算当中。
 
     因此新组合的特征被称为视点特征直方图（VFH）。
     
-    下图表体现的就是新特征的想法，包含了以下两部分：
+### 下图表体现的就是新特征的想法，包含了以下两部分：
         1.一个视点方向相关的分量
         2.一个包含扩展FPFH的描述表面形状的分量
 
@@ -345,7 +352,7 @@
     对于一个已知的点云数据集，只一个单一的VFH描述子，
     而合成的PFH/FPFH特征的数目和点云中的点数目相同。
 
-    头文件
+### 头文件
     #include <pcl/features/vfh.h>
     #include <pcl/features/normal_3d.h>//法线特征
 
@@ -389,9 +396,10 @@
       //计算pfh特征值
       vfh.compute (*vfh_fe_ptr);
 
+[视点特征直方图VFH VFHEstimation](vFH_Feature.cpp) 
     ----------------------------------------------------------
 
-## 【6】NARF　深度图像　边缘特征
+## 【6】NARF　深度图像　边缘特征  pcl::NarfKeypoint   pcl::NarfDescriptor
     从深度图像(RangeImage)中提取NARF关键点  pcl::NarfKeypoint   
      然后计算narf特征 pcl::NarfDescriptor
     边缘提取
@@ -444,9 +452,11 @@
       narf_descriptor.getParameters().rotation_invariant = rotation_invariant;
       pcl::PointCloud<pcl::Narf36> narf_descriptors;
       narf_descriptor.compute (narf_descriptors);
+      
+[NARF　深度图像　边缘特征 NarfKeypoint  NarfDescriptor ](narf_feature.cpp) 
 
     ---------------------------------------------------------------
-## 【7】RoPs特征(Rotational Projection Statistics　旋转投影统计特征　) 描述子
+## 【7】RoPs特征(Rotational Projection Statistics　旋转投影统计特征　) 描述子 pcl::ROPSEstimation 
         0.　在关键点出建立局部坐标系。
         1.　在一个给定的角度在当前坐标系下对关键点领域(局部表面) 进行旋转
         2.　把 局部表面 投影到 xy，yz，xz三个2维平面上
@@ -488,9 +498,9 @@
       pcl::PointCloud<pcl::Histogram <135> >::Ptr histograms (new pcl::PointCloud <pcl::Histogram <135> > ());
       feature_estimator.compute (*histograms);
 
-
+[旋转投影统计特征 ROPSEstimation ](rOPSEstimation.cpp) 
     -------------------------------------
-## 【8】momentofinertiaestimation类获取基于惯性偏心矩 描述子。
+## 【8】惯性偏心矩 描述子   pcl::MomentOfInertiaEstimation 
     这个类还允许提取云的轴对齐和定向包围盒。
     但请记住，不可能的最小提取OBB包围盒。
 
@@ -533,7 +543,7 @@
       feature_extractor.getEigenValues (major_value, middle_value, minor_value);//特征值
       feature_extractor.getEigenVectors (major_vector, middle_vector, minor_vector);//特征向量
       feature_extractor.getMassCenter (mass_center);//点云中心点
-
+[惯性偏心矩 描述子 包围盒 MomentOfInertiaEstimation ](bounding_boxes_fea.cpp) 
     --------------------------------------------------------------------
 ## 【9】全局一致的空间分布描述子特征
     Globally Aligned Spatial Distribution (GASD) descriptors
@@ -563,7 +573,7 @@
       gasd.compute (descriptor);
       // 得到匹配 变换
       Eigen::Matrix4f trans = gasd.getTransform();
-
+[全局一致的空间分布描述子特征 GASDColorEstimation ](Globally_Aligned_Spatial_Distribution.cpp) 
     ---------------------------------------------------------------
 ## 【10】 特征描述算子算法基准化分析
     使用FeatureEvaluationFramework类对不同的特征描述子算法进行基准测试，
