@@ -8,7 +8,6 @@
 
 ./random_sample_consensus -sf
 
-
 */
 #include <iostream>
 #include <pcl/console/parse.h>
