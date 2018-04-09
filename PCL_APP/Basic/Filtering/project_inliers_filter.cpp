@@ -5,6 +5,8 @@
 参数化模型通过一组参数来设定，对于平面来说使用其等式形式。
 在PCL中有特定存储常见模型系数的数据结构。
 
+投影滤波类就是输入点云和投影模型，输出为投影到模型上之后的点云。
+
 #include <pcl/ModelCoefficients.h>        //模型系数头文件
 #include <pcl/filters/project_inliers.h> 　//投影滤波类头文件
 
