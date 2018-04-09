@@ -1,4 +1,5 @@
 /*
+统计滤波器用于去除明显离群点
 下载桌子点云数据
 https://raw.github.com/PointCloudLibrary/data/master/tutorials/table_scene_lms400.pcd
 
