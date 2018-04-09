@@ -3,7 +3,7 @@
     可以一次删除满足对输入的点云设定的一个或多个条件指标的所有的数据点
     删除点云中不符合用户指定的一个或者多个条件的数据点
 不在条件范围内的点　被替换为　nan
-
+pcl::removeNaNFromPointCloud()去除Nan点
 #include <pcl/filters/conditional_removal.h>
 */
 #include <iostream>
