@@ -135,7 +135,6 @@ int main (int argc, char** argv)
         boost::this_thread::sleep(boost::posix_time::microseconds(100000));
     }
 
-
   return (0);
 }
 
