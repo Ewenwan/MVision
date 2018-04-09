@@ -1,34 +1,38 @@
 # 点云分割
 
-    点云的分割与分类也算是一个大Topic了，这里因为多了一维就和二维图像比多了许多问题，
-    点云分割又分为区域提取、线面提取、语义分割与聚类等。
-    
-    同样是分割问题，点云分割涉及面太广，确实是三言两语说不清楚的。
-    
-    只有从字面意思去理解了，遇到具体问题再具体归类。
-    
-    一般说来，点云分割是目标识别分类的基础。
+	点云分割是根据空间，几何和纹理等特征对点云进行划分，
+	使得同一划分内的点云拥有相似的特征，点云的有效分割往往是许多应用的前提，
+	例如逆向工作，CAD领域对零件的不同扫描表面进行分割，
+	然后才能更好的进行空洞修复曲面重建，特征描述和提取，
+	进而进行基于3D内容的检索，组合重用等。
 
-    分割：
-      区域声场、
-      Ransac线面提取、
-      NDT-RANSAC、
-      K-Means、
-      Normalize Cut、
-      3D Hough Transform(线面提取)、
-      连通分析。
 
-    分类：
-      基于点的分类，
-      基于分割的分类，
-      监督分类与非监督分类
+	点云的分割与分类也算是一个大Topic了，这里因为多了一维就和二维图像比多了许多问题，
+	点云分割又分为区域提取、线面提取、语义分割与聚类等。
+	同样是分割问题，点云分割涉及面太广，确实是三言两语说不清楚的。
+	只有从字面意思去理解了，遇到具体问题再具体归类。
+	一般说来，点云分割是目标识别分类的基础。
 
-    语义分类：
-      获取场景点云之后，如何有效的利用点云信息，如何理解点云场景的内容，
-      进行点云的分类很有必要，需要为每个点云进行Labeling。
-      可以分为基于点的分类方法和基于分割的分类方法。
-      从方法上可以分为基于监督分类的技术或者非监督分类技术，
-      深度学习也是一个很有希望应用的技术
+## 分割：
+	区域声场、
+	Ransac线面提取、
+	NDT-RANSAC、
+	K-Means、
+	Normalize Cut、
+	3D Hough Transform(线面提取)、
+	连通分析。
+
+## 分类：
+	基于点的分类，
+	基于分割的分类，
+	监督分类与非监督分类
+
+## 语义分类：
+	获取场景点云之后，如何有效的利用点云信息，如何理解点云场景的内容，
+	进行点云的分类很有必要，需要为每个点云进行Labeling。
+	可以分为基于点的分类方法和基于分割的分类方法。
+	从方法上可以分为基于监督分类的技术或者非监督分类技术，
+	深度学习也是一个很有希望应用的技术
 
 
 
@@ -36,10 +40,11 @@
     在计算机视觉领域广泛的使用各种不同的采样一致性参数估计算法用于排除错误的样本，
     样本不同对应的应用不同，例如剔除错误的配准点对，分割出 处在模型上的点集，
     PCL中以随机采样一致性算法（RANSAC）为核心，
+    
     同时实现了五种类似与随机采样一致形算法的随机参数估计算法:
-        例如随机采样一致性算法（RANSAC）、
-        最大似然一致性算法（MLESAC）、
-        最小中值方差一致性算法（LMEDS）等，
+        1. 例如随机采样一致性算法（RANSAC）、
+        2. 最大似然一致性算法（MLESAC）、
+        3. 最小中值方差一致性算法（LMEDS）等，
     所有估计参数算法都符合一致性原则。
     在PCL中设计的采样一致性算法的应用主要就是对点云进行分割，根据设定的不同的几个模型，
     估计对应的几何参数模型的参数，在一定容许的范围内分割出在模型上的点云。 
@@ -50,15 +55,13 @@
     它可以从一组包含“局外点”的观测数据集中，通过迭代方式估计数学模型的参数。
     
     它是一种不确定的算法——它有一定的概率得出一个合理的结果；
-    
+  
     为了提高概率必须提高迭代次数。
-
-     数 据分两种：
+    数据分两种：
        有效数据（inliers）和
        无效数据（outliers）。
        
      偏差不大的数据称为有效数据，
-     
      偏差大的数据是无效数据。
      
      如果有效数据占大多数，无效数据只是少量时，
@@ -74,17 +77,19 @@
     相反，RANSAC能得出一个仅仅用局内点计算出模型，并且概 率还足够高。
     但是，RANSAC并不能保证结果一定正确，为了保证算法有足够高的合理概率，我们必须小心的选择算法的参数。
 
-    左图：包含很多局外点的数据集        右图：RANSAC找到的直线（局外点并不影响结果）
+    左图：包含很多局外点的数据集   右图：RANSAC找到的直线（局外点并不影响结果）
     
-#### 概述
-
-	    RANSAC算法的输入是一组观测数据，一个可以解释或者适应于观测数据的参数化模型，一些可信的参数。
-	    RANSAC通过反复选择数据中的一组随机子集来达成目标。被选取的子集被假设为局内点，并用下述方法进行验证：
-	    1.有一个模型适应于假设的局内点，即所有的未知参数都能从假设的局内点计算得出。
-	    2.用1中得到的模型去测试所有的其它数据，如果某个点适用于估计的模型，认为它也是局内点。
-	    3.如果有足够多的点被归类为假设的局内点，那么估计的模型就足够合理。
-	    4.然后，用所有假设的局内点去重新估计模型，因为它仅仅被初始的假设局内点估计过。
-	    5.最后，通过估计局内点与模型的错误率来评估模型。
+#### RANSAC算法概述
+	RANSAC算法的输入是一组观测数据，一个可以解释或者适应于观测数据的参数化模型，一些可信的参数。
+	RANSAC通过反复选择数据中的一组随机子集来达成目标。被选取的子集被假设为局内点，
+	并用下述方法进行验证：
+	
+	1.有一个模型适应于假设的局内点，即所有的未知参数都能从假设的局内点计算得出。
+	2.用1中得到的模型去测试所有的其它数据，如果某个点适用于估计的模型，认为它也是局内点。
+	3.如果有足够多的点被归类为假设的局内点，那么估计的模型就足够合理。
+	4.然后，用所有假设的局内点去重新估计模型，因为它仅仅被初始的假设局内点估计过。
+	5.最后，通过估计局内点与模型的错误率来评估模型。
+	
 #### 算法
     伪码形式的算法如下所示：
 ##### 输入：
@@ -192,8 +197,97 @@
     4.获取距离阈值  double   getDistanceThreshold ()
     5.设置最大迭代次数 void  setMaxIterations (int max_iterations)
     6.获取最大迭代次数 int   getMaxIterations ()
+     
+## 1 随机采样一致性 球模型 和 平面模型 pcl::SampleConsensusModelSphere  pcl::SampleConsensusModelPlane
+	在没有任何参数的情况下，三维窗口显示创建的原始点云（含有局内点和局外点），
+	如图所示，很明显这是一个带有噪声的菱形平面，
+	噪声点是立方体，自己要是我们在产生点云是生成的是随机数生在（0，1）范围内。
+	./random_sample_consensus
+	./random_sample_consensus -f
+	./random_sample_consensus -sf
+### code	
+	#include <pcl/sample_consensus/ransac.h>          // 采样一致性
+	#include <pcl/sample_consensus/sac_model_plane.h> // 平面模型
+	#include <pcl/sample_consensus/sac_model_sphere.h>// 球模型
 
-[随机采样一致性 球模型 和 平面模型](random_sample_consensus.cpp)
+	//创建随机采样一致性对象
+	pcl::SampleConsensusModelSphere<pcl::PointXYZ>::Ptr
+	model_s(new pcl::SampleConsensusModelSphere<pcl::PointXYZ> (cloud));   //针对球模型的对象
+	pcl::SampleConsensusModelPlane<pcl::PointXYZ>::Ptr
+	model_p (new pcl::SampleConsensusModelPlane<pcl::PointXYZ> (cloud));   //针对平面模型的对象
 
-## 欧氏距离分割
-## 区域增长分割
+	//根据命令行参数，来随机估算对应平面模型，并存储估计的局内点
+	pcl::RandomSampleConsensus<pcl::PointXYZ> ransac (model_p);
+	ransac.setDistanceThreshold (.01);    //与平面距离小于0.01 的点称为局内点考虑
+	ransac.computeModel();                //执行随机参数估计
+	ransac.getInliers(inliers);           //存储估计所得的局内点
+
+	//根据命令行参数  来随机估算对应的圆球模型，存储估计的内点
+	pcl::RandomSampleConsensus<pcl::PointXYZ> ransac (model_s);
+	ransac.setDistanceThreshold (.01);
+	ransac.computeModel();
+	ransac.getInliers(inliers);
+
+[随机采样一致性 球模型 和 平面模型 SampleConsensusModelSphere Plane](random_sample_consensus.cpp)
+---------------------------------------------------------------------
+
+## 2 分割平面 平面模型分割  基于随机采样一致性   pcl::SACSegmentation  pcl::SACMODEL_PLANE
+	平面模型分割
+	
+	基于随机采样一致性
+	// 模型系数
+	  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+	  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);//内点索引
+	 // pcl::PointIndices::Ptr outliers (new pcl::PointIndices);//外点索引
+	// 创建一个点云分割对象
+	  pcl::SACSegmentation<pcl::PointXYZ> seg;
+	  // 是否优化模型系数
+	  seg.setOptimizeCoefficients (true);
+	  // 设置模型　和　采样方法
+	  seg.setModelType (pcl::SACMODEL_PLANE);//　平面模型
+	  seg.setMethodType (pcl::SAC_RANSAC);// 随机采样一致性算法
+	  seg.setDistanceThreshold (0.01);//是否在平面上的阈值
+
+	  seg.setInputCloud (cloud);//输入点云
+	  seg.segment (*inliers, *coefficients);//分割　得到平面系数　已经在平面上的点的　索引
+[平面模型分割 ModelCoefficients SACMODEL_PLANE SACSegmentation ](planar_segmentation.cpp)	  
+
+## 3 圆柱体分割　依据法线信息分割 平面上按　圆柱体模型分割得到圆柱体点云
+
+
+[圆柱体分割 依据法线信息分割 ](cylinder_segmentation.cpp)
+
+## 4 欧氏距离分割 平面模型分割平面　平面上按　聚类得到　多个点云团
+
+
+[欧氏距离分割 聚类得到　多个点云团 ](clusters_segmentation.cpp)	 
+
+
+## 5 基于　法线差值　和　曲率差值的　区域聚类分割算法
+
+
+[基于法线差值和曲率差值的区域聚类分割算法](region_growing_normal_cur.cpp)
+
+## 6 基于颜色的　区域聚类分割算法
+
+[](color_based_region_growing_segmentation.cpp)
+
+## 7 最小分割算法  (分割点云) 基于距离加权的最小图分割算法
+
+
+[最小分割 距离加权的最小图分割算法 ](min_Cut_Based_Segmentation.cpp)
+
+## 8 基于不同领域半径估计的　法线的差异类 欧氏聚类 分割 点云
+
+
+[基于不同领域半径估计的　法线的差异类 欧氏聚类 分割 ](Difference_of_Normals_in_diff_radis__Segmentation.cpp)	 
+
+## 9 超体聚类是一种图像的分割方法
+
+
+[超体聚类是一种图像的分割方法 ](supervoxel_clustering.cpp)
+
+
+## 10 使用渐进式形态学滤波器 识别地面 
+[使用渐进式形态学滤波器 识别地面 ](ProgressiveMorphologicalFilter_segmentation.cpp)
+
