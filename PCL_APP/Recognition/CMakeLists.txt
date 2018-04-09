@@ -22,11 +22,21 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions( ${PCL_DEFINITIONS} )
 
 
-# 【5】计算法线向量
-#【6】下采样滤波使用均匀采样（可以试试体素格子下采样）得到关键点
-#【7】为keypoints关键点计算SHOT描述子
-#【8】按存储方法KDTree匹配两个点云（描述子向量匹配）点云分组得到匹配的组 描述 点对匹配关系
-#【9】参考帧霍夫聚类/集合一致性聚类得到 匹配点云cluster  平移矩阵和 匹配点对关系
+# 基于对应分组的三维物体识别
+#【1】计算法线向量
+#【2】下采样滤波使用均匀采样（可以试试体素格子下采样）得到关键点
+#【3】为keypoints关键点计算SHOT描述子
+#【4】按存储方法KDTree匹配两个点云（描述子向量匹配）点云分组得到匹配的组 描述 点对匹配关系
+#【5】参考帧霍夫聚类/集合一致性聚类得到 匹配点云cluster  平移矩阵和 匹配点对关系
 add_executable( correspondence_grouping correspondence_grouping.cpp)
 target_link_libraries( correspondence_grouping  ${PCL_LIBRARIES} )
+
+# 隐式形状模型 ISM （隐形状模型 （Implicit Shape Model））
+# 训练模型　识别模型点云
+add_executable(implicit_shape_model implicit_shape_model.cpp)
+target_link_libraries( implicit_shape_model  ${PCL_LIBRARIES} )
+
+# 3D物体识别的假设检验 对应分组的三维物体识别 icp点云配准　验证结果
+add_executable( hVObjectRec hypothesis_Ver_Object_Rec.cpp)
+target_link_libraries( hVObjectRec  ${PCL_LIBRARIES} )
 
