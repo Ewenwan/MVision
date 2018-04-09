@@ -368,4 +368,31 @@
 [模型 滤波器 ModelOutlierRemoval](Basic/Filtering/ModelOutlierRemoval.cpp)
                               
                               
-                              
+ ## h. 从一个点云中提取索引 根据点云索引提取对应的点云                     
+	基于某一分割算法提取点云中的一个子集
+	#include <pcl/filters/voxel_grid.h>
+	#include <pcl/filters/extract_indices.h>
+	// 设置ExtractIndices的实际参数
+	pcl::ExtractIndices<pcl::PointXYZ> extract;        //创建点云提取对象
+	// 创建点云索引对象　
+	pcl::PointIndices::Ptr inliers (new pcl::PointIndices());
+	// 分割点云
+	// 为了处理点云包含的多个模型，在一个循环中执行该过程并在每次模型被提取后，保存剩余的点进行迭代
+	seg.setInputCloud (cloud_filtered);// 设置源　滤波后的点云
+	seg.segment (*inliers, *coefficients);// 输入分割系数得到　分割后的点云　索引inliers
+	// 提取索引　Extract the inliers
+	extract.setInputCloud (cloud_filtered);
+	extract.setIndices (inliers);
+	extract.setNegative (false);
+	extract.filter (*cloud_p);// 按索引提取　点云
+	
+	//　外点　绿色
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_other(new pcl::PointCloud<pcl::PointXYZ>);
+	// *cloud_other = *cloud - *output;
+	// 移去平面局内点，提取剩余点云
+	extract_indices.setNegative (true);
+	extract_indices.filter (*cloud_other);
+	std::cout << "Output has " << output->points.size () << " points." << std::endl;
+	  
+[从一个点云中提取索引 根据点云索引提取对应的点云](Basic/Filtering/extract_indices.cpp)
+                             
