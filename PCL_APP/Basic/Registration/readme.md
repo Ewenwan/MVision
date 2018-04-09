@@ -29,13 +29,12 @@
     严格说来是6个参数，因为旋转矩阵也可以通过罗格里德斯变换转变成1*3的旋转向量。
 
 ## 常用的点云配准算法有两种：
-        正态分布变换方法  NDT  正态分布变换进行配准（normal Distributions Transform） 
-        和著名的ICP点云配准，
-        
-        此外还有许多其它算法       
-## 列举如下：
+        1. 正态分布变换方法  NDT  正态分布变换进行配准（normal Distributions Transform） 
+        2. 和著名的 迭代最近点 Iterative Closest Point （ICP） 点云配准，
+                    
+## 此外还有许多其它算法  列举如下：
         ICP：稳健ICP、point to plane ICP、point to line ICP、MBICP、GICP
-        NDT 3D、Multil-Layer NDT
+        NDT: NDT 3D、Multil-Layer NDT
         FPCS、KFPSC、SAC-IA
         Line Segment Matching、ICL
 
@@ -66,10 +65,10 @@
 
 ## 错误对应关系的去除（correspondence rejection）:
 
-      由于噪声的影响，通常并不是所有估计的对应关系都是正确的，
-      由于错误的对应关系对于最终的刚体变换矩阵的估算会产生负面的影响，
-      所以必须去除它们，可以采用随机采样一致性估计，或者其他方法剔除错误的对应关系，
-      最终只使用一定比例的对应关系，这样既能提高变换矩阵的估计京都也可以提高配准点的速度。
+        由于噪声的影响，通常并不是所有估计的对应关系都是正确的，
+        由于错误的对应关系对于最终的刚体变换矩阵的估算会产生负面的影响，
+        所以必须去除它们，可以采用随机采样一致性估计，或者其他方法剔除错误的对应关系，
+        最终只使用一定比例的对应关系，这样既能提高变换矩阵的估计京都也可以提高配准点的速度。
 
 ## 变换矩阵的估算（transormation estimation）的步骤如下:
 
@@ -90,12 +89,12 @@
 ### ICP处理流程分为四个主要的步骤：
 
         1. 对原始点云数据进行采样(关键点 keypoints(NARF, SIFT 、FAST、均匀采样 UniformSampling)、
-         特征描述符　descriptions，NARF、 FPFH、BRIEF 、SIFT、ORB )
+           特征描述符　descriptions，NARF、 FPFH、BRIEF 、SIFT、ORB )
         2. 确定初始对应点集(匹配 matching )
         3. 去除错误对应点对(随机采样一致性估计 RANSAC )
         4. 坐标变换的求解
 
-### Feature based registration
+### Feature based registration 配准
         1. SIFT 关键点 (pcl::SIFT…something)
         2. FPFH 特征描述符  (pcl::FPFHEstimation)  
         3. 估计对应关系 (pcl::CorrespondenceEstimation)
@@ -118,9 +117,10 @@
           pcl::recognition::ORROctree
           pcl::recognition::RotationSpace
           
-### ICP迭代最近点算法  pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+### 1. ICP迭代最近点算法  pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
     ===========================================================
-      pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;//创建IterativeClosestPoint的对象
+      pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
+         //创建IterativeClosestPoint的对象
       icp.setInputCloud(cloud_in);                 //cloud_in设置为点云的源点
       icp.setInputTarget(cloud_out);               //cloud_out设置为与cloud_in对应的匹配目标
       pcl::PointCloud<pcl::PointXYZ> Final;        //存储经过配准变换点云后的点云
@@ -131,7 +131,10 @@
       icp.getFinalTransformation()
     ===========================================================
     
-### 非线性ICP 配准对象
+[ICP迭代最近点算法 IterativeClosestPoint ](iterative_closest_point.cpp)   
+    
+    
+### 2. 非线性ICP 配准对象  逐步匹配多幅点云  pcl::IterativeClosestPointNonLinear
     pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg;   // 非线性ICP 配准对象
 
     逐步匹配多幅点云
@@ -150,11 +153,22 @@
     此文件为第一个和第二个点云配准后与第一个输入点云在同一个坐标系下的点云。
 [数据](https://github.com/PointCloudLibrary/data/tree/master/tutorials/pairwise)
 
-      Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity (), prev, targetToSource;// Ti Source to target
-      PointCloudWithNormals::Ptr reg_result = points_with_normals_src;
-      reg.setMaximumIterations (2);////设置最大的迭代次数，即每迭代两次就认为收敛，停止内部迭代
-      for (int i = 0; i < 30; ++i)   ////手动迭代，每手动迭代一次，在配准结果视口对迭代的最新结果进行刷新显示
-      {
+        // 配准
+        pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg;   // 配准对象
+        reg.setTransformationEpsilon (1e-6);   ///设置收敛判断条件，越小精度越大，收敛也越慢 
+        // Set the maximum distance between two correspondences (src<->tgt) to 10cm大于此值的点对不考虑
+        // Note: adjust this based on the size of your datasets
+        reg.setMaxCorrespondenceDistance (0.1);// 10cm大于此值的点对不考虑
+        // 设置点表示
+        reg.setPointRepresentation (boost::make_shared<const MyPointRepresentation> (point_representation));
+
+        reg.setInputSource (points_with_normals_src);   // 设置源点云
+        reg.setInputTarget (points_with_normals_tgt);   // 设置目标点云
+        Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity (), prev, targetToSource;// Ti Source to target
+        PointCloudWithNormals::Ptr reg_result = points_with_normals_src;
+        reg.setMaximumIterations (2);////设置最大的迭代次数，即每迭代两次就认为收敛，停止内部迭代
+        for (int i = 0; i < 30; ++i)   ////手动迭代，每手动迭代一次，在配准结果视口对迭代的最新结果进行刷新显示
+        {
         PCL_INFO ("Iteration Nr. %d.\n", i);
         // 存储点云以便可视化
         points_with_normals_src = reg_result;
@@ -171,35 +185,85 @@
         prev = reg.getLastIncrementalTransformation ();//　
         // visualize current state  vp_2 右边显示配准 
         showCloudsRight(points_with_normals_tgt, points_with_normals_src);
-      }
-      // Get the transformation from target to source
-      targetToSource = Ti.inverse();//deidao
+        }
+        // Get the transformation from target to source
+        targetToSource = Ti.inverse();//deidao
 
-      // Transform target back in source frame
-      pcl::transformPointCloud (*cloud_tgt, *output, targetToSource);
+        // Transform target back in source frame
+        pcl::transformPointCloud (*cloud_tgt, *output, targetToSource);
+        
+[非线性ICP 配准对象  逐步匹配多幅点云 IterativeClosestPointNonLinea ](pairwise_incremental_registration.cpp)
+ 
+## 3. 交互式ICP可视化的程序。
+        该程序将加载点云并对其进行刚性变换。
+        之后，使用ICP算法将变换后的点云与原来的点云对齐。
+        每次用户按下“空格”，进行ICP迭代，刷新可视化界面。
 
-    interactive_icp.cpp
+        在这里原始例程使用的是PLY格式的文件，可以找一个PLY格式的文件进行实验，
+        也可以使用格式转换文件 把PCD 文件转为PLY文件
+
+        Creating a mesh with Blender
+
+        1.  Install and open Blender then 
+            delete the cube in the scene by pressing “Del” key :
+        2. Add a monkey mesh in the scene :
+
+        3. Subdivide the original mesh to make it more dense :
+           Configure the subdivision to 2 or 3 for example : 
+           don’t forget to apply the modifier
+
+        4. Export the mesh into a PLY file :
+ 
+[交互式ICP可视化的程序]( interactive_icp.cpp)
 
     ==============================================
 
-＃＃　正态分布变换进行配准（normal Distributions Transform）
+## 4. 正态分布变换进行配准（normal Distributions Transform）
 
     介绍关于如何使用正态分布算法来确定两个大型点云之间的刚体变换，
     正态分布变换算法是一个配准算法，它应用于三维点的统计模型，
     使用标准最优化技术来确定两个点云间的最优匹配，
     因为其在配准的过程中不利用对应点的特征计算和匹配，
     所以时间比其他方法比较快.
+### code
+        // 初始化正态分布(NDT)对象
+        pcl::NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> ndt;
 
+        // 根据输入数据的尺度设置NDT相关参数
+        ndt.setTransformationEpsilon (0.01);// 为终止条件设置最小转换差异
+        ndt.setStepSize (0.1);              // 为more-thuente线搜索设置最大步长
+        ndt.setResolution (1.0);            // 设置NDT网格网格结构的分辨率（voxelgridcovariance）
 
+        //以上参数在使用房间尺寸比例下运算比较好，但是如果需要处理例如一个咖啡杯子的扫描之类更小的物体，需要对参数进行很大程度的缩小
+
+        //设置匹配迭代的最大次数，这个参数控制程序运行的最大迭代次数，一般来说这个限制值之前优化程序会在epsilon变换阀值下终止
+        //添加最大迭代次数限制能够增加程序的鲁棒性阻止了它在错误的方向上运行时间过长
+        ndt.setMaximumIterations (35);
+
+        ndt.setInputSource (filtered_cloud);  //源点云
+        // Setting point cloud to be aligned to.
+        ndt.setInputTarget (target_cloud);  //目标点云
+
+        // 设置使用机器人测距法得到的粗略初始变换矩阵结果
+        Eigen::AngleAxisf init_rotation (0.6931, Eigen::Vector3f::UnitZ ());
+        Eigen::Translation3f init_translation (1.79387, 0.720047, 0);
+        Eigen::Matrix4f init_guess = (init_translation * init_rotation).matrix ();
+
+        // 计算需要的刚体变换以便将输入的源点云匹配到目标点云
+        pcl::PointCloud<pcl::PointXYZ>::Ptr output_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+        ndt.align (*output_cloud, init_guess);
+    
+[download](http://pointclouds.org/documentation/tutorials/normal_distributions_transform.php#normal-distributions-transform)
+[正态分布变换进行配准 ](normal_distributions_transform.cpp)
     ===================================
 
 ## 物体三维模型重建　3d scanner for small objects
 
-    1. 输入数据处理：
+### 1. 输入数据处理：
       计算法线、分割
            通过将阈值应用到HSV颜色空间中的颜色中，将前景点分割为手和目标区域。
           手部区域扩大了几个像素，以减少意外将手点包括到物体云中的危险。
-    2. 点云配准:
+### 2. 点云配准:
       使用迭代最近点（ICP）算法将处理过的数据点云与普通模型网格对齐。
       适应度：　拒绝后对应关系的均方欧氏距离。
       预选择：　丢弃面向传感器的模型点。
@@ -216,7 +280,7 @@
       适应度大于用户定义的阈值（在收敛状态下进行评估）。
       模型网格和数据云之间的重叠小于用户定义的阈值（在收敛状态下进行评估）。
 
-    3. 模型合并:
+### 3. 模型合并:
       重构初始模型网格（无组织），并将已注册的数据云（组织）与模型合并。
 
       合并是通过从数据云搜索最近的邻居到模型网格，
@@ -232,4 +296,34 @@
       此设置确保当前正在合并的顶点始终保持在网格中，而不考虑可见性。
       一旦物体转过身，某些顶点就看不见了。
       年龄的增加，直到他们达到最大年龄时，如果他们被保留在网格或删除。
+### code 
+        // 估计物体点云　和　场景点云　fphf特征　Estimate features
+        pcl::console::print_highlight ("Estimating features...\n");
+        FeatureEstimationT fest;//　fphf特征估计
+        fest.setRadiusSearch (0.025);//　搜索半径
+        fest.setInputCloud (object);
+        fest.setInputNormals (object);
+        fest.compute (*object_features);//　物体点云　fphf特征
+        fest.setInputCloud (scene);
+        fest.setInputNormals (scene);
+        fest.compute (*scene_features);//　场景点云　fphf特征
 
+        // SampleConsensusPrerejective随机采样一致性　配准　Perform alignment
+        pcl::console::print_highlight ("Starting alignment...\n");
+        pcl::SampleConsensusPrerejective<PointNT,PointNT,FeatureT> align;//配准
+        align.setInputSource (object);//源点云
+        align.setSourceFeatures (object_features);//源点云　fphf特征
+        align.setInputTarget (scene);//目标点云
+        align.setTargetFeatures (scene_features);//目标点云　　特征
+        align.setMaximumIterations (50000); // 　RANSAC 　最大迭代次数
+        align.setNumberOfSamples (3); // 采样点数　Number of points to sample for generating/prerejecting a pose
+        align.setCorrespondenceRandomness (5);// 使用的特征数量　Number of nearest features to use
+        align.setSimilarityThreshold (0.9f); // 相似性　阈值　Polygonal edge length similarity threshold
+        align.setMaxCorrespondenceDistance (2.5f * leaf);// 内点　阈值　Inlier threshold
+        align.setInlierFraction (0.25f); // Required inlier fraction for accepting a pose hypothesis
+        {
+        pcl::ScopeTime t("Alignment");
+        align.align (*object_aligned);
+        }
+  
+[物体三维模型重建 ](alignment_prerejective.cpp)
