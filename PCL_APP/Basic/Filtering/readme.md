@@ -125,6 +125,16 @@
         sor.setInputCloud (cloud);            　　　　//设置需要过滤的点云(指针)　给滤波对象
         sor.setLeafSize (0.01f, 0.01f, 0.01f);  　　//设置滤波时创建的体素体积为1cm的立方体
         sor.filter (*cloud_filtered);           　　//执行滤波处理，存储输出
+	
+	
+	//  Approximate 体素格滤波器VoxelGrid　
+	pcl::ApproximateVoxelGrid<pcl::PointXYZ> approximate_voxel_filter;
+	approximate_voxel_filter.setLeafSize (0.2, 0.2, 0.2);
+	approximate_voxel_filter.setInputCloud (input_cloud);// 第二次扫描点云数据作为源点云
+	approximate_voxel_filter.filter (*filtered_cloud);
+	std::cout << "Filtered cloud contains " << filtered_cloud->size ()
+	<< " data points from room_scan2.pcd" << std::endl;
+
 
 [体素格滤波器 VoxelGrid](VoxelGrid_filter.cpp)
       --------------------------------------------------------------
