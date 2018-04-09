@@ -22,8 +22,8 @@
 	1. 直通滤波器　　pcl::PassThrough<pcl::PointXYZ> pass
       
 	2. 体素格滤波器　pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
-      
-      	3. 统计滤波器    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+	
+	3. 统计滤波器    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
       
 	4. 半径滤波器    pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;
       
