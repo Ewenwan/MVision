@@ -1,95 +1,141 @@
 # pcl 简介 
-      PCL（Point Cloud Library）是在吸收了前人点云相关研究基础上建立起来的大型跨平台开源C++编程库，
+      PCL（Point Cloud Library）是在吸收了前人点云相关研究基础上
+      建立起来的大型跨平台开源C++编程库，
       它实现了大量点云相关的通用算法和高效数据结构，
-      涉及到点云获取、滤波、分割、配准、检索、特征提取、识别、追踪、曲面重建、可视化等。
+      
+      涉及到
+            点云获取、
+            滤波、
+            分割、
+            配准、
+            检索、
+            特征提取、
+            识别、
+            追踪、
+            曲面重建、
+            可视化等。
+            
       支持多种操作系统平台，可在Windows、Linux、Android、Mac OS X、部分嵌入式实时系统上运行。
+      
       如果说OpenCV是2D信息获取与处理的结晶，
+      
       那么PCL就在3D信息获取与处理上具有同等地位，PCL是BSD授权方式，
+      
       可以免费进行商业和学术应用。
 
 # PCL的发展与创景
 
-      PCL起初是ROS（Robot Operating System）下由来自于慕尼黑大学（TUM - Technische Universität München）
-      和斯坦福大学（Stanford University）Radu博士等人维护和开发的开源项目，主要应用于机器人研究应用领域，
-      随着各个算法模块的积累，于2011年独立出来，正式与全球3D信息获取、处理的同行一起，组建了强大的开发维护团队，
+      PCL起初是ROS（Robot Operating System）下由来自于
+      慕尼黑大学（TUM - Technische Universität München）
+      和斯坦福大学（Stanford University）Radu博士等人维护和开发的开源项目，
+      主要应用于机器人研究应用领域，
+      随着各个算法模块的积累，于2011年独立出来，
+      正式与全球3D信息获取、处理的同行一起，组建了强大的开发维护团队，
       以多所知名大学、研究所和相关硬件、软件公司为主，可参考图1。
 
 
-##　机器人领域
+# PCL在机器人领域中的应用
 
-      移动机器人对其工作环境的有效感知、辨识与认知，是其进行自主行为优化并可靠完成所承担任务的前提和基础。
-      如何实现场景中物体的有效分类与识别是移动机器人场景认知的核心问题，目前基于视觉图像处理技术来进行
-      场景的认知是该领域的重要方法。但移动机器人在线获取的视觉图像质量受光线变化影响较大，
+      移动机器人对其工作环境的有效感知、辨识与认知，
+      是其进行自主行为优化并可靠完成所承担任务的前提和基础。
+      
+      如何实现场景中物体的　有效分类　与　识别是移动机器人场景认知的核心问题，
+      目前基于　视觉图像处理技术　来进行场景的认知是该领域的重要方法。
+      
+      但移动机器人在线获取的视觉图像质量受光线变化影响较大，
       特别是在光线较暗的场景更难以应用，随着RGBD获取设备的大量推广，在机器人领域势必掀起一股深度信息
+      
       结合2D信息的应用研究热潮，深度信息的引入能够使机器人更好地对环境进行认知、辨识，
+      
       与图像信息在机器人领域的应用一样，需要强大智能软件算法支撑，PCL就为此而生，
+      
       最重要的是PCL本身就是为机器人而发起的开源项目，PCL中不仅提供了对现有的RGBD信息的获取设备的支持，
-      还提供了高效的分割、特征提取、识别、追踪等最新的算法，
+      
+      还提供了高效的　分割、特征提取、识别、追踪等最新的算法，
       最重要的是它可以移植到android、ubuntu等主流Linux平台上，
       PCL无疑将会成为机器人应用领域一把瑞士军刀。
 
+# PCL在　虚拟现实、人机交互中的应用
 
-       虚拟现实、人机交互
-
-          虚拟现实技术（简称VR），又称灵境技术，是以沉浸性、交互性和构想性为基本特征的计算机高级人机界面。
-      它综合利用了计算机图形学、仿真技术、多媒体技术、人工智能技术、计算机网络技术、并行处理技术和多传感器技术，
-      模拟人的视觉、听觉、触觉等感觉器官功能，使人能够沉浸在计算机生成的虚拟境界中，并能够通过语言、
-      手势等自然的方式与之进行实时交互，创建了一种适人化的多维信息空间，具有广阔的应用前景。
-      目前各种交互式体感应用的推出，让虚拟现实与人机交互发展非常迅速，以微软、华硕、三星等为例，
-      目前诸多公司推出的RGBD解决方案，势必会让虚拟现实走出实验室，因为现有的RGBD设备已经开始大量推向市场，
+      虚拟现实技术（简称VR），又称灵境技术，
+      是以沉浸性、交互性和构想性为基本特征的计算机高级人机界面。
+      它综合利用了
+            计算机图形学、
+            仿真技术、
+            多媒体技术、
+            人工智能技术、
+            计算机网络技术、
+            并行处理技术和
+            多传感器技术，
+            
+      模拟人的视觉、听觉、触觉等感觉器官功能，
+      使人能够沉浸在计算机生成的虚拟境界中，并能够通过语言、
+      手势等自然的方式与之进行实时交互，
+      创建了一种适人化的多维信息空间，具有广阔的应用前景。
+      目前各种交互式体感应用的推出，
+      让虚拟现实与人机交互发展非常迅速，以微软、华硕、三星等为例，
+      目前诸多公司推出的RGBD解决方案，势必会让虚拟现实走出实验室，
+      因为现有的RGBD设备已经开始大量推向市场，
       只是缺少，其他应用的跟进，这正是在为虚拟现实和人机交互应用铸造生态链的底部，
       笔者认为这也正是PCL为何在此时才把自己与世人分享的重要原因所在，
       它将是基于RGBD设备的虚拟现实和人机交互应用生态链中最重要的一个环节。
       让我们抓住这一个节点，立足于交互式应用的一片小天地，但愿本书来的不是太迟。
 
-
-
-       PCL利用OpenMP、GPU、CUDA等先进高性能计算技术，通过并行化提高程序实时性。
-      K近邻搜索操作的构架是基于FLANN (Fast Library for Approximate Nearest Neighbors)所实现的，速度也是目前技术中最快的。
-      PCL中的所有模块和算法都是通过Boost共享指针来传送数据的，因而避免了多次复制系统中已存在的数据的需要，
+# PCL特点
+      PCL利用OpenMP、GPU、CUDA等先进高性能计算技术，通过并行化提高程序实时性。
+      K近邻搜索操作的构架是基于FLANN (Fast Library for Approximate Nearest Neighbors)
+      所实现的，速度也是目前技术中最快的。
+      PCL中的所有模块和算法都是通过Boost共享指针来传送数据的，
+      因而避免了多次复制系统中已存在的数据的需要，
       从0.6版本开始，PCL就已经被移入到Windows，MacOS和Linux系统，
       并且在Android系统也已经开始投入使用，这使得PCL的应用容易移植与多方发布。
 
       ========================================
-      在PCL中一个处理管道的基本接口程序是：
-        创建处理对象：（例如过滤、特征估计、分割等）;
-        使用setInputCloud通过输入点云数据，处理模块;
-        设置算法相关参数;
-        调用计算（或过滤、分割等）得到输出。
+# 在PCL中一个处理管道的基本接口程序是：
+      创建处理对象：（例如过滤、特征估计、分割等）;
+      使用setInputCloud通过输入点云数据，处理模块;
+      设置算法相关参数;
+      调用计算（或过滤、分割等）得到输出。
 
       为了进一步简化和开发，PCL被分成一系列较小的代码库，
       使其模块化，以便能够单独编译使用提高可配置性，特别适用于嵌入式处理中:
 
-       libpcl filters： 如采样、去除离群点、特征提取、拟合估计等数据实现过滤器；
-       libpcl features：实现多种三维特征，如曲面法线、曲率、边界点估计、矩不变量、主曲率，
-                        PFH和FPFH特征，旋转图像、积分图像，NARF描述子，RIFT，相对标准偏差，数据强度的筛选等等；
-       libpcl I/O：     实现数据的输入和输出操作，例如点云数据文件（PCD）的读写；
-       libpcl segmentation：实现聚类提取，如通过采样一致性方法对一系列参数模型（如平面、柱面、球面、直线等）
-                            进行模型拟合点云分割提取，提取多边形棱镜内部点云等等；
-       libpcl surface：     实现表面重建技术，如网格重建、凸包重建、移动最小二乘法平滑等；
-       libpcl register：    实现点云配准方法，如ICP等；
-       libpclkeypoints：    实现不同的关键点的提取方法，这可以用来作为预处理步骤，决定在哪儿提取特征描述符；
-       libpcl range ：      实现支持不同点云数据集生成的范围图像。
-
-
-      命令行安装　　编译好的二进制文件
+       1. libpcl filters： 
+            如采样、去除离群点、下采样(特征提取)、拟合估计等数据实现过滤器；
+       2. libpcl features：
+            实现多种三维特征，如曲面法线、曲率、边界点估计、矩不变量、主曲率，
+            PFH和FPFH特征，旋转图像、积分图像，NARF描述子，
+            RIFT，相对标准偏差，数据强度的筛选等等；
+       3. libpcl I/O：     
+            实现数据的输入和输出操作，例如点云数据文件（PCD）的读写；
+       4. libpcl segmentation：
+            实现聚类提取，如通过采样一致性方法对一系列参数模型（如平面、柱面、球面、直线等）
+            进行模型拟合点云分割提取，提取多边形棱镜内部点云等等；
+       5. libpcl surface：     
+            实现表面重建技术，如网格重建、凸包重建、移动最小二乘法平滑等；
+       6. libpcl register：   
+            实现点云配准方法，如ICP,NDT等；
+       7. libpclkeypoints：   
+            实现不同的关键点的提取方法，这可以用来作为预处理步骤，决定在哪儿提取特征描述符；
+       8. libpcl range ：      
+            实现支持不同点云数据集生成的范围图像。
+            
+# PCL命令行安装　　编译好的二进制文件     
       仓库
       sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
       sudo apt-get update
       sudo apt-get install libpcl-all
+      
+# 源码安装
+      安装依赖:
+            Boost，Eigen，FlANN，VTK，OpenNI，QHull
+            sudo apt-get install　build-essential　libboost-all-dev　
+            sudo apt-get install libvtk5-dev 
 
+## Vtk，（visualization toolkit 可视化工具包）是一个开源的免费软件系统，
 
+[Vtk教程](http://blog.csdn.net/www_doling_net/article/details/8763686)
 
-      【１】源码安装
-      安装依赖
-      Boost，Eigen，FlANN，VTK，OpenNI，QHull
-
-      sudo apt-get install　build-essential　libboost-all-dev　
-
-      sudo apt-get install libvtk5-dev 
-
-      Vtk，（visualization toolkit 可视化工具包）是一个开源的免费软件系统，
-      教程　http://blog.csdn.net/www_doling_net/article/details/8763686
       主要用于三维计算机图形学、图像处理和可视化。
       它在三维函数库OpenGL的基础上采用面向对象的设计方法发展而来，且具有跨平台的特性。 
       Vtk是在面向对象原理的基础上设计和实现的，它的内核是用C++构建的
@@ -108,22 +154,21 @@
       vtkProcessObject 过程对象一般也称为过滤器，按照某种运算法则对数据对象进行处理
 
 
-       FLANN介绍
+## FLANN介绍
       FLANN库全称是Fast Library for Approximate Nearest Neighbors，
       它是目前最完整的（近似）最近邻开源库。
-      http://www.cs.ubc.ca/research/flann/uploads/FLANN/flann_manual-1.8.4.pdf
-      去下载　http://www.cs.ubc.ca/research/flann/#download
+[最近邻开源库 论文](http://www.cs.ubc.ca/research/flann/uploads/FLANN/flann_manual-1.8.4.pdf)
+[安装下载](http://www.cs.ubc.ca/research/flann/#download)
 
-
-
+## Eigen安装　c++　矩阵运算库　几何学　坐标变换　其次坐标
       linux下安装
       sudo apt-get install libeigen3-dev
       定位安装位置
       locate eigen3
       sudo updatedb
 
+## 下载pcl源码 源码安装
 
-      下载源码
       git clone https://github.com/PointCloudLibrary/pcl pcl-trunk
 
       //注意　PCL_ROS 其实引用了PCL库，不要随意编译PCL库，可能导致PCL-ROS不能使用！
@@ -140,7 +185,7 @@
       make -j2
       sudo make -j2 install
 
-
+# 对象
       ====================================
       // .width 和 .height 对象 int
       cloud.width = 640; // there are 640 points per line 每一行 640个点
@@ -237,7 +282,7 @@
 
 
 
-      PCD（点云数据）文件格式，以下几种格式
+## PCD（点云数据）文件格式，以下几种格式
       （1）PLY是一种多边形文件格式，
       （2）STL是3D System公司创建的模型文件格式，主要应用于CAD，CAM领域
       （3）OBJ是从几何学上定义的文件格式，
@@ -308,7 +353,7 @@
 
 
       ======================
-      模板类实现
+##  模板类实现
       // foo.h
       #ifndef PCL_FOO_
       #define PCL_FOO_
@@ -385,7 +430,7 @@
       }
 
       =================================================
-      定义自己的算法类  
+##  定义自己的算法类  
        双边滤波（Bilateral filter）  示例
       http://pointclouds.org/documentation/tutorials/writing_new_classes.php#writing-new-classes
 
