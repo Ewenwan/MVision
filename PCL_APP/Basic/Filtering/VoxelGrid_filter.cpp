@@ -65,6 +65,7 @@ int
 
   // 创建滤波器对象　Create the filtering object
   pcl::VoxelGrid<pcl::PCLPointCloud2> vg;
+  // pcl::ApproximateVoxelGrid<pcl::PointXYZ> avg;
   vg.setInputCloud (cloud2_ptr);//设置输入点云
   vg.setLeafSize(0.01f, 0.01f, 0.01f);//　体素块大小　１cm
   vg.filter (*cloud2_filtered_ptr);
