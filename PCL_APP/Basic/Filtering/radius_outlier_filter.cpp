@@ -1,13 +1,13 @@
 /*
 球半径滤波器
 #include <pcl/filters/radius_outlier_removal.h>
-
-
 球半径滤波器与统计滤波器相比更加简单粗暴。
 以某点为中心　画一个球计算落在该球内的点的数量，当数量大于给定值时，
 则保留该点，数量小于给定值则剔除该点。
 此算法运行速度快，依序迭代留下的点一定是最密集的，
 但是球的半径和球内点的数目都需要人工指定。
+
+RadiusOutlinerRemoval比较适合去除单个的离群点   ConditionalRemoval 比较灵活，可以根据用户设置的条件灵活过滤
 
 */
 #include <iostream>
