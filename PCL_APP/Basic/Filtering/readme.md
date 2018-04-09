@@ -19,23 +19,23 @@
          4. 点云滤波依赖于集合信息而非数值信息
 
 ## 点云滤波方法主要有: 
-      1. 直通滤波器　　pcl::PassThrough<pcl::PointXYZ> pass
+	1. 直通滤波器　　pcl::PassThrough<pcl::PointXYZ> pass
       
-      2. 体素格滤波器　pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
+	2. 体素格滤波器　pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
       
-      3. 统计滤波器    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+      	3. 统计滤波器    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
       
-      4. 半径滤波器    pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;
+	4. 半径滤波器    pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;
       
-      5. 双边滤波  pcl::BilateralFilter<pcl::PointXYZ> bf;
-          该类的实现利用的并非XYZ字段的数据进行，
+	5. 双边滤波  pcl::BilateralFilter<pcl::PointXYZ> bf;
+          　该类的实现利用的并非XYZ字段的数据进行，
 	    而是利用强度数据进行双边滤波算法的实现，
 	    所以在使用该类时点云的类型必须有强度字段，否则无法进行双边滤波处理，
-          双边滤波算法是通过取临近采样点和加权平均来修正当前采样点的位置，
-	    从而达到滤波效果，同时也会有选择剔除与当前采样点“差异”太大的相邻采样点，从而保持原特征的目的 
+          　双边滤波算法是通过取临近采样点和加权平均来修正当前采样点的位置，
+	   从而达到滤波效果，同时也会有选择剔除与当前采样点“差异”太大的相邻采样点，从而保持原特征的目的 
           
-    	6. 高斯滤波    pcl::filters::GaussianKernel< PointInT, PointOutT >  
-         是基于高斯核的卷积滤波实现  高斯滤波相当于一个具有平滑性能的低通滤波器 
+	6. 高斯滤波    pcl::filters::GaussianKernel< PointInT, PointOutT >  
+         　是基于高斯核的卷积滤波实现  高斯滤波相当于一个具有平滑性能的低通滤波器 
 
 	7. 立方体滤波 pcl::CropBox< PointT>    
 	   过滤掉在用户给定立方体内的点云数据
@@ -43,19 +43,19 @@
 	8. 封闭曲面滤波 pcl::CropHull< PointT>   
 	    过滤在给定三维封闭曲面或二维封闭多边形内部或外部的点云数据     
           
-      9. 空间剪裁：
+	9. 空间剪裁：
             pcl::Clipper3D<pcl::PointXYZ>
             pcl::BoxClipper3D<pcl::PointXYZ>
             pcl::CropBox<pcl::PointXYZ>
             pcl::CropHull<pcl::PointXYZ> 剪裁并形成封闭曲面
             
-      10. 卷积滤波:实现将两个函数通过数学运算产生第三个函数，可以设定不同的卷积核
+	10. 卷积滤波:实现将两个函数通过数学运算产生第三个函数，可以设定不同的卷积核
             pcl::filters::Convolution<PointIn, PointOut>
             pcl::filters::ConvolvingKernel<PointInT, PointOutT>
             
-      11. 随机采样一致滤波
-      等，
-      通常组合使用完成任务。
+	11. 随机采样一致滤波
+        等，
+        通常组合使用完成任务。
       
 ## PCL中总结了几种需要进行点云滤波处理情况，这几种情况分别如下：
       （1）  点云数据密度不规则需要平滑
