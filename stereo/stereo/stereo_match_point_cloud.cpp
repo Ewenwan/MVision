@@ -25,6 +25,7 @@ http://blog.sina.com.cn/s/blog_c3db2f830101fp2l.html
 　　　　　　　　　　　　　　　Scanline 代价聚合优化种方法就是以左目图像的源匹配点为中心，
 	       
 现今Stereo matching算法大致可以分为三个部分： pre-process 、stereo matching 、post-process。
+1图像增强　2匹配　 3视差优化
 pre-process即为USM图像增强，直方图归一化或直方图规定化。
 post-process即为常规的disparity refinement，一般stereo matching算法出来的结果不会太好，
 可能很烂，但经过refinement后会得到平滑的结果。
