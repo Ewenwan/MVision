@@ -92,8 +92,17 @@
     透过棱镜的白光 　“White light” through a prism  ------> 折射光(Refracted light)----> 光谱 Spectral 　
     我们的眼睛有三个受体（锥细胞），它们对可见光作出反应并产生颜色感。
     
-    
-    
+[CSC320S: Introduction to Visual Computing 视觉计算导论 ](http://www.cs.toronto.edu/~kyros/courses/320/)
+
+[Facebook surround 360 《全景图拼接》](https://github.com/facebook/Surround360)
+
+        输入：17张raw图像，包括14张side images、2张top images、1张bottom image
+        输出：3D立体360度全景图像  
+[博客笔记](https://blog.csdn.net/electech6/article/details/53618965)   
+        
+
+[深度摄影风格转换 Deep Photo Style Transfer](https://github.com/luanfujun/deep-photo-styletransfer)
+
 ### 图像形变 Image warping
 [参考](http://www.ipcv.org/image-warping/)
 ### 色彩增强/转换　Color transfer
@@ -120,6 +129,9 @@
 ### 三维重构 3D modeling
 [参考](http://www.ipcv.org/3dmodeling/)
 [视觉SLAM](http://www.ipcv.org/on-visual-slam/)
+
+[Self-augmented Convolutional Neural Networks](https://github.com/msraig/self-augmented-net)
+
 
 [运动估计 motion estimation](http://www.ipcv.org/on-motion-estimation/)
 
@@ -149,6 +161,36 @@
 ### 2.f 立体匹配 Stereo matching 
 [参考](http://www.ipcv.org/code-stereomatching/)
 
+[双目视觉自动驾 场景物体跟踪paper](http://www.cvlibs.net/publications/Menze2015CVPR.pdf)
+
+[kitti双目数据集解决方案](http://www.cvlibs.net/datasets/kitti/eval_scene_flow.php?benchmark=stereo)
+
+[将深度神经网络用于将2D电影转换为3D电影的转换](https://github.com/piiswrong/deep3d)
+
+[神经网络　双目匹配](https://github.com/jzbontar/mc-cnn)
+
+
+[中山大学张弛博士](http://chizhang.me/)
+
+    MeshStereo: A Global Stereo Model with Mesh Alignment Regularization for View Interpolation
+    1、讨论了立体视觉匹配（Stereo Matching）问题的定义及其与人眼感知深度的关系；
+    2、对Matching Cost Volume进行了可视化分析，以期望达到听者对其的直观且本质的理解；
+    3、讨论了立体视觉匹配问题中的四个经典方法（
+        Graph Cut，Adaptive Support Weight Aggregation, 
+        Semi-Global Matching, 
+        以及 PatchMatch Stereo）；
+    4、讨论了MeshStereo的试图统一disparity求解以及网格生成两个步骤的motivation，
+        以及formulate这样一个unified model会遇到的困难；
+    5、讨论了MeshStereo引入splitting probability的解决方案及其优化过程。
+    
+    Webinar最后展示了MeshStereo在深度估计以及新视角渲染两个任务中的结果。
+
+
+[Stereo Matching Using Tree Filtering non-local算法在双目立体匹配上的应用 ](https://blog.csdn.net/wsj998689aa/article/details/45584725)
+
+
+
+
 ### 2.g 深度匹配 depth matching 
 [深度匹配 depth matching ](http://www.ipcv.org/on-depth-matching/)
 
@@ -160,6 +202,7 @@
 
 ### 2.j 群体分析 Crowd analysis
 [参考](http://www.ipcv.org/code-crowdanalysis/)
+[群体运动度量](https://github.com/metalbubble/collectiveness)
 
 ### 2.k 光流场跟踪 Optical flow
 [参考](http://www.ipcv.org/code-opticalflow/)
