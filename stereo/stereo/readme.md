@@ -1,5 +1,5 @@
 # 双目相机
-
+[棋盘格](https://github.com/DLuensch/StereoVision-ADCensus/tree/master/Documents/chessboards)
  * 双目相机 矫正 
  * 用法 ./Stereo_Calibr -w=6 -h=8  -s=24.3 stereo_calib.xml   我的  ./Stereo_Calibr -w=8 -h=10 -s=200 stereo_calib.xml
  * ./stereo_calib -w=9 -h=6 stereo_calib.xml 标准图像
