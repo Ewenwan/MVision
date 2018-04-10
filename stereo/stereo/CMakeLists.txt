@@ -36,3 +36,7 @@ target_link_libraries( Stereo_Match ${OpenCV_LIBS} ${PCL_LIBRARIES})
 add_executable( stereo_m_on_line stereo_match_on_line.cpp )
 # 链接OpenCV库 pcl库
 target_link_libraries(stereo_m_on_line ${OpenCV_LIBS})
+
+# 双目匹配 + 生成点云
+add_executable(stereo_pc stereo_match_point_cloud.cpp)
+target_link_libraries(stereo_pc ${OpenCV_LIBS} ${PCL_LIBRARIES})
