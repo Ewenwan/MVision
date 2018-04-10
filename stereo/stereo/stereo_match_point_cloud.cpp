@@ -22,9 +22,14 @@ http://blog.sina.com.cn/s/blog_c3db2f830101fp2l.html
                 自适应窗口代价聚合，
 			在设定的最大窗口范围内搜索，
 　　　　　　　　　　　　　满足下面三个约束条件确定每个像素的十字坐标，完成自适应窗口的构建。
-　　　　　　　　　　　　　　　Scanline 代价聚合优化
-
- 种方法就是以左目图像的源匹配点为中心，
+　　　　　　　　　　　　　　　Scanline 代价聚合优化种方法就是以左目图像的源匹配点为中心，
+	       
+现今Stereo matching算法大致可以分为三个部分： pre-process 、stereo matching 、post-process。
+pre-process即为USM图像增强，直方图归一化或直方图规定化。
+post-process即为常规的disparity refinement，一般stereo matching算法出来的结果不会太好，
+可能很烂，但经过refinement后会得到平滑的结果。
+ADCensus 算法讲解
+https://www.cnblogs.com/sinbad360/p/7842009.html
 
 视差获取
 
