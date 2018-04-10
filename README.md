@@ -70,6 +70,30 @@
 
 ## 0 计算摄影　摄影几何
 [计算摄影方面的部分课程讲义](http://www.ipcv.org/cp-lecture/)
+[相机内部图像处理流程](http://www.comp.nus.edu.sg/~brown/ICIP2013_Brown.html)
+[pdf](http://www.comp.nus.edu.sg/~brown/ICIP2013_Tutorial_Brown.pdf)
+
+    相机 = 光测量装置(Camera = light-measuring device)
+        照明光源(Illumination source)（辐射(radiance)） --> 
+        场景元素(Scene Element)   --->
+        成像系统(Imaging System)  --->
+        内部图像平面(Internal Image Plane) --->
+        输出（数字）图像(Output (digital) image) 
+    图像 = 辐射能量测量(Image = radiant-energy measurement)  
+    
+    
+    现代摄影流水线　Modern photography pipeline 
+    场景辐射　--->　相机前端(镜头过滤器 镜头Lens 快门Shutter 孔径)　--->　
+    相机内部(ccd响应response（RAW） CCD插值Demosaicing （原）)　--->　
+    相机后端处理(直方图均衡Hist equalization、空间扭曲Spatial warping)--->　输出
+    
+
+
+    透过棱镜的白光 　“White light” through a prism  ------> 折射光(Refracted light)----> 光谱 Spectral 　
+    我们的眼睛有三个受体（锥细胞），它们对可见光作出反应并产生颜色感。
+    
+    
+    
 ### 图像形变 Image warping
 [参考](http://www.ipcv.org/image-warping/)
 ### 色彩增强/转换　Color transfer
