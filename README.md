@@ -1,5 +1,6 @@
 # MVision　Machine Vision 机器视觉
 [学习无人驾驶车，你所必须知道的](https://zhuanlan.zhihu.com/p/27686577)
+[强化学习从入门到放弃的资料](https://zhuanlan.zhihu.com/p/34918639?utm_source=wechat_session&utm_medium=social&wechatShare=1&from=singlemessage&isappinstalled=0)
 ##  公司
 [视觉领域的部分国内公司](http://www.ipcv.org/cvcom/)
 ###  初创公司：
