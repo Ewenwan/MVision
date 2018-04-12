@@ -13,7 +13,7 @@ find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 # pcl 
-find_package( PCL REQUIRED COMPONENT common io )
+find_package( PCL REQUIRED COMPONENT common io visualization)
 include_directories( ${PCL_INCLUDE_DIRS} )
 add_definitions( ${PCL_DEFINITIONS} )
 
@@ -40,3 +40,9 @@ target_link_libraries(stereo_m_on_line ${OpenCV_LIBS})
 # 双目匹配 + 生成点云
 add_executable(stereo_pc stereo_match_point_cloud.cpp)
 target_link_libraries(stereo_pc ${OpenCV_LIBS} ${PCL_LIBRARIES})
+
+# 自己封装　双目匹配
+add_executable(my_stereo stereo_match_my_class.cpp StereoMatch.cpp)
+target_link_libraries(my_stereo ${OpenCV_LIBS} ${PCL_LIBRARIES})
+
+
