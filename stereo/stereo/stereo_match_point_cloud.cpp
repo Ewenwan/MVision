@@ -15,6 +15,10 @@ http://blog.sina.com.cn/s/blog_c3db2f830101fp2l.html
 	     2. Census Feature特征原理很简单
 　　　　　　　         在指定窗口内比较周围亮度值与中心点的大小，匹配距离用汉明距表示。
 　　　　　　　　　　　　　   Census保留周边像素空间信息，对光照变化有一定鲁棒性。
+
+就是在给定的窗口内，比较中心像素与周围邻居像素之间的大小关系，大了就为1，小了就为0，
+然后每个像素都对应一个二值编码序列，然后通过海明距离来表示两个像素的相似程度，
+
 	     3. 信息结合
 　　　　　　　　　　　　　　　　cost = r(Cad , lamd1) + r(Cces, lamd2)
                 r(C , lamd) = 1 - exp(- c/ lamd)
@@ -22,15 +26,74 @@ http://blog.sina.com.cn/s/blog_c3db2f830101fp2l.html
                 自适应窗口代价聚合，
 			在设定的最大窗口范围内搜索，
 　　　　　　　　　　　　　满足下面三个约束条件确定每个像素的十字坐标，完成自适应窗口的构建。
-　　　　　　　　　　　　　　　Scanline 代价聚合优化种方法就是以左目图像的源匹配点为中心，
-	       
+　　　　　　　　　　　　　　　Scanline 代价聚合优化
+
+ad : 
+// 对应像素差的绝对值 3通道均值  Absolute Differences
+float ADCensusCV::ad(int wL, int hL, int wR, int hR) const
+{
+    float dist = 0;
+    const Vec3b &colorLP = leftImage.at<Vec3b>(hL, wL);
+    const Vec3b &colorRP = rightImage.at<Vec3b>(hR, wR);
+
+    for(uchar color = 0; color < 3; ++color)
+    {
+        dist += std::abs(colorLP[color] - colorRP[color]);
+    }
+    return (dist / 3);//3通道均值
+}
+Census:
+// census值
+float ADCensusCV::census(int wL, int hL, int wR, int hR) const
+{
+    float dist = 0;
+    const Vec3b &colorRefL = leftImage.at<Vec3b>(hL, wL);//中心点 颜色
+    const Vec3b &colorRefR = rightImage.at<Vec3b>(hR, wR);
+
+    for(int h = -censusWin.height / 2; h <= censusWin.height / 2; ++h)
+    {
+        for(int w = -censusWin.width / 2; w <= censusWin.width / 2; ++w)
+        {// 在指定窗口内比较周围亮度值与中心点的大小
+            const Vec3b &colorLP = leftImage.at<Vec3b>(hL + h, wL + w);
+            const Vec3b &colorRP = rightImage.at<Vec3b>(hR + h, wR + w);
+            for(uchar color = 0; color < 3; ++color)
+            {
+      // bool diff = (colorLP[color] < colorRefL[color]) ^ (colorRP[color] < colorRefR[color]);
+         bool diff = (colorLP[color] - colorRefL[color]) * (colorRP[color] - colorRefR[color]) < 0;
+                dist += (diff)? 1: 0;// 匹配距离用汉明距表示 
+// 都比中心点大/小　保留周边像素空间信息，对光照变化有一定鲁棒性
+            }
+        }
+    }
+
+    return dist;
+}
+// ad + census值 信息结合
+float ADCensusCV::adCensus(int wL, int hL, int wR, int hR) const
+{
+    float dist;
+
+    // compute Absolute Difference cost
+    float cAD = ad(wL, hL, wR, hR);
+
+    // compute Census cost
+    float cCensus = census(wL, hL, wR, hR);
+
+    // combine the two costs
+    dist = 1 - exp(-cAD / lambdaAD);
+    dist += 1 - exp(-cCensus / lambdaCensus);
+
+    return dist;
+}
+
+
 现今Stereo matching算法大致可以分为三个部分： pre-process 、stereo matching 、post-process。
 1图像增强　2匹配　 3视差优化
 pre-process即为USM图像增强，直方图归一化或直方图规定化。
 post-process即为常规的disparity refinement，一般stereo matching算法出来的结果不会太好，
 可能很烂，但经过refinement后会得到平滑的结果。
-ADCensus 算法讲解
-https://www.cnblogs.com/sinbad360/p/7842009.html
+
+种方法就是以左目图像的源匹配点为中心，
 
 视差获取
 
@@ -149,7 +212,8 @@ Ptr<StereoSGBM> sgbm = StereoSGBM::create(0,16,3);//全局的SGBM;
 第三种为GC方法：
 该方法速度超慢，但效果超好。
 
-
+https://github.com/yuhuazou/StereoVision/blob/master/StereoVision/StereoMatch.cpp
+var
  */
 
 #include "opencv2/calib3d/calib3d.hpp"
@@ -157,7 +221,7 @@ Ptr<StereoSGBM> sgbm = StereoSGBM::create(0,16,3);//全局的SGBM;
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/core/utility.hpp"
-
+#include <opencv2/opencv.hpp> 
 #include <stdio.h>
 #include <iostream> 
 
@@ -170,6 +234,7 @@ Ptr<StereoSGBM> sgbm = StereoSGBM::create(0,16,3);//全局的SGBM;
 #include <pcl/visualization/pcl_visualizer.h>//可视化
 
 #include <pcl/visualization/cloud_viewer.h>//点云可视化
+#include <pcl/visualization/pcl_visualizer.h>//
 
 // 定义点云使用的格式：这里用的是XYZRGB　即　空间位置和RGB色彩像素对
 typedef pcl::PointXYZRGB PointT; //点云中的点对象  位置和像素值
@@ -188,8 +253,11 @@ double cy = 242.6;
 double fx = 484.8;//焦距和缩放  等效
 double fy = 478.5;
 double depthScale = 10000.0;// 深度 单位归一化到m 原数据单位 为 0.1mm
-double base_line = 162.7;//mm为单位
-
+double base_line = 1627.50788;//  0.1mm 为单位
+double bf = base_line * fx / depthScale;
+//double bf = base_line * fx;
+double invfx = 1.0f/fx;//
+double invfy = 1.0f/fy;
 
 static void print_help()
 {
@@ -351,7 +419,7 @@ int initialize_sys(Ptr<StereoBM> bm,
     //Ptr<StereoSGBM> sgbm = StereoSGBM::create(0,16,3);//全局的SGBM
     //参数解析
     cv::CommandLineParser parser(argc, argv,
-        "{help h||}{algorithm|bm|}{max-disparity|64|}{blocksize|15|}{no-display||}{scale|1|}{i|intrinsics.yml|}{e|extrinsics.yml|}");
+        "{help h||}{algorithm|bm|}{max-disparity|64|}{blocksize|19|}{no-display||}{scale|1|}{i|intrinsics.yml|}{e|extrinsics.yml|}");
 /*
 max-disparity 是最大视差，可以理解为对比度，越大整个视差的range也就越大，这个要求是16的倍数
 blocksize 一般设置为5-29之间的奇数，应该是局部算法的窗口大小
@@ -454,10 +522,10 @@ blocksize 一般设置为5-29之间的奇数，应该是局部算法的窗口大
 		  Mat R, T, R1, P1, R2, P2;
 		  fs["R"] >> R;
 		  fs["T"] >> T;	  
-		 // fs["P1"] >> P1;
-		 // fs["P2"] >> P2;
-		 // fs["R1"] >> R1;
-		 //  fs["R2"] >> R2;		  
+		  fs["P1"] >> P1;
+		  fs["P2"] >> P2;
+		  fs["R1"] >> R1;
+		  fs["R2"] >> R2;		  
 	         //图像矫正摆正 映射计算  
 		  stereoRectify( M1, D1, M2, D2, img_size, R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY, -1, img_size, &roi1, &roi2 );
 // 获取矫正映射矩阵
@@ -466,6 +534,8 @@ blocksize 一般设置为5-29之间的奇数，应该是局部算法的窗口大
 
 
     } 
+
+
     
     numberOfDisparities = numberOfDisparities > 0 ? numberOfDisparities : ((img_size.width/8) + 15) & -16;
     // bm算法
@@ -477,13 +547,14 @@ blocksize 一般设置为5-29之间的奇数，应该是局部算法的窗口大
     bm->setBlockSize(SADWindowSize > 0 ? SADWindowSize : 15);//sad窗口大小
     bm->setMinDisparity(0);//最小视差值，代表了匹配搜索从哪里开始
     bm->setNumDisparities(numberOfDisparities);//表示最大搜索视差数
-    bm->setTextureThreshold(10);//低纹理区域的判断阈值 x方向导数绝对值之和小于阈值
-    bm->setUniquenessRatio(15);//视差唯一性百分比
+    bm->setTextureThreshold(10);//低纹理区域的判断阈值 x方向导数绝对值之和小于阈值 100 1000
+    bm->setUniquenessRatio(15);//视差唯一性百分比  使用匹配功能模式    5
     bm->setSpeckleWindowSize(100);//检查视差连通域 变化度的窗口大小
     bm->setSpeckleRange(32);//视差变化阈值  当窗口内视差变化大于阈值时，该窗口内的视差清零
-    bm->setDisp12MaxDiff(-1);
-//左视图差（直接计算）和右视图差（cvValidateDisparity计算得出）之间的最大允许差异
-
+    bm->setDisp12MaxDiff(1);// -1bmPreFilterSize
+//左视图差（直接计算）和右视图差（cvValidateDisparity计算得出）之间的最大允许差异 默认为-1  
+// 对视差生成效果影响较大的主要参数是setSADWindowSize、
+//setNumberDisparities和 setUniquenessRatio，这三个参数要重点关注和调整。其他参数的影响不算很大。
   // sgbm算法
     sgbm->setPreFilterCap(63);//预处理滤波器的截断值 [1-63] 
     int sgbmWinSize = SADWindowSize > 0 ? SADWindowSize : 3;
@@ -497,7 +568,7 @@ blocksize 一般设置为5-29之间的奇数，应该是局部算法的窗口大
     sgbm->setUniquenessRatio(10);//表示匹配功能函数
     sgbm->setSpeckleWindowSize(100);//检查视差连通域 变化度的窗口大小
     sgbm->setSpeckleRange(32);//视差变化阈值  当窗口内视差变化大于阈值时，该窗口内的视差清零
-    sgbm->setDisp12MaxDiff(-1);
+    sgbm->setDisp12MaxDiff(1);// -1
 //左视图差（直接计算）和右视图差（cvValidateDisparity计算得出）之间的最大允许差异
     if(alg==STEREO_HH)               sgbm->setMode(StereoSGBM::MODE_HH);
     else if(alg==STEREO_SGBM)  sgbm->setMode(StereoSGBM::MODE_SGBM);
@@ -548,7 +619,7 @@ int getpc(cv::Mat& disparity, const cv::Mat& m_Calib_Mat_Q, cv::Mat& img, PointC
 //  cv::reprojectImageTo3D(disparity, pointClouds, m_Calib_Mat_Q, true);
     reprojectImageTo3D(disparity, pointClouds, m_Calib_Mat_Q, true);
 
-    pointClouds *= 1.6;
+    //pointClouds *= 1.6;//最好不要乘
    // cout << "cloud size " <<  pointClouds.rows * pointClouds.cols << endl;
 //为什么利用修正了的 Q 矩阵所计算得到的三维数据中， Y 坐标数据是正负颠倒的, 坐标系的问题 
     //PointCloud::Ptr pointCloud_PCL( new PointCloud ); 
@@ -558,7 +629,7 @@ int getpc(cv::Mat& disparity, const cv::Mat& m_Calib_Mat_Q, cv::Mat& img, PointC
         {
             PointT p ; //点云 XYZRGB
             cv::Point3f point = pointClouds.at<cv::Point3f>(y, x);
-            p.x = -point.x;//现实世界中的位置坐标
+            p.x = point.x;//现实世界中的位置坐标
             p.y = -point.y;
             p.z = point.z;
             p.b = img.data[ y*img.step + x*img.channels() ];//注意opencv彩色图像通道的顺序为 bgr
@@ -576,8 +647,8 @@ int getpc(cv::Mat& disparity, const cv::Mat& m_Calib_Mat_Q, cv::Mat& img, PointC
 /*
 
  *                  				                 | Xw|
- * 			| u|     |fx  0   ux 0|     |R      T|   | Yw|
- *       		| v| =   |0   fy  uy 0|  *  |        | * | Zw|=  P*W
+ * 			| u|     |fx  0   cx 0|     |R      T|   | Yw|
+ *       		| v| =   |0   fy  cy 0|  *  |        | * | Zw|=  P*W
  * 			|1 |     |0   0   1  0|    |0 0  0 1|    | 1 |
  * http://wiki.opencv.org.cn/index.php/Cv相机标定和三维重建
  *   像素坐标齐次表示(3*1)  =  内参数矩阵 齐次表示(3*4)  ×  外参数矩阵齐次表示(4*4) ×  物体世界坐标 齐次表示(4*1)
@@ -590,8 +661,8 @@ int getpc(cv::Mat& disparity, const cv::Mat& m_Calib_Mat_Q, cv::Mat& img, PointC
  *  Q为 视差转深度矩阵 disparity-to-depth mapping matrix 
 
 　Z = f*B/d       =   f    /(d/B)
- X = Z*(x-c_x)/f = (x-c_x)/(d/B)
- X = Z*(y-c_y)/f = (y-y_x)/(d/B)
+ X = Z*(x-c_x)/fx = (x-c_x)/(d/B)
+ Y = Z*(y-c_y)/fy = (y-c_x)/(d/B)
 
  *  http://blog.csdn.net/angle_cal/article/details/50800775
  *     Q= | 1   0    0         -c_x     |    Q03
@@ -608,7 +679,12 @@ int getpc(cv::Mat& disparity, const cv::Mat& m_Calib_Mat_Q, cv::Mat& img, PointC
                                                          与实际值相差一个负号
  * Z = f * B/ D    f 焦距 量纲为像素点   B为双目基线距离   
  * 左右相机基线长度 量纲和标定时 所给标定板尺寸 相同  D视差 量纲也为 像素点 分子分母约去，Z的量纲同 T
- * 
+
+[ 1., 0., 0., -3.3265590286254883e+02, 
+  0., 1., 0., -2.3086411857604980e+02, 
+  0., 0., 0., 3.9018919929094244e+02, 
+  0., 0., 6.1428092115522364e-04, 0. ]
+
 */
 int my_getpc(cv::Mat& disparity, const cv::Mat& m_Calib_Mat_Q, cv::Mat& leftImage, PointCloud& pointCloud){
 
@@ -630,6 +706,13 @@ int my_getpc(cv::Mat& disparity, const cv::Mat& m_Calib_Mat_Q, cv::Mat& leftImag
             PointT point ; //点云 XYZRGB
             // 读取　视差　disparity
             float d = disparity.at<float>(y, x);
+
+// 这里好像有问题
+            //if ( d <= 0 ) d = disparity.at<float>(y-1, x);
+            //if ( d <= 0 ) d = disparity.at<float>(y, x-1);
+            //if ( d <= 0 ) d = disparity.at<float>(y, x+1);
+            //if ( d <= 0 ) d = disparity.at<float>(y-1, x+1);
+
             if ( d <= 0 ) continue; //Discard bad pixels
             // 读取　颜色 color
             Vec3b colorValue = leftImage.at<Vec3b>(y, x);
@@ -651,9 +734,48 @@ int my_getpc(cv::Mat& disparity, const cv::Mat& m_Calib_Mat_Q, cv::Mat& leftImag
     // Resize PCL and save to file
     pointCloud.width = pointCloud.points.size();
     pointCloud.height = 1;
-    //cout << "cloud size " <<  pointCloud.size() << endl;
+    cout << "cloud size " <<  pointCloud.size() << endl;
     return 1;
 }
+// 
+int ff_getpc(cv::Mat& disparity, cv::Mat& leftImage, PointCloud& pointCloud){
+
+    if (disparity.empty())
+    {
+       return 0;
+    }
+    for (int y = 0; y < disparity.rows; ++y)// y 每一行
+    {
+        for (int x = 0; x < disparity.cols; ++x)// x　每一列
+        {
+            PointT point ; //点云 XYZRGB
+            // 读取　视差　disparity
+            float d = disparity.at<float>(y, x);
+            //if ( d <= 0 ) continue; //Discard bad pixels
+            //if ( d <= 0 ) d = disparity.at<float>(y-1, x);
+            //if ( d <= 0 ) d = disparity.at<float>(y, x-1);
+            //if ( d <= 0 ) d = disparity.at<float>(y, x+1);
+            //if ( d <= 0 ) d = disparity.at<float>(y-1, x+1);
+	    if ( d <= 0 ) continue;
+            // 读取　颜色 color
+            Vec3b colorValue = leftImage.at<Vec3b>(y, x);
+            point.r = static_cast<int>(colorValue[2]);
+            point.g = static_cast<int>(colorValue[1]);
+            point.b = static_cast<int>(colorValue[0]);
+            point.z = bf / (double)d;// Z = bf/d
+            point.x = (double)(x - cx) * point.z * invfx;// x = Z*(x-c_x)/fx
+            point.y = (double)(y - cy) * point.z * invfy;// y = Z*(y-c_y)/fy
+            pointCloud.points.push_back(point);
+        }
+    }
+    // pointCloud.is_dense = false; 
+    // Resize PCL and save to file
+    pointCloud.width = pointCloud.points.size();
+    pointCloud.height = 1;
+    cout << "cloud size " <<  pointCloud.size() << endl;
+    return 1;
+}
+
 
 // 得到深度图
 void detectDepth(cv::Mat& disparity32, cv::Mat& depth)
@@ -753,9 +875,11 @@ int main(int argc, char** argv)
     //boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer_ptr (new pcl::visualization::PCLVisualizer ("3D Viewer"));  
     //设置一个boost共享对象，并分配内存空间
     //viewer_ptr->setBackgroundColor(0.0, 0.0, 0.0);//背景黑色
-    pcl::visualization::CloudViewer viewer("pcd　viewer");// 显示窗口的名字
+pcl::visualization::CloudViewer viewer("pcd　viewer");// 显示窗口的名字
   //viewer.showCloud(cloud_filtered_ptr);
-
+    //pcl::visualization::PCLVisualizer viewer("3D Viewer");
+    //viewer.addCoordinateSystem (1.0);
+    //viewer.initCameraParameters ();
     while(CapAll.read(src_img)) 
 	{  
 	     img1= src_img(cv::Range(0, 480), cv::Range(0, 640));   //imread(file,0) 灰度图  imread(file,1) 彩色图  默认彩色图
@@ -827,11 +951,13 @@ int main(int argc, char** argv)
 		  //imshow("视差32", disp32);
                   PointCloud::Ptr pointCloud_PCL2( new PointCloud ); 
 		  PointCloud& pointCloud1 = *pointCloud_PCL2;
-                  getpc(disp32, Q, src_img1, pointCloud1);
+                  //getpc(disp32, Q, src_img1, pointCloud1);
                  //my_getpc(disp32, Q, src_img1, pointCloud1);
+                  ff_getpc(disp32, src_img1, pointCloud1);
                  // cout << "cloud size " <<  pointCloud1.width * pointCloud1.height<<endl;
-  		  viewer.showCloud(pointCloud_PCL2);
-
+  		 viewer.showCloud(pointCloud_PCL2);
+//pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(pointCloud_PCL2);
+//viewer.addPointCloud<pcl::PointXYZRGB> (pointCloud_PCL2, rgb, "sample cloud");
 		 // cv::Mat  depth;
 		  //detectDepth(disp32, depth);
 		  //namedWindow("深度图32", 0);// CV_WINDOW_NORMAL
@@ -855,7 +981,7 @@ int main(int argc, char** argv)
 		   //while (!viewer.wasStopped())
 		   // {
 			//viewer.spinOnce ();
-			//pcl_sleep(0.03);
+			pcl_sleep(0.08);
 		    //}
 		  fflush(stdout);
 		  char c = waitKey(0);
