@@ -153,7 +153,7 @@ bool StereoProcessor::compute()
     {
         costInitialization();//　代价初始化　AD + census　/　默认　defaultBorderCost * COST_FACTOR
         costAggregation();  // 自适应窗口代价聚合 将中心点附近自适应不规则区域的　adCensus　求和
-    //    scanlineOptimization();// 扫描线优化 
+        scanlineOptimization();// 扫描线优化 
 //由于代价聚合的结果不大靠谱，可以考虑将其视作数据项，
 //建立全局能量函数（公式如下所示），这样便直接过渡到了全局算法。
         outlierElimination();// 代价转视差　外点(遮挡点+不稳定)检测 
