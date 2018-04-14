@@ -4,6 +4,8 @@
 ## 可以建立　相机坐标系下的　点云
 ## 如需建立 世界坐标系下的点云　需要跟踪　每一帧图像的位姿变化　既需要配合　视觉里程计来使用
 [viso2](http://wiki.ros.org/viso2)
+# 机器人视觉　实验室　代码参考　
+[ 机器人视觉　实验室　代码参考　](http://www.cs.utoronto.ca/~urtasun/SW/code.html)
 
 ## 节点　Nodes
 ### 节点1. elas_ros Nodes
