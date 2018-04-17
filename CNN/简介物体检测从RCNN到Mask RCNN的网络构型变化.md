@@ -1,20 +1,18 @@
 
 # 总结：
-	http://blog.csdn.net/linolzhang/article/details/54344350
+[1](http://blog.csdn.net/linolzhang/article/details/54344350)
+[2](http://blog.csdn.net/phdat101/article/details/53000036)
 
-
-	http://blog.csdn.net/phdat101/article/details/53000036
 	这篇主要介绍Object Detection一些经典的网络结构。
 	顺序是RCNN->SPP->Fast RCNN->Faster RCNN->YOLO->SSD->YOLO2->Mask RCNN->YOLO3。
 	这里只粗糙地介绍网络构型变化。更多细节强烈推荐阅读原文。
 
 
-	斯坦福李飞飞-深度学习计算机视觉   网易云课堂
-	http://study.163.com/course/introduction.htm?courseId=1003223001
+[视频-斯坦福李飞飞-深度学习计算机视觉   网易云课堂](http://study.163.com/course/introduction.htm?courseId=1003223001)
 
 	##########################################
 	#############################################
-	RCNN
+# RCNN
 	http://blog.csdn.net/cyiano/article/details/69950331
 	 1 ss算法产生候选区域
 	 ( 颜色差值加权无向图区域差异分割 +
@@ -22,7 +20,12 @@
 	 )
 [参考1](https://blog.csdn.net/guoyunfei20/article/details/78723646)
 [参考2](https://blog.csdn.net/guoyunfei20/article/details/78727972)
+[图分割论文代码](http://cs.brown.edu/people/pfelzens/segment/)
 
+	OpenCV 3.3 实现了selective search
+	在OpenCV的contrib模块中实现了selective search算法。类定义为：
+	cv::ximgproc::segmentation::SelectiveSearchSegmentation  
+	
 	opencv3.3 有 图分割的实现
 	/opencv_contrib/modules/ximgproc/include/opencv2/ximgproc/segmentation.hpp 
 
@@ -31,7 +34,7 @@
 	   3.2 通过边界回归(独立)（bounding-box regression) 得到精确的目标区域，由于实际目标会产生多个子区域，
 	       旨在对完成分类的前景目标进行精确的定位与合并，避免多个检出。
 
-	RCNN存在三个明显的问题：
+### RCNN存在三个明显的问题：
 	    1）多个候选区域对应的图像需要预先提取，占用较大的磁盘空间；
 	    2）针对传统CNN需要固定尺寸的输入图像，crop/warp（归一化）产生物体截断或拉伸，会导致输入CNN的信息丢失；
 	    3）每一个ProposalRegion都需要进入CNN网络计算，上千个Region存在大量的范围重叠，重复的特征提取带来巨大的计算浪费。
