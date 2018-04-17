@@ -54,6 +54,9 @@
       也可以将这下lib 复制到 window 操作系统目录下
       C:\Windows\SysWOW64   64位
       C:\Windows\System32   32位
+## window下 找不到lib 文件
+	可以用notePad++等文本编辑器打开类似 *.vcxproj的工程文件，查找到类似<AdditionalDependencies>libcocos2d.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>的标签，删除不想关联的lib,如glew32.lib;字符串(或者 %(AdditionalDependencies) 标签 ；来自父级关联的lib), 然后保存，重新加载项目即可
+
 ## linux下安装
 安装依赖：
 
