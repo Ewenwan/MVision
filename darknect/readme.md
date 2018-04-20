@@ -98,11 +98,27 @@
     给定自然图片， 从中识别出特定物体。
     待识别的物体有20类：
     囊括了车、人、猫、狗等20类常见目标。训练样本较少、场景变化多端，非常具有挑战性。
-        person
-        bird, cat, cow, dog, horse, sheep
-        aeroplane, bicycle, boat, bus, car, motorbike, train
-        bottle, chair, dining table, potted plant, sofa, tv/monitor
-
+    
+      aeroplane  
+      bicycle
+      bird
+      boat
+      bottle
+      bus
+      car
+      cat
+      chair
+      cow
+      diningtable
+      dog
+      horse
+      motorbike
+      person
+      pottedplant
+      sheep
+      sofa
+      train
+      tvmonitor
 
     ===================================
   ### 10.2 下载数据集：
