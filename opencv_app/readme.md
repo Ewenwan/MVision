@@ -75,8 +75,8 @@
 
       编译依赖 sudo apt-get install build-essential
       必须     sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
-      可选     sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
-
+      可选     sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+## 问题1 
       安装OpenCv 3.1的过程中要下载ippicv_linux_20151201，由于网络的原因，这个文件经常会下载失败。
       下载　  ippicv_linux_20151201
       http://blog.csdn.net/huangkangying/article/details/53406370
@@ -93,8 +93,20 @@
       需要单独编译
       https://github.com/opencv/opencv_contrib
 
+## 问题2 
+	ubuntu装opencv  error: ‘NppiGraphcutState‘ has not been declared
+     解决方案：
+	进入opencv-3.1.0/modules/cudalegacy/src/目录，修改graphcuts.cpp文件，将：
+	#include "precomp.hpp"
+	#if !defined (HAVE_CUDA) || defined (CUDA_DISABLER)
+	改为
+	#include "precomp.hpp"
+	#if !defined (HAVE_CUDA) || defined (CUDA_DISABLER) || (CUDART_VERSION >= 8000)
+	然后make编译就可以了 
 
-      进入主目录　
+      
+ ## 编译
+     进入主目录　
       mkdir build  //建立一个build目录，把cmake的文件都放着里边
       cd build     //进入build目录
       //cmake .. 
