@@ -11,6 +11,26 @@
     git clone https://github.com/pjreddie/darknet
     cd darknet
     make
+    
+    安装了 opencv之后 可以打开opencv的编译选项
+    还有多线程 openMP选项
+    OPENCV=1
+    OPENMP=1
+
+    problem:
+    /usr/bin/ld: 找不到 -lippicv
+    solution:
+
+    pkg-config加载库的路径是/usr/local/lib,我们去这这个路径下看看，
+    发现没有-lippicv对应的库，别的选项都有对应的库，然后我们把-lippicv对应的库（libippicv.a）
+    放到这个路径下就好啦了。
+
+    我的liboppicv.a 在../opencv-3.1.0/3rdparty/ippicv/unpack/ippicv_lnx/lib/intel64/liboppicv.a
+    这个路径下。
+
+    你的也在你自己opencv文件夹的对应路径下。
+    先cd 到上面这个路径下，然后sudo cp liboppicv.a /usr/local/lib 
+    将这个库文件复制到/usr/local/lib下就好了。
 
 
     ============================================
