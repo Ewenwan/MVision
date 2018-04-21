@@ -1,0 +1,5 @@
+<library path="lib/libimage_publisher">
+  <class name="image_publisher/image_publisher" type="image_publisher::ImagePublisherNodelet" base_class_type="nodelet::Nodelet">
+    <description>Nodelet to publish sensor_msgs/Image</description>
+  </class>
+</library>
