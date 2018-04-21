@@ -72,7 +72,8 @@ public://共有　方法
 	 * 参数 : disparity	[out]	视差图
 	 */
 	int sgbmMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity);
-	
+	int hhMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity);
+	int wayMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity);
 	/*----------------------------
 	 * 功能 : 基于 VAR 算法计算视差
 	 *----------------------------
