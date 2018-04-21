@@ -169,7 +169,8 @@ int StereoMatch::loadCalibData(const char* xmlFilePath)
 	m_ptr_SGBM->setSpeckleWindowSize(100);//检查视差连通域 变化度的窗口大小
 	m_ptr_SGBM->setSpeckleRange(32);//视差变化阈值  当窗口内视差变化大于阈值时，该窗口内的视差清零
 	m_ptr_SGBM->setDisp12MaxDiff(1);// -1
-	m_ptr_SGBM->setMode(StereoSGBM::MODE_SGBM);// StereoSGBM::MODE_HH  StereoSGBM::MODE_SGBM_3WAY
+	m_ptr_SGBM->setMode(cv::StereoSGBM::MODE_SGBM);
+// StereoSGBM::MODE_HH  StereoSGBM::MODE_SGBM_3WAY
 
 
 	m_Calib_Data_Loaded = true;
@@ -231,9 +232,9 @@ int StereoMatch::bmMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& dispa
 	cv::Mat imgLborder, imgRborder;
 	//if (m_numberOfDisparies != m_ptr_BM->params.numDisparities)
 	//	m_numberOfDisparies = m_ptr_BM->params.numDisparities;
-	copyMakeBorder( imgLremap, imgLborder, 0, 0, 
+	cv::copyMakeBorder( imgLremap, imgLborder, 0, 0, 
 			m_maxDisparies_bm, 0, IPL_BORDER_REPLICATE);
-	copyMakeBorder( imgRremap, imgRborder, 0, 0, 
+	cv::copyMakeBorder( imgRremap, imgRborder, 0, 0, 
 			m_maxDisparies_bm, 0, IPL_BORDER_REPLICATE);
         m_numberOfDisparies = m_maxDisparies_bm;
 	// 计算视差 带有扩展的边框
@@ -306,9 +307,9 @@ int StereoMatch::sgbmMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& dis
 	cv::Mat imgLborder, imgRborder;
 	//if (m_numberOfDisparies != m_ptr_SGBM->params.numDisparities)
 	//	m_numberOfDisparies = m_ptr_SGBM->params.numDisparities;
-	copyMakeBorder( imgLremap, imgLborder, 0, 0, 
+	cv::copyMakeBorder( imgLremap, imgLborder, 0, 0, 
 			m_maxDisparies_sgbm, 0, IPL_BORDER_REPLICATE);
-	copyMakeBorder( imgRremap, imgRborder, 0, 0, 
+	cv::copyMakeBorder( imgRremap, imgRborder, 0, 0, 
 			m_maxDisparies_sgbm, 0, IPL_BORDER_REPLICATE);
         m_numberOfDisparies = m_maxDisparies_sgbm;
 	// 计算视差 带有扩展的边框
@@ -330,6 +331,129 @@ int StereoMatch::sgbmMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& dis
 	return 1;
 }
 
+/*----------------------------
+ * 功能 : 基于 SGBM::MODE_HH 算法计算视差
+ *----------------------------
+ * 函数 : StereoMatch::sgbmMatch
+ * 访问 : public 
+ * 返回 : 0 - 失败，1 - 成功
+ *
+ * 参数 : frameLeft		[in]	左摄像机帧图
+ * 参数 : frameRight		[in]	右摄像机帧图
+ * 参数 : disparity		[out]	视差图
+ */
+int StereoMatch::hhMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity)
+{
+	// 输入检查
+	if (frameLeft.empty() || frameRight.empty())
+	{
+		disparity = cv::Scalar(0);
+		return 0;
+	}
+        m_ptr_SGBM->setMode(cv::StereoSGBM::MODE_HH);// 
+	// 复制图像
+	cv::Mat imgLproc, imgRproc;
+	frameLeft.copyTo(imgLproc);
+	frameRight.copyTo(imgRproc);
+
+	// 校正图像，使左右视图行对齐	
+	cv::Mat imgLremap, imgRremap;
+	if (m_Calib_Data_Loaded)
+	{
+	  cv::remap(imgLproc, imgLremap, m_Calib_Mat_Remap_L_X, 
+	        m_Calib_Mat_Remap_L_Y, cv::INTER_LINEAR);// 对用于视差计算的画面进行校正
+	  cv::remap(imgRproc, imgRremap, m_Calib_Mat_Remap_R_X, 
+	        m_Calib_Mat_Remap_R_Y, cv::INTER_LINEAR);
+	} 
+	else
+	{
+	  imgLremap = imgLproc;
+	  imgRremap = imgRproc;
+	}
+
+	// 对左右视图的左边进行边界延拓，以获取与原始视图相同大小的有效视差区域
+	cv::Mat imgLborder, imgRborder;
+	//if (m_numberOfDisparies != m_ptr_SGBM->params.numDisparities)
+	//	m_numberOfDisparies = m_ptr_SGBM->params.numDisparities;
+	cv::copyMakeBorder( imgLremap, imgLborder, 0, 0, 
+			m_maxDisparies_sgbm, 0, IPL_BORDER_REPLICATE);
+	cv::copyMakeBorder( imgRremap, imgRborder, 0, 0, 
+			m_maxDisparies_sgbm, 0, IPL_BORDER_REPLICATE);
+        m_numberOfDisparies = m_maxDisparies_sgbm;
+	// 计算视差 带有扩展的边框
+	cv::Mat dispBorder;
+	m_ptr_SGBM->compute(imgLborder, imgRborder, dispBorder);
+
+	// 截取与原始画面对应的视差区域（舍去加宽的部分）
+	cv::Mat disp;
+	disp = dispBorder.colRange(m_numberOfDisparies, imgLborder.cols);	
+	//disp.copyTo(disparity, m_Calib_Mat_Mask_Roi);
+	disp.copyTo(disparity);
+
+	return 1;
+}
+
+/*----------------------------
+ * 功能 : 基于 SGBM::MODE_SGBM_3WAY 算法计算视差
+ *----------------------------
+ * 函数 : StereoMatch::sgbmMatch
+ * 访问 : public 
+ * 返回 : 0 - 失败，1 - 成功
+ *
+ * 参数 : frameLeft		[in]	左摄像机帧图
+ * 参数 : frameRight		[in]	右摄像机帧图
+ * 参数 : disparity		[out]	视差图
+ */
+int StereoMatch::wayMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity)
+{
+	// 输入检查
+	if (frameLeft.empty() || frameRight.empty())
+	{
+		disparity = cv::Scalar(0);
+		return 0;
+	}
+        m_ptr_SGBM->setMode(cv::StereoSGBM::MODE_SGBM_3WAY);// 
+	// 复制图像
+	cv::Mat imgLproc, imgRproc;
+	frameLeft.copyTo(imgLproc);
+	frameRight.copyTo(imgRproc);
+
+	// 校正图像，使左右视图行对齐	
+	cv::Mat imgLremap, imgRremap;
+	if (m_Calib_Data_Loaded)
+	{
+	  cv::remap(imgLproc, imgLremap, m_Calib_Mat_Remap_L_X, 
+	        m_Calib_Mat_Remap_L_Y, cv::INTER_LINEAR);// 对用于视差计算的画面进行校正
+	  cv::remap(imgRproc, imgRremap, m_Calib_Mat_Remap_R_X, 
+	        m_Calib_Mat_Remap_R_Y, cv::INTER_LINEAR);
+	} 
+	else
+	{
+	  imgLremap = imgLproc;
+	  imgRremap = imgRproc;
+	}
+
+	// 对左右视图的左边进行边界延拓，以获取与原始视图相同大小的有效视差区域
+	cv::Mat imgLborder, imgRborder;
+	//if (m_numberOfDisparies != m_ptr_SGBM->params.numDisparities)
+	//	m_numberOfDisparies = m_ptr_SGBM->params.numDisparities;
+	cv::copyMakeBorder( imgLremap, imgLborder, 0, 0, 
+			m_maxDisparies_sgbm, 0, IPL_BORDER_REPLICATE);
+	cv::copyMakeBorder( imgRremap, imgRborder, 0, 0, 
+			m_maxDisparies_sgbm, 0, IPL_BORDER_REPLICATE);
+        m_numberOfDisparies = m_maxDisparies_sgbm;
+	// 计算视差 带有扩展的边框
+	cv::Mat dispBorder;
+	m_ptr_SGBM->compute(imgLborder, imgRborder, dispBorder);
+
+	// 截取与原始画面对应的视差区域（舍去加宽的部分）
+	cv::Mat disp;
+	disp = dispBorder.colRange(m_numberOfDisparies, imgLborder.cols);	
+	//disp.copyTo(disparity, m_Calib_Mat_Mask_Roi);
+	disp.copyTo(disparity);
+
+	return 1;
+}
 
 /*----------------------------
  * 功能 : 基于 VAR 算法计算视差
