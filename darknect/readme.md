@@ -58,7 +58,7 @@
     
 [cython 0.25 版本](https://packages.ubuntu.com/artful/cython)
     
-    安装 sudo apt-mark hold cython  
+    安装 sudo dpkg -i cython_0.25.2-2build3_amd64.deb 
     
     更新:
     git pull  # Grab latest source
