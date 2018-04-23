@@ -30,10 +30,14 @@
 
     你的也在你自己opencv文件夹的对应路径下。
     先cd 到上面这个路径下，然后sudo cp liboppicv.a /usr/local/lib 
-    将这个库文件复制到/usr/local/lib下就好了。
-
-
-    ============================================
+    将这个库文件复制到/usr/local/lib下就好了。
+    
+    查看 opencv 是否安装成功
+    pkg-config --modversion opencv 
+    
+    
+[caffe的安装](https://blog.csdn.net/yhaolpz/article/details/71375762)
+============================================
     =============================================
   ## 2.下载训练好的权重weight文件
     wget https://pjreddie.com/media/files/yolov3.weights
@@ -174,4 +178,19 @@
 
 
     ==========================================================
-    =========================================================
+    =========================================================
+## 11 在coco数据集上训练
+[数据集主页](http://cocodataset.org/)
+
+    微软发布的COCO数据库, 除了图片以外还提供物体检测, 分割(segmentation)和对图像的语义文本描述信息.
+[COCO数据库的网址是: MS COCO API - ](http://mscoco.org/) 
+[Github网址 -  ](https://github.com/pdollar/coco)
+[关于API更多的细节在网站: ](http://mscoco.org/dataset/#download) 
+
+    数据库提供Matlab, Python和Lua的API接口. 其中matlab和python的API接口可以提供完整的图像标签数据的加载, 
+    parsing和可视化.此外,网站还提供了数据相关的文章, 教程等. 在使用COCO数据库提供的API和demo时, 需要首先下载COCO的图像和标签数据.
+
+### 11.1 COCO的数据标注信息包括: 
+    - 类别标志 
+    - 类别数量区分 
+    - 像素级的分割 
