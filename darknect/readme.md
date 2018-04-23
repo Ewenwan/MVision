@@ -58,6 +58,7 @@
     
 [cython 0.25 版本](https://packages.ubuntu.com/artful/cython)
     
+    安装 sudo apt-mark hold cython  
     
     更新:
     git pull  # Grab latest source
