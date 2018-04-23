@@ -42,6 +42,24 @@
     nvcc=/usr/local/cuda-8.0/bin/nvcc
     
 [caffe的安装](https://blog.csdn.net/yhaolpz/article/details/71375762)
+### scikit-image源码安装
+    git clone https://github.com/scikit-image/scikit-image.git
+
+    安装所有必需的依赖项:
+    sudo apt-get install python-matplotlib python-numpy python-pil python-scipy
+
+    使用已经安装好的的编译器:
+    sudo apt-get install build-essential cython
+
+
+    cd scikit-image
+    如果你的编译工具完全的话，直接运行:
+    pip install -U -e .
+
+    更新:
+    git pull  # Grab latest source
+    python setup.py build_ext -i  # Compile any modified extensions
+
 ============================================
     =============================================
   ## 2.下载训练好的权重weight文件
