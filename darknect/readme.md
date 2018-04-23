@@ -294,5 +294,24 @@
       teddy bear        
       hair drier       
       toothbrush        }}
-      
-      
+      
+## 11.2下载数据集   
+    cp scripts/get_coco_dataset.sh data
+    cd data
+    bash get_coco_dataset.sh
+    
+## 11.3修改 coco数据集的配置文件
+    vim cfg/coco.data
+    classes= 80
+    train  = <path-to-coco>/trainvalno5k.txt
+    valid  = <path-to-coco>/5k.txt
+    names = data/coco.names
+    backup = backup
+    
+    
+    
+## 修改模型配置文件 
+    cp cfg/yolo.cfg my_yolo.cfg
+    vim my_yolo.cfg
+## 训练
+ 
