@@ -45,6 +45,7 @@
 
 ### scikit-image 安装
     命令行安装 sudo apt-get install python-skimage
+    
     源码安装
     git clone https://github.com/scikit-image/scikit-image.git
 
@@ -66,6 +67,9 @@
     更新:
     git pull  # Grab latest source
     python setup.py build_ext -i  # Compile any modified extensions
+
+###  from google.protobuf.internal import enum_type_wrapper ImportError: No module named google.protobuf
+    sudo apt-get install python-protobuf
 
 ============================================
     =============================================
