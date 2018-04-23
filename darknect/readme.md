@@ -166,7 +166,12 @@
       valid  = <path-to-voc>2007_test.txt
       names = data/voc.names
       backup = backup
-
+## 我的
+    classes= 20
+    train  = /home/sujun/ewenwan/software/darknet/data/voc/my_train_data.txt
+    valid  = /home/sujun/ewenwan/software/darknet/data/voc/2007_test.txt
+    names = data/voc.names
+    backup = backup
     =========================================================
  ### 10.5 下载预训练分类网络参数 imagenet数据集的 分类网络参数
     from  darknet53 
