@@ -12,6 +12,8 @@
     cd darknet
     make
     
+[opencv](https://github.com/Ewenwan/MVision/blob/master/opencv_app/readme.md)安装
+
     安装了 opencv之后 可以打开opencv的编译选项
     还有多线程 openMP选项
     OPENCV=1
