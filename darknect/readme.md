@@ -17,9 +17,9 @@
     OPENCV=1
     OPENMP=1
 
-    problem:
+    问题    problem:
     /usr/bin/ld: 找不到 -lippicv
-    solution:
+    解决办法 solution:
 
     pkg-config加载库的路径是/usr/local/lib,我们去这这个路径下看看，
     发现没有-lippicv对应的库，别的选项都有对应的库，然后我们把-lippicv对应的库（libippicv.a）
@@ -105,7 +105,6 @@
     给定自然图片， 从中识别出特定物体。
     待识别的物体有20类：
     囊括了车、人、猫、狗等20类常见目标。训练样本较少、场景变化多端，非常具有挑战性。
-    
       aeroplane  
       bicycle
       bird
@@ -202,7 +201,6 @@
     - 类别标志 
     - 类别数量区分 
     - 像素级的分割 
-    
     COCO数据集有超过 200,000 张图片，80种物体类别. 所有的物体实例都用详细的分割mask进行了标注，共标注了超过 500,000 个物体实体.     
     {    
     person  # 1    
