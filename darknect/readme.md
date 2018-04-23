@@ -42,11 +42,14 @@
     nvcc=/usr/local/cuda-8.0/bin/nvcc
     
 [caffe的安装](https://blog.csdn.net/yhaolpz/article/details/71375762)
-### scikit-image源码安装
+
+### scikit-image 安装
+    命令行安装 sudo apt-get install python-skimage
+    源码安装
     git clone https://github.com/scikit-image/scikit-image.git
 
     安装所有必需的依赖项:
-    sudo apt-get install python-matplotlib python-numpy python-pil python-scipy
+    sudo apt-get install python-matplotlib python-numpy python-pil python-scipy python-
 
     使用已经安装好的的编译器:
     sudo apt-get install build-essential cython
