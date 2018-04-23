@@ -55,7 +55,10 @@
     cd scikit-image
     如果你的编译工具完全的话，直接运行:
     pip install -U -e .
-
+    
+[cython 0.25 版本](https://packages.ubuntu.com/artful/cython)
+    
+    
     更新:
     git pull  # Grab latest source
     python setup.py build_ext -i  # Compile any modified extensions
