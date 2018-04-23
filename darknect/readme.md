@@ -198,9 +198,7 @@
     - 类别数量区分 
     - 像素级的分割 
     
-    COCO数据集有超过 200,000 张图片，80种物体类别. 所有的物体实例都用详细的分割mask进行了标注，共标注了超过 500,000 个物体实体. 
-    
-    
+    COCO数据集有超过 200,000 张图片，80种物体类别. 所有的物体实例都用详细的分割mask进行了标注，共标注了超过 500,000 个物体实体.     
     {    
     person  # 1    
     vehicle 交通工具 #8        
@@ -311,7 +309,13 @@
     
     
 ## 修改模型配置文件 
-    cp cfg/yolo.cfg my_yolo.cfg
-    vim my_yolo.cfg
+    cp cfg/yolo.cfg my_yolov3.cfg
+    vim my_yolov3.cfg
 ## 训练
- 
+    ./darknet detector train cfg/coco.data cfg/my_yolov3.cfg darknet53.conv.74
+### 多gpu训练
+    ./darknet detector train cfg/coco.data cfg/yolov3.cfg darknet53.conv.74 -gpus 0,1,2,3
+### 中断后 断点接着 训练
+    ./darknet detector train cfg/coco.data cfg/yolov3.cfg backup/yolov3.backup -gpus 0,1,2,3
+
+
