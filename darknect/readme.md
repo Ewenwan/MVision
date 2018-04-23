@@ -199,3 +199,100 @@
     - 像素级的分割 
     
     COCO数据集有超过 200,000 张图片，80种物体类别. 所有的物体实例都用详细的分割mask进行了标注，共标注了超过 500,000 个物体实体. 
+    
+    
+    {    
+    person  # 1    
+    vehicle 交通工具 #8        
+    { bicycle         自行车
+      car             小汽车       
+      motorcycle      摩托车
+      airplane        飞机       
+      bus             公交车
+      train           火车       
+      truck           卡车
+      boat}           船    
+    outdoor  室外#5        
+    { traffic light   交通灯     
+      fire hydrant    消防栓     
+      stop sign       
+      parking meter      
+      bench}    
+    animal  动物 #10        
+    { bird       
+      cat      
+      dog      
+      horse       
+      sheep      
+      cow       
+      elephant      
+      bear       
+      zebra      
+      giraffe}   
+    accessory 饰品 #5        
+    { backpack 背包       
+      umbrella 雨伞       
+      handbag 手提包       
+      tie 领带       
+      suitcase 手提箱 }   
+    sports  运动 #10        
+    { frisbee      
+      skis      
+      snowboard       
+      sports ball       
+      kite        
+      baseball bat       
+      baseball glove       
+      skateboard        
+      surfboard       
+      tennis racket        } 
+      
+    kitchen  厨房 #7       
+    { bottle        
+      wine glass       
+      cup       
+      fork        
+      knife       
+      spoon        
+      bowl        }  
+    food  食物#10        
+    { banana        
+      apple       
+      sandwich        
+      orange       
+      broccoli       
+      carrot        
+      hot dog        
+      pizza       
+      donut       
+      cake        }    
+    furniture 家具 #6        
+    { chair       
+      couch       
+      potted plant       
+      bed        
+      dining table       
+      toilet        }    
+    electronic 电子产品 #6        
+    { tv        
+      laptop       
+      mouse        
+      remote        
+      keyboard        
+      cell phone        }   
+    appliance 家用电器 #5        
+    { microwave       
+      oven        
+      toaster       
+      sink        
+      refrigerator        }    
+    indoor  室内物品#7        
+    { book        
+      clock       
+      vase     
+      scissors        
+      teddy bear        
+      hair drier       
+      toothbrush        }}
+      
+      
