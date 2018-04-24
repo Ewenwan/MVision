@@ -38,6 +38,7 @@ int main(int argc, char** argv)
 		imgL = iP.unsharpMasking(imgL, "median", 5, 0.2, 0.8);
 		imgR = iP.unsharpMasking(imgR, "median", 5, 0.2, 0.8);
 	 	StereoM.bmMatch(imgL, imgR, disp);
+	        StereoM.elasMatch(imgL, imgR, disp);
 		//StereoM.sgbmMatch(imgL, imgR, disp);
 		//StereoM.hhMatch(imgL, imgR, disp);
 		//StereoM.wayMatch(imgL, imgR, disp);//效果太差
