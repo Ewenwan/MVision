@@ -15,6 +15,9 @@
 #include "opencv2/core/utility.hpp"
 #include <iostream>
 
+// elas 
+#include "elas/elas.h"
+
 //pcl
 //点云数据处理
 #include <pcl/point_cloud.h>
@@ -74,6 +77,18 @@ public://共有　方法
 	int sgbmMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity);
 	int hhMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity);
 	int wayMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity);
+	/*----------------------------
+	 * 功能 : 基于 elas 算法计算视差
+	 *----------------------------
+	 * 函数 : StereoMatch::elasMatch
+	 * 访问 : public 
+	 * 返回 : 0 - 失败，1 - 成功
+	 *
+	 * 参数 : frameLeft		[in]	左摄像机帧图
+	 * 参数 : frameRight		[in]	右摄像机帧图
+	 * 参数 : disparity		[out]	视差图
+	 */
+        int elasMatch(cv::Mat& frameLeft, cv::Mat& frameRight, cv::Mat& disparity);
 	/*----------------------------
 	 * 功能 : 基于 VAR 算法计算视差
 	 *----------------------------
@@ -179,6 +194,8 @@ public://共有　方法
 	//cv::StereoBM		m_BM;	// 立体匹配 BM 方法
 	//cv::StereoSGBM	m_SGBM;	// 立体匹配 SGBM 方法
 	//cv::StereoVar		m_VAR;	// 立体匹配 VAR 方法
+	Elas elas;//elas类
+	//cv::Ptr<Elas> elas_ptr;//
 	double			m_FL;	// 左摄像机校正后的焦距值
 
 private:
@@ -223,6 +240,7 @@ private:
 
         int m_maxDisparies_bm;                  // 视差变化范围
         int m_maxDisparies_sgbm;                // 视差变化范围
+	int m_maxDisparies_elas;                // 视差变化范围
 
 	int m_frameWidth;                       // 帧宽
         int m_frameHeight;                      // 帧高
