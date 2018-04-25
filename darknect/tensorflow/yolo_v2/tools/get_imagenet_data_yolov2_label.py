@@ -1,5 +1,5 @@
 # coding=utf-8
-
+# image_net 数据集 生成 yolo 数据集格式
 # 使用说明
 # 将该文件放在ILSVRC2016/bject_detection/ILSVRC目录下，并将Data文件夹重命名为JPEGImages
 # 执行该工具，Lists目录下会生成图片路径列表
