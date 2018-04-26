@@ -212,8 +212,11 @@
 
     =========================================================
   ### 10.6 . 在  VOC 训练
+    从零开始
     ./darknet detector train cfg/voc.data cfg/yolov3-voc.cfg darknet53.conv.74
-
+    断点继续训练
+    ./darknet detector train cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc.backup darknet53.conv.74
+    
   ### 10.7 使用训练结果 测试、
     ./darknet detect cfg/yolov3-voc.cfg backup/yolov3-voc_20000.weights data/dog.jpg
     ==========================================================
