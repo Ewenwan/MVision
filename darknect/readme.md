@@ -40,7 +40,13 @@
     
 ### 如需GPU 注意千万不要忘了修改nvcc  实际cuda 安装路径
     nvcc=/usr/local/cuda-8.0/bin/nvcc
-    
+  
+### 问题 找不到 libopencv_shape.so.3.0: cannot open shared object file: No such file or directory 
+    进入目录：cd /etc/ld.so.conf.d
+    创建：sudo vim opencv.conf
+    添加：/usr/local/lib           opencv的实际安装路径
+    执行：sudo ldconfig
+
 [caffe的安装](https://blog.csdn.net/yhaolpz/article/details/71375762)
 
 ### scikit-image 安装
