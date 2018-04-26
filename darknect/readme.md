@@ -202,6 +202,35 @@
     valid  = /home/sujun/ewenwan/software/darknet/data/voc/2007_test.txt
     names = data/voc.names
     backup = backup
+    
+### 以及 网络配置文件 
+    [net]
+    # Testing
+    # batch=1 # bigger gpu memory cost higher 
+    #  subdivisions=1
+
+    # Training   训练
+    batch=64          # 一次训练使用多张图片
+    subdivisions=16   # 分成16次载入gpu内存 也就是一次载入 4张图片
+    width=416
+    height=416
+    channels=3
+    momentum=0.9      # 动量 
+    decay=0.0005      # 衰减
+    angle=0# 图片旋转
+    saturation = 1.5# 图像预处理
+    exposure = 1.5
+    hue=.1
+
+    learning_rate=0.0001#  bigger easy spread学习率
+    burn_in=1000
+    max_batches = 50200
+    policy=steps
+    steps=40000,45000#逐步降低 学习率 牛顿下山法
+    scales=.1,.1
+    ...
+    ...
+    
     =========================================================
  ### 10.5 下载预训练分类网络参数 imagenet数据集的 分类网络参数
     from  darknet53 
