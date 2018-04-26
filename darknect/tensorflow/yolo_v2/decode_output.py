@@ -7,18 +7,18 @@ Detection ops for Yolov2
 import tensorflow as tf
 import numpy as np
 
-
+# 默认80个类别
 def decode(detection_feat, feat_sizes=(13, 13), num_classes=80,
            anchors=None):
     """decode from the detection feature"""
-    H, W = feat_sizes
-    num_anchors = len(anchors)
+    H, W = feat_sizes# 最后 特征图的 尺寸 13*13格子数量
+    num_anchors = len(anchors)# 每个格子预测的 边框数量 
     detetion_results = tf.reshape(detection_feat, [-1, H * W, num_anchors,
                                         num_classes + 5])
 
-    bbox_xy = tf.nn.sigmoid(detetion_results[:, :, :, 0:2])
-    bbox_wh = tf.exp(detetion_results[:, :, :, 2:4])
-    obj_probs = tf.nn.sigmoid(detetion_results[:, :, :, 4])
+    bbox_xy = tf.nn.sigmoid(detetion_results[:, :, :, 0:2])# 边框中心点 相对于所在格子 左上点 的偏移的比例
+    bbox_wh = tf.exp(detetion_results[:, :, :, 2:4])# 
+    obj_probs = tf.nn.sigmoid(detetion_results[:, :, :, 4])# 物体 
     class_probs = tf.nn.softmax(detetion_results[:, :, :, 5:])
 
     anchors = tf.constant(anchors, dtype=tf.float32)
