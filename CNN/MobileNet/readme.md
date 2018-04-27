@@ -1,6 +1,6 @@
-# MobileNets模型结构
+# MobileNet 模型结构
 # 深度可分解卷积
-# MobileNets总共28层（1 + 2 × 13 + 1 = 28）
+# MobileNet v1 总共28层（1 + 2 × 13 + 1 = 28） 
 [参考理解](https://blog.csdn.net/wfei101/article/details/78310226)
 
 [参考代码](https://github.com/Zehaos/MobileNet/blob/master/nets/mobilenet.py)
@@ -15,6 +15,9 @@
 
 [MobileNetV2-pytorch](https://github.com/Randl/MobileNetV2-pytorch)
 
+[MobileNetV2-caffe](https://github.com/suzhenghang/MobileNetv2/tree/master/.gitignore)
+
+[MobileNet-v2-caffe](https://github.com/austingg/MobileNet-v2-caffe)
 
       是Google针对手机等嵌入式设备(  移动和嵌入式视觉应用 mobile and embedded vision applications)
       提出的一种轻量级的深层神经网络，取名为MobileNets。
@@ -55,3 +58,40 @@
         作用是改变输入输出通道数，减少特征图数量，让网络变瘦。
 ###   B 第二个超参数是分辨率乘数  ，
         分辨率乘数用来改变输入数据层的分辨率，同样也能减少参数。
+### v1 网络结构 
+      """
+      1. 普通3d卷积层 3*3*3*round(32 * width_multiplier) 3*3卷积核 3通道输入 输出通道数量 随机确定1~32个
+      2. 13个 depthwise_separable_conv2d 层 3*3*1*输入通道 -> BN -> RELU ->  1*1*输入通道*输出通道 -> BN -> RELU
+      3. 均值池化层	 7*7核	+ squeeze 去掉维度为1的维
+      4. 全连接层 输出  -> [N, 1000]
+      5. softmax分类输出到 0~1之间
+      """
+### v2 结构 借鉴 ResNet结构
+#### 残差模块
+      f(x) + W*x
+      f(x) 为 2个 3x3的卷积
+      实际中，考虑计算的成本，对残差块做了计算C，即将2个3x3的卷积层替换为 1x1 + 3x3 + 1x1 。
+      新结构中的中间3x3的卷积层首先在一个降维1x1卷积层下减少了计算，然后在另一个1x1的卷积层下做了还原，既保持了精度又减少了计算量。
+      
+      _____________________________________>
+      |                                     +  f(x) + x
+      x-----> 1x1 + 3x3标准 + 1x1 卷积 ----->  
+           压缩”→“卷积提特征”→“扩张”
+#### MobileNet v2
+      在v1 的 Depth-wise convolution之前多了一个1*1的“扩张”层，目的是为了提升通道数，获得更多特征；
+      最后不采用Relu，而是Linear，目的是防止Relu破坏特征。
+      结合 x (中间3x3DW 步长为1结合x  步长为2时不结合x )
+      1. 步长为1结合x shortcut
+      ___________________________________>
+      |                                     -->  f(x) + x
+      x-----> 1x1 + 3x3DW + 1x1 卷积 ----->  
+           “扩张”→“卷积提特征”→ “压缩”
+      ResNet是：压缩”→“卷积提特征”→“扩张”，MobileNetV2则是Inverted residuals,即：“扩张”→“卷积提特征”→ “压缩”
+      
+      2. 步长为2时不结合x 
+      x-----> 1x1 + 3x3DW(步长为2) + 1x1 卷积 ----->   输出
+      
+      
+      
+      
+      
