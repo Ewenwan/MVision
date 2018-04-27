@@ -2,9 +2,13 @@
 # 深度可分解卷积
 # MobileNets总共28层（1 + 2 × 13 + 1 = 28）
 [参考理解](https://blog.csdn.net/wfei101/article/details/78310226)
-[参考代码](2018/04/27 ref:https://github.com/Zehaos/MobileNet/blob/master/nets/mobilenet.py)
+
+[参考代码](https://github.com/Zehaos/MobileNet/blob/master/nets/mobilenet.py)
+
 [论文地址](https://arxiv.org/pdf/1704.04861.pdf)
+
 [有tensorflow的实现](https://github.com/tensorflow/models/blob/master/slim/nets/mobilenet_v1.md)
+
 [caffe也有人实现](https://github.com/shicai/MobileNet-Caffe)
 
       是Google针对手机等嵌入式设备(  移动和嵌入式视觉应用 mobile and embedded vision applications)
