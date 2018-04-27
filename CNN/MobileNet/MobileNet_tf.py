@@ -32,6 +32,9 @@ import tensorflow as tf
 from tensorflow.python.training import moving_averages
 
 UPDATE_OPS_COLLECTION = "_update_ops_"
+#### 使用GPU时指定 gpu设备
+# import os
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 ################################################################
 # 创建变量 create variable 默认可优化训练
