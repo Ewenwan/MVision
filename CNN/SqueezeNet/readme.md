@@ -6,6 +6,8 @@
 
 [论文源码 caffe model](https://github.com/DeepScale/SqueezeNet)
 
+[PyTorch实现的SqeezeNet](https://github.com/pytorch/vision/blob/master/torchvision/models/squeezenet.py)
+
 # SqueezeNet的工作为以下几个方面：
     1. 提出了新的网络架构Fire Module，通过减少参数来进行模型压缩
     2. 使用其他方法对提出的SqeezeNet模型进行进一步压缩
@@ -51,6 +53,6 @@
     并且在conv1, fire4, fire8, 和 conv10这几层 之后 使用步长为2的max-pooling，
     即将池化层放在相对靠后的位置，这使用了以上的策略（3）。
     
-    
-    
-   
+##  一些改进版本
+    还有改进版本 simple bypass 以及  complex bypass的改进版本。
+    在中间某些层之间增加 残差网络的结构  结合不同层级的 特征图
