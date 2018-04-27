@@ -1,5 +1,14 @@
+#-*- coding: utf-8 -*-
+# 论文
+# https://arxiv.org/pdf/1602.07360.pdf
+# 论文源码  caffe model
+# https://github.com/DeepScale/SqueezeNet 
 """
-2017/12/02
+2018/04/27
+SqueezeNet的工作为以下几个方面：
+   1. 提出了新的网络架构Fire Module，通过减少参数来进行模型压缩
+   2. 使用其他方法对提出的SqeezeNet模型进行进一步压缩
+   3. 对参数空间进行了探索，主要研究了压缩比和3∗3卷积比例的影响
 """
 
 import tensorflow as tf
