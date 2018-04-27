@@ -1,5 +1,7 @@
 #-*- coding: utf-8 -*-
 # 预处理 
+"""
+"""
 import numpy as np
 import tensorflow as tf
 from scipy.misc import imread, imresize, imsave
