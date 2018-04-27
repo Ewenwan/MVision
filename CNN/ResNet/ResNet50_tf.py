@@ -27,6 +27,12 @@ sudo pip3 install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/
 
 import tensorflow as tf
 from tensorflow.python.training import moving_averages# 移动平均
+
+#### 使用GPU时指定 gpu设备
+#import os
+#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
+
 ####### 全连接层 卷积层初始化############################
 fc_initializer = tf.contrib.layers.xavier_initializer
 conv2d_initializer = tf.contrib.layers.xavier_initializer_conv2d
