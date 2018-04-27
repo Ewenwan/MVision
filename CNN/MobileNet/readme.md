@@ -5,7 +5,9 @@
 
 [参考代码](https://github.com/Zehaos/MobileNet/blob/master/nets/mobilenet.py)
 
-[论文地址](https://arxiv.org/pdf/1704.04861.pdf)
+[V1 论文地址](https://arxiv.org/pdf/1704.04861.pdf)
+
+[MobileNet V2 论文地址](https://arxiv.org/pdf/1801.04381.pdf)
 
 [有tensorflow的实现](https://github.com/tensorflow/models/blob/master/slim/nets/mobilenet_v1.md)
 
