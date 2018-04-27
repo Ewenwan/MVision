@@ -1,5 +1,7 @@
 #-*- coding: utf-8 -*-
 # 参数配置文件
+"""
+"""
 import argparse
 
 parser = argparse.ArgumentParser(description="MobileNetV2")
