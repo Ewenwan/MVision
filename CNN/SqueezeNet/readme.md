@@ -32,3 +32,25 @@
     2. 减少输入通道数量：这一部分使用squeeze layers来实现
     3. 将欠采样操作延后，可以给卷积层提供更大的激活图：更大的激活图保留了更多的信息，可以提供更高的分类准确率
     其中，1 和 2 可以显著减少参数数量，3 可以在参数数量受限的情况下提高准确率。
+    
+## SqueezeNet 的核心模块 Fire Module
+    1. 只使用1∗1 卷积 filter 构建 squeeze convolution layer    减少参数 策略1 
+    2. 使用1∗1 和3∗3 卷积 filter的组合 构建的 expand layer
+    3. squeeze convolution layer 中 1∗1 卷积 filter数量可调 s1
+       expand layer  中 1∗1 卷积 filter数量可调  e1
+       expand layer  中 3∗3 卷积 filter数量可调  e2
+    4. s1 < e1 + e2                                           减少参数 策略2 
+ 
+## SqueezeNet 网络结构 
+    1. SqueezeNet以卷积层（conv1）开始， 
+    2. 接着使用8个Fire modules (fire2-9)，
+    3. 最后以卷积层（conv10）结束卷积特征提取
+    4. 再通过 全局均值池化 + softmax分类得到结果
+    
+    每个fire module中的filter数量逐渐增加，
+    并且在conv1, fire4, fire8, 和 conv10这几层 之后 使用步长为2的max-pooling，
+    即将池化层放在相对靠后的位置，这使用了以上的策略（3）。
+    
+    
+    
+   
