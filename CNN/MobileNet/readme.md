@@ -9,9 +9,12 @@
 
 [MobileNet V2 论文地址](https://arxiv.org/pdf/1801.04381.pdf)
 
-[有tensorflow的实现](https://github.com/tensorflow/models/blob/master/slim/nets/mobilenet_v1.md)
+[有tensorflow的实现 v1](https://github.com/tensorflow/models/blob/master/slim/nets/mobilenet_v1.md)
 
-[caffe也有人实现](https://github.com/shicai/MobileNet-Caffe)
+[caffe也有人实现 v1](https://github.com/shicai/MobileNet-Caffe)
+
+[MobileNetV2-pytorch](https://github.com/Randl/MobileNetV2-pytorch)
+
 
       是Google针对手机等嵌入式设备(  移动和嵌入式视觉应用 mobile and embedded vision applications)
       提出的一种轻量级的深层神经网络，取名为MobileNets。
