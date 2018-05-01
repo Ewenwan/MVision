@@ -7,6 +7,8 @@
 
 [斯坦福CS231计算机视觉2017](http://www.mooc.ai/course/268/learn?lessonid=1819#lesson/1819)
 
+[2018 MIT 6.S094 麻省理工深度学习和自动驾驶课程 ](http://www.mooc.ai/course/483/notes)
+
 ##  公司
 [视觉领域的部分国内公司](http://www.ipcv.org/cvcom/)
 ###  初创公司：
