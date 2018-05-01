@@ -10,6 +10,14 @@
 [2018 MIT 6.S094 麻省理工深度学习和自动驾驶课程 中文](http://www.mooc.ai/course/483/notes)
 
 [MIT  深度学习和自动驾驶课程 英文](https://selfdrivingcars.mit.edu/)
+
+[DeepTraffic](https://selfdrivingcars.mit.edu/deeptraffic/)
+
+[SegFuse: Dynamic Driving Scene Segmentation](https://selfdrivingcars.mit.edu/segfuse/)
+
+[DeepTesla - End-to-End Steering Model](https://selfdrivingcars.mit.edu/deeptesla/)
+
+
 ##  公司
 [视觉领域的部分国内公司](http://www.ipcv.org/cvcom/)
 ###  初创公司：
