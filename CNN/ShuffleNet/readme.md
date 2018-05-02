@@ -1,6 +1,12 @@
 # 轻量级网络--ShuffleNet 分组点卷积+通道重排+逐通道卷积
 ## 进化过程 ResNet ---> MobileNet ----> ShuffleNet
 
+[论文地址](https://arxiv.org/pdf/1707.01083.pdf)
+
+[tf代码](https://github.com/MG2033/ShuffleNet)
+
+[caffe代码](https://github.com/farmingyard/ShuffleNet)
+
 ## ResNet 残差网络  结合不同层特征
     ________________________________>
     |                                 ADD -->  f(x) + x
