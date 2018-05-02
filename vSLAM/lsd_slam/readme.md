@@ -73,4 +73,38 @@
 
 
 ## 换用 catkin_make 编译
+    1. 目录下有两个包 core 和 view 所以 在 lsd_slam目录下新建一个文件夹 lad_slam  
+    把 CMakeLists.txt 和 package.xml 放入
+
+    包信息  package.xml
+
+            <?xml version="1.0"?>
+            <package>
+              <name>lsd_slam</name>
+              <version>0.0.0</version>
+              <description>
+                Large-Scale Direct Monocular SLAM
+             </description>
+
+              <author>Jakob Engel</author>
+              <maintainer email="engelj@in.tum.de">Jakob Engel</maintainer>
+              <license>see http://vision.in.tum.de/lsdslam </license>
+              <url>http://vision.in.tum.de/lsdslam</url>
+
+              <license>TODO</license>
+              <buildtool_depend>catkin</buildtool_depend>
+              <run_depend>lsd_slam_core</run_depend>
+              <run_depend>lsd_slam_viewer</run_depend>
+
+              <export>
+                <metapackage/>
+              </export>
+            </package>
+
+    CMakeLists.txt    
+
+            cmake_minimum_required(VERSION 2.8.3)
+            project(lsd_slam_robot)
+            find_package(catkin REQUIRED)
+            catkin_metapackage()
 
