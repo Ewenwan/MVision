@@ -32,22 +32,22 @@
 ## 5. 编译LSD-SLAM
     rosmake lsd_slam  
 ## 6. 运行LSD-SLAM
-1. 启动ROS服务               roscore  
-2. 启动摄像服务（USB摄像模式）  rosrun uvc_camera uvc_camera_node device:=/dev/video0  
-3. 启动LSD-viewer查看点云     rosrun lsd_slam_viewer viewer  
-4. 启动LSD-core  
-   1）数据集模式
-   rosrun lsd_slam_core dataset_slam _files:=<files> _hz:=<hz> _calib:=<calibration_file>  
-   _files填数据集png包的路径，_hz表示帧率，填0代表默认值，_calib填标定文件地址 
-   如：
-   rosrun lsd_slam_core data
-   set_slam _files:=<your path>/LSD_room/images _hz:=0 _calib:=<your path>/LSD_room/cameraCalibration.cfg  
-  
-   2）USB摄像模式
-   rosrun lsd_slam_core live_slam /image:=<yourstreamtopic> _calib:=<calibration_file>  
-   _calib同上，/image选择视频流 
-   如：
-   rosrun lsd_slam_core live_slam /image:=image_raw _calib:=<your path>/LSD_room/cameraCalibration.cfg 
-  
-  
+    1. 启动ROS服务               roscore  
+    2. 启动摄像服务（USB摄像模式）  rosrun uvc_camera uvc_camera_node device:=/dev/video0  
+    3. 启动LSD-viewer查看点云     rosrun lsd_slam_viewer viewer  
+    4. 启动LSD-core  
+       1）数据集模式
+       rosrun lsd_slam_core dataset_slam _files:=<files> _hz:=<hz> _calib:=<calibration_file>  
+       _files填数据集png包的路径，_hz表示帧率，填0代表默认值，_calib填标定文件地址 
+       如：
+       rosrun lsd_slam_core data
+       set_slam _files:=<your path>/LSD_room/images _hz:=0 _calib:=<your path>/LSD_room/cameraCalibration.cfg  
+
+       2）USB摄像模式
+       rosrun lsd_slam_core live_slam /image:=<yourstreamtopic> _calib:=<calibration_file>  
+       _calib同上，/image选择视频流 
+       如：
+       rosrun lsd_slam_core live_slam /image:=image_raw _calib:=<your path>/LSD_room/cameraCalibration.cfg 
+
+
   
