@@ -158,12 +158,37 @@ def grouped_conv2d(name, x, w=None, num_filters=16, kernel_size=(3, 3), padding=
 ## 取每个组中的一部分重新排序
 def channel_shuffle(name, x, num_groups):
     with tf.variable_scope(name) as scope:
-        n, h, w, c = x.shape.as_list()# 批数量  特征图尺寸  通道总数量
-        x_reshaped = tf.reshape(x, [-1, h, w, num_groups, c // num_groups])# 分组 再 分组
+        n, h, w, c = x.shape.as_list()# 批数量  特征图尺寸  通道总数量  1*10 
+        x_reshaped = tf.reshape(x, [-1, h, w, num_groups, c // num_groups])# 分组 再 分组 2*5
         x_transposed = tf.transpose(x_reshaped, [0, 1, 2, 4, 3])
         output = tf.reshape(x_transposed, [-1, h, w, c])
         return output
+"""
+Shuffle的基本思路如下，假设输入2个group，输出5个group
 
+| group 1   | group 2  |
+
+| 1,2,3,4,5  |6,7,8,9,10 |
+
+转化为矩阵为2*5的矩阵
+1 2 3 4 5
+6 7 8 9 10
+
+转置矩阵，5*2矩阵
+1 6
+2 7
+3 8
+4 9
+5 10
+摊平矩阵
+| group 1   | group 2  | group 3   | group 4  | group 5  |
+
+| 1,6        |2,7      |3,8        |4,9       |5,10      |
+"""
+      
+      
+      
+      
 ########################################################################    
 # 5. 逐通道卷积操作 depthwise_conv####################################### 
 # 逐通道卷积 每个卷积核 只和输入数据的一个通道卷积
