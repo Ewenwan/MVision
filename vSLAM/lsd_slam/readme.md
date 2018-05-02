@@ -52,3 +52,14 @@
 ## catkin_make编译
 [catkin_make编译 参考](https://blog.csdn.net/zhuquan945/article/details/72980831)
   
+
+### 编译错误记录 
+
+#### opencv 
+    KeyFrameDisplay.h
+    
+    //#include <opencv2/core/types_c.h>
+    #include <opencv2/core.hpp>
+    #include <opencv2/core/utility.hpp>
+    
+    
