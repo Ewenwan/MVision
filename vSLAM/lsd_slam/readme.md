@@ -49,5 +49,6 @@
        如：
        rosrun lsd_slam_core live_slam /image:=image_raw _calib:=<your path>/LSD_room/cameraCalibration.cfg 
 
-
+## catkin_make编译
+[catkin_make编译 参考](https://blog.csdn.net/zhuquan945/article/details/72980831)
   
