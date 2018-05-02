@@ -63,3 +63,14 @@
     #include <opencv2/core/utility.hpp>
     
     
+    
+###  sophus 错误
+    opt/ros/indigo/include/sophus/sim3.hpp:339:5: error: passing ‘const RxSO3Type {aka const Sophus::RxSO3Group}’ as ‘this’ argument of ‘void Sophus::RxSO3GroupBase::setScale(const Scalar&) [with Derived = Sophus::RxSO3Group; Sophus::RxSO3GroupBase::Scalar = double]’ discards qualifiers [-fpermissive]
+    rxso3().setScale(scale);
+    ^
+    make[3]: *** [CMakeFiles/lsdslam.dir/src/DepthEstimation/DepthMap.cpp.o] Error 1
+    make[3]: *** [CMakeFiles/lsdslam.dir/src/SlamSystem.cpp.o] Error 1
+
+
+## 换用 catkin_make 编译
+
