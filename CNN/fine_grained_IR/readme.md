@@ -17,19 +17,17 @@
     2. 基于图像精细化特征表达的方法：
        该方法提出使用高维度的图像特征（如：bilinear vector）对图像信息进行高阶编码，以达到准确分类的目的。
 # 按照其使用的监督信息的多少 分为 强监督 和 弱监督 信息的细粒度图像分类模型
+[细粒度图像分析进展综述](https://blog.csdn.net/u011746554/article/details/75096674)
 ## 1. 基于强监督信息的细粒度图像分类模型
     是指，在模型训练时，为了获得更好的分类精度，
     除了图像的类别标签外，
     还使用了物体标注框（object bounding box）和
     部位标注点（part annotation）等额外的人工标注信息。
-    
     算法框架有：
     1. Part-based R-CNN 
-[局部驱动的区域卷积网络 Part-based R-CNN](https://arxiv.org/pdf/1407.3867.pdf)
-    
+[局部驱动的区域卷积网络 Part-based R-CNN](https://arxiv.org/pdf/1407.3867.pdf)   
     
     2. Pose Normalized CNN
-    
     
     3. Mask-CNN 
 [Mask-CNN](https://arxiv.org/pdf/1605.06878.pdf)    
@@ -39,11 +37,9 @@
     仅使用图像的类别标签 + 物体标注框。
     思路同强监督分类模型类似，也需要借助全局和局部信息来做细粒度级别的分类。
     而区别在于，弱监督细粒度分类希望在不借助part annotation的情况下，也可以做到较好的局部信息的捕捉。
-    
     算法框架有：
     1. Two Level Attention Model
-[两个不同层次的特征](https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Xiao_The_Application_of_2015_CVPR_paper.pdf)
-    
+[两个不同层次的特征](https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Xiao_The_Application_of_2015_CVPR_paper.pdf)    
     
     2. Constellations 
 [Constellations ](https://arxiv.org/pdf/1504.08289v3.pd)    
