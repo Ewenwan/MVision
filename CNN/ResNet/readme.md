@@ -28,3 +28,7 @@
     8  softmax分类 预测类别输出
     实际中，考虑计算的成本，对残差块做了计算优化，即将2个3x3的卷积层替换为 1x1 + 3x3 + 1x1 。
     新结构中的中间3x3的卷积层首先在一个降维1x1卷积层下减少了计算，然后在另一个1x1的卷积层下做了还原，既保持了精度又减少了计算量。
+
+# DenseNet 密集网络
+## 每一层的输入来自于前面所有层的输出
+[DenseNet 密集网络](https://img-blog.csdn.net/20171208164855253?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdHV6aXhpbmk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
