@@ -18,6 +18,8 @@
 [DeepTesla - End-to-End Steering Model](https://selfdrivingcars.mit.edu/deeptesla/)
 
 # 无人驾驶的各个方面知识
+[参考](https://blog.csdn.net/qq_40027052/article/details/78485120)
+
     1. 感知（Perception）：
         主要涉及的技术点包括场景理解、交通状况分析、路面检测、空间检测、
         障碍物检测、行人检测、路沿检测、车道检测。还有一个比较新颖有趣的是通过胎压去检测道路质量。
