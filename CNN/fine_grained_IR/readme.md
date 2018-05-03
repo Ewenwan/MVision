@@ -15,13 +15,47 @@
     1. 基于图像重要区域定位的方法：
        该方法集中探讨如何利用弱监督的信息自动找到图像中有判别力的区域，从而达到精细化分类的目的。
     2. 基于图像精细化特征表达的方法：
-       该方法提出使用高维度的图像特征（如：bilinear vector）对图像信息进行高阶编码，以达到准确分类的目的。
-       
+       该方法提出使用高维度的图像特征（如：bilinear vector）对图像信息进行高阶编码，以达到准确分类的目的。
+# 按照其使用的监督信息的多少 分为 强监督 和 弱监督 信息的细粒度图像分类模型
+## 1. 基于强监督信息的细粒度图像分类模型
+    是指，在模型训练时，为了获得更好的分类精度，
+    除了图像的类别标签外，
+    还使用了物体标注框（object bounding box）和
+    部位标注点（part annotation）等额外的人工标注信息。
+    
+    算法框架有：
+    1. Part-based R-CNN 
+[局部驱动的区域卷积网络 Part-based R-CNN](https://arxiv.org/pdf/1407.3867.pdf)
+    
+    
+    2. Pose Normalized CNN
+    
+    
+    3. Mask-CNN 
+[Mask-CNN](https://arxiv.org/pdf/1605.06878.pdf)    
+    
+## 2. 基于弱监督信息的细粒度图像分类模型
+    在模型训练时仅使用图像级别标注信息，而不再使用额外的part annotation信息时，也能取得与强监督分类模型可比的分类精度。
+    仅使用图像的类别标签 + 物体标注框。
+    思路同强监督分类模型类似，也需要借助全局和局部信息来做细粒度级别的分类。
+    而区别在于，弱监督细粒度分类希望在不借助part annotation的情况下，也可以做到较好的局部信息的捕捉。
+    
+    算法框架有：
+    1. Two Level Attention Model
+[两个不同层次的特征](https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Xiao_The_Application_of_2015_CVPR_paper.pdf)
+    
+    
+    2. Constellations 
+[Constellations ](https://arxiv.org/pdf/1504.08289v3.pd)    
+    
+    3. Bilinear CNN
+[Bilinear CNN](https://arxiv.org/pdf/1504.07889.pdf) 
+
 # 算法框架 
-    1. CNN  特征提取网络(科目卷积层 、 属目卷积层、种目卷积层)    提取不同层面的特征
-    2. APN  注意力建议网络   得到不同的关注区域
-    3. DCNN 卷积细粒度特征描述网络
-    4. 全连接层之后得到粗细粒度互补的层次化特征表达，再通过 分类网络softmax 输出结果
+    1. CNN  特征提取网络(科目卷积层 、 属目卷积层、种目卷积层)    提取不同层面的特征
+    2. APN  注意力建议网络   得到不同的关注区域
+    3. DCNN 卷积细粒度特征描述网络
+    4. 全连接层之后得到粗细粒度互补的层次化特征表达，再通过 分类网络softmax 输出结果
 
 
 
