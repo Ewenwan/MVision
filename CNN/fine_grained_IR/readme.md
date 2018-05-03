@@ -1,6 +1,9 @@
 # 深度学习: 细粒度图像识别 (fine-grained image recognition)
 > 细粒度图像识别 (fine-grained image recognition)，即 精细化分类，不同品种的花、鸟、狗、汽车
+
 [细粒度图像识别算法研究 百度文库参考](https://wenku.baidu.com/view/f4c00ec3a76e58fafbb00310.html)
+
+[百度开放平台 细粒度图像分类](https://ai.baidu.com/tech/imagerecognition/fine_grained)
 
 # 精细化分类
     识别出物体的大类别（比如：计算机、手机、水杯等）较易，但如果进一步去判断更为精细化的物体分类名称，则难度极大。
