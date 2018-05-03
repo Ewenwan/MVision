@@ -7,3 +7,7 @@
 [Focal Loss 导数 反向传播](https://github.com/Ewenwan/paper-note/blob/master/focal_loss.pdf)
 
 [交叉熵损失 cross_entropy_loss 导数 反向传播 ](https://github.com/Ewenwan/paper-note/blob/master/cross_entropy_loss.pdf)
+
+[caffe FL实现  softmax ](https://github.com/xuanyuyt/Focal-Loss-1)
+
+[caffe FL实现 sigmoid](https://github.com/sciencefans/Focal-Loss)
