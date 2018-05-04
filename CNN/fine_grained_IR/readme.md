@@ -8,7 +8,8 @@
         进行更加细致的子类划分, 但由于子类别间细微的
         类间差异和较大的类内差异, 较之普通的图像分类
         任务, 细粒度图像分类难度更大.
-        
+[南大 细粒度图像分类 综述](https://cs.nju.edu.cn/wujx/paper/AAS_2017.pdf)
+
 [细粒度图像识别算法研究 百度文库参考](https://wenku.baidu.com/view/f4c00ec3a76e58fafbb00310.html)
 
 [百度开放平台 细粒度图像分类](https://ai.baidu.com/tech/imagerecognition/fine_grained)
