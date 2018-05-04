@@ -70,7 +70,7 @@
 
 # 数据库 
 ## CUB200-2011  Caltech-UCSD Birds-200-2011 
-        共包含200 种不同类别, 共11,788张鸟类图像数据. 
+        共包含200 种不同类别, 共11,788张鸟类图像数据. 
         每张图像包含15个局部部位标注点（part annotation），312 个二值属性, 1个标注框, 以及语义分割图像
 [鸟类数据集](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html)
 
@@ -87,13 +87,13 @@
 
 ## Cars
         提供196类不同品牌不同年份不同车型的车辆图像数据, 一共包含有16,185张图像, 
-        分成训练集(8,144张)和测试集(8,041张)
-        只提供标注框信息。
+        分成训练集(8,144张)和测试集(8,041张)
+        只提供标注框信息。
 [Stanford Cars 汽车数据集](http://ai.stanford.edu/~jkrause/cars/car_dataset.html)
 
 ## FGVC-Aircraf  Fine-Grained Visual Classification of Aircraft 
         提供102 类不同的飞机照片,每一类别含有100 张不同的照片, 整个数据库共
-        有10,200张图片, 只提供标注框信息.
+        有10,200张图片, 只提供标注框信息.
 [飞机数据集](http://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/)
 
 
