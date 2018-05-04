@@ -23,6 +23,8 @@
 
 [细粒度分类-车辆分类](https://blog.csdn.net/u012938704/article/details/68934403)
 
+
+
 # 精细化分类
     识别出物体的大类别（比如：计算机、手机、水杯等）较易，但如果进一步去判断更为精细化的物体分类名称，则难度极大。
     最大的挑战在于，同一大类别下 不同 子类别 间的 视觉差异 极小。因此，精细化分类 所需的图像分辨率 较高。
@@ -65,6 +67,35 @@
 
     3. Bilinear CNN
 [Bilinear CNN](https://arxiv.org/pdf/1504.07889.pdf) 
+
+# 数据库 
+## CUB200-2011  Caltech-UCSD Birds-200-2011 
+        共包含200 种不同类别, 共11,788张鸟类图像数据. 
+        每张图像包含15个局部部位标注点（part annotation），312 个二值属性, 1个标注框, 以及语义分割图像
+[鸟类数据集](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html)
+
+## Stanford Dogs 120种不同种
+        狗的图像数据, 共有20,580 张图, 只提供标注框 和 类别标注数据
+[狗类数据集](http://vision.stanford.edu/aditya86/ImageNetDogs/)
+
+## Oxford Flowers
+        分为两种不同规模的数据 库, 分别包含17种类别和102种类别的花. 其中,
+        102种类别的数据库比较常用, 每个类别包含了40到258 张图像数据, 总共有8,189张图像. 
+        该数据库只提供语义分割图像, 不包含其他额外标注信息.
+
+[花类数据集](http://www.robots.ox.ac.uk/~vgg/data/flowers/)
+
+## Cars
+        提供196类不同品牌不同年份不同车型的车辆图像数据, 一共包含有16,185张图像, 
+        分成训练集(8,144张)和测试集(8,041张)
+        只提供标注框信息。
+[Stanford Cars 汽车数据集](http://ai.stanford.edu/~jkrause/cars/car_dataset.html)
+
+## FGVC-Aircraf  Fine-Grained Visual Classification of Aircraft 
+        提供102 类不同的飞机照片,每一类别含有100 张不同的照片, 整个数据库共
+        有10,200张图片, 只提供标注框信息.
+[飞机数据集](http://www.robots.ox.ac.uk/~vgg/data/fgvc-aircraft/)
+
 
 # 算法框架 
     1. CNN  特征提取网络(科目卷积层 、 属目卷积层、种目卷积层)    提取不同层面的特征
