@@ -1,6 +1,14 @@
 # 深度学习: 细粒度图像识别 (fine-grained image recognition)
 > 细粒度图像识别 (fine-grained image recognition)，即 精细化分类，不同品种的花、鸟、狗、汽车
 
+        细粒度图像分类(Fine-Grained Categorization),
+        又被称作子类别图像分类(Sub-Category Recognition),
+        是近年来计算机视觉、模式识别等领域一个
+        非常热门的研究课题. 其目的是对粗粒度的大类别
+        进行更加细致的子类划分, 但由于子类别间细微的
+        类间差异和较大的类内差异, 较之普通的图像分类
+        任务, 细粒度图像分类难度更大.
+        
 [细粒度图像识别算法研究 百度文库参考](https://wenku.baidu.com/view/f4c00ec3a76e58fafbb00310.html)
 
 [百度开放平台 细粒度图像分类](https://ai.baidu.com/tech/imagerecognition/fine_grained)
