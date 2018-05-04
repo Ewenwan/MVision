@@ -94,7 +94,7 @@
 
 [ Pose Normalized CNN](https://arxiv.org/pdf/1406.2952.pdf)
 
-### 3. Mask-CNN 
+### 3. 基于部位分割模型的 Mask-CNN 
 
 [论文笔记](https://blog.csdn.net/cyiano/article/details/71440358)
 
@@ -131,13 +131,30 @@
     思路同强监督分类模型类似，也需要借助全局和局部信息来做细粒度级别的分类。
     而区别在于，弱监督细粒度分类希望在不借助part annotation的情况下，也可以做到较好的局部信息的捕捉。
     算法框架有：
-    1. Two Level Attention Model
-[两个不同层次的特征](https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Xiao_The_Application_of_2015_CVPR_paper.pdf)    
+    
+### 1. 两级注意力算法 Two Level Attention Model
+        该模型主要关注两个不同层次的特征, 分别是对象级(Object-Level)和
+        局部级(Part-Level), 即在以往强监督工作中所使用的标注框和局部区域位置这两层信息.
+        a. 在预处理阶段, 主要是从原始图像中检测并提取前景对象, 以减少背景信息带来的干扰.
+           仅仅使用卷积网络来对ss算法产生的区域中的背景区域进行过滤. 
+           这样导致的结果是, 对于一张输入图像, 可能对应许多包含前景对象的候选区域.
 
-    2. Constellations 
+        b. 对象级模型，对对象级图像进行分类。
+        一个区域候选, 经过卷积网络之后, 得到一个softmax 层的输出.
+        对所有区域的输出求平均, 作为该图像最终的softmax层输出.
+        
+        c. 局部级模型, 为了从繁杂的候选区域中选出关键的局部区域
+           1. 首先利用对象级模型得到的网络来对每一个候选区域提取特征.
+           2. 对这些特征进行谱聚类, 得到k个不同的聚类簇, 每个簇代表一个局部信息, 如头部、脚等. 
+           3. 将不同局部区域的特征级联成一个特征向量,用来训练SVM, 作为局部级模型给出的分类器.
+        d. 最后, 将对象级模型的预测结果与局部级模型的结果相结合, 作为模型的最终输出.
+        
+[两个不同层次的特征](https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Xiao_The_Application_of_2015_CVPR_paper.pdf)    
+
+### 2. 星座(Constellations)算法
 [Constellations ](https://arxiv.org/pdf/1504.08289v3.pd)    
 
-    3. Bilinear CNN
+### 3. Bilinear CNN
 [Bilinear CNN](https://arxiv.org/pdf/1504.07889.pdf) 
 
 # 数据库 
