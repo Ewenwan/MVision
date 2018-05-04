@@ -57,6 +57,14 @@
 ## window下 找不到lib 文件
 	可以用notePad++等文本编辑器打开类似 *.vcxproj的工程文件，查找到类似<AdditionalDependencies>libcocos2d.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>的标签，删除不想关联的lib,如glew32.lib;字符串(或者 %(AdditionalDependencies) 标签 ；来自父级关联的lib), 然后保存，重新加载项目即可
 
+## lib文件平台框架架构 与 目标架构不匹配 问题
+	打开属性管理器 （视图->属性管理器(属性窗口)->属性页->）
+	分别配置 平台下 x86  x64
+	的 不同库目录（区别架构）
+
+	然后 -> 配置管理器 -> 确定使用哪一种架构编译
+	活动解决方案平台 x64  / x86
+
 ## linux下安装
 安装依赖：
 
