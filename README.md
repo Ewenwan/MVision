@@ -17,6 +17,8 @@
 
 [DeepTesla - End-to-End Steering Model](https://selfdrivingcars.mit.edu/deeptesla/)
 
+[中文slam首页](http://www.slamcn.org/index.php/%E9%A6%96%E9%A1%B5)
+
 # 无人驾驶的各个方面知识
 [参考](https://blog.csdn.net/qq_40027052/article/details/78485120)
 
