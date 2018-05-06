@@ -21,6 +21,8 @@
 
 [ORB-LSD-SVO比较-刘浩敏_bilibili](https://www.bilibili.com/video/av5934066/)
 
+[路径规划A*算法及SLAM自主地图创建导航算法](http://www.voidcn.com/article/p-yfjpnwte-tz.html)
+
 # 无人驾驶的各个方面知识
 [参考](https://blog.csdn.net/qq_40027052/article/details/78485120)
 
