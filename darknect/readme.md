@@ -333,7 +333,8 @@
     Learning Rate: 1e-05, Momentum: 0.9, Decay: 0.0005
     
     2、删除log的结尾几行，使最后一行为batch的输出，如：
-    497001: 0.863348, 0.863348 avg, 0.001200 rate, 5.422251 seconds, 107352216 images
+    shift +g 到最后
+    497001: 0.863348, 0.863348 avg, 0.001200 rate, 5.422251 seconds, 107352216 images
 
     3、执行extract_log.py脚本，格式化log。
     
