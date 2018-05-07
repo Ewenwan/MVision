@@ -43,6 +43,7 @@
 
 ### 6.测试
         sudo make runtest -j8
+        不成功多运行几次
 
 ### 7.安装python 接口
  
