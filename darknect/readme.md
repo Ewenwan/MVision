@@ -534,9 +534,9 @@
           sudo tar xzf labels.tgz                        标签
           sudo unzip -q instances_train-val2014.zip     分割  得到 annotations  实例分割
 
-          生成训练/测试图像列表文件
-          paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt   测试验证数据
-          paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt  迅雷数据
+          生成训练/测试图像列表文件
+          paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt   测试验证数据
+          paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt  训练数据
 
 ## 11.3修改 coco数据集的配置文件
     vim cfg/coco.data
