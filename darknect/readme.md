@@ -326,7 +326,7 @@
     修改cfg中的学习率变化策略，10万次迭代时不改变学习率，30万次时再降低。
     
     我使用迭代97000次时的备份的checkout点来继续训练。
-    ./darknet detector train cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc_97000.weights -gpus 0,1,2,3 2>1 | tee paul_train_log.txt
+    ./darknet detector train cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc_97000.weights -gpus 0,1,2,3 2>1 | sudo tee paul_train_log.txt
     
     除了可视化loss，还可以可视化Avg IOU，Avg Recall等参数。
     可视化’Region Avg IOU’, ‘Class’, ‘Obj’, ‘No Obj’, ‘Avg Recall’,’count’
@@ -504,6 +504,7 @@
 
 ## 11.3修改 coco数据集的配置文件
     vim cfg/coco.data
+    
     classes= 80
     train  = <path-to-coco>/trainvalno5k.txt
     valid  = <path-to-coco>/5k.txt
@@ -513,12 +514,12 @@
     
     
 ## 修改模型配置文件 
-    cp cfg/yolo.cfg my_yolov3.cfg
+    cp cfg/yolov3.cfg my_yolov3.cfg
     vim my_yolov3.cfg
 ## 训练
     ./darknet detector train cfg/coco.data cfg/my_yolov3.cfg darknet53.conv.74
-### 多gpu训练
-    ./darknet detector train cfg/coco.data cfg/yolov3.cfg darknet53.conv.74 -gpus 0,1,2,3
+### 多gpu训练 记录log 以便可视化loss
+    ./darknet detector train cfg/coco.data cfg/yolov3.cfg darknet53.conv.74 -gpus 0,1,2,3 2>1 | sudo tee paul_train_log.txt
 ### 中断后 断点接着 训练
     ./darknet detector train cfg/coco.data cfg/yolov3.cfg backup/yolov3.backup -gpus 0,1,2,3
 
