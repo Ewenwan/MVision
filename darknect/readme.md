@@ -83,16 +83,32 @@
 ============================================
     =============================================
   ## 2.下载训练好的权重weight文件
-    yolov3
-    wget https://pjreddie.com/media/files/yolov3.weights   对于coco数据集的
+      yolov3
+      wget https://pjreddie.com/media/files/yolov3.weights   对于coco数据集的
 
-    yolo v1 的权重 大 网络
-    wget http://pjreddie.com/media/files/yolov1/yolov1.weights       对于 voc数据集
-    ./darknet yolo test cfg/yolov1/yolo.cfg yolov1.weights data/dog.jpg   检测
 
-    yolo v1 的权重 小 网络
-    wget http://pjreddie.com/media/files/yolov1/tiny-yolov1.weights  对于 voc数据集
-    ./darknet yolo test cfg/yolov1/tiny-yolo.cfg tiny-yolov1.weights data/person.jpg 检测
+      yolo v2 的权重 大 网络
+      wget https://pjreddie.com/media/files/yolov2.weights         对于 coco数据集     yolov2.cfg
+      ./darknet detect cfg/yolov2.cfg yolov2.weights data/dog.jpg  检测
+      yolo v2 的权重 小 网络
+      wget https://pjreddie.com/media/files/yolov2-tiny.weights    对于 coco数据集     yolov2-tiny.cfg
+      ./darknet detect cfg/yolov2-tiny.cfg yolov2-tiny.weights data/dog.jpg  检测
+
+       yolo v2 的权重 大 网络
+      wget https://pjreddie.com/media/files/yolov2-voc.weights        对于 voc数据集   yolov2-voc.cfg
+      ./darknet detect cfg/yolov2-voc.cfg yolov2.weights data/dog.jpg  检测
+      yolo v2 的权重 小 网络
+      wget https://pjreddie.com/media/files/yolov2-tiny-voc.weights    对于 voc数据集     yolov2-tiny-voc.cfg
+      ./darknet detect cfg/yolov2-tiny-voc.cfg yolov2-tiny-voc.weights data/dog.jpg  检测
+
+
+      yolo v1 的权重 大 网络
+      wget http://pjreddie.com/media/files/yolov1/yolov1.weights       对于 voc数据集
+      ./darknet yolo test cfg/yolov1/yolo.cfg yolov1.weights data/dog.jpg   检测
+
+      yolo v1 的权重 小 网络
+      wget http://pjreddie.com/media/files/yolov1/tiny-yolov1.weights  对于 voc数据集
+      ./darknet yolo test cfg/yolov1/tiny-yolo.cfg tiny-yolov1.weights data/person.jpg 检测
 
     =============================================
     =============================================
@@ -252,12 +268,15 @@
     =========================================================
  ### 10.5 下载预训练分类网络参数 imagenet数据集的 分类网络参数
     yolo v3 的预训练文件
-    from  darknet53 
-    wget https://pjreddie.com/media/files/darknet53.conv.74   对于 yolov3.cfg / 对于 yolov3-voc.cfg 等
-     
-    yolo v1 的预训练文件
-    https://pjreddie.com/media/files/extraction.conv.weights   对于 yolov1.cfg
-    https://pjreddie.com/media/files/darknet.conv.weights      对于 yolov1-tiny.cfg
+    from  darknet53 
+    wget https://pjreddie.com/media/files/darknet53.conv.74   对于 yolov3.cfg / 对于 yolov3-voc.cfg 等
+
+    yolo v2 的预训练文件
+    wget https://pjreddie.com/media/files/darknet19_448.conv.23
+
+    yolo v1 的预训练文件
+    https://pjreddie.com/media/files/extraction.conv.weights   对于 yolov1.cfg
+    https://pjreddie.com/media/files/darknet.conv.weights      对于 yolov1-tiny.cfg
 
 
 
