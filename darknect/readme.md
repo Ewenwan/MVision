@@ -83,7 +83,16 @@
 ============================================
     =============================================
   ## 2.下载训练好的权重weight文件
-    wget https://pjreddie.com/media/files/yolov3.weights
+    yolov3
+    wget https://pjreddie.com/media/files/yolov3.weights   对于coco数据集的
+
+    yolo v1 的权重 大 网络
+    wget http://pjreddie.com/media/files/yolov1/yolov1.weights       对于 voc数据集
+    ./darknet yolo test cfg/yolov1/yolo.cfg yolov1.weights data/dog.jpg   检测
+
+    yolo v1 的权重 小 网络
+    wget http://pjreddie.com/media/files/yolov1/tiny-yolov1.weights  对于 voc数据集
+    ./darknet yolo test cfg/yolov1/tiny-yolo.cfg tiny-yolov1.weights data/person.jpg 检测
 
     =============================================
     =============================================
