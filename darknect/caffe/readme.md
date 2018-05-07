@@ -1,5 +1,5 @@
   # caffe 安装
-    [caffe的安装](https://blog.csdn.net/yhaolpz/article/details/71375762)
+[caffe的安装](https://blog.csdn.net/yhaolpz/article/details/71375762)
 
    ## 问题记录
     安装  caffe首先在你要安装的路径下 clone ：git clone https://github.com/BVLC/caffe.git1
@@ -69,9 +69,16 @@
        pip install -U scikit-image #若没有安装pip: sudo apt install python-pip
        有时安装不了
 # yolo 模型转换到 caffe下
+1. yolov1的caffe实现
 [caffe-yolo v1 python](https://github.com/xingwangsfu/caffe-yolo)
 
 [caffe-yolo v1  c++](https://github.com/yeahkun/caffe-yolo)
+
+2. yolov2新添了route、reorg、region层，好在github上有人已经实现移植。
+[移植yolo2到caffe框架](https://github.com/hustzxd/z1)
+
+[caffe-yolov2](https://github.com/gklz1982/caffe-yolov2)
+
 
 ## 三个文件的作用
         1. create_yolo_prototxt.py ：  用来将原来的yolo的cfg文件 转成 caffe的prototxt文件，这是模型的配置文件，是描述模型的结构。
