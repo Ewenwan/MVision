@@ -90,4 +90,8 @@
                         python里能够import caffe 
                         你需要在caffe文件夹下make pycaffe，并设置PYTHONPATH环境变量。
 
+### yolo的cfg文件 转成 caffe的prototxt
+    python create_yolo_prototxt.py
+### yolo的weights文件转成caffe的caffemodel
+    python create_yolo_caffemodel.py -m yolo_train_val.prototxt -w yolo.weights -o yolo.caffemodel
 
