@@ -509,37 +509,37 @@
       toothbrush        }}
       
 ## 11.2下载数据集   
-      cp scripts/get_coco_dataset.sh data
-      cd data
-      bash get_coco_dataset.sh
+        cp scripts/get_coco_dataset.sh data
+        cd data
+        bash get_coco_dataset.sh
 
-      脚本细节
-      1. 下载 数据库API
-         git clone https://github.com/pdollar/coco
-         cd coco
-      2. 创建 images文件夹 并下载 图像数据 解压
-         下载  点击链接可直接下载
-         wget -c https://pjreddie.com/media/files/train2014.zip
-         wget -c https://pjreddie.com/media/files/val2014.zip
+        脚本细节
+        1. 下载 数据库API
+           git clone https://github.com/pdollar/coco
+           cd coco
+        2. 创建 images文件夹 并下载 图像数据 解压
+           下载  点击链接可直接下载
+           wget -c https://pjreddie.com/media/files/train2014.zip
+           wget -c https://pjreddie.com/media/files/val2014.zip
 
-         解压
-         unzip -q train2014.zip
-         unzip -q val2014.zip
-      3. 下载标注文件等
-          cd ..
-          wget -c https://pjreddie.com/media/files/instances_train-val2014.zip
-          wget -c https://pjreddie.com/media/files/coco/5k.part
-          wget -c https://pjreddie.com/media/files/coco/trainvalno5k.part
-          wget -c https://pjreddie.com/media/files/coco/labels.tgz
-          sudo tar xzf labels.tgz                        标签
-          sudo unzip -q instances_train-val2014.zip     分割  得到 annotations  实例分割
+           解压
+           unzip -q train2014.zip
+           unzip -q val2014.zip
+        3. 下载标注文件等
+            cd ..
+            wget -c https://pjreddie.com/media/files/instances_train-val2014.zip
+            wget -c https://pjreddie.com/media/files/coco/5k.part
+            wget -c https://pjreddie.com/media/files/coco/trainvalno5k.part
+            wget -c https://pjreddie.com/media/files/coco/labels.tgz
+            sudo tar xzf labels.tgz                        标签
+            sudo unzip -q instances_train-val2014.zip     分割  得到 annotations  实例分割
 
-          生成训练/测试图像列表文件
-          paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt   测试验证数据
-          paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt  训练数据
+            生成训练/测试图像列表文件
+            paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt   测试验证数据
+            paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt  训练数据
 
 ## 11.3修改 coco数据集的配置文件
-    vim cfg/coco.data
+    vim cfg/coco_my.data
     
     classes= 80
     train  = <path-to-coco>/trainvalno5k.txt
@@ -550,8 +550,8 @@
     
     
 ## 修改模型配置文件 
-    cp cfg/yolov3.cfg my_yolov3.cfg
-    vim my_yolov3.cfg
+    cp cfg/yolov3.cfg yolov3_my.cfg
+    vim yolov3_my.cfg
 ## 训练
     ./darknet detector train cfg/coco.data cfg/my_yolov3.cfg darknet53.conv.74
 ### 多gpu训练 记录log 以便可视化loss
