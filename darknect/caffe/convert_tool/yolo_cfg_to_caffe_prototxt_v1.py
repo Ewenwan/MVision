@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# yolo的cfg文件 转成 caffe的prototxt文件，这是模型的配置文件，是描述模型的
 from ConfigParser import ConfigParser
 from collections import OrderedDict
 import argparse
