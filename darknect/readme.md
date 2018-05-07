@@ -251,9 +251,13 @@
     
     =========================================================
  ### 10.5 下载预训练分类网络参数 imagenet数据集的 分类网络参数
-    from  darknet53 
-
-    wget https://pjreddie.com/media/files/darknet53.conv.74
+    yolo v3 的预训练文件
+    from  darknet53 
+    wget https://pjreddie.com/media/files/darknet53.conv.74   对于 yolov3.cfg / 对于 yolov3-voc.cfg 等
+     
+    yolo v1 的预训练文件
+    https://pjreddie.com/media/files/extraction.conv.weights   对于 yolov1.cfg
+    https://pjreddie.com/media/files/darknet.conv.weights      对于 yolov1-tiny.cfg
 
 
 
