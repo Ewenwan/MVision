@@ -531,8 +531,8 @@
           wget -c https://pjreddie.com/media/files/coco/5k.part
           wget -c https://pjreddie.com/media/files/coco/trainvalno5k.part
           wget -c https://pjreddie.com/media/files/coco/labels.tgz
-          tar xzf labels.tgz                       标签
-          unzip -q instances_train-val2014.zip     分割
+          sudo tar xzf labels.tgz                        标签
+          sudo unzip -q instances_train-val2014.zip     分割  得到 annotations  实例分割
 
           图像列表文件
           paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt
