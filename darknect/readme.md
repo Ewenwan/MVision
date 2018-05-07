@@ -553,7 +553,7 @@
     cp cfg/yolov3.cfg yolov3_my.cfg
     vim yolov3_my.cfg
 ## 训练
-    ./darknet detector train cfg/coco.data cfg/my_yolov3.cfg darknet53.conv.74
+    ./darknet detector train cfg/coco_my.data cfg/yolov3_my.cfg darknet53.conv.74 2>1 -gpus 1 2>1 | sudo tee coco_train_log.txt
 ### 多gpu训练 记录log 以便可视化loss
     ./darknet detector train cfg/coco.data cfg/yolov3.cfg darknet53.conv.74 -gpus 0,1,2,3 2>1 | sudo tee paul_train_log.txt
 ### 中断后 断点接着 训练
