@@ -30,8 +30,8 @@
     #WITH_PYTHON_LAYER := 1 
     修改为 
     WITH_PYTHON_LAYER := 1
-
- ### 4.修改 python 路径INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include
+    
+### 4.修改 python 路径INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include
     LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib 
     修改为： 
     INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial
@@ -41,10 +41,10 @@
  ### 5.编译
         make all -j8
 
- ### 6.测试
+### 6.测试
         sudo make runtest -j8
 
- ### 7.安装python 接口
+### 7.安装python 接口
  
         sudo make pycaffe -j8
     7.1 numpy依赖错误
