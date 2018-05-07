@@ -473,10 +473,35 @@
       toothbrush        }}
       
 ## 11.2下载数据集   
-    cp scripts/get_coco_dataset.sh data
-    cd data
-    bash get_coco_dataset.sh
-    
+      cp scripts/get_coco_dataset.sh data
+      cd data
+      bash get_coco_dataset.sh
+
+      脚本细节
+      1. 下载 数据库API
+         git clone https://github.com/pdollar/coco
+         cd coco
+      2. 创建 images文件夹 并下载 图像数据 解压
+         下载  点击链接可直接下载
+         wget -c https://pjreddie.com/media/files/train2014.zip
+         wget -c https://pjreddie.com/media/files/val2014.zip
+
+         解压
+         unzip -q train2014.zip
+         unzip -q val2014.zip
+      3. 下载标注文件等
+          cd ..
+          wget -c https://pjreddie.com/media/files/instances_train-val2014.zip
+          wget -c https://pjreddie.com/media/files/coco/5k.part
+          wget -c https://pjreddie.com/media/files/coco/trainvalno5k.part
+          wget -c https://pjreddie.com/media/files/coco/labels.tgz
+          tar xzf labels.tgz                       标签
+          unzip -q instances_train-val2014.zip     分割
+
+          图像列表文件
+          paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt
+          paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt
+
 ## 11.3修改 coco数据集的配置文件
     vim cfg/coco.data
     classes= 80
