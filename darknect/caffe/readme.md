@@ -38,7 +38,7 @@
     LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux
 
 
- ### 5.编译
+### 5.编译
         make all -j8
 
 ### 6.测试
