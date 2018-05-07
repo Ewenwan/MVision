@@ -67,4 +67,10 @@
        ImportError: No module named skimage.io1 
        解决方法：
        pip install -U scikit-image #若没有安装pip: sudo apt install python-pip
-       有时安装不了
+       有时安装不了
+# yolo 模型转换到 caffe下
+[caffe-yolo v1 python](https://github.com/xingwangsfu/caffe-yolo)
+
+[caffe-yolo v1  c++](https://github.com/yeahkun/caffe-yolo)
+
+
