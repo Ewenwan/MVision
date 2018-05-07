@@ -272,7 +272,7 @@
     再使用backup中备份的weights通过多GPU继续训练。
     一般情况下使用单GPU训练1000个迭代即可切换到多GPU。
     
-    ./darknet detector train cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc_1000.weights -gpus 0,1,2,3 2>1 | tee paul_train_log.txt
+    ./darknet detector train cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc_1000.weights -gpus 0,1,2,3 2>1 | sudo tee paul_train_log.txt
     
     nvidia-smi 差看GPU使用情况
     
