@@ -81,12 +81,12 @@
 
 
 ## 三个文件的作用
-        1. create_yolo_prototxt.py ：  用来将原来的yolo的cfg文件 转成 caffe的prototxt文件，这是模型的配置文件，是描述模型的结构。
-        2. create_yolo_caffemodel.py ：用来将yolo的weights文件转成caffe的caffemodel文件， 这是模型的参数，里面包含了各层的参数。
-        3. yolo_detect.py ：这个Python程序里import了caffe，caffe的python库。
-                            运行这个python程序需要指定用上两个python程序转好的prototxt文件和caffemodel文件，用于初始化caffe的网络。
-                            并在输入的图像上得到检测结果。
-                            python里能够import caffe 
-                            你需要在caffe文件夹下make pycaffe，并设置PYTHONPATH环境变量。
+      1. create_yolo_prototxt.py ：  用来将原来的yolo的cfg文件 转成 caffe的prototxt文件，这是模型的配置文件，是描述模型的结构。
+      2. create_yolo_caffemodel.py ：用来将yolo的weights文件转成caffe的caffemodel文件， 这是模型的参数，里面包含了各层的参数。
+      3. yolo_detect.py ：这个Python程序里import了caffe，caffe的python库。
+                        运行这个python程序需要指定用上两个python程序转好的prototxt文件和caffemodel文件，用于初始化caffe的网络。
+                        并在输入的图像上得到检测结果。
+                        python里能够import caffe 
+                        你需要在caffe文件夹下make pycaffe，并设置PYTHONPATH环境变量。
 
-                    
+
