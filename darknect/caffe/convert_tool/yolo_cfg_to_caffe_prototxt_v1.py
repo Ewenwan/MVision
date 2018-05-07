@@ -6,10 +6,10 @@ import argparse
 import logging
 import os
 import sys
-
+# caffe 层描述格式
 class CaffeLayerGenerator(object):
     def __init__(self, name, ltype):
-        self.name = name
+        self.name = name#名字
         self.bottom = []
         self.top = []
         self.type = ltype
