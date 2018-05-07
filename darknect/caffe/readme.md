@@ -21,7 +21,7 @@
     #USE_CUDNN := 1
     修改成： 
     USE_CUDNN := 11234
- ### 2.应用 opencv 版本将
+### 2.应用 opencv 版本将
     #OPENCV_VERSION := 3 
     修改为： 
     OPENCV_VERSION := 3
