@@ -202,4 +202,12 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
         反对称矩阵性质 A转置  = -A
         正交矩阵  性质 B转置  = B逆
-    
+## 旋转矩阵 与 SO3李群 so3李代数
+[旋转矩阵理解](http://www.cnblogs.com/caster99/p/4703033.html)    
+
+        旋转矩阵为正交矩阵，
+        正交矩阵每一列都是单位矩阵，并且两两正交，
+        正交矩阵的逆（inverse）等于正交矩阵的转置（transpose）
+> 以三个欧拉角中的RotX为例（其余两个欧拉角以此类推，标准笛卡尔坐标系绕x轴旋转O角都，逆时针旋转为正方向）
+<img src="https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/Rx.png" wigth=700>
+
