@@ -176,4 +176,8 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     如果下降太慢，使用较大的λ，使之更接近梯度下降法  Δ = − J转置 * F(X0)
 
 
+# 【4】 李群李代数知识
 
+[李群李代数 反对称矩阵 指数映射 对数 刚体变换群SE3](https://blog.csdn.net/x_r_su/article/details/52749616)
+
+[李群李代数在计算机视觉中的应用](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6223449)
