@@ -1,428 +1,101 @@
-# lad_slam 直接法 视觉里程计
+# lsd是一个 大规模的 单目直接法 视觉半稠密 slam系统
 
-# ros下安装
-## 使用 老版本编译系统 rosmake
-    sudo apt-get install python-rosinstall  
-    mkdir ~/rosbuild_ws   #创建 编译空间
-    cd ~/rosbuild_ws  
-    rosws init . /opt/ros/indigo   #编译空间初始化
-    mkdir package_dir  
-    rosws set ~/rosbuild_ws/package_dir -t .  #设置
-    echo "source ~/rosbuild_ws/setup.bash" >> ~/.bashrc  
-    bash  
-    cd package_dir 
-## 2. 安装依赖包 
-    sudo apt-get install ros-indigo-libg2o ros-indigo-cv-bridge liblapack-dev libblas-dev freeglut3-dev libqglviewer-dev libsuitesparse-dev libx11-dev  
-## 3.下载包
-    git clone https://github.com/tum-vision/lsd_slam.git lsd_slam  
-## 4. 如果你需要openFabMap去闭环检测的话（可选） 需要opencv 非免费的包
-    在 lsd_slam_core/CMakeLists.txt  
-    中去掉下列四行注释即可
-    #add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/openFabMap)  
-    #include_directories(${PROJECT_SOURCE_DIR}/thirdparty/openFabMap/include)  
-    #add_definitions("-DHAVE_FABMAP")  
-    #set(FABMAP_LIB openFABMAP )  
-    
-    需要注意openFabMap需要OpenCv nonfree模块支持，OpenCV3.0以上已经不包含，作者推荐2.4.8版本
-    其中nonfree模块可以由以下方式安装
-    $ sudo add-apt-repository --yes ppa:xqms/opencv-nonfree  
-    $ sudo apt-get update  
-    $ sudo apt-get install libopencv-nonfree-dev  
-    
-## 5. 编译LSD-SLAM
-    rosmake lsd_slam  
-## 6. 运行LSD-SLAM
-    1. 启动ROS服务               roscore  
-    2. 启动摄像服务（USB摄像模式）  rosrun uvc_camera uvc_camera_node device:=/dev/video0  
-    3. 启动LSD-viewer查看点云     rosrun lsd_slam_viewer viewer  
-    4. 启动LSD-core  
-       1）数据集模式
-       rosrun lsd_slam_core dataset_slam _files:=<files> _hz:=<hz> _calib:=<calibration_file>  
-       _files填数据集png包的路径，_hz表示帧率，填0代表默认值，_calib填标定文件地址 
-       如：
-       rosrun lsd_slam_core data
-       set_slam _files:=<your path>/LSD_room/images _hz:=0 _calib:=<your path>/LSD_room/cameraCalibration.cfg  
+[lad源码解析 参考解析](https://blog.csdn.net/lancelot_vim)
 
-       2）USB摄像模式
-       rosrun lsd_slam_core live_slam /image:=<yourstreamtopic> _calib:=<calibration_file>  
-       _calib同上，/image选择视频流 
-       如：
-       rosrun lsd_slam_core live_slam /image:=image_raw _calib:=<your path>/LSD_room/cameraCalibration.cfg 
+[lad算法分析 代码分析 安装 非ros改造](http://www.cnblogs.com/hitcm/category/763753.html)
 
-## catkin_make编译
-[catkin_make编译 参考](https://blog.csdn.net/zhuquan945/article/details/72980831)
+[算法数学基础](https://blog.csdn.net/xdEddy/article/details/78009748)
+ 
+[tracking  optimizationThreadLoop线程 分析等](https://blog.csdn.net/u013004597)
+
+https://blog.csdn.net/tiandijun/article/details/62226163
+
+[官网:](http://vision.in.tum.de/research/vslam/lsdslam)
+[代码:](https://github.com/tum-vision/lsd_slam)
+
+# 运行lsd-slam
+[一个来自官方的范例，使用的dataset如下，400+M](http://vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip)
+
+    解压之
+    然后运行下面的3个命令，即可看到效果
+    rosrun lsd_slam_viewer viewer
+    rosrun lsd_slam_core live_slam image:=/image_raw camera_info:=/camera_info
+    rosbag play ./LSD_room.bag
+
+    平移，旋转，相似以及投影变换，在lsd-slam中，有个三方开源库叫做Sophus/sophus，封装好了前三个变换。
+[库分析  Sophus/sophus ](https://blog.csdn.net/lancelot_vim/article/details/51706832)
+
+
+# 算法整体框架
+    1. Tracking 跟踪线程，当前图像与当前关键帧匹配，获取姿态变换；
+    2. 深度图估计线程，    创建新的关键帧/优化当前关键帧，更新关键帧数据库
+                                           创建新的关键帧： 传播深度信息到新的关键帧，正则化深度图
+                                           优化当前关键帧：近似为小基线长度双目，概率卡尔曼滤波优化更新，正则化深度图
+    3. 全局地图优化，        关键帧加入当地图，从地图中匹配最相似的关键帧，估计sim3位姿变换
+
+================================================
+## 【1】 TRacking 跟踪 运动变换矩阵求解 对极几何 求解 基本矩阵 F 得到Rt矩阵 两组单目相机 2D图像 
+     * (随机采样序列 8点法求解)
+     *  2D 点对 求 两相机的 旋转和平移矩阵
+     * 空间点 P  两相机 像素点对  p1  p2 两相机 归一化平面上的点对 x1 x2 与P点对应
+     * 相机内参数 K  两镜头旋转平移矩阵  R t 或者 变换矩阵 T
+     *  p1 = KP  (世界坐标系)     p2 = K( RP + t)  = KTP
+     *  而 x1 =  K逆* p1  x2 =  K逆* p2  相机坐标系下 归一化平面上的点     x1= (px -cx)/fx    x2= (py -cy)/fy
+     *  所以  x1 = P  得到   x2 =  R * x1  + t   
+     
+     *  t 外积 x2  = t 外积 R * x1 +  t 外积 t  =  t 外积 R * x1 ； 
+        t外积t =0 sin(cet) =0 垂线段投影 方向垂直两个向量
+     *  x2转置 *  t 外积  x2 = x2转置 * t 外积 R  x1   = 0 ；
+        因为  t 外积  x2 得到的向量垂直 t 也垂直 x2
+     *  有 x2转置 * t 外积 R  x1   = x2转置 * E * x1 =  0 ； 
+        E 为本质矩阵
+     *  p2转置 * K 转置逆 * t 外积 R * K逆 * p1   = p2转置 * F * p1 =  0 ；
+        F 为基础矩阵
+     * 
+     * x2转置 * E * x1 =  0    x1 x2  为 由 像素坐标转化的归一化坐标
+     * 一个点对一个约束 ，8点法  可以算出 E的各个元素
+     * 再 SVD奇异值分解 E 得到 R t
+
+ =========================
+## 【2】深度估计 Depth Estimate 沿极线搜索得深度
+    p2'  =  K × P2 = 
+            fx  0  ux       X      fx * X + ux * Z
+            0   fy  uy   ×  Y    = fy * Y + uy * Z
+            0   0   1       Z      Z
+    P2 = K逆 *  p2'        
+
+    p2 =    u                   fx/Z * X + ux
+            v  = 1/Z * p2'  =   fy/Z * Y + uy
+            1                   1
+    这里的Z就是 点在投影面p2下的深度
+    p2'  = Z * p2  = d * p2
+
+> 那么   P2 = K逆 * p2'  = Z * K逆 * p2 = d * K逆 * p2 
+
+     P2为相机视角2下的3D坐标， P1为相机视角1下的3D坐标
+     P2 = R * P1 + t 
+     P1 = R逆 * (P2 - t)    = 
+          R逆 * P2 - R逆*t  =  
+          R' * P2 +  t'     = 
+          d * R' * K逆 * p2  +  t' 
+              R'  = R逆
+              t'   = - R逆*t
+          
+> P1 =    d * R' * x2  +  t'    ,  x2    为相机视角2的归一化平面  x2 =  K逆 * p2
+
+     上式
+     [P1]1 =     d * [R']1 * x2  +  [t']1   
+     [P1]2 =     d * [R']2 * x2  +  [t']2 
+     [P1]3 =     d * [R']3 * x2  +  [t']3 
+
+     [P1]1 /  [P1]3  =  [K逆 * p2]1   
+     [P1]2 /  [P1]3  =  [K逆 * p2]2 
+
+ 如果通过极线搜索匹配找到了一个确定的p1，使用p1的横纵坐标均可求得深度d 
+ 联立可求解d  
   
-
-### 编译错误记录 
-
-#### opencv 
-    KeyFrameDisplay.h
-    
-    //#include <opencv2/core/types_c.h>
-    #include <opencv2/core.hpp>
-    #include <opencv2/core/utility.hpp>
-    
-    
-    
-###  sophus 错误
-    opt/ros/indigo/include/sophus/sim3.hpp:339:5: error: passing ‘const RxSO3Type {aka const Sophus::RxSO3Group}’ as ‘this’ argument of ‘void Sophus::RxSO3GroupBase::setScale(const Scalar&) [with Derived = Sophus::RxSO3Group; Sophus::RxSO3GroupBase::Scalar = double]’ discards qualifiers [-fpermissive]
-    rxso3().setScale(scale);
-    ^
-    make[3]: *** [CMakeFiles/lsdslam.dir/src/DepthEstimation/DepthMap.cpp.o] Error 1
-    make[3]: *** [CMakeFiles/lsdslam.dir/src/SlamSystem.cpp.o] Error 1
-
-
-## 换用 catkin_make 编译
-    1. 目录下有两个包 core 和 view 所以 在 lsd_slam目录下新建一个文件夹 lad_slam  
-    把 CMakeLists.txt 和 package.xml 放入
-
-    包信息  package.xml
-           =========================
-            <?xml version="1.0"?>
-            <package>
-              <name>lsd_slam</name>
-              <version>0.0.0</version>
-              <description>
-                Large-Scale Direct Monocular SLAM
-             </description>
-
-              <author>Jakob Engel</author>
-              <maintainer email="engelj@in.tum.de">Jakob Engel</maintainer>
-              <license>see http://vision.in.tum.de/lsdslam </license>
-              <url>http://vision.in.tum.de/lsdslam</url>
-
-              <license>TODO</license>
-              <buildtool_depend>catkin</buildtool_depend>
-              <run_depend>lsd_slam_core</run_depend>
-              <run_depend>lsd_slam_viewer</run_depend>
-
-              <export>
-                <metapackage/>
-              </export>
-            </package>
-            ====================
-    CMakeLists.txt    
-            ====================
-            cmake_minimum_required(VERSION 2.8.3)
-            project(lsd_slam)
-            find_package(catkin REQUIRED)
-            catkin_metapackage()
-            ====================
-### lsd_slam_viewer 
-    包信息  package.xml
-        ==============================
-        <package>
-        <name>lsd_slam_viewer</name>
-        <version>0.0.0</version>  
-
-        <description>
-         3D Viewer for LSD-SLAM.
-        </description>
-
-        <author>Jakob Engel</author>
-        <maintainer email="engelj@in.tum.de">Jakob Engel</maintainer>
-        <license>see http://vision.in.tum.de/lsdslam</license>
-        <url>http://vision.in.tum.de/lsdslam</url>
-
-        <buildtool_depend>catkin</buildtool_depend>
-        <build_depend>cv_bridge</build_depend>
-        <build_depend>dynamic_reconfigure</build_depend>
-        <build_depend>sensor_msgs</build_depend>
-        <build_depend>roscpp</build_depend>
-        <build_depend>roslib</build_depend>
-        <build_depend>rosbag</build_depend>
-        <build_depend>message_generation</build_depend>
-        <build_depend>cmake_modules</build_depend>
-
-        <run_depend>cmake_modules</run_depend>
-        <run_depend>cv_bridge</run_depend>
-        <run_depend>dynamic_reconfigure</run_depend>
-        <run_depend>sensor_msgs</run_depend>
-        <run_depend>roscpp</run_depend>
-        <run_depend>roslib</run_depend>
-        <run_depend>rosbag</run_depend>
-
-        </package>
-
-       ======================================
-     CMakeLists.txt 
-       ======================================
-        cmake_minimum_required(VERSION 2.4.6)
-        project(lsd_slam_viewer)
-
-        # Set the build type. Options are:
-        #  Coverage : w/ debug symbols, w/o optimization, w/ code-coverage
-        #  Debug : w/ debug symbols, w/o optimization
-        #  Release : w/o debug symbols, w/ optimization
-        #  RelWithDebInfo : w/ debug symbols, w/ optimization
-        #  MinSizeRel : w/o debug symbols, w/ optimization, stripped binaries
-        set(CMAKE_BUILD_TYPE Release)
-
-        ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/thirdparty/Sophus)
-
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
-
-        find_package(catkin REQUIRED COMPONENTS
-        cv_bridge
-        dynamic_reconfigure
-        sensor_msgs
-        roscpp
-        rosbag
-        message_generation
-        roslib
-        )
-        #find_package(OpenCV 2.4.3 REQUIRED)
-        find_package(OpenCV 3.0 QUIET) #support opencv3
-        if(NOT OpenCV_FOUND)
-        find_package(OpenCV 2.4.3 QUIET)
-        if(NOT OpenCV_FOUND)
-        message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
-        endif()
-        endif()
-        find_package(cmake_modules REQUIRED)
-
-        find_package(OpenGL REQUIRED)
-        set(QT_USE_QTOPENGL TRUE)
-        set(QT_USE_QTXML TRUE)
-        find_package(QGLViewer REQUIRED)
-        find_package(Eigen REQUIRED)
-        find_package(OpenCV REQUIRED)
-        find_package(Boost REQUIRED COMPONENTS thread)
-
-        include_directories(${QGLVIEWER_INCLUDE_DIR}
-            ${catkin_INCLUDE_DIRS} 
-            ${EIGEN_INCLUDE_DIR}
-            ${QT_INCLUDES} )
-
-        # SSE flags
-        set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} -march=native -Wall -std=c++0x"
-        )
-
-        add_message_files(DIRECTORY msg FILES keyframeMsg.msg keyframeGraphMsg.msg)
-        generate_messages(DEPENDENCIES)
-
-        generate_dynamic_reconfigure_options(
-        cfg/LSDSLAMViewerParams.cfg
-        )
-
-
-        # Sources files
-        set(SOURCE_FILES         
-        src/PointCloudViewer.cpp
-        src/KeyFrameDisplay.cpp
-        src/KeyFrameGraphDisplay.cpp
-        src/settings.cpp
-        src/keyboard/keyboard.cc# keyboard
-        src/robot/robot.cc# robor model
-        src/serial/serial.cc# communication
-        )
-
-        set(HEADER_FILES     
-        src/PointCloudViewer.h
-        src/KeyFrameDisplay.h
-        src/KeyFrameGraphDisplay.h
-        src/settings.h
-        src/keyboard/keyboard.h
-        src/robot/robot.h
-        src/serial/serial.h
-        )
-
-        include_directories(
-        ${PROJECT_SOURCE_DIR}/thirdparty/Sophus
-        )  
-
-        set(LIBS
-        ${QGLViewer_LIBRARIES}
-        ${QGLVIEWER_LIBRARY} 
-        ${catkin_LIBRARIES}
-        ${Boost_LIBRARIES}
-        ${QT_LIBRARIES}
-        GL glut GLU X11
-        )
-
-        add_executable(viewer src/main_viewer.cpp ${SOURCE_FILES} ${HEADER_FILES})
-        target_link_libraries(viewer ${LIBS}
-             )
-        add_executable(videoStitch src/main_stitchVideos.cpp)
-        target_link_libraries(videoStitch ${OpenCV_LIBS} ${LIBS})
-
-        #add_executable(videoStitch src/main_stitchVideos.cpp)
-        #target_link_libraries(viewer ${QGLViewer_LIBRARIES}
-        #			     ${QGLVIEWER_LIBRARY}
-        #			     ${catkin_LIBRARIES}
-        #			     ${QT_LIBRARIES}
-        #			     GL glut GLU
-        #		      )
-
-      =============================
-      
- ### lsd_slam_core
- 包信息  package.xml
-         ========================
-        <?xml version="1.0"?>
-        <package>
-          <name>lsd_slam_core</name>
-          <version>0.0.0</version>
-          <description>
-             Large-Scale Direct Monocular SLAM
-          </description>
-
-          <author>Jakob Engel</author>
-          <maintainer email="engelj@in.tum.de">Jakob Engel</maintainer>
-          <license>see http://vision.in.tum.de/lsdslam </license>
-          <url>http://vision.in.tum.de/lsdslam</url>
-
-          <buildtool_depend>catkin</buildtool_depend>
-          <build_depend>cv_bridge</build_depend>
-          <build_depend>dynamic_reconfigure</build_depend>
-          <build_depend>sensor_msgs</build_depend>
-          <build_depend>roscpp</build_depend>
-          <build_depend>lsd_slam_viewer</build_depend>
-          <build_depend>rosbag</build_depend>
-          <build_depend>eigen</build_depend>
-          <build_depend>suitesparse</build_depend>
-          <build_depend>libg2o</build_depend>
-          <build_depend>cmake_modules</build_depend>
-
-          <run_depend>cmake_modules</run_depend>
-          <run_depend>cv_bridge</run_depend>
-          <run_depend>dynamic_reconfigure</run_depend>
-          <run_depend>sensor_msgs</run_depend>
-          <run_depend>roscpp</run_depend>
-          <run_depend>lsd_slam_viewer</run_depend>
-          <run_depend>rosbag</run_depend>
-          <run_depend>eigen</run_depend>
-          <run_depend>suitesparse</run_depend>
-          <run_depend>libg2o</run_depend>
-
-        </package> 
-        ===============
-        
-  CMakeLists.txt 
-  
-        ===============
-        cmake_minimum_required(VERSION 2.8.7)
-        project(lsd_slam_core)
-
-        set(CMAKE_BUILD_TYPE Release)
-
-        find_package(catkin REQUIRED COMPONENTS
-          cv_bridge
-          dynamic_reconfigure
-          sensor_msgs
-          image_transport
-          roscpp
-          rosbag
-        )
-
-        #find_package(OpenCV 2.4.3 REQUIRED)
-        find_package(OpenCV 3.0 QUIET) #support opencv3
-        if(NOT OpenCV_FOUND)
-           find_package(OpenCV 2.4.3 QUIET)
-           if(NOT OpenCV_FOUND)
-              message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
-           endif()
-        endif()
-
-        find_package(cmake_modules REQUIRED)
-
-        find_package(Eigen3 REQUIRED)
-        find_package(X11 REQUIRED)
-        include(cmake/FindG2O.cmake)
-        include(cmake/FindSuiteParse.cmake)
-
-        message("-- CHOLMOD_INCLUDE_DIR : " ${CHOLMOD_INCLUDE_DIR})
-        message("-- CSPARSE_INCLUDE_DIR : " ${CSPARSE_INCLUDE_DIR})
-        message("-- G2O_INCLUDE_DIR : " ${G2O_INCLUDE_DIR})
-
-        # FabMap
-        # uncomment this part to enable fabmap
-        #add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/openFabMap)
-        #include_directories(${PROJECT_SOURCE_DIR}/thirdparty/openFabMap/include)
-        #add_definitions("-DHAVE_FABMAP")
-        #set(FABMAP_LIB openFABMAP )
-
-        generate_dynamic_reconfigure_options(
-          cfg/LSDDebugParams.cfg
-          cfg/LSDParams.cfg
-        )
-
-        catkin_package(
-          LIBRARIES lsdslam
-          DEPENDS Eigen SuiteSparse
-          CATKIN_DEPENDS libg2o 
-        )
-
-        # SSE flags
-        add_definitions("-DUSE_ROS")
-        add_definitions("-DENABLE_SSE")
-
-        # Also add some useful compiler flag
-        set(CMAKE_CXX_FLAGS
-           "${CMAKE_CXX_FLAGS} -march=native -Wall -std=c++0x"
-        ) 
-        # Set source files
-        set(lsd_SOURCE_FILES
-          ${PROJECT_SOURCE_DIR}/src/DataStructures/Frame.cpp
-          ${PROJECT_SOURCE_DIR}/src/DataStructures/FramePoseStruct.cpp
-          ${PROJECT_SOURCE_DIR}/src/DataStructures/FrameMemory.cpp
-          ${PROJECT_SOURCE_DIR}/src/SlamSystem.cpp
-          ${PROJECT_SOURCE_DIR}/src/LiveSLAMWrapper.cpp
-          ${PROJECT_SOURCE_DIR}/src/DepthEstimation/DepthMap.cpp
-          ${PROJECT_SOURCE_DIR}/src/DepthEstimation/DepthMapPixelHypothesis.cpp
-          ${PROJECT_SOURCE_DIR}/src/util/globalFuncs.cpp
-          ${PROJECT_SOURCE_DIR}/src/util/SophusUtil.cpp
-          ${PROJECT_SOURCE_DIR}/src/util/settings.cpp
-          ${PROJECT_SOURCE_DIR}/src/util/Undistorter.cpp
-          ${PROJECT_SOURCE_DIR}/src/Tracking/Sim3Tracker.cpp
-          ${PROJECT_SOURCE_DIR}/src/Tracking/Relocalizer.cpp
-          ${PROJECT_SOURCE_DIR}/src/Tracking/SE3Tracker.cpp
-          ${PROJECT_SOURCE_DIR}/src/Tracking/least_squares.cpp
-          ${PROJECT_SOURCE_DIR}/src/Tracking/TrackingReference.cpp
-          ${PROJECT_SOURCE_DIR}/src/IOWrapper/Timestamp.cpp
-          ${PROJECT_SOURCE_DIR}/src/GlobalMapping/FabMap.cpp
-          ${PROJECT_SOURCE_DIR}/src/GlobalMapping/KeyFrameGraph.cpp
-          ${PROJECT_SOURCE_DIR}/src/GlobalMapping/g2oTypeSim3Sophus.cpp
-          ${PROJECT_SOURCE_DIR}/src/GlobalMapping/TrackableKeyFrameSearch.cpp
-        )
-        set(SOURCE_FILES
-          ${lsd_SOURCE_FILES}
-          ${PROJECT_SOURCE_DIR}/src/IOWrapper/ROS/ROSImageStreamThread.cpp
-          ${PROJECT_SOURCE_DIR}/src/IOWrapper/ROS/ROSOutput3DWrapper.cpp
-          ${PROJECT_SOURCE_DIR}/src/IOWrapper/OpenCV/ImageDisplay_OpenCV.cpp
-        )
-        include_directories(
-          include
-          ${EIGEN3_INCLUDE_DIR}
-          ${PROJECT_SOURCE_DIR}/src
-          ${PROJECT_SOURCE_DIR}/thirdparty/Sophus
-          ${CSPARSE_INCLUDE_DIR} #Has been set by SuiteParse
-          ${CHOLMOD_INCLUDE_DIR} #Has been set by SuiteParse
-        )
-        set(LIBS
-        ${catkin_LIBRARIES}
-        ${G2O_LIBRARIES} 
-        ${OpenCV_LIBS}
-        ${EIGEN3_LIBS}
-        )
-        # build shared library.
-        add_library(lsdslam SHARED ${SOURCE_FILES})
-        target_link_libraries(lsdslam ${FABMAP_LIB} ${LIBS} csparse cxsparse 
-        X11
-        )
-        #rosbuild_link_boost(lsdslam thread)
-        # build live ros node
-        add_executable(live_slam src/main_live_odometry.cpp)
-        target_link_libraries(live_slam lsdslam ${LIBS}
-        X11
-        )
-        # build image node
-        add_executable(dataset src/main_on_images.cpp)
-        target_link_libraries(dataset lsdslam ${LIBS}
-        X11
-        )
-        # TODO add INSTALL
-
-        ============
-  
+ 由于SLAM领域经过长期实践发现取深度倒数在计算机中表示并对其进行估计有着更高的健壮性，
+ 所以如今的SLAM系统一般使用逆深度对三维世界进行表示。
+ 
+ 
+ 
