@@ -21,6 +21,12 @@
 
 [ORB-LSD-SVO比较-刘浩敏_bilibili](https://www.bilibili.com/video/av5934066/)
 
+[LSD算法代码解析](http://www.cnblogs.com/shhu1993/p/7136033.html)
+
+[SVO算法代码解析](http://www.cnblogs.com/shhu1993/p/7135847.html)
+
+[DSO 半闲居士 解析](https://zhuanlan.zhihu.com/p/29177540)
+
 [路径规划A*算法及SLAM自主地图创建导航算法](http://www.voidcn.com/article/p-yfjpnwte-tz.html)
 
 # 无人驾驶的各个方面知识
