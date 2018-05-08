@@ -7,6 +7,8 @@
 
 [斯坦福CS231计算机视觉2017](http://www.mooc.ai/course/268/learn?lessonid=1819#lesson/1819)
 
+[深度学习程序示例 cs231n等](https://github.com/autoliuweijie/DeepLearning)
+
 [2018 MIT 6.S094 麻省理工深度学习和自动驾驶课程 中文](http://www.mooc.ai/course/483/notes)
 
 [MIT  深度学习和自动驾驶课程 英文](https://selfdrivingcars.mit.edu/)
