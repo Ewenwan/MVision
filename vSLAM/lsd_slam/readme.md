@@ -42,7 +42,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
      *  p1 = KP  (世界坐标系)     p2 = K( RP + t)  = KTP
      *  而 x1 =  K逆* p1  x2 =  K逆* p2  相机坐标系下 归一化平面上的点     x1= (px -cx)/fx    x2= (py -cy)/fy
 
-> *所以  x1 = P  得到   x2 =  R * x1  + t*
+> **所以  x1 = P  得到   x2 =  R * x1  + t**
 
      *  t 外积 x2  = t 外积 R * x1 +  t 外积 t  =  t 外积 R * x1 ； 
         t外积t =0 sin(cet) =0 垂线段投影 方向垂直两个向量
@@ -50,10 +50,10 @@ https://blog.csdn.net/tiandijun/article/details/62226163
         因为  t 外积  x2 得到的向量垂直 t 也垂直 x2
      *   x2转置 * t 外积 R  x1   = x2转置 * E * x1 =  0 ； 
 
-> 得到       x2转置 * E * x1 =  0 ， E = t 外积 R  为本质矩阵
+> **得到       x2转置 * E * x1 =  0 ， E = t 外积 R  为本质矩阵**
 
     * p2转置 * K 转置逆 * t 外积 R * K逆 * p1   = p2转置 * F * p1 =  0 ； 
-> 进一步得到  p2转置 * F * p1 =  0 ,     F = K 转置逆 * t 外积 R * K逆 = K 转置逆 * E * K逆 为基础矩阵
+> **进一步得到  p2转置 * F * p1 =  0 ,     F = K 转置逆 * t 外积 R * K逆 = K 转置逆 * E * K逆 为基础矩阵**
 
     * x2转置 * E * x1 =  0  
     * x1 x2  为 由 像素坐标转化的归一化坐标
@@ -77,7 +77,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     这里的Z2就是 点在投影面p2下的深度
     p2'  = Z2 * p2  = d * p2
 
-> 那么   P2 = K逆 * p2'  = Z * K逆 * p2 = d * K逆 * p2 
+> **那么   P2 = K逆 * p2'  = Z * K逆 * p2 = d * K逆 * p2**
 
      P2为相机视角2下的3D坐标， P1为相机视角1下的3D坐标
      P2 = R * P1 + t 
@@ -88,7 +88,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
               R'  = R逆
               t'   = - R逆*t
           
-> P1 =    d * R' * x2  +  t'    ,  x2    为相机视角2的归一化平面  x2 =  K逆 * p2
+> **P1 =    d * R' * x2  +  t'    ,  x2    为相机视角2的归一化平面  x2 =  K逆 * p2**
 
      上式  P1 可由 p1求得部分
      x2   可由 p2求得
@@ -109,7 +109,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
      [P1]1 /  [P1]3  =  [K逆 * p1]1   
      [P1]2 /  [P1]3  =  [K逆 * p1]2 
  
-> 在相机视角2下的像素点p2，如果通过极线搜索匹配找到了一个确定的p1， 这里通过 直接法灰度块匹配
+> **在相机视角2下的像素点p2，如果通过极线搜索匹配找到了一个确定的p1， 这里通过 直接法灰度块匹配**
 
     使用p1的横纵坐标均可求得深度d 
     联立可求解d  
