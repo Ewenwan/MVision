@@ -142,7 +142,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     多维函数的一阶导数F'(X) = J 雅克比矩阵, X = [ x1, x2, x3, x4, ..., xn]
 ![](https://github.com/Ewenwan/Mathematics/blob/master/pic/1.png)
 
-<img src="https://github.com/Ewenwan/Mathematics/blob/master/pic/1.png" width="300px" />
+<img src="https://github.com/Ewenwan/Mathematics/blob/master/pic/1.png" width="600px" />
 
     多维函数的二阶导数F''(X) = H 海赛矩阵, X = [ x1, x2, x3, x4, ..., xn]
 ![](https://github.com/Ewenwan/Mathematics/blob/master/pic/2.png)
