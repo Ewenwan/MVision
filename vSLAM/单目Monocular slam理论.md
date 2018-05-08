@@ -4,3 +4,4 @@
       而map部分就是计算pixel的深度，
       如果相机的位姿有了，就可以通过三角法(triangulation)确定pixel的深度，
       把这些计算好深度的pixel放到map里就重建出了三维环境。 
+[参考](https://blog.csdn.net/heyijia0327/article/details/50758944)
