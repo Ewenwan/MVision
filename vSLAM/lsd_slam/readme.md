@@ -66,6 +66,8 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     * p1 、 p2 为匹配点
     * 一个点对一个约束 ，8点法  可以算出 E的各个元素
     * 再 SVD奇异值分解 E 得到 R t
+[单应矩阵 基本矩阵 本质矩阵的区别与联系](https://blog.csdn.net/x_r_su/article/details/54813929)
+
 
  ====================================================================
 ## 【2】深度估计 Depth Estimate 沿极线搜索得到匹配点对，根据运动矩阵得深度
