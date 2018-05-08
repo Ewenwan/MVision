@@ -181,3 +181,25 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 [李群李代数 反对称矩阵 指数映射 对数 刚体变换群SE3](https://blog.csdn.net/x_r_su/article/details/52749616)
 
 [李群李代数在计算机视觉中的应用](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6223449)
+
+## 矢量叉乘 右手定则
+    向量 u = (u1, u2, u3)
+         v = (v1, v2, v3)
+    两个向量叉乘，得到一个垂直与向量u和向量v组成的平面， 
+        u × v = (u2*v3 - u3*v2      0  -u3  u2     v1
+                 u3*v1 - u1*v3   =  u3  0  -u1  *  v2
+                 u1*v2 - u2*v1)    -u2  u1  0      v3
+        叉积性质 u × v * u = u × v * v  = 0向量，   且  u × v  = -v × u
+        u × v  = u' * v, 向量 u 叉乘 上 向量v，可以转化成一个矩阵 与 u的向量乘积
+        这个矩阵是一个3×3的实数矩阵，叫做 向量u的反对称矩阵，(我的叫法为叉乘矩阵)
+              0  -u3  u2
+        u'  = u3  0  -u1 
+             -u2  u1  0 
+        注意观察这个矩阵，它有一个特殊的性质
+                         0   u3  -u2
+        u'转置 = - u' = -u3  0    u1
+                         u2  -u1  0
+
+        反对称矩阵性质 A转置  = -A
+        正交矩阵  性质 B转置  = B逆
+    
