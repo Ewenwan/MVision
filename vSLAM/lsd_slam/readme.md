@@ -140,12 +140,10 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     得到 x = x0 − f'(x0) / f′'(x0) 不断迭代优化，使得 f'(x) 逼近0，使得f(x)达到极值
 ## 3. GS 高斯牛顿法 优化算法
     多维函数的一阶导数F'(X) = J 雅克比矩阵, X = [ x1, x2, x3, x4, ..., xn]
-![](https://github.com/Ewenwan/Mathematics/blob/master/pic/1.png)
-
 <img src="https://github.com/Ewenwan/Mathematics/blob/master/pic/1.png" width="600px" />
 
     多维函数的二阶导数F''(X) = H 海赛矩阵, X = [ x1, x2, x3, x4, ..., xn]
-![](https://github.com/Ewenwan/Mathematics/blob/master/pic/2.png)
+<img src="https://github.com/Ewenwan/Mathematics/blob/master/pic/2.png" width="600px" />
 
     当对多维函数F(X),进行优化时，原来一维函数优化迭代式子 x = x0 − f'(x0) / f′'(x0) 
     可写成 X = X0 - F'(X0)/F''(X0)*F(X0)
