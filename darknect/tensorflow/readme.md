@@ -29,7 +29,8 @@
     sudo pip uninstall TensorFlowsudo pip uninstall protobuf 
     
     最新 的软件仓库安装 不包含一些最新的功能
-    github 源码安装源码安装介绍
+    ubuntu 软件仓库 https://packages.ubuntu.com/
+    github 源码安装源码安装介绍
     http://blog.csdn.net/masa_fish/article/details/54096996
     
      源码安装的过程很好理解，大体可以分为以下四步：
