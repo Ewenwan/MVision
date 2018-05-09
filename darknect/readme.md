@@ -238,48 +238,48 @@
     backup = backup
     
 ### 以及 网络配置文件 
-    [net]
-    # Testing
-    # batch=1 # bigger gpu memory cost higher 
-    #  subdivisions=1
+      [net]
+      # Testing
+      # batch=1 # bigger gpu memory cost higher 
+      #  subdivisions=1
 
-    # Training   训练
-    batch=64          # 一次训练使用多张图片
-    subdivisions=16   # 分成16次载入gpu内存 也就是一次载入 4张图片
-    width=416
-    height=416
-    channels=3
-    momentum=0.9      # 动量 
-    decay=0.0005      # 衰减
-    angle=0# 图片旋转
-    saturation = 1.5# 图像预处理
-    exposure = 1.5
-    hue=.1
+      # Training   训练
+      batch=64          # 一次训练使用多张图片
+      subdivisions=16   # 分成16次载入gpu内存 也就是一次载入 4张图片
+      width=416
+      height=416
+      channels=3
+      momentum=0.9      # 动量 
+      decay=0.0005      # 衰减
+      angle=0# 图片旋转
+      saturation = 1.5# 图像预处理
+      exposure = 1.5
+      hue=.1
 
-    learning_rate=0.0001#  bigger easy spread学习率
-    burn_in=1000
-    max_batches = 50200
-    policy=steps
-    steps=40000,45000# 逐步降低 学习率 牛顿下山法
-    scales=.1,.1
-    ...
-    ...
-    [convolutional]
-    size=1
-    stride=1
-    pad=1
-    filters=75          # 最后输出 = 3*(20+5)  三个尺度，每个尺度预测3种格子，每个格子预测20类，5个框参数
-    activation=linear
+      learning_rate=0.0001#  bigger easy spread学习率
+      burn_in=1000
+      max_batches = 50200
+      policy=steps
+      steps=40000,45000# 逐步降低 学习率 牛顿下山法
+      scales=.1,.1
+      ...
+      ...
+      [convolutional]
+      size=1
+      stride=1
+      pad=1
+      filters=75          # 最后输出 = 3*(20+5)  三个尺度，每个尺度预测3种格子，每个格子预测20类，5个框参数
+      activation=linear
 
-    [yolo]
-    mask = 0,1,2        # 前三个 预设边框尺寸  kmeans聚类的结果
-    anchors = 10,13,  16,30,  33,23,  30,61,  62,45,  59,119,  116,90,  156,198,  373,326
-    classes=20          # 类别数量
-    num=9               # 总共的预设边框数量
-    jitter=.3           # 数据扩充的抖动
-    ignore_thresh = .5  # 阈值
-    truth_thresh = 1   
-    random=1            # 多尺度训练开关
+      [yolo]
+      mask = 0,1,2        # 前三个 预设边框尺寸  kmeans聚类的结果
+      anchors = 10,13,  16,30,  33,23,  30,61,  62,45,  59,119,  116,90,  156,198,  373,326
+      classes=20          # 类别数量
+      num=9               # 总共的预设边框数量
+      jitter=.3           # 数据扩充的抖动
+      ignore_thresh = .5  # 阈值
+      truth_thresh = 1   
+      random=1            # 多尺度训练开关
 
     
     
