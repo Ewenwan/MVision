@@ -158,13 +158,47 @@
 
     ==============================================
     ==============================================
-  ## 9、时时检测视频
+## 9、时时检测视频
     ./darknet detector demo cfg/coco.data cfg/yolov3.cfg yolov3.weights <video file>
 
 
     ==============================================
     ==============================================
-  ## 10.在 Pascal VOC 数据集上训练
+## 9.5 训练问题记录
+### Tips0: 数据集问题
+    如果是学习如何训练，建议不要用VOC或者COCO,这两个数据集复杂，类别较多，
+    复现作者的效果需要一定的功力，迭代差不多5w次，就可以看到初步的效果。
+    所以，不如挑个简单数据集的或者手动标注个几百张就可以进行训练学习。
+### Tips1: CUDA: out of memory 以及 resizing 问题
+    显存不够，调小batch，关闭多尺度训练：random = 0。
+### Tips2: 在迭代前期，loss很大，正常吗？
+    经过几个数据集的测试，前期loss偏大是正常的，后面就很快收敛了。
+### Tips3: YOLOV3中的mask作用？
+    三个尺度上预测不同大小的框
+    82卷积层 为最大的预测尺度，使用较大的mask，但是可以预测出较小的物体
+    94卷积层 为中间的预测尺度，使用中等的mask，
+    106卷积层为最小的预测尺度，使用较小的mask，可以预测出较大的物体
+#### Tips4: YOLOV3中的num作用？ 
+    总共提供9种不同尺度的先验框，
+    每个尺度预测三种，先验框。预测20类的话，3*（5+20）=75
+### Tips5: YOLOV3训练出现nan的问题？
+    在显存允许的情况下，可适当增加batch大小，可以一定程度上减少NAN的出现
+### Tips6: Anchor box作用是？
+    F-rcnn使用人工指定的预设款尺寸，可能没有宏观特性
+    在数据集上 对真实边框 使用 K-means 聚类得到的边款长宽比例更具有宏观特性
+    预测的坐标值是，相对应格子的坐上点的偏移量
+    而长宽是相对于 整幅图像大小的比例，
+    b.w = exp(x[index + 2*stride]) * biases[2*n]/w
+    b.h = exp(x[index + 3*stride]) * biases[2*n+1]/h
+    x[] 为网络输出
+    biases[]为 预设边框的大小
+    意识就是说，每个格子预测的边框输出为0~1之间
+    且网络输出 x[] 是相对于预设格子尺寸的 指数对数
+    就是在预设格子尺寸上调整，预测输出
+    
+    v2 版本的格子尺寸 cfg文件中定义的是 相对于最后特征图（原图/32）
+    v3 版本的格子尺寸 cfg文件中定义的是 相对于网络输入图的尺寸
+## 10.在 Pascal VOC 数据集上训练
     ====================================
   ### 10.1 Pascal VOC数据集介绍：
     给定自然图片， 从中识别出特定物体。
@@ -239,30 +273,30 @@
     
 ### 以及 网络配置文件 
       [net]
-      # Testing
-      # batch=1 # bigger gpu memory cost higher 
+      # Testing    # 测试模式
+      # batch=1 # bigger gpu memory cost higher 
       #  subdivisions=1
 
       # Training   训练
       batch=64          # 一次训练使用多张图片
       subdivisions=16   # 分成16次载入gpu内存 也就是一次载入 4张图片
-      width=416
-      height=416
+      width=416         # 网络输入的 宽 高 通道数量
+      height=416
       channels=3
       momentum=0.9      # 动量 
-      decay=0.0005      # 衰减
-      angle=0# 图片旋转
-      saturation = 1.5# 图像预处理
-      exposure = 1.5
-      hue=.1
+      decay=0.0005      # 衰减权重
+      angle=0           # 图片旋转
+      saturation = 1.5  # 饱和度 图像预处理
+      exposure = 1.5    # 曝光度
+      hue=.1            # 色调
 
       learning_rate=0.0001#  bigger easy spread学习率
-      burn_in=1000
-      max_batches = 50200
-      policy=steps
-      steps=40000,45000# 逐步降低 学习率 牛顿下山法
-      scales=.1,.1
-      ...
+      burn_in=1000        # 学习率控制参数
+      max_batches = 50200 # 最大迭代次数
+      policy=steps        # 学习策略 随时间递减，还是按步长递减
+      steps=40000,45000   # 学习率变动步长 逐步降低 学习率 牛顿下山法
+      scales=.1,.1        # 学习率变动因子
+      ...
       ...
       [convolutional]
       size=1
@@ -333,8 +367,24 @@
     使用多GPU训练时，学习率是使用单GPU训练的n倍，n是使用GPU的个数
     
   ### 可视化训练过程的中间参数
-    训练log中各参数的意义
-    Region Avg IOU：平均的IOU，代表预测的bounding box和ground truth的交集与并集之比，期望该值趋近于1。
+    v3 各项参数
+    A.filters数目是怎么计算的：3x(classes数目+5)，和聚类数目分布有关，论文中有说明；
+    B.如果想修改默认anchors数值，使用k-means即可；
+    C.如果显存很小，将random设置为0，关闭多尺度训练；
+    D.其他参数如何调整，有空再补;
+    E.前100次迭代loss较大，后面会很快收敛；
+    log 参数：
+    Region xx: cfg文件中yolo-layer的索引；
+    Avg IOU:当前迭代中，预测的box与标注的box的平均交并比，越大越好，期望数值为1；
+    Class:  标注物体的分类准确率，越大越好，期望数值为1；
+    obj:    越大越好，期望数值为1；
+    No obj: 越小越好；
+    .5R:    查全率较低 以IOU=0.5为阈值时候的recall; recall = 检出的正样本/实际的正样本
+    0.75R:  查全率较低 以IOU=0.75为阈值时候的recall;
+    count:  正样本数目。
+
+    训练log中各参数的意义 v2
+    Region Avg IOU：平均的IOU，代表预测的bounding box和ground truth的交集与并集之比，期望该值趋近于1。
     Class:是标注物体的概率，期望该值趋近于1.
     Obj：期望该值趋近于1.
     No Obj:期望该值越来越小但不为零.
