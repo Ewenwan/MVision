@@ -24,6 +24,7 @@ v3 训练log中各参数的意义:
 6. .5R: 以IOU=0.5为阈值时候的recall; recall = 检出的正样本/实际的正样本
 7. 0.75R: 以IOU=0.75为阈值时候的recall;
 8. count:正样本数目。
+
 示例数据：
 Region 106 Avg IOU: -nan, Class: -nan, Obj: -nan, No Obj: 0.000088, .5R: -nan, .75R: -nan,  count: 0
 Syncing... Done!
