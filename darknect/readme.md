@@ -367,30 +367,30 @@
     ./darknet detector train cfg/voc.data cfg/yolov3-voc.cfg darknet53.conv.74 2>1 | tee paul_train_log.txt
   ### 多GPU训练技巧
     darknet支持多GPU，使用多GPU训练可以极大加速训练速度。
-  ### 单GPU与多GPU的切换技巧
+    ### 单GPU与多GPU的切换技巧
     在darknet上使用多GPU训练需要一定技巧，盲目使用多GPU训练会悲剧的发现损失一直在下降、
     recall在上升，然而Obj几乎为零,最终得到的权重文件无法预测出bounding box。
-    
+
     使用多GPU训练前需要先用单GPU训练至Obj有稳定上升的趋势后（我一般在obj大于0.1后切换）
     再使用backup中备份的weights通过多GPU继续训练。
     一般情况下使用单GPU训练1000个迭代即可切换到多GPU。
-    
-    ./darknet detector train cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc_1000.weights -gpus 0,1,2,3 2>1 | sudo tee paul_train_log.txt
-    
+
+    ./darknet detector train cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc_1000.weights -gpus 0,1,2,3 2>1 | sudo tee paul_train_log.txt
+
     nvidia-smi 差看GPU使用情况
     
   ### 使用多GPU时的学习率
     使用多GPU训练时，学习率是使用单GPU训练的n倍，n是使用GPU的个数
     
   ### 可视化训练过程的中间参数
-    v3 各项参数
+    v3 各项参数
     A.filters数目是怎么计算的：3x(classes数目+5)，和聚类数目分布有关，论文中有说明；
     B.如果想修改默认anchors数值，使用k-means即可；
     C.如果显存很小，将random设置为0，关闭多尺度训练；
     D.其他参数如何调整，有空再补;
     E.前100次迭代loss较大，后面会很快收敛；
-    log 参数：
-    Region xx: cfg文件中yolo-layer的索引；
+    log 参数：
+    Region xx: cfg文件中yolo-layer的索引；
     Avg IOU:当前迭代中，预测的box与标注的box的平均交并比，越大越好，期望数值为1；
     Class:  标注物体的分类准确率，越大越好，期望数值为1；
     obj:    越大越好，期望数值为1；
@@ -399,29 +399,29 @@
     0.75R:  查全率较低 以IOU=0.75为阈值时候的recall;
     count:  正样本数目。
 
-    训练log中各参数的意义 v2
-    Region Avg IOU：平均的IOU，代表预测的bounding box和ground truth的交集与并集之比，期望该值趋近于1。
+    训练log中各参数的意义 v2
+    Region Avg IOU：平均的IOU，代表预测的bounding box和ground truth的交集与并集之比，期望该值趋近于1。
     Class:是标注物体的概率，期望该值趋近于1.
     Obj：期望该值趋近于1.
     No Obj:期望该值越来越小但不为零.
     Avg Recall：期望该值趋近1
     avg：平均损失，期望该值趋近于0
-    
+
     使用train_loss_visualization.py脚本可以绘制loss变化曲线。
-    
+
     保存log时会生成两个文件，文件1里保存的是网络加载信息和checkout点保存信息，paul_train_log.txt中保存的是训练信息。
 
     1、删除log开头的三行：
     0,1,2,3,4,5,6,7
     yolo-paul
     Learning Rate: 1e-05, Momentum: 0.9, Decay: 0.0005
-    
+
     2、删除log的结尾几行，使最后一行为batch的输出，如：
-    shift +g 到最后
-    497001: 0.863348, 0.863348 avg, 0.001200 rate, 5.422251 seconds, 107352216 images
+    shift +g 到最后
+    497001: 0.863348, 0.863348 avg, 0.001200 rate, 5.422251 seconds, 107352216 images
 
     3、执行extract_log.py脚本，格式化log。
-    
+
     最终log格式：
     Loaded: 5.588888 seconds
     Region Avg IOU: 0.649881, Class: 0.854394, Obj: 0.476559, No Obj: 0.007302, Avg Recall: 0.737705,  count: 61
@@ -437,21 +437,21 @@
 
     4、修改train_loss_visualization.py中lines为log行数，并根据需要修改要跳过的行数。
     skiprows=[x for x in range(lines) if ((x%10!=9) |(x<1000))]
-    
+
     运行train_loss_visualization.py会在脚本所在路径生成avg_loss.png
-    
+
     从损失变化曲线可以看出，模型在100000万次迭代后损失下降速度非常慢，几乎没有下降。
     结合log和cfg文件发现，我自定义的学习率变化策略在十万次迭代时会减小十倍，
     十万次迭代后学习率下降到非常小的程度，导致损失下降速度降低。
     修改cfg中的学习率变化策略，10万次迭代时不改变学习率，30万次时再降低。
-    
+
     我使用迭代97000次时的备份的checkout点来继续训练。
     ./darknet detector train cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc_97000.weights -gpus 0,1,2,3 2>1 | sudo tee paul_train_log.txt
-    
+
     除了可视化loss，还可以可视化Avg IOU，Avg Recall等参数。
     可视化’Region Avg IOU’, ‘Class’, ‘Obj’, ‘No Obj’, ‘Avg Recall’,’count’
     这些参数可以使用脚本train_iou_visualization.py，使用方式和train_loss_visualization.py相同。
-    
+
 
 ### 使用验证集评估模型
     评估模型可以使用命令valid（只有预测结果，没有评价预测是否正确）或recall，这两个命令都无法满足我的需求，我实现了category命令做性能评估。
