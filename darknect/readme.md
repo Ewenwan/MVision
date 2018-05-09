@@ -517,8 +517,8 @@
         1. 下载 数据库API
            git clone https://github.com/pdollar/coco
            cd coco
-        2. 创建 images文件夹 并下载 图像数据 解压
-           下载  点击链接可直接下载
+        2. 创建 images文件夹 并下载 图像数据 解压
+           在images文件夹下下载  点击链接可直接下载
            wget -c https://pjreddie.com/media/files/train2014.zip
            wget -c https://pjreddie.com/media/files/val2014.zip
 
