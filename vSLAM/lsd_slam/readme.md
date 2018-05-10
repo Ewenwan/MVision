@@ -186,7 +186,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
 [李群李代数在计算机视觉中的应用](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6223449)
 
-## 矢量叉乘 右手定则
+## 4.1 矢量叉乘 右手定则
     向量 u = (u1, u2, u3)
          v = (v1, v2, v3)
     两个向量叉乘，得到一个垂直与向量u和向量v组成的平面， 
@@ -206,7 +206,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
         反对称矩阵性质 A转置  = -A
         正交矩阵  性质 B转置  = B逆
-## 旋转矩阵 与 SO3李群 so3李代数
+## 4.2 旋转矩阵 与 SO3李群 so3李代数
 [旋转矩阵理解](http://www.cnblogs.com/caster99/p/4703033.html)    
 
         旋转矩阵为正交矩阵，
@@ -270,7 +270,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     在非单位矩阵的R处的正切空间(导数空间)就是反对称矩阵乘以R
     R‘ = w * R
 
-## 旋转矩阵的指数映射
+## 4.4 旋转矩阵的指数映射
     R(t)' = w * R(t)
     把旋转矩阵R用x替换掉，如下：
       x(t)' = w * x(t), 一个函数的导数 等于一个系数乘以它自身（指数函数 exp(a*t)）
@@ -289,7 +289,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     我们说，可以将 反对称矩阵 w 的 so3李代数  通过 指数映射 （R(t) = exp(w*t)） 转换到 旋转矩阵R 的 SO3李群上去
     也即将 三维曲面空间 R 的导数，某点上的切平面上的一点 通过指数映射到 三维曲面空间上去
 
-### 指数映射的展开  exp(w*t) = I + w*t + (w*t)^2/2! + ... + (w*t)^n/n! + ...
+### 4.42 指数映射的展开  exp(w*t) = I + w*t + (w*t)^2/2! + ... + (w*t)^n/n! + ...
 考虑一种简单情况，当反对称矩阵 对应的 3维向量的模长为1时,||w||=1，旋转速度恒定为1
 
      w
@@ -352,3 +352,40 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     反对称矩阵 w  =  W3    0  -W1
                     -W2   W1  0                                         
 > ||W||的计算轻松加随意，三维向量变换成反对称矩阵也是容易，所以整个将三维旋转速度映射到旋转矩阵编程实现是不是也很容易了。        
+
+## 4.5 欧式变换矩阵 T= [ R t]
+
+
+
+
+## 4.6  李群 李代数 c++ 库 sophus 
+### sophus 库安装 
+    * 本库为旧版本 非模板的版本
+    * git clone https://github.com//strasdat/Sophus.git
+    * git checkout a621ff   版本
+    * 再cmake编译
+### 变量简介
+    SO(n)   特殊正交群   对应 n*n 的旋转矩阵 R  群(集合) 
+    SE(n+1) 特殊欧式群   对应 n*n 的旋转矩阵和 n*1的平移向量 组合成的  变换矩阵T  群(集合)
+    so(n)   SO(n)对应的李代数 为 so(n)   n×1列向量 (反对称矩阵对应的向量)使得矩阵 和 代数 一一对应  可以使用代数的更新方法来更新 矩阵
+    SO(3)  表示三维空间的 旋转矩阵 集合 R 3×3
+    SE(3)  表示三维空间的 变换矩阵 集合 T 4×4
+    李代数 so3的本质就是个三维向量，直接Eigen::Vector3d定义。 3个旋转
+    李代数 se3的本质就是个六维向量，3个旋转 + 3个平移
+
+    欧拉角定义：
+    旋转向量定义的 李群SO(3) Sophus::SO3 SO3_v( 0, 0, M_PI/2 );  // 亦可从旋转向量构造  这里注意，不是旋转向量的三个坐标值，有点像欧拉角构造。
+    旋转向量 转 旋转矩阵  Eigen::Matrix3d R = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d(0,0,1)).toRotationMatrix();
+    旋转矩阵定义的 李群SO(3)           Sophus::SO3 SO3_R(R);               // Sophus::SO(3)可以直接从旋转矩阵构造
+                     旋转矩阵 转 四元素     Eigen::Quaterniond q(R);            // 或者四元数(从旋转矩阵构造)
+    四元素定义的     李群SO(3)   Sophus::SO3 SO3_q( q );
+    李代数so3           为李群SO(3)  的对数映射  Eigen::Vector3d so3 = SO3_R.log();
+
+     平移   Eigen::Vector3d t(1,0,0);           // 沿X轴平移1
+     从旋转矩阵 和 平移t 构造  SE3      Sophus::SE3 SE3_Rt(R, t);           // 从R,t构造SE(3)
+     从四元素     和 平移t 构造  SE3      Sophus::SE3 SE3_qt(q,t);            // 从q,t构造SE(3)
+     李代数se(3) 是一个6维向量   为李群SE3 的对数映射
+     typedef Eigen::Matrix<double,6,1> Vector6d;// Vector6d指代　Eigen::Matrix<double,6,1>
+     Vector6d se3 = SE3_Rt.log();
+  
+  
