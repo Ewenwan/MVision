@@ -34,6 +34,8 @@
     F(x) 由一系列的 卷积层通道 组合而成
 [博客参考](https://blog.csdn.net/jningwei/article/details/80059533)
 
+[代码参考](https://github.com/facebookresearch/ResNeXt)
+
 # DenseNet 密集网络
 ## 每一层的输入来自于前面所有层的输出
 
