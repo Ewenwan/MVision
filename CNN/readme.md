@@ -1,6 +1,8 @@
 # 卷积神经网络
 [各种卷积方式](https://github.com/vdumoulin/conv_arithmetic)
 
+[TensorFlow学习（九）：各种卷积网络](https://blog.csdn.net/xierhacker/article/details/53174594)
+
 [Tensflow Net MODEL 官方实现](https://github.com/tensorflow/models/tree/master/research/slim/nets)
 
 # 损失函数 交叉熵CrossEntropy 以及  Focal Loss 
