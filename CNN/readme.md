@@ -3,6 +3,8 @@
 
 [TensorFlow学习（九）：各种卷积网络](https://blog.csdn.net/xierhacker/article/details/53174594)
 
+[TensorFlow实战](https://blog.csdn.net/column/details/18067.html)
+
 [Tensflow Net MODEL 官方实现](https://github.com/tensorflow/models/tree/master/research/slim/nets)
 
 # 损失函数 交叉熵CrossEntropy 以及  Focal Loss 
@@ -15,3 +17,7 @@
 [caffe FL实现  softmax ](https://github.com/xuanyuyt/Focal-Loss-1)
 
 [caffe FL实现 sigmoid](https://github.com/sciencefans/Focal-Loss)
+
+[语义分割 目标检测论文解读合集](https://blog.csdn.net/column/details/18106.html)
+
+[轻量级深度卷积神经网络模型](https://blog.csdn.net/column/details/19143.html)
