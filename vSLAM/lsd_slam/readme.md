@@ -417,7 +417,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
      通过这种方式，能够避免奇异点，保证很小的变换矩阵也能够表示出来。
 
-## 4.6  李群 李代数 c++ 库 sophus 
+## 4.6  李群 李代数 c++ 库 sophus  Eigen 矩阵运算c++库
 ### 4.6.1 sophus 库安装 
     * 本库为旧版本 非模板的版本
     * git clone https://github.com//strasdat/Sophus.git
@@ -449,40 +449,58 @@ https://blog.csdn.net/tiandijun/article/details/62226163
                0  0]
       
      v = t导数 - w*t 
+### 4.6.2 Eigen 矩阵运算c++库
+     1. 旋转向量   Eigen::AngleAxisd    角度 + 轴   
+        Eigen::AngleAxisd rotation_vector ( M_PI/4, Eigen::Vector3d ( 0,0,1 ) );//沿 Z 轴旋转 45 度
+     2. 旋转矩阵   Eigen::Matrix3d      3*3  R
+        rotation_vector.toRotationMatrix(); //旋转向量转换 到 旋转矩阵
+        // 旋转向量 直接转 旋转矩阵 
+        Eigen::Matrix3d Eigen::Matrix3d R = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d(0,0,1)).toRotationMatrix();
+     3. 欧拉角向量 Eigen::Vector3d      3*1  r, p, y
+        Eigen::Vector3d rotation_matrix.eulerAngles ( 2,1,0 ); 
+        // ( 2,1,0 )表示ZYX顺序，即roll pitch yaw顺序  旋转矩阵到 欧拉角转换到欧拉角
+     4. 四元素    Eigen::Quaterniond  
+        Eigen::Quaterniond q = Eigen::Quaterniond ( rotation_vector );// 旋转向量 定义四元素 
+        q = Eigen::Quaterniond ( rotation_matrix );                   //旋转矩阵定义四元素
+     5. 欧式变换矩阵 Eigen::Isometry3d   4*4  T 
+        Eigen::Isometry3d  T=Eigen::Isometry3d::Identity(); // 虽然称为3d，实质上是4＊4的矩阵   旋转 R+ 平移t 
+        T.rotate ( rotation_vector );                       // 按照rotation_vector进行旋转
+        也可 Eigen::Isometry3d  T(q)                        // 一步 按四元素表示的旋转 定义 变换矩阵
+        T.pretranslate ( Eigen::Vector3d ( 1,3,4 ) );       // 把平移向量设成(1,3,4)
+        cout<< T.matrix() <<endl;
 
+### 4.6.3 欧拉角定义：
+      1. 旋转向量定义的 李群SO(3) 
+         Sophus::SO3 SO3_v( 0, 0, M_PI/2 ); 
+         // 亦可从旋转向量构造  这里注意，不是旋转向量的轴，是对应轴 + 轴上的旋转
+         相当于把轴 和 旋转角度 放在一起表示了  (0, 0, M_PI/2) 表示的就是 绕 Z轴(0,0,1), 旋转M_PI/2角度
 
-### 4.6.2 欧拉角定义：
-    1. 旋转向量定义的 李群SO(3) 
-       Sophus::SO3 SO3_v( 0, 0, M_PI/2 ); 
-       // 亦可从旋转向量构造  这里注意，不是旋转向量的轴，是对应轴 + 轴上的旋转
-       相当于把轴 和 旋转角度 放在一起表示了  (0, 0, M_PI/2) 表示的就是 绕 Z轴(0,0,1), 旋转M_PI/2角度
+      2. 旋转向量 转 旋转矩阵                     角        Z轴(0,0,1)
+         Eigen::Matrix3d R = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d(0,0,1)).toRotationMatrix();
 
-    2. 旋转向量 转 旋转矩阵                     角        Z轴(0,0,1)
-       Eigen::Matrix3d R = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d(0,0,1)).toRotationMatrix();
+      3. 旋转矩阵定义的 李群SO(3)
+         ophus::SO3 SO3_R(R);     // Sophus::SO(3)可以直接从旋转矩阵构造
 
-    3. 旋转矩阵定义的 李群SO(3)   S
-       ophus::SO3 SO3_R(R);    // Sophus::SO(3)可以直接从旋转矩阵构造
+      4. 旋转矩阵 转 四元素         
+         Eigen::Quaterniond q(R); // 或者四元数(从旋转矩阵构造)
 
-    4. 旋转矩阵 转 四元素         
-       Eigen::Quaterniond q(R); // 或者四元数(从旋转矩阵构造)
+      5. 四元素定义的  李群SO(3)   
+         Sophus::SO3 SO3_q( q );
 
-    5. 四元素定义的  李群SO(3)   
-       Sophus::SO3 SO3_q( q );
+      6. 李代数so3 为李群SO(3) 的对数映射  
+         Eigen::Vector3d so3 = SO3_R.log();
 
-    6. 李代数so3 为李群SO(3) 的对数映射  
-       Eigen::Vector3d so3 = SO3_R.log();
+      7. 平移  向量表示 
+         Eigen::Vector3d t(1,0,0);   // 沿X轴平移1
 
-    7. 平移  向量表示 
-       Eigen::Vector3d t(1,0,0);   // 沿X轴平移1
+      8. 从旋转矩阵R 和 平移t 构造 欧式变换矩阵李群 SE3      
+         Sophus::SE3 SE3_Rt(R, t);   // 从R,t构造SE(3)
 
-    8. 从旋转矩阵R 和 平移t 构造 欧式变换矩阵李群 SE3      
-       Sophus::SE3 SE3_Rt(R, t);   // 从R,t构造SE(3)
+      9. 从四元素q和 平移t 欧式变换矩阵李群 SE3      
+         Sophus::SE3 SE3_qt(q,t);   // 从q,t构造SE(3)
 
-    9. 从四元素q和 平移t 欧式变换矩阵李群 SE3      
-       Sophus::SE3 SE3_qt(q,t);   // 从q,t构造SE(3)
-
-    10. 李代数se(3) 是一个6维向量   为李群SE3 的对数映射
-        typedef Eigen::Matrix<double,6,1> Vector6d;// Vector6d指代　Eigen::Matrix<double,6,1>
-        Vector6d se3 = SE3_Rt.log();
+      10. 李代数se(3) 是一个6维向量   为李群SE3 的对数映射
+          typedef Eigen::Matrix<double,6,1> Vector6d;// Vector6d指代　Eigen::Matrix<double,6,1>
+          Vector6d se3 = SE3_Rt.log();
 
   
