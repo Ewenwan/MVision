@@ -1,5 +1,5 @@
-# coding=utf-8
-# 制作中文label ，命名规则为cn_类索引_字体.png
+# -*- coding: utf-8 -*- 
+# 制作中文label ，命名规则为cn_类索引_字体大小.png
 
 import os
 
@@ -13,19 +13,61 @@ def get_name_list(path):
         line = line.rstrip()
         name_list.append(line)# 类别名
     return name_list
-
+# 中文字体 英文文件名标签 
+# 查看系统的中文字体 fc-list :lang=zh-cn  >>> /usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf
 # 制作标签，s是字体大小
 def make_labels(s):
     i = 0
     for word in l:
         os.system(
-            "convert -fill black -background white -bordercolor white -border 4  -font /usr/share/fonts/truetype/arphic/ukai.ttc -pointsize %d label:\"%s\" \"cn_%d_%d.png\"" % (
+            "convert -fill black -background white -bordercolor white -border 4  -font /usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf -pointsize %d label:\"%s\" \"cn_%d_%d.png\"" % (
             s, word, i, s / 12 - 1))
         i = i + 1
 
 
-# l=["人","自行车","车","摩托车","飞机","大巴","火车","卡车","船","交通灯","消防栓","停止标识","停车计时器","长凳","鸟","猫","狗","马","羊","牛","大象","熊","斑马","长颈鹿","背包","伞","手提包","领带","手提箱","飞盘","雪橇","滑雪板","体育用球","风筝","棒球棒","棒球手套","滑板","冲浪板","网球拍","瓶子","红酒杯","杯子","叉子","小刀","勺子","碗","香蕉","苹果","三明治","橘子","西兰花","萝卜","热狗","披萨","甜甜圈","蛋糕","椅子","沙发","盆栽","床","餐桌","厕所","显示器","笔记本","鼠标","遥控","键盘","手机","微波炉","烤箱","吐司机","水槽","冰箱","书","闹钟","花瓶","剪刀","泰迪熊","吹风机","牙刷"]
-l = get_name_list("/raid/pengchong_data/Tools/Paul_YOLO/data/paul_cn.names")
+# 中文标签  coco
+l1 = ["人","自行车","汽车","摩托车","飞机","公交车",
+      "火车","卡车","船","交通灯","消防栓",
+	  "停止标志","停车计时器","长凳","鸟","猫","狗",
+	  "马","羊","牛","大象","熊","斑马","长颈鹿",
+	  "背包","雨伞","手提包","领带","手提箱","飞盘","滑雪",
+	  "滑雪板","体育用球","风筝","棒球棒","棒球手套",
+	  "滑板","冲浪板","网球拍","瓶子","红酒杯","杯子",
+	  "叉子","小刀","勺子","碗","香蕉","苹果","三明治",
+	  "橘子","西兰花","胡萝卜","热狗","披萨","甜甜圈","蛋糕",
+	  "椅子","沙发","盆栽","床","餐桌","厕所","显示器",
+	  "笔记本","鼠标","遥控器","键盘","手机","微波炉","烤箱",
+	  "吐司机","水槽","冰箱","书","闹钟","花瓶","剪刀",
+	  "玩具熊","吹风机","牙刷"]
+l=["人","自行车","车","摩托车","飞机","大巴",
+   "火车","卡车","船","交通灯","消防栓",
+   "停止标识","停车计时器","长凳","鸟","猫","狗",
+   "马","羊","牛","大象","熊","斑马","长颈鹿",
+   "背包","伞","手提包","领带","手提箱","飞盘","雪橇",
+   "滑雪板","体育用球","风筝","棒球棒","棒球手套",
+   "滑板","冲浪板","网球拍","瓶子","红酒杯","杯子",
+   "叉子","小刀","勺子","碗","香蕉","苹果","三明治",
+   "橘子","西兰花","萝卜","热狗","披萨","甜甜圈","蛋糕",
+   "椅子","沙发","盆栽","床","餐桌","厕所","显示器",
+   "笔记本","鼠标","遥控","键盘","手机","微波炉","烤箱",
+   "吐司机","水槽","冰箱","书","闹钟","花瓶","剪刀",
+   "泰迪熊","吹风机","牙刷"]
+
+# 英文png文件名
+l2 = ["person","bicycle","car","motorbike","aeroplane","bus",
+      "train","truck","boat","traffic light","fire hydrant",
+	  "stop sign","parking meter","bench","bird","cat","dog",
+	  "horse","sheep","cow","elephant","bear","zebra","giraffe",
+	  "backpack","umbrella","handbag","tie","suitcase","frisbee","skis",
+	  "snowboard","sports ball","kite","baseball bat","baseball glove",
+	  "skateboard","surfboard","tennis racket","bottle","wine glass","cup",
+	  "fork","knife","spoon","bowl","banana","apple","sandwich",
+	  "orange","broccoli","carrot","hot dog","pizza","donut","cake",
+	  "chair","sofa","pottedplant","bed","diningtable","toilet","tvmonitor",
+	  "laptop","mouse","remote","keyboard","cell phone","microwave","oven",
+	  "toaster","sink","refrigerator","book","clock","vase","scissors",
+	  "teddy bear","hair drier","toothbrush"] 
+#l = get_name_list("/raid/pengchong_data/Tools/Paul_YOLO/data/paul_cn.names")
 
 for i in [12, 24, 36, 48, 60, 72, 84, 96]:
     make_labels(i)
