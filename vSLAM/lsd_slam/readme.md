@@ -502,5 +502,37 @@ https://blog.csdn.net/tiandijun/article/details/62226163
       10. 李代数se(3) 是一个6维向量   为李群SE3 的对数映射
           typedef Eigen::Matrix<double,6,1> Vector6d;// Vector6d指代　Eigen::Matrix<double,6,1>
           Vector6d se3 = SE3_Rt.log();
+### 4.6.4 g2o的使用
 
-  
+[详解](https://www.cnblogs.com/gaoxiang12/p/5304272.html)
+
+[代码](双目BA实例 https://github.com/gaoxiang12/g2o_ba_example)
+
+     g2o 全称 general graph optimization，是一个用来优化非线性误差函数的c++框架。
+     稀疏优化 SparseOptimizer 是我们最终要维护的东东。
+     它是一个Optimizable Graph，从而也是一个Hyper Graph。
+     一个 SparseOptimizer 含有很多个顶点 （都继承自 Base Vertex）和
+     很多种边（继承自 BaseUnaryEdge, BaseBinaryEdge或BaseMultiEdge）。
+     这些 Base Vertex 和 Base Edge 都是抽象的基类，而实际用的顶点和边，都是它们的派生类。
+     我们用 
+     SparseOptimizer.addVertex 和 
+     SparseOptimizer.addEdge   向一个图中添加顶点和边，
+     最后调用 SparseOptimizer.optimize 完成优化。
+
+     在优化之前，需要指定我们用的求解器和迭代算法。
+     一个 SparseOptimizer 拥有一个 
+         迭代算法 Optimization Algorithm，
+         继承自Gauss-Newton,  Levernberg-Marquardt, Powell's dogleg 三者之一（我们常用的是GN或LM）。
+
+     同时，这个 Optimization Algorithm 拥有一个 Solver，它含有两个部分：
+        1. 一个是 SparseBlockMatrix ，用于计算稀疏的雅可比和海塞,BlockSolver；
+        2. 一个是用于计算迭代过程中最关键的一步，线性方程组求解器；
+             H * Δx = −b
+             这就需要一个线性方程的求解器。
+             而这个求解器，可以从 PCG, CSparse, Choldmod 三者选一。
+
+     综上所述，在g2o中选择优化方法一共需要三个步骤：
+       1.  选择一个线性方程求解器，从 PCG, CSparse, Choldmod中选，实际则来自 g2o/solvers 文件夹中定义的东东。
+       2.  选择一个 BlockSolver 。
+       3.  选择一个迭代优化更新策略，从GN, LM, Doglog中选。
+[G2O图优化demo和理论推导](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/g2o%E5%9B%BE%E4%BC%98%E5%8C%96.md)
