@@ -43,14 +43,17 @@
     然后我们从头文件看看：
     Caffe中与Layer相关的头文件有7个，
 
-### 2.1.1 layer.hpp: 
+### 2.1.1 基类层 layer.hpp: 
 
-    layer.hpp`头文件里，包含了这几个头文件：
+>  layer.hpp`头文件里，包含了这几个头文件：
+
     #include "caffe/blob.hpp"
     #include "caffe/common.hpp"
     #include "caffe/proto/caffe.pb.h"
     #include "caffe/util/device_alternate.hpp"
-     父类Layer，定义所有layer的基本接口。
+    
+> 父类Layer，定义所有layer的基本接口。
+
      1. layer中有这三个主要参数：
          LayerParameter layer_param_;      
               // 这个是protobuf文件中存储的layer参数
@@ -69,7 +72,8 @@
          输入统一都是bottom，输出为top。
          其中Backward里面有个propagate_down参数，用来表示该Layer是否反向传播参数。
          Forward_cpu、Forward_gpu和Backward_cpu、Backward_gpu，这些接口都是virtual，
-### 2.1.2 data_layers.hpp: 
+         
+### 2.1.2 数据层 data_layers.hpp: 
 
     继承自父类Layer，定义与输入数据操作相关的子Layer，
     例如DataLayer，HDF5DataLayer和ImageDataLayer等。
