@@ -157,6 +157,16 @@
 
 
 ## 2.2 数据层 Data
+
+    数据通过数据层进入Caffe，数据层在整个网络的底部。
+    数据可以来自高效的数据库（LevelDB 或者 LMDB），直接来自内存。
+    如果不追求高效性，可以以HDF5或者一般图像的格式从硬盘读取数据。
+    
+   一些基本的操作，如：mean subtraction, 
+                     scaling, 
+                     random cropping, and 
+                     mirroring 均可以直接在数据层上进行指定。
+
     type: "Data"
     数据格式一般有 LevelDB和 LMDB
     数据层 一般无 bottom: ,会有多个 top: 
@@ -166,4 +176,137 @@
     incude{
        phase:TRAIN   一般训练和测试时是不一样的，这里表示训练阶段的层，如果没有include标签，表示即在训练阶段又在测试阶段
     }
+
+### 2.2.1 数据库格式数据  Database
+      类型：Data
+
+      必须参数：
+            source: 包含数据的目录名称
+            batch_size: 一次处理 的 输入的数量，过大内存不够
+      可选参数：
+            rand_skip: 在开始的时候从输入中跳过这个数值，这在异步随机梯度下降（SGD）的时候非常有用
+            backend [default LEVELDB]: 选择使用 LEVELDB 或者 LMDB
+### 2.2.2 直接来自内存  In-Memory
+      类型: MemoryData
+      必需参数：
+      batch_size, channels, height, width: 指定从内存读取数据的大小
+      MemoryData层直接从内存中读取数据，而不是拷贝过来。
+      因此，要使用它的话，你必须调用  
+      MemoryDataLayer::Reset (from C++)
+      或者Net.set_input_arrays (from Python)以此指定一块连续的数据（通常是一个四维张量）。
+### 2.2.3 HDF5 Input
+      类型: HDF5Data
+      必要参数：
+            source: 需要读取的文件名
+            batch_size：一次处理的输入的数量
+
+### 2.2.4 HDF5 Output
+      类型: HDF5Output
+      必要参数：
+      file_name: 输出的文件名
+      HDF5的作用和这节中的其他的层不一样，它是把输入的blobs写到硬盘
+      
+### 2.2.5 来自图像文件 Images
+      类型: ImageData
+      必要参数：
+            source: text文件的名字，每一行给出一张图片的文件名和label
+            batch_size: 一个batch中图片的数量
+
+      可选参数：
+            rand_skip：在开始的时候从输入中跳过这个数值，这在异步随机梯度下降（SGD）的时候非常有用
+            shuffle [default false]
+            new_height, new_width: 把所有的图像resize到这个大小
+
+## 2.3 激励层（neuron_layers） 激活层
+      一般来说，激励层是element-wise的操作，输入和输出的大小相同，一般情况下就是一个非线性函数。
+
+      数据输入输出维度不变
+      输入：
+            n×c×h×w
+      输出：
+            n×c×h×w
+### 2.3.1 ReLU / Rectified-Linear and Leaky-ReLU 最小阈值激活
+      标准， f(x) = max(0,x) ，当x > 0时输出x，但x <= 0时输出negative_slope 阈值
+      Leaky-ReLU   max(0.1x,x)
+
+      定义：
+      layer {
+       name: "relu1"
+       type: "ReLU"
+       bottom: "conv1"
+       top: "conv1"
+      }
+
+### 2.3.2 Sigmoid    负指数导数激活
+      标准   f(x) = 1/(1+exp(-x))  x = 0, f(x) = y = 0.5
+      映射到 0~1之间
+      sigmoid函数连续，光滑，严格单调，以(0,0.5)中心对称，是一个非常良好的阈值函数。
+      当x趋近负无穷时，y趋近于0；趋近于正无穷时，y趋近于1；x=0时，y=0.5。
+      当然，在x超出[-6,6]的范围后，函数值基本上没有变化，值非常接近，在应用中一般不考虑。
+
+      导数：
+      f′(x) = f(x) * (1 − f(x))
+
+      定义：
+      layer {
+        name: "encode1neuron"
+        bottom: "encode1"
+        top: "encode1neuron"
+        type: "Sigmoid"
+      }
+
+### 2.3.3  TanH / Hyperbolic Tangent  双曲正切
+      请注意sigmoid函数和TanH函数在纵轴上的区别。
+      sigmoid函数将实数映射到(0,1)。
+      TanH将实数映射到(-1,1)。
+       tanh(x) = ( exp(x) − exp(−x) ) / ( exp(x) + exp(−x) )
+
+       定义：
+      layer {
+        name: "layer"
+        bottom: "in"
+        top: "out"
+        type: "TanH"
+      }
+    
+### 2.3.4 绝对值激活 Absolute Value
+      ABSVAL层通过 y =  abs(x) 计算每一个输入x的输出。
+
+      定义：
+      layer {
+        name: "layer"
+        bottom: "in"
+        top: "out"
+        type: "AbsVal"
+      }
+      
+### 2.3.5 Power 平移乘方激活 
+      POWER层通过 y = (shift + scale * x) ^ power计算每一个输入x的输出。
+
+      定义：
+      layer {
+        name: "layer"
+        bottom: "in"
+        top: "out"
+        type: "Power"
+        power_param {
+          power: 1
+          scale: 1
+          shift: 0
+        }
+      }
+      
+### 2.3.6 BNLL 二项正态对数似然 激活
+      BNLL (binomial normal log likelihood) 层通过 
+      y = log(1 + exp(x)) 计算每一个输入x的输出
+
+      定义：
+      layer {
+        name: "layer"
+        bottom: "in"
+        top: "out"
+        type: BNLL
+      }
+
+## 2.4 视觉层（vision_layers）
 
