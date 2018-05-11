@@ -61,6 +61,7 @@
               // 这个存储的是layer的参数，在程序中用的，数据流
          vector<bool> param_propagate_down_; 
               // 这个bool表示是否计算各个blob参数的diff，即传播误差
+              
     2. 其三个主要接口：
         virtual void SetUp(const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top)
          // 需要根据实际的参数设置进行实现，对各种类型的参数初始化；
@@ -74,9 +75,27 @@
          Forward_cpu、Forward_gpu和Backward_cpu、Backward_gpu，这些接口都是virtual，
          
 ### 2.1.2 数据层 data_layers.hpp: 
+> **data_layers.hpp这个头文件包含了这几个头文件**
 
-    继承自父类Layer，定义与输入数据操作相关的子Layer，
-    例如DataLayer，HDF5DataLayer和ImageDataLayer等。
+      #include "boost/scoped_ptr.hpp" // 是一个类似于auto_ptr的智能指针
+        // scoped_ptr(局部指针)名字的含义：这个智能指针只能在作用域里使用，不希望被转让
+        // 把拷贝构造函数和赋值操作都声明为私有的，禁止对智能指针的复制操作，保证了被它管理的指针不能被转让所有权。
+        // private:
+        // scoped_ptr(scoped_ptr const &);
+        // scoped_ptr & operator=(scoped_ptr const &);
+      #include "hdf5.h"
+      #include "leveldb/db.h"
+      #include "lmdb.h"
+
+      #include "caffe/blob.hpp"
+      #include "caffe/common.hpp"
+      #include "caffe/filler.hpp"
+      #include "caffe/internal_thread.hpp"
+      #include "caffe/layer.hpp"
+      #include "caffe/proto/caffe.pb.h"
+
+      继承自父类Layer，定义与输入数据操作相关的子Layer，
+      例如DataLayer，HDF5DataLayer和ImageDataLayer等。
 
 ### 2.1.3 vision_layers.hpp: 
 
