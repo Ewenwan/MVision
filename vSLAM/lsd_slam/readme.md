@@ -506,7 +506,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
 [详解](https://www.cnblogs.com/gaoxiang12/p/5304272.html)
 
-[代码](双目BA实例 https://github.com/gaoxiang12/g2o_ba_example)
+[代码双目BA实例 ](https://github.com/gaoxiang12/g2o_ba_example)
 
      g2o 全称 general graph optimization，是一个用来优化非线性误差函数的c++框架。
      稀疏优化 SparseOptimizer 是我们最终要维护的东东。
