@@ -55,21 +55,29 @@
 > 但是，通过闭环检测，发现它回到了原始起点。
 
 > 可以看出，编码器误差导致计算的位姿和观测到有差异，那机器人这几个状态中的位姿到底是怎么样的才最好的满足这些条件呢
+
 ![](https://github.com/Ewenwan/Mathematics/blob/master/pic/3.png)
+
 > 首先构建位姿之间的关系，即图的边
+
 ![](https://github.com/Ewenwan/Mathematics/blob/master/pic/4.png)
 
-> 线性方程组中变量小于方程的个数（三个未知数，四个方程），要计算出最优的结果，使出杀手锏最小二乘法。先构建残差平方和函数：
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/5.png)
+> 线性方程组中变量小于方程的个数（三个未知数，四个方程），要计算出最优的结果，使出杀手锏最小二乘法。
+
+> 先构建残差平方和函数：
+
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/5.png)
 
 > 为了使残差平方和最小，我们对上面的函数每个变量求偏导，并使得偏导数等于0.
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/6.png)
+
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/6.png)
 
 > 整理得到
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/7.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/7.png)
 
 > 接着矩阵求解线性方程组
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/8.png)
+
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/8.png)
 
 > 所以调整以后为满足这些边的条件，机器人的位姿为：
 X0 = 0, X1 = 0.93, X2 = 0.07.
@@ -78,22 +86,22 @@ X0 = 0, X1 = 0.93, X2 = 0.07.
 
 ## 观测的路标（landmark）
 > 上面是用闭环检测，这次用观测的路标（landmark）来构建边。如下图所示，假设一个机器人初始起点在0处，并观测到其正前方2m处有一个路标。然后机器人向前移动，通过编码器测得它向前移动了1m，这时观测到路标在其前方0.8m。请问，机器人位姿和路标位姿的最优状态
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/11.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/11.png)
 
 > 在这个图中，我们把路标也当作了一个顶点。构建边的关系如下
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/12.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/12.png)
 
 > 左边-右边 得到误差方程
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/13.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/13.png)
 
 > 残差平方和
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/14.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/14.png)
 
 > 求偏导数
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/15.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/15.png)
 
 > 最后整理并计算得
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/16.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/16.png)
 
 > 得到路标和机器人位姿 
 X0 = 0, X1 = 1.07, l2 = 1.93
@@ -106,7 +114,7 @@ X0 = 0, X1 = 1.07, l2 = 1.93
 > c = sum(fi) = x0^2 + 10 * (x1 - x0 - 1)^2 + (l0 - x0 -2)^2 + (l0 - x1 - 0.8)^2
 
 > 求偏导得到
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/17.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/17.png)
 
 > 转换为矩阵求逆矩阵得到解
 X0 = 0, X1 = 1.01, l2 = 1.9
@@ -120,12 +128,13 @@ X0 = 0, X1 = 1.01, l2 = 1.9
  
  > 目标函数
  
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/21.png)
-   > e 函数在原理上表示一个误差，是一个矢量，作为优化变量Xk和 实际值Zk符合程度的一个度量。
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/21.png)
+
+> e 函数在原理上表示一个误差，是一个矢量，作为优化变量Xk和 实际值Zk符合程度的一个度量。
    
-   > 它越大表示xk越不符合zk。但是，由于目标函数必须是标量，所以必须用它的平方形式来表达目标函数。
+> 它越大表示xk越不符合zk。但是，由于目标函数必须是标量，所以必须用它的平方形式来表达目标函数。
    
-   > 最简单的形式是直接做成平方：e(x,z)转置 * e(x,z)。  
+> 最简单的形式是直接做成平方：e(x,z)转置 * e(x,z)。  
 
 > 进一步，为了表示我们对误差各分量重视程度的不一样，还使用一个信息矩阵 Ω 来表示各分量的不一致性。
 
@@ -143,15 +152,15 @@ X0 = 0, X1 = 1.01, l2 = 1.9
 
 > 于是总体优化问题变为n条边加和的形式：
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/29.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/29.png)
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/22.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/22.png)
 
 > 边的具体形式有很多种，可以是一元边、二元边或多元边，它们的数学表达形式取决于传感器或你想要描述的东西。
 
 > 例如视觉SLAM中，在一个相机Pose Tk 处对空间点xk进行了一次观测，得到zk，那么这条二元边的数学形式即为:
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/23.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/23.png)
 
 > 单个边其实并不复杂。
 
@@ -161,7 +170,7 @@ X0 = 0, X1 = 1.01, l2 = 1.9
 
 > 首先对误差项进行一阶展开：
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/24.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/24.png)
 
 > 这是的Jk是ek关于Xk的导数，矩阵形式下为雅可比阵。
 
@@ -169,7 +178,7 @@ X0 = 0, X1 = 1.01, l2 = 1.9
 
 > 于是，对于第条边的目标函数项，进一步展开：
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/25.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/25.png)
 
 > 其中，矩阵转置性质  (A * B)转置 = B转置 * A转置；(A + B)转置 = A转置 + B转置；(K * A)转置=K* A转置；A转置 * B = (B转置 * A)转置
 
@@ -195,7 +204,7 @@ X0 = 0, X1 = 1.01, l2 = 1.9
 
 > 一阶导雅克比矩阵 和二阶导海塞矩阵 均为稀疏的矩阵，即大部分是零元素。 Jk = (0 ··· 0 Jk1 ··· Jki ··· 0 ··· Jkq0 ··· 0)
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/30.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/30.png)
 
 > 这种稀疏性能很好地帮助我们快速求解上面的线性方程。稀疏代数库包括SBA、PCG、CSparse、Cholmod等等。g2o正是使用它们来求解图优化问题的。
 
@@ -240,18 +249,18 @@ X0 = 0, X1 = 1.01, l2 = 1.9
 [卡尔曼滤波 -- 从推导到应用(一)](https://blog.csdn.net/heyijia0327/article/details/17487467)
 
 ## 线性系统的状态差分方程    系统预测  = A 转换矩阵1 * 上次状态  + B 转换矩阵2 * 输入  + Q 噪声1
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/41.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/41.png)
 
 > 其中x是系统的状态向量，大小为n * 1 列。A为转换矩阵，大小为 n * n。u为系统输入，大小为 k * 1。B是将输入转换为状态的矩阵，大小为n * k。随机变量w为系统噪声。注意这些矩阵的大小，它们与你实际编程密切相关。
 
 ### 看一个具体的匀加速运动的实例
 > 有一个匀加速运动的小车，它受到的合力为 ft , 由匀加速运动的位移和速度公式，能得到由 t-1 到 t 时刻的位移和速度变化公式
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/42.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/42.png)
 
 > 位移x = 位移x + （速度v + 加速度* 时间/2）* 时间 ； 加速度 = 外力 f / 质量 m  ； 速度v = 速度v + 加速度 * 时间
 
 > 该系统的状态向量包括位移和速度，分别用 xt 和 xt的导数 表示。控制输入变量为u=f/m，也就是加速度，于是有如下矩阵形式
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/44.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/44.png)
 
 > 这里对应的的矩阵A大小为 2 * 2 , 矩阵B大小为 2 * 1。 
 
@@ -261,31 +270,31 @@ X0 = 0, X1 = 1.01, l2 = 1.9
 
 ## 测量值的预测   =  H 转换矩阵3 * 系统预测值 + R 噪声2
 > 测量值是由系统状态变量映射出来的:
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/45.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/45.png)
 
 > 注意Z是测量值，大小为m * 1(不是n * 1，也不是1 * 1，后面将说明），H也是状态变量到测量量的转换矩阵。大小为m * n。随机变量v是测量噪声。
 
 >同时对于匀加速模型，假设下车是匀加速远离我们，我们站在原点用超声波仪器测量小车离我们的距离。
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/46.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/46.png)
 
 > 也就是测量值直接等于位移。可能又会问，为什么不直接用测量值呢？测量值噪声太大了，根本不能直接用它来进行计算。试想一个本来是朝着一个方向做匀加速运动的小车，你测出来的位移确是前后移动（噪声影响），只根据测量的结果，你就以为车子一会往前开一会往后开。
 对于状态方程中的系统噪声w和测量噪声v，假设服从如下多元高斯分布，并且w,v是相互独立的。其中Q系统噪声,R为测量噪声变量的协方差矩阵。
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/47.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/47.png)
 
 > 对于小车匀加速运动的模型，假设系统的噪声向量只存在速度分量上，且速度噪声的方差是一个常量0.01，位移分量上的系统噪声为0。
 
 > 测量值只有位移，它的协方差矩阵R 大小是1 * 1，就是测量噪声的方差本身, 而系统噪声协方差矩阵为：
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/48.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/48.png)
 
 > Q中，叠加在速度上系统噪声方差为0.01，位移上的为0，它们间协方差为0，即噪声间没有关联。
 
 
 ## 系统估计值 = 系统状态方程预测值 + 增益系数 * (真实测量值 - 测量值预测值)
 > 理论预测（先验）有了，测量值（后验）也有了，那怎么根据这两者得到最优的估计值呢？首先想到的就是加权，或者称之为反馈。由一般的反馈思想我们得到估计值：
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/49.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/49.png)
 
 ## 增益系数的求解  
 > 列出 系统估计值的 协方差矩阵 Pk+1 的公式 包含 增益 K 和  系统预测值 的协方差矩阵 Pk' 测量转移矩阵 H  测量过程噪声协方差 R
