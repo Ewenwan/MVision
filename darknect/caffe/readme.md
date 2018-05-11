@@ -111,25 +111,56 @@
     然后我们从头文件看看：
     Caffe中与Layer相关的头文件有7个，
 
-    layer.hpp: 
-              父类Layer，定义所有layer的基本接口。
-    data_layers.hpp: 
-              继承自父类Layer，定义与输入数据操作相关的子Layer，
-              例如DataLayer，HDF5DataLayer和ImageDataLayer等。
-    vision_layers.hpp: 
-              继承自父类Layer，定义与特征表达相关的子Layer，
-              例如 卷积层ConvolutionLayer，池化层PoolingLayer和 LRNLayer等。
-    neuron_layers.hpp: 
-              继承自父类Layer，定义与非线性变换相关的子Layer，神经元激活层，
-              例如ReLULayer，TanHLayer和SigmoidLayer等。
-    loss_layers.hpp: 
-              继承自父类Layer，定义与输出误差计算相关的子Layer，
-              例如 欧几里得距离损失 EuclideanLossLayer，SoftmaxWithLossLayer 和 HingeLossLayer等。
-    common_layers.hpp: 继承自父类Layer，定义与中间结果数据变形、逐元素操作相关的子Layer，
-              例如 通道合并ConcatLayer，点乘 InnerProductLayer和 SoftmaxLayer等 softmax归一化。
-    layer_factory.hpp: 
-              Layer工厂模式类，
-              负责维护现有可用layer和相应layer构造方法的映射表。
+> layer.hpp: 
+
+    layer.hpp`头文件里，包含了这几个头文件：
+    #include "caffe/blob.hpp"
+    #include "caffe/common.hpp"
+    #include "caffe/proto/caffe.pb.h"
+    #include "caffe/util/device_alternate.hpp"
+     父类Layer，定义所有layer的基本接口。
+     1. layer中有这三个主要参数：
+         LayerParameter layer_param_;      
+              // 这个是protobuf文件中存储的layer参数
+         vector<share_ptr<Blob<Dtype>>> blobs_;
+              // 这个存储的是layer的参数，在程序中用的，数据流
+         vector<bool> param_propagate_down_; 
+              // 这个bool表示是否计算各个blob参数的diff，即传播误差
+    2. 其三个主要接口：
+        virtual void SetUp(const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top)
+         // 需要根据实际的参数设置进行实现，对各种类型的参数初始化；
+        inline Dtype Forward(const vector<Blob<Dtype>*>& bottom, vector<Blob<Dtype>*>* top);
+         // 前向计算
+        inline void Backward(const vector<Blob<Dtype>*>& top, const vector<bool>& propagate_down, const <Blob<Dtype>*>* bottom);
+         // 反向传播更新
+
+         输入统一都是bottom，输出为top。
+         其中Backward里面有个propagate_down参数，用来表示该Layer是否反向传播参数。
+         Forward_cpu、Forward_gpu和Backward_cpu、Backward_gpu，这些接口都是virtual，
+> data_layers.hpp: 
+
+    继承自父类Layer，定义与输入数据操作相关的子Layer，
+    例如DataLayer，HDF5DataLayer和ImageDataLayer等。
+
+> vision_layers.hpp: 
+
+    继承自父类Layer，定义与特征表达相关的子Layer，
+    例如 卷积层ConvolutionLayer，池化层PoolingLayer和 LRNLayer等。
+> neuron_layers.hpp: 
+
+    继承自父类Layer，定义与非线性变换相关的子Layer，神经元激活层，
+    例如ReLULayer，TanHLayer和SigmoidLayer等。
+> loss_layers.hpp: 
+
+    继承自父类Layer，定义与输出误差计算相关的子Layer，
+    例如 欧几里得距离损失 EuclideanLossLayer，SoftmaxWithLossLayer 和 HingeLossLayer等。
+> common_layers.hpp: 继承自父类Layer，定义与中间结果数据变形、逐元素操作相关的子Layer，
+
+    例如 通道合并ConcatLayer，点乘 InnerProductLayer和 SoftmaxLayer等 softmax归一化。
+> layer_factory.hpp: 
+
+    Layer工厂模式类，
+    负责维护现有可用layer和相应layer构造方法的映射表。
 
 
 
