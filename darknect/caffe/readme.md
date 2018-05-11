@@ -97,6 +97,7 @@
     
 # caffe 模型配置文件 prototxt 详解
 ![](https://img-blog.csdn.net/20160327122151958?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
     每个模型由多个 层 构成
       layer {{{{
         name: "{}" #层名字，可随意取名
@@ -104,6 +105,34 @@
         bottom: "{}"# 层入口 输入
         top: "{}"{{}}# 层出口 输出  可以有多个 bottom 和 top 表示有多条数据通道
       }}}}
+ 
+> 相关头文件
+
+    然后我们从头文件看看：
+    Caffe中与Layer相关的头文件有7个，
+
+    layer.hpp: 
+              父类Layer，定义所有layer的基本接口。
+    data_layers.hpp: 
+              继承自父类Layer，定义与输入数据操作相关的子Layer，
+              例如DataLayer，HDF5DataLayer和ImageDataLayer等。
+    vision_layers.hpp: 
+              继承自父类Layer，定义与特征表达相关的子Layer，
+              例如 卷积层ConvolutionLayer，池化层PoolingLayer和 LRNLayer等。
+    neuron_layers.hpp: 
+              继承自父类Layer，定义与非线性变换相关的子Layer，神经元激活层，
+              例如ReLULayer，TanHLayer和SigmoidLayer等。
+    loss_layers.hpp: 
+              继承自父类Layer，定义与输出误差计算相关的子Layer，
+              例如 欧几里得距离损失 EuclideanLossLayer，SoftmaxWithLossLayer 和 HingeLossLayer等。
+    common_layers.hpp: 继承自父类Layer，定义与中间结果数据变形、逐元素操作相关的子Layer，
+              例如 通道合并ConcatLayer，点乘 InnerProductLayer和 SoftmaxLayer等 softmax归一化。
+    layer_factory.hpp: 
+              Layer工厂模式类，
+              负责维护现有可用layer和相应layer构造方法的映射表。
+
+
+
 ## 数据层 Data
     type: "Data"
     数据格式一般有 LevelDB和 LMDB
