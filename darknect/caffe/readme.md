@@ -1,16 +1,16 @@
-# yolo 模型转换到 caffe下
-1. yolov1的caffe实现
+# 1. yolo 模型转换到 caffe下
+      1.1  yolov1的caffe实现
 [caffe-yolo v1 python](https://github.com/xingwangsfu/caffe-yolo)
 
 [caffe-yolo v1  c++](https://github.com/yeahkun/caffe-yolo)
 
-2. yolov2新添了route、reorg、region层，好在github上有人已经实现移植。
+      1.2. yolov2新添了route、reorg、region层，好在github上有人已经实现移植。
 [移植yolo2到caffe框架](https://github.com/hustzxd/z1)
 
 [caffe-yolov2](https://github.com/gklz1982/caffe-yolov2)
 
 
-## 三个文件的作用
+## 1.2 三个文件的作用
       1. create_yolo_prototxt.py ：  用来将原来的yolo的cfg文件 转成 caffe的prototxt文件，这是模型的配置文件，是描述模型的结构。
       2. create_yolo_caffemodel.py ：用来将yolo的weights文件转成caffe的caffemodel文件， 这是模型的参数，里面包含了各层的参数。
       3. yolo_detect.py ：这个Python程序里import了caffe，caffe的python库。
@@ -19,29 +19,29 @@
                         python里能够import caffe 
                         你需要在caffe文件夹下make pycaffe，并设置PYTHONPATH环境变量。
 
-### yolo的cfg文件 转成 caffe的prototxt
+### 1.2.1 yolo的cfg文件 转成 caffe的prototxt
     python create_yolo_prototxt.py
-### yolo的weights文件转成caffe的caffemodel
+### 1.2.2 yolo的weights文件转成caffe的caffemodel
     python create_yolo_caffemodel.py -m yolo_train_val.prototxt -w yolo.weights -o yolo.caffemodel
     
     
-# caffe 模型配置文件 prototxt 详解
+# 2. caffe 模型配置文件 prototxt 详解
 ![](https://img-blog.csdn.net/20160327122151958?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
 
-    每个模型由多个 层 构成
-      layer {{{{
-        name: "{}" #层名字，可随意取名
-        type: "{}" #层类型 数据层Data 卷积层Convolution 池化层Pooling 非线性变换、内积运算，以及数据加载、归一化和损失计算 等
-        bottom: "{}"# 层入口 输入
-        top: "{}"{{}}# 层出口 输出  可以有多个 bottom 和 top 表示有多条数据通道
-      }}}}
- 
-> 相关头文件
+      每个模型由多个 层 构成
+      layer {{{{
+        name: "{}" #层名字，可随意取名
+        type: "{}" #层类型 数据层Data 卷积层Convolution 池化层Pooling 非线性变换、内积运算，以及数据加载、归一化和损失计算 等
+        bottom: "{}"# 层入口 输入
+        top: "{}"{{}}# 层出口 输出  可以有多个 bottom 和 top 表示有多条数据通道
+      }}}}
+
+## 2.1 相关头文件
 
     然后我们从头文件看看：
     Caffe中与Layer相关的头文件有7个，
 
-> layer.hpp: 
+### 2.1.1 layer.hpp: 
 
     layer.hpp`头文件里，包含了这几个头文件：
     #include "caffe/blob.hpp"
@@ -66,35 +66,35 @@
 
          输入统一都是bottom，输出为top。
          其中Backward里面有个propagate_down参数，用来表示该Layer是否反向传播参数。
-         Forward_cpu、Forward_gpu和Backward_cpu、Backward_gpu，这些接口都是virtual，
-> data_layers.hpp: 
+         Forward_cpu、Forward_gpu和Backward_cpu、Backward_gpu，这些接口都是virtual，
+### 2.1.2 data_layers.hpp: 
 
     继承自父类Layer，定义与输入数据操作相关的子Layer，
     例如DataLayer，HDF5DataLayer和ImageDataLayer等。
 
-> vision_layers.hpp: 
+### 2.1.3 vision_layers.hpp: 
 
     继承自父类Layer，定义与特征表达相关的子Layer，
     例如 卷积层ConvolutionLayer，池化层PoolingLayer和 LRNLayer等。
-> neuron_layers.hpp: 
+### 2.1.4 neuron_layers.hpp: 
 
     继承自父类Layer，定义与非线性变换相关的子Layer，神经元激活层，
     例如ReLULayer，TanHLayer和SigmoidLayer等。
-> loss_layers.hpp: 
+### 2.1.5 loss_layers.hpp: 
 
     继承自父类Layer，定义与输出误差计算相关的子Layer，
     例如 欧几里得距离损失 EuclideanLossLayer，SoftmaxWithLossLayer 和 HingeLossLayer等。
-> common_layers.hpp: 继承自父类Layer，定义与中间结果数据变形、逐元素操作相关的子Layer，
+### 2.1.6 common_layers.hpp: 继承自父类Layer，定义与中间结果数据变形、逐元素操作相关的子Layer，
 
     例如 通道合并ConcatLayer，点乘 InnerProductLayer和 SoftmaxLayer等 softmax归一化。
-> layer_factory.hpp: 
+### 2.1.7 layer_factory.hpp: 
 
     Layer工厂模式类，
     负责维护现有可用layer和相应layer构造方法的映射表。
 
 
 
-## 数据层 Data
+## 2.2 数据层 Data
     type: "Data"
     数据格式一般有 LevelDB和 LMDB
     数据层 一般无 bottom: ,会有多个 top: 
