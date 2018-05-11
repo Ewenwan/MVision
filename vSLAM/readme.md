@@ -1,3 +1,23 @@
+# 目录 
+    ch1 Preface 
+    ch2 Overview of SLAM & linux, cmake    概述，cmake基础
+    ch3 Rigid body motion & Eigen          三维几何
+    ch4 Lie group and Lie Algebra & Sophus 李群与李代数
+    ch5 Cameras and Images & OpenCV        图像与相机模型
+    ch6 Non-linear optimization & Ceres, g2o 非线性优化
+    ch7 Feature based Visual Odometry      特征点法视觉里程计
+    ch8 Direct (Intensity based) Visual Odometry 直接法视觉里程计
+    ch9 Project
+    ch10 Back end optimization & Ceres, g2o       后端优化1
+    ch11 Pose graph and Factor graph & g2o, gtsam 位姿图优化
+    ch12 Loop closure & DBoW3                     词袋方法 
+    ch13 Dense reconstruction & REMODE, Octomap   稠密地图构建
+    
+    svo_slam
+    dso_slam   
+    lsd_slam   直接法
+    ORB_SLAM2  基于ORB特征点的 slam
+
 # Awesome SLAM [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
 Simultaneous Localization and Mapping, also known as SLAM, is the computational problem of constructing or updating a map of an unknown environment while simultaneously keeping track of an agent's location within it.
