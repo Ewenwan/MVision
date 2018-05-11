@@ -257,18 +257,18 @@ image **load_alphabet()
         alphabets[j] = calloc(128, sizeof(image));
 /////////////////////////////////////
 		#ifdef CHINESE
-			   for(i = 0; i < 80; i++)
-			   {
-				   char buff[256];
-				   sprintf(buff, "data/labels/cn_%d_%d.png", i, j);
-				   alphabets[j][i] = load_image_color(buff, 0, 0);
-			   }
+			for(i = 0; i < 80; i++)
+			{
+			   char buff[256];
+			   sprintf(buff, "data/labels/cn_%d_%d.png", i, j);
+			   alphabets[j][i] = load_image_color(buff, 0, 0);
+			}
 		#else		
-        for(i = 32; i < 127; ++i){
-            char buff[256];
-            sprintf(buff, "data/labels/%d_%d.png", i, j);
-            alphabets[j][i] = load_image_color(buff, 0, 0);
-        }
+			for(i = 32; i < 127; ++i){
+			    char buff[256];
+			    sprintf(buff, "data/labels/%d_%d.png", i, j);
+			    alphabets[j][i] = load_image_color(buff, 0, 0);
+			}
 		#endif
 //////////////////////////////////////////////////////////
     }
@@ -332,12 +332,12 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
 /////////////////////////////////// 改 /////////////////////////////////////////////
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
             if (alphabet) {
-                image label = get_label(alphabet, labelstr, (im.h*.03));
-				#ifdef CHINESE
-					image label = get_label_cn(alphabet, class, (im.h*.03));
-				#else
-					image label = get_label(alphabet, names[class], (im.h*.03));
-				#endif
+                //image label = get_label(alphabet, labelstr, (im.h*.03));
+		#ifdef CHINESE
+			image label = get_label_cn(alphabet, class, (im.h*.03));
+		#else
+			image label = get_label(alphabet, names[class], (im.h*.03));
+		#endif
                 draw_label(im, top + width, left, label, rgb);
                 free_image(label);
             }
