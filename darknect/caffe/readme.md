@@ -37,13 +37,12 @@
     INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial
     LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux
 
-
 ### 5.编译
-        make all -j8
+    make all -j8
 
 ### 6.测试
-        sudo make runtest -j8
-        不成功多运行几次
+    sudo make runtest -j8
+    不成功多运行几次
 
 ### 7.安装python 接口
  
@@ -94,4 +93,25 @@
     python create_yolo_prototxt.py
 ### yolo的weights文件转成caffe的caffemodel
     python create_yolo_caffemodel.py -m yolo_train_val.prototxt -w yolo.weights -o yolo.caffemodel
+    
+    
+# caffe 模型配置文件 prototxt 详解
+![](https://img-blog.csdn.net/20160327122151958?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+    每个模型由多个 层 构成
+      layer {{{{
+        name: "{}" #层名字，可随意取名
+        type: "{}" #层类型 数据层Data 卷积层Convolution 池化层Pooling 非线性变换、内积运算，以及数据加载、归一化和损失计算 等
+        bottom: "{}"# 层入口 输入
+        top: "{}"{{}}# 层出口 输出  可以有多个 bottom 和 top 表示有多条数据通道
+      }}}}
+## 数据层 Data
+    type: "Data"
+    数据格式一般有 LevelDB和 LMDB
+    数据层 一般无 bottom: ,会有多个 top: 
+    例如：
+    top: "data"     数据 x
+    top: "label"    标签 y   对应的是分类模型 监督学习
+    incude{
+       phase:TRAIN   一般训练和测试时是不一样的，这里表示训练阶段的层，如果没有include标签，表示即在训练阶段又在测试阶段
+    }
 
