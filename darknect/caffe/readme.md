@@ -28,6 +28,8 @@
     
     
 # 2. caffe 模型配置文件 prototxt 详解
+[博客参考](https://blog.csdn.net/maweifei/article/details/72848185?locationNum=15&fps=1)
+
 ![](https://img-blog.csdn.net/20160327122151958?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
 
       每个模型由多个 层 构成
