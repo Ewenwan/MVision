@@ -55,10 +55,9 @@
 > 但是，通过闭环检测，发现它回到了原始起点。
 
 > 可以看出，编码器误差导致计算的位姿和观测到有差异，那机器人这几个状态中的位姿到底是怎么样的才最好的满足这些条件呢
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/3.png)
-
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/3.png)
 > 首先构建位姿之间的关系，即图的边
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/4.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/4.png)
 
 > 线性方程组中变量小于方程的个数（三个未知数，四个方程），要计算出最优的结果，使出杀手锏最小二乘法。先构建残差平方和函数：
 ![](https://github.com/Ewenwan/Mathematics/tree/master/pic/5.png)
