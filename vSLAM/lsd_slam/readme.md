@@ -536,3 +536,5 @@ https://blog.csdn.net/tiandijun/article/details/62226163
        2.  选择一个 BlockSolver 。
        3.  选择一个迭代优化更新策略，从GN, LM, Doglog中选。
 [G2O图优化demo和理论推导](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/g2o%E5%9B%BE%E4%BC%98%E5%8C%96.md)
+
+[卡尔曼滤波推到+应用](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2.md)
