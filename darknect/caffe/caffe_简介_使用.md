@@ -686,3 +686,60 @@
 
 [可参考台大反向传播视频](http://speech.ee.ntu.edu.tw/~tlkagk/courses/MLDS_2015_2/Lecture/DNN%20backprop.ecm.mp4/index.html)
 
+### layer.hpp 源文件
+
+    #ifndef CAFFE_LAYER_H_  
+    #define CAFFE_LAYER_H_  
+
+    #include <algorithm>  
+    #include <string>  
+    #include <vector>  
+
+    #include "caffe/blob.hpp"  //数据
+    #include "caffe/common.hpp"  //通用
+    #include "caffe/layer_factory.hpp"  
+    #include "caffe/proto/caffe.pb.h"  
+    #include "caffe/util/device_alternate.hpp"  
+    namespace caffe {  //caffe命名空间
+
+    template <typename Dtype>// 通用 数据类型模板 Dtype 
+
+    class Layer {  
+     public:  
+    /* 
+    首先获得当前网络的Phase 模式，是 训练train还是 测试test，
+    在初始化 列表初始化LayerParameter,之后blobs_这里存放的是一个指向blob类的shared_ptr指针
+    的一个vector，在这里是申请空间，然后将传入的layer_param中的blob拷贝过来。 
+    */  
+    // 显示的构造函数不需要重写，任何初始工作在SetUp()中完成  
+    // 构造方法只复制层参数说明的值，如果层说明参数中提供了权值和偏置参数，也复制  
+      explicit Layer(const LayerParameter& param)  
+        : layer_param_(param) {  
+          // Set phase and copy blobs (if there are any).  
+    //1. 训练还是测试？phase 
+          phase_ = param.phase();  
+          if (layer_param_.blobs_size() > 0) {  
+    // 将blobs_的大小设置为参数中的大小    
+            blobs_.resize(layer_param_.blobs_size());  
+            for (int i = 0; i < layer_param_.blobs_size(); ++i) {  
+    // 新建若干个Blob   
+              blobs_[i].reset(new Blob<Dtype>());  
+    // 从blob文件中获取数据  
+              blobs_[i]->FromProto(layer_param_.blobs(i));  
+            }  
+          }//用protobuf 传入的参数对blobs_ 做初始化，blobs_ 是一个vector 存放指向Blob类的智能指针。  
+
+          #ifdef USE_MPI  
+          //If this is a gather layer, all it subsequent layer doesn't need gradient sync.  
+          //We will only change itself's property here,  
+          //subsequent layers will be inferred in the Net  
+        if (is_gathering()){  
+            set_need_sync(false);  
+          }else{  
+            set_need_sync(true);  
+          }  
+          #endif  
+        }  
+      virtual ~Layer() {}  
+    ////////////////初始化函数SetUp，每个Layer对象都必须遵循固定的调用模式,
+
