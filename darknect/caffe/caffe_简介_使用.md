@@ -710,36 +710,90 @@
     首先获得当前网络的Phase 模式，是 训练train还是 测试test，
     在初始化 列表初始化LayerParameter,之后blobs_这里存放的是一个指向blob类的shared_ptr指针
     的一个vector，在这里是申请空间，然后将传入的layer_param中的blob拷贝过来。 
-    */  
-    // 显示的构造函数不需要重写，任何初始工作在SetUp()中完成  
-    // 构造方法只复制层参数说明的值，如果层说明参数中提供了权值和偏置参数，也复制  
+    */ 
+    // 显示的构造函数==========【1】==========================
+    // 显示的构造函数不需要重写，任何初始工作在SetUp()中完成  
+    // 构造方法只复制层参数说明的值，如果层说明参数中提供了权值和偏置参数，也复制
       explicit Layer(const LayerParameter& param)  
         : layer_param_(param) {  
           // Set phase and copy blobs (if there are any).  
     //1. 训练还是测试？phase 
           phase_ = param.phase();  
           if (layer_param_.blobs_size() > 0) {  
-    // 将blobs_的大小设置为参数中的大小    
+           //2. 将blobs_的大小设置为参数中的大小    
             blobs_.resize(layer_param_.blobs_size());  
             for (int i = 0; i < layer_param_.blobs_size(); ++i) {  
-    // 新建若干个Blob   
+              // 3. 新建若干个Blob   
               blobs_[i].reset(new Blob<Dtype>());  
-    // 从blob文件中获取数据  
+              // 4. 从blob文件中获取数据  
               blobs_[i]->FromProto(layer_param_.blobs(i));  
             }  
           }//用protobuf 传入的参数对blobs_ 做初始化，blobs_ 是一个vector 存放指向Blob类的智能指针。  
 
-          #ifdef USE_MPI  
+          #ifdef USE_MPI  // 
           //If this is a gather layer, all it subsequent layer doesn't need gradient sync.  
           //We will only change itself's property here,  
           //subsequent layers will be inferred in the Net  
-        if (is_gathering()){  
-            set_need_sync(false);  
-          }else{  
-            set_need_sync(true);  
-          }  
+            if (is_gathering()){  
+                set_need_sync(false);  
+              }else{  
+                set_need_sync(true);  
+              }  
           #endif  
         }  
-      virtual ~Layer() {}  
-    ////////////////初始化函数SetUp，每个Layer对象都必须遵循固定的调用模式,
+      virtual ~Layer() {}//虚析构函数 需要重写
 
+    //=====================================【2】==========================================    
+    ////////////////初始化函数SetUp，每个Layer对象都必须遵循固定的调用模式/////////////////////
+    // 实现每个layer对象的setup函数
+    // 此方法非虚函数，不用重写，模式固定 
+    void SetUp(const vector<Blob<Dtype>* >& bottom, // 输入层 输入数据  blob中的存储空间已申请
+      const vector<Blob<Dtype>* >& top) {  // 输出层 输出数据，blob对象以构造但是其中的存储空间未申请
+      // 具体空间大小需根据bottom blob大小和layer_param_共同决定，具体在Reshape函数现实 
+    CheckBlobCounts(bottom, top); // 1. 检查输入输出blob个数是否满足要求，每个层能处理的输入输出数据不一样
+    LayerSetUp(bottom, top);      // 2. 调用LayerSetUp函数初始化特殊的层，每个Layer子类需重写这个函数完成定制的初始化 
+    Reshape(bottom, top);         // 3. 调用Reshape函数为top blob分配合适大小的存储空间
+    SetLossWeights(top);          // 4. 为每个top blob设置损失权重乘子，非LossLayer 层的top blob其值为零
+    } 
+
+    //=====================================【3】==========================================
+    /////////////////每个子类Layer必须重写的初始化函数LayerSetUp， 完成定制的初始化 
+    //定制初始化，每个子类layer必须实现此虚函数
+    virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom, //输入blob, 数据成员data_和diff_存储了相关数据
+      const vector<Blob<Dtype>*>& top)// 输出blob, blob对象已构造但数据成员的空间尚未申请
+
+      {}  //此方法执行一次定制化的层初始化，包括从layer_param_读入并处理相关的层权值和偏置参数， 
+          // 调用Reshape函数申请top blob的存储空间 
+
+    //=====================================【4】==========================================
+    /////////////////////每个子类Layer必须重写的Reshape函数，完成top blob形状的设置并为其分配存储空间，
+    // 根据bottom blob的形状和layer_param_计算top blob的形状并为其分配存储空间
+    virtual void Reshape(const vector<Blob<Dtype>*>& bottom, 
+      const vector<Blob<Dtype>*>& top) = 0;
+
+    //=====================================【5】==========================================
+    //////////////前向传播函数 Forward 
+    // 首先是Forward.这其实是一个装饰器，
+    // 继承之后在调用的调用其相应的forward_cpu或者forward_gpu，
+    // 根据输入的input data blob计算相应的output data blob，
+    // 同时会反应这一层layer的total loss. 
+    inline Dtype Forward(const vector<Blob<Dtype>*>& bottom,  //输入blob
+      const vector<Blob<Dtype>*>& top); // 输出blob
+
+    //=====================================【5】==========================================
+    ////////////// 反向传播函数Backward  
+    //给定top blob 的 error gradient 误差梯度 计算得到bottom 的 误差梯度 error gradient。
+    // 在Ouput blobs里面的diff存储的就是其相应的error gradients。
+    // 其中propagate_down这个参数跟Bottom的长度是一样的
+    // 其每一个Index用来指定是否需要反向传播error gradients 到对应的bottom blob。
+    // 而bottom 这里面的diff 区域存放的就是BackWard计算出来相应的gradient error. 
+    inline void Backward( const vector<Blob<Dtype>* >& top, // 输入是 output blobs，top blobs
+      const vector<bool>& propagate_down,                 // 更新标志
+      const vector<Blob<Dtype>* >& bottom);               // 输出是 bottom blobs
+
+    //=====================================【6】========================================== 
+    // 返回可学习的参数
+    vector<shared_ptr<Blob<Dtype> > >& blobs() {  
+    return blobs_;//返回vector  blobs_  
+    }       
+    
