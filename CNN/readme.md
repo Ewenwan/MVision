@@ -23,3 +23,5 @@
 [轻量级深度卷积神经网络模型](https://blog.csdn.net/column/details/19143.html)
 
 [CUDA C 矩阵乘的分块优化](https://blog.csdn.net/mrhiuser/article/details/51750907)
+
+[CNN 模型压缩与加速算法综述](https://blog.csdn.net/qq_40027052/article/details/78645122)
