@@ -32,7 +32,10 @@ void im2col_cpu(
 
     int channels_col = channels * ksize * ksize;// 特征图展开  列长度 总行数
     for (c = 0; c < channels_col; ++c) {
-		// caffe源码实现是一行一行来实现的
+	// caffe源码实现是一行一行来实现的
+	//下面的三个坐标表示在卷积核里面的位置。存储是一个通道，一行一行的存储。
+        //因此wide_offset是ksize的取余，h_offset是ksize(核的宽)的倍数然后对ksize（每个核的高）的取余。
+        //c_im，每个核的通道为ksize*ksize。
         int w_offset = c % ksize;
         int h_offset = (c / ksize) % ksize;
         int c_im = c / ksize / ksize;
