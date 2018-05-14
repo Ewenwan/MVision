@@ -1,5 +1,5 @@
-// 卷积层 
-// 在如配置文件时会打印总的 运算量 
+// 卷积层  前相反向传播 卷积层输入输出 运算量
+// 载入配置文件时会打印总的 运算量 
 // fprintf(stderr, "conv  %5d %2d x%2d /%2d  %4d x%4d x%4d   --->  %4d x%4d x%4d  %5.3f GFLOPs\n", n, size, size, stride, w, h, c, l.out_w, l.out_h, l.out_c, (2.0 * l.n * l.size*l.size*l.c/l.groups * l.out_h*l.out_w)/1000000000.);
 #include "convolutional_layer.h"
 #include "utils.h"
@@ -462,6 +462,7 @@ void backward_bias(float *bias_updates, float *delta, int batch, int n, int size
     }
 }
 
+// 正向传播============================================================
 void forward_convolutional_layer(convolutional_layer l, network net)
 {
     int i, j;
@@ -475,65 +476,75 @@ void forward_convolutional_layer(convolutional_layer l, network net)
         net.input = l.binary_input;
     }
 
-    int m = l.n/l.groups;
-    int k = l.size*l.size*l.c/l.groups;
-    int n = l.out_w*l.out_h;
-    for(i = 0; i < l.batch; ++i){
-        for(j = 0; j < l.groups; ++j){
-            float *a = l.weights + j*l.nweights/l.groups;
-            float *b = net.workspace;
-            float *c = l.output + (i*l.groups + j)*n*m;
-
+    int m = l.n/l.groups;// 每组 卷积核的个数
+    int k = l.size*l.size*l.c/l.groups;//分组后 每个卷积核的维度（大小）
+    int n = l.out_w*l.out_h;//输出featuremap的维度（大小）
+    for(i = 0; i < l.batch; ++i){//batch依次的操作
+        for(j = 0; j < l.groups; ++j){// 每一组
+		
+            float *a = l.weights + j*l.nweights/l.groups;// 卷积核 权重
+            float *b = net.workspace;// 偏置
+            float *c = l.output + (i*l.groups + j)*n*m;// 每组输出特征图像素 数量
+            // 卷积操作方式 将特征图展开 成 矩阵
             im2col_cpu(net.input + (i*l.groups + j)*l.c/l.groups*l.h*l.w,
                 l.c/l.groups, l.h, l.w, l.size, l.stride, l.pad, b);
-            gemm(0,0,m,n,k,1,a,k,b,n,1,c,n);
+            gemm(0,0,m,n,k,1,a,k,b,n,1,c,n);//利用矩阵乘法实现卷积操作
         }
     }
-
+    // 批归一化操作  去均值 除以方差
     if(l.batch_normalize){
         forward_batchnorm_layer(l, net);
     } else {
-        add_bias(l.output, l.biases, l.batch, l.n, l.out_h*l.out_w);
+        add_bias(l.output, l.biases, l.batch, l.n, l.out_h*l.out_w);//添加偏置 
     }
 
-    activate_array(l.output, l.outputs*l.batch, l.activation);
+    activate_array(l.output, l.outputs*l.batch, l.activation);//激活函数
     if(l.binary || l.xnor) swap_binary(&l);
 }
 
+// 反向传播=========================================================
 void backward_convolutional_layer(convolutional_layer l, network net)
 {
     int i, j;
     int m = l.n/l.groups;
     int n = l.size*l.size*l.c/l.groups;
     int k = l.out_w*l.out_h;
-
+	
+    // 这个函数实现的是返回激活函数导数 与 后面传播回来的误差的乘积
+	// 权重梯度
     gradient_array(l.output, l.outputs*l.batch, l.activation, l.delta);
 
     if(l.batch_normalize){
         backward_batchnorm_layer(l, net);
     } else {
+		//求 偏置 bias的梯度
         backward_bias(l.bias_updates, l.delta, l.batch, l.n, k);
     }
 
-    for(i = 0; i < l.batch; ++i){
-        for(j = 0; j < l.groups; ++j){
-            float *a = l.delta + (i*l.groups + j)*m*k;
+    for(i = 0; i < l.batch; ++i){// 批次
+        for(j = 0; j < l.groups; ++j){// 每组
+		//a的维度是l.n*（height_col * width_col）也就是m*k
+        //b是输入的featuremap维度是（channels*ksize*ksize）*（height_col*width_col）也就是n*k
+        //c是卷积核维度是（l.n）*（channels*ksize*ksize）也就是m*n
+        //因此c = a*（b'）
+            float *a = l.delta + (i*l.groups + j)*m*k;//表示反向传播回来的值，现在是要通过卷积层
             float *b = net.workspace;
             float *c = l.weight_updates + j*l.nweights/l.groups;
 
             float *im = net.input+(i*l.groups + j)*l.c/l.groups*l.h*l.w;
-
+            
+			
             im2col_cpu(im, l.c/l.groups, l.h, l.w, 
                     l.size, l.stride, l.pad, b);
-            gemm(0,1,m,n,k,1,a,k,b,k,1,c,n);
+            gemm(0,1,m,n,k,1,a,k,b,k,1,c,n);//这个函数返回卷积核的梯度
 
             if(net.delta){
                 a = l.weights + j*l.nweights/l.groups;
                 b = l.delta + (i*l.groups + j)*m*k;
-                c = net.workspace;
-
+                c = net.workspace;//专门存储image转化成col 矩阵 的指针
+                //计算返回到前面一层的误差，返回的大小跟输入进去的大小是一致的。
                 gemm(1,0,n,k,m,1,a,n,b,k,0,c,k);
-
+        
                 col2im_cpu(net.workspace, l.c/l.groups, l.h, l.w, l.size, l.stride, 
                     l.pad, net.delta + (i*l.groups + j)*l.c/l.groups*l.h*l.w);
             }
@@ -625,4 +636,3 @@ image *visualize_convolutional_layer(convolutional_layer l, char *window, image 
     free_image(dc);
     return single_weights;
 }
-
