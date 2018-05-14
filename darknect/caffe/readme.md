@@ -403,6 +403,51 @@
            o_w = (o_w + 2×padw − k_w)/ s_w + 1,
       一般填充数量都会等于 (kernel - 1)/2
       所以输出尺寸基本上 等于 原尺寸/步长
+### 2.4.3 局部响应归一化层 LRN(Local Response Normalization)
+      类型：LRN
+
+      可选参数：
+      local_size [default 5]：
+            对于cross channel LRN为 需要求和的  邻近channel的数量；
+            对于within channel LRN为 需要求和的 空间区域的边长；
+
+      alpha [default 1]： scaling参数,缩放比例；
+      beta [default 5]：  指数β；
+      norm_region [default ACROSS_CHANNELS]: 
+             选择LRN实现的方法：
+                1. ACROSS_CHANNELS ；
+                2. WITHIN_CHANNEL
+      计算公式：
+      对每一个输入除以 xi / (1 + (α/n)⋅ ∑ xi^2 )^β
+
+      在这里，参数α是scaling参数，参数β是指数。而参数 n 对应local_size 的大小。
+#### 解析：
+      一种提高准确度的技术方法。
+      跟激活函数是有区别的，LRN一般是在激活、池化后进行的一中处理方法。
+      类似的还有 BN层 批归一化。
+      是对一个局部的输入区域进行的归一化。
+      有两种不同的形式：
+      1. ACCROSS_CHANNEL；
+      2. WITHIN_CHANNEL。
+      其实很好从字面上进行理解。
+
+      第一种方法综合了不同的channel(类似点卷积的左右)，
+          而在一个channel里面只取1*1（所以size是localsize×1×1）。
+      第二种方法中，
+          不在channel方向上扩展，只在单一channel上进行空间扩展（所以size是1×localsize×localsize）。
+     
 
 ## 2.5 损失层（Loss Layers）
+      深度学习是通过最小化 网络输出和目标的 误差Loss 来 驱动学习。
+      
+### 2.5.1 Softmax loss  softmax+Loss组成
+      Softmax Loss层应用于多标签分类。
+      对于输入，计算了multinomial logistic loss。
+      在概念上近似等于一个Softmax层加上一个multinomial logistic loss层。
+      但在梯度的计算上更加稳定。
 
+      ai = zi/sum(exp(zi))   softmax 指数 归一化
+      Loss = -log(aj)        指定类别 负对数 误差
+      对指定类别的 输出概率(归一化后为0~1之间) 做log
+      越接近1，越接近目标值，loss越趋近于0
+      在0~1之间 log为负数，所以在前面加了一个 符号
