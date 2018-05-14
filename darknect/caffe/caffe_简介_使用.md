@@ -558,23 +558,23 @@
       Flatten层是把一个输入的大小为n * c * h * w变成一个简单的向量，其大小为 n * (c*h*w) * 1 * 1。
 
 ### 2.6.4 变形层 Reshape
-类型：Reshape
+    类型：Reshape
 
-例子：
-layer {
-    name: "reshape"
-    type: "Reshape"
-    bottom: "input"
-    top: "output"
-    reshape_param {
-      shape {
-        dim: 0  # copy the dimension from below  直接从底层复制
-        dim: 2
-        dim: 3
-        dim: -1 # infer it from the other dimensions 从其他的数据里面推测这一维应该是多少。
+    例子：
+    layer {
+        name: "reshape"
+        type: "Reshape"
+        bottom: "input"
+        top: "output"
+        reshape_param {
+          shape {
+            dim: 0  # copy the dimension from below  直接从底层复制
+            dim: 2
+            dim: 3
+            dim: -1 # infer it from the other dimensions 从其他的数据里面推测这一维应该是多少。
+          }
+        }
       }
-    }
-  }
 #### 2.6.4.1 说明  
       输入：单独的一个blob，可以是任意维；
 
@@ -594,19 +594,20 @@ layer {
       -1 从其他的数据里面推测这一维应该是多少。
 
 ### 2.6.5 链接层 Concatenation 通道扩展链接
-类型：Concat
+    类型：Concat
 
-例子：
-layer {
-  name: "concat"
-  bottom: "in1"
-  bottom: "in2"
-  top: "out"
-  type: "Concat"
-  concat_param {
-    axis: 1
-  }
-}
+    例子：
+    layer {
+      name: "concat"
+      bottom: "in1"
+      bottom: "in2"
+      top: "out"
+      type: "Concat"
+      concat_param {
+        axis: 1
+      }
+    }
+    
 ####  2.6.5.1 说明
       可选参数：
       ·axis [default 1]：0代表链接num，1代表链接channels
