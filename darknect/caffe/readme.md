@@ -311,4 +311,61 @@
       }
 
 ## 2.4 视觉层（vision_layers）
+### 2.4.1 卷积层(Convolution)
+
+      类型：CONVOLUTION 
+      例子：
+      layers { 
+          name: "conv1"             # 名字
+          type: CONVOLUTION         # 卷积层类型
+          bottom: "data"            # 输入层
+          top: "conv1"              # 输出层
+          blobs_lr: 1               # 权重卷积核参数更新学习率 learning rate multiplier for the filters 
+          blobs_lr: 2               # 偏置参数更新学习率 learning rate multiplier for the biases 
+          weight_decay: 1           # 权重卷积核参数更新 衰减系数 weight decay multiplier for the filters 
+          weight_decay: 0           # 偏置参数更新 衰减系数 weight decay multiplier for the biases 
+          convolution_param { 
+              num_output: 96        # 卷积核数量，即输出通道数量 learn 96 filters     必选
+              kernel_size: 11       # 卷积核尺寸 11*11 each filter is 11x11         必选
+              stride: 4             # 卷积步长，输出特征图尺寸，尺寸变为 1/4 step 4 pixels between each filter application 
+              weight_filler {       # 权重初始化设置
+                  type: "gaussian"  # 高斯分布初始化卷积核参数 initialize the filters from a Gaussian 
+                  std: 0.01         # 标准差0.01，默认均值0 distribution with stdev 0.01 (default mean: 0) } 
+                  bias_filler {     # 偏置初始化设置
+                      type: "constant" # 常量 initialize the biases to zero (0) 
+                      value: 0         # 0
+                   } 
+              }
+          }
+      }
+
+#### 2.4.1.1 可选参数：
+      bias_filler：             偏置的初始化方法
+      bias_term [default true]：指定是否是否开启偏置项  y = w*x + b  或则  y = w*x
+      pad (or pad_h and pad_w) [default 0]：         指定在输入图的每一边加上多少个像素 一般为 卷积核尺寸-1的一半
+      stride (or stride_h and stride_w) [default 1]：指定滤波器的步长
+      group (g) [default 1]: 如果g>1，那么将每个滤波器都限定只与某个输入的子集有关联。
+                             换句话说，将输入分为g组，同时将输出也分为g组。
+                             那么第i组输出只与第i组输入有关。  之后再经过点卷积 或者通道重排 结合不同通道信息
+
+#### 2.4.1.2通过卷积后的大小变化：
+      输入：
+           [n,i_w,i_h,W]
+           特征图大小 i_w,i_h
+           通道数量 W
+           个数 n
+      卷积核尺寸:
+       [k_w,k_h,W] × V
+           卷积核尺寸 [k_w,k_h,W]
+           个数       V
+      输出：
+      [n,o_w,o_h,V]
+           特征图大小 o_w,o_h
+           通道数量 V
+           个数 n
+      其中：
+           o_h = (i_h + 2×padh − kernelh)/ strideh + 1,
+           o_w = (o_w + 2×padw − kernelw)/ stridew + 1,
+      一般填充数量都会等于 (kernel - 1)/2
+      所以卷积核输出的特征图尺寸一般不会变换，变化的是 通道数量
 
