@@ -371,29 +371,29 @@
       如果有步长，则，等于 原尺寸/步长
       
 #### 2.4.1.3in examples\mnist\lenet_train_test.prototxt   
-layer {  
-  name: "conv1"       // 层的名字  
-  type: "Convolution" // 层的类型，说明具体执行哪一种计算  
-  bottom: "data" // 层的输入数据Blob的名字  
-  top: "conv1"   // 层的输出数据Blob的名字  
-  param {        // 层的权值和偏置相关参数  
-    lr_mult: 1   // 权重学习率
-  }   
-  param {  
-    lr_mult: 2   // 偏置学习率
-  }  
-  convolution_param { // 卷积层卷积运算相关的参数  
-    num_output: 20    // 输出通道数量 卷积核个数
-    kernel_size: 5    // 5*5卷积核尺寸
-    stride: 1         // 步长为1 特征图尺寸不变 有填充
-    weight_filler {   // 权重 初始化
-      type: "xavier"  
-    }  
-    bias_filler {     // 偏置初始化
-      type: "constant"
-    }  
-  }  
-}  
+      layer {  
+        name: "conv1"       // 层的名字  
+        type: "Convolution" // 层的类型，说明具体执行哪一种计算  
+        bottom: "data" // 层的输入数据Blob的名字  
+        top: "conv1"   // 层的输出数据Blob的名字  
+        param {        // 层的权值和偏置相关参数  
+          lr_mult: 1   // 权重学习率
+        }   
+        param {  
+          lr_mult: 2   // 偏置学习率
+        }  
+        convolution_param { // 卷积层卷积运算相关的参数  
+          num_output: 20    // 输出通道数量 卷积核个数
+          kernel_size: 5    // 5*5卷积核尺寸
+          stride: 1         // 步长为1 特征图尺寸不变 有填充
+          weight_filler {   // 权重 初始化
+            type: "xavier"  
+          }  
+          bias_filler {     // 偏置初始化
+            type: "constant"
+          }  
+        }  
+      }  
       
 ### 2.4.2 池化层（Pooling）
       类型：POOLING
@@ -586,23 +586,23 @@ layer {
       Flatten层是把一个输入的大小为n * c * h * w变成一个简单的向量，其大小为 n * (c*h*w) * 1 * 1。
 
 ### 2.6.4 变形层 Reshape
-类型：Reshape
+      类型：Reshape
 
-例子：
-layer {
-    name: "reshape"
-    type: "Reshape"
-    bottom: "input"
-    top: "output"
-    reshape_param {
-      shape {
-        dim: 0  # copy the dimension from below  直接从底层复制
-        dim: 2
-        dim: 3
-        dim: -1 # infer it from the other dimensions 从其他的数据里面推测这一维应该是多少。
-      }
-    }
-  }
+      例子：
+      layer {
+          name: "reshape"
+          type: "Reshape"
+          bottom: "input"
+          top: "output"
+          reshape_param {
+            shape {
+              dim: 0  # copy the dimension from below  直接从底层复制
+              dim: 2
+              dim: 3
+              dim: -1 # infer it from the other dimensions 从其他的数据里面推测这一维应该是多少。
+            }
+          }
+        }
 #### 2.6.4.1 说明  
       输入：单独的一个blob，可以是任意维；
 
@@ -622,19 +622,19 @@ layer {
       -1 从其他的数据里面推测这一维应该是多少。
 
 ### 2.6.5 链接层 Concatenation 通道扩展链接
-类型：Concat
+      类型：Concat
 
-例子：
-layer {
-  name: "concat"
-  bottom: "in1"
-  bottom: "in2"
-  top: "out"
-  type: "Concat"
-  concat_param {
-    axis: 1
-  }
-}
+      例子：
+      layer {
+        name: "concat"
+        bottom: "in1"
+        bottom: "in2"
+        top: "out"
+        type: "Concat"
+        concat_param {
+          axis: 1
+        }
+      }
 ####  2.6.5.1 说明
       可选参数：
       ·axis [default 1]：0代表链接num，1代表链接channels
