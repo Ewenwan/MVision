@@ -33,3 +33,9 @@
 ![](https://img-blog.csdn.net/20160327122151958?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
 
 [caffe 模型配置文件 prototxt 详解](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_%E7%AE%80%E4%BB%8B_%E4%BD%BF%E7%94%A8.md)
+
+[caffe 版本 yolo 过程记录](https://blog.csdn.net/u012235274/article/details/52120152)
+
+[caffe-yolo 训练](https://blog.csdn.net/u012235274/article/details/52399425)
+
+[YOLO算法的Caffe实现](https://blog.csdn.net/u014380165/article/details/72553074)
