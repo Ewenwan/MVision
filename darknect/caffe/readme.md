@@ -681,8 +681,35 @@ layer {
 
 ### 2.6.10 Mean-Variance Normalization
 
+## 3  以上为层初始化  还有 数据前向传播 以及 误差反向传播
+      每种类型的layer需要定义三种关键操作LayerSetUp, Forward, Backward：
 
+      LayerSetUp: 网络构建时初始化层和层的连接
+      Forward:    网络数据前向传递，给定bottom输入数据，计算输出到top
+      Backward：  网络误差反向传递，给定top的梯度，计算bottom的梯度并存储到bottom blob
 
+      Layer的设计主要就是SetUp、Forward、Backward函数（层一开始的时候的设置、然后就是前传和反传）
 
+      这其中的SetUp的实现又依赖于CheckBlobCounts、LayerSetUp、Reshape等的实现。
+                 这其中Reshape又是必须要实现的，因为它是纯虚函数
+      这其中的Forward中又依赖于Forward_cpu、Forward_gpu，
+                 这其中Forward_cpu又是必须要实现的。
+      这其中的Backward中又依赖于Backward_cpu、Backward_gpu，
+                 这其中Backward_cpu 又是必须要实现的。
 
+      首先layer必须要实现一个forward function，前递函数当然功能可以自己定义啦，
+      在forward中呢他会从input也就是Layer的bottom，
+      对了caffe里面网络的前一层是叫bottom的，从bottom中获取blob，并且计算输出的Blob，
+      前向传播：
+           al+1 = 激活函数(W * al + bl+1)
+           a为神经元激活后的输出
+      当然他们也会实现一个反向传播backward function，
+      根据他们的input的blob以及output blob的 error gradient 梯度误差 计算得到该层的梯度误差。
+
+      反向传播：
+             gl = 激活函数导数(zl) * W 转置 * gl+1
+             g为 损失函数对z的偏导数
+             z = W*a + b
+
+[可参考台大反向传播视频](http://speech.ee.ntu.edu.tw/~tlkagk/courses/MLDS_2015_2/Lecture/DNN%20backprop.ecm.mp4/index.html)
 
