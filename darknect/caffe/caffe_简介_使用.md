@@ -772,7 +772,7 @@
       const vector<Blob<Dtype>*>& top) = 0;
 
     //=====================================【5】==========================================
-    //////////////前向传播函数 Forward 
+    //////////////前向传播函数 Forward    非虚函数 实际回调用虚函数  forward_cpu或者forward_gpu，
     // 首先是Forward.这其实是一个装饰器，
     // 继承之后在调用的调用其相应的forward_cpu或者forward_gpu，
     // 根据输入的input data blob计算相应的output data blob，
@@ -791,9 +791,293 @@
       const vector<bool>& propagate_down,                 // 更新标志
       const vector<Blob<Dtype>* >& bottom);               // 输出是 bottom blobs
 
-    //=====================================【6】========================================== 
-    // 返回可学习的参数
+    //=====================================【6】==========================================
+
+    // 返回数据===========================
     vector<shared_ptr<Blob<Dtype> > >& blobs() {  
     return blobs_;//返回vector  blobs_  
     }       
-    
+
+    //返回layer parameter  ===============
+    const LayerParameter& layer_param() const { return layer_param_; }  
+
+    //将layer plarameter 写入模型配置文件 protobuf ============= 
+    virtual void ToProto(LayerParameter* param, bool write_diff = false);  
+
+    //返回 一个blob top 在给定 index 的 loss ============
+    inline Dtype loss(const int top_index) const {  
+    return (loss_.size() > top_index) ? loss_[top_index] : Dtype(0);  
+    }  
+
+    // 设置一个blob top 在给定 index 的 loss============= 
+    inline void set_loss(const int top_index, const Dtype value) {  
+    if (loss_.size() <= top_index) {  
+      loss_.resize(top_index + 1, Dtype(0));  
+    }  
+    loss_[top_index] = value;  
+    } 
+
+    // 虚函数，而且还是内联的，返回层类型 ================= 
+    virtual inline const char* type() const { return ""; } 
+    // 虚函数，获得bottom blob的精确个数 ==================   
+    virtual inline int ExactNumBottomBlobs() const { return -1; }    
+    // 虚函数，获得bottom blob的最小个数 ================   
+    virtual inline int MinBottomBlobs() const { return -1; }    
+
+    // 虚函数，获得bottom blob的最大个数 ============ 
+    virtual inline int MaxBottomBlobs() const { return -1; }    
+
+    // 虚函数，获得top blob的精确个数   =================== 
+    virtual inline int ExactNumTopBlobs() const { return -1; }    
+
+    // 虚函数，获得top blob的最小个数  ================  
+    virtual inline int MinTopBlobs() const { return -1; }    
+
+    // 虚函数，获得top blob的最大个数    ====================
+    virtual inline int MaxTopBlobs() const { return -1; }    
+
+    // 虚函数，bottom blob和top blob的个数是否一致 ========================   
+    virtual inline bool EqualNumBottomTopBlobs() const { return false; }
+
+    // 返回当前层是否自动创建匿名top blobs =====================   
+    // 如果返回true，表明网络初始化的时候创建了了足够多的匿名top blobs    
+    // 来满足ExactNumTopBlobs或者MinTopBlobs所要求的top blobs的个数    
+    virtual inline bool AutoTopBlobs() const { return false; }  
+
+    // AllowforceBackward用来设置是否强制梯度返回================
+    // 因为有些层其实不需要梯度信息 ，后面两个函数分别查看以及设置是是否需要计算梯度。 
+    // 对于一个给定的bottom blob，返回是否允许强制反传    
+    virtual inline bool AllowForceBackward(const int bottom_index) const {    
+    return true;    
+    }
+
+    // 设置  哪些 bottom 需要反向传播========
+    inline bool param_propagate_down(const int param_id) {  
+    return (param_propagate_down_.size() > param_id) ?  
+        param_propagate_down_[param_id] : false;  
+    }  
+    inline void set_param_propagate_down(const int param_id, const bool value) {  
+    if (param_propagate_down_.size() <= param_id) {  
+      param_propagate_down_.resize(param_id + 1, true);  
+    }  
+    param_propagate_down_[param_id] = value;  
+    } 
+    #ifdef USE_MPI  
+    // 多线程  并行 配置
+    inline virtual bool is_gathering() {return false;}
+    inline virtual bool is_scattering() {return false;}  
+    inline bool need_sync(){return need_sync_;}  
+    inline void set_need_sync(bool val){need_sync_ = val;}  
+    #endif
+
+    protected:  
+    //The protobuf that stores the layer parameters
+    // 层说明参数，从protocal buffers格式的网络结构说明文件中读取  
+    LayerParameter layer_param_;  
+    // The phase: TRAIN or TEST 
+    // 层状态，参与网络的训练还是测试  
+    Phase phase_;  
+    // The vector that stores the learnable parameters as a set of blobs.
+    // 层权值和偏置参数，使用向量是因为权值参数和偏置是分开保存在两个blob中的  
+    vector<shared_ptr<Blob<Dtype> > > blobs_;  
+    // Vector indicating whether to compute the diff of each param blob 
+    // 标志每个top blob是否需要计算反向传递的梯度值 
+    // 参数是否需要更新
+    vector<bool> param_propagate_down_;
+
+    // 非LossLayer为零，LossLayer中表示每个top blob计算的loss的权重  
+    vector<Dtype> loss_;  
+
+    #ifdef USE_MPI  
+    bool need_sync_;  // 并行
+    #endif
+
+    //=====================================【7】==========================================  
+    ///////前向传播函数 Forward 这个非虚函数，它们内部会调用如下虚函数完成数据前向传
+    // 前向传播 CPU版本
+    virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,  
+      const vector<Blob<Dtype>*>& top) = 0;  
+    // 前向传播 GPU版本
+    virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,  
+      const vector<Blob<Dtype>*>& top) {  
+    // LOG(WARNING) << "Using CPU code as backup.";  
+    return Forward_cpu(bottom, top);  
+    } 
+    //=====================================【8】==========================================  
+    //////反向传播函数Backward 这个非虚函数，它们内部会调用如下虚函数完成 误差反向传播
+    // 误差反向传播，根据执行环境的不同每个子类Layer必须重写CPU和GPU版本
+    // CPU版本
+    virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,  // 输入误差 top Blob
+      const vector<bool>& propagate_down,                     // 更新标志
+      const vector<Blob<Dtype>*>& bottom) = 0;                // 输出 bottom Blob
+    // GPU版本
+    virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,  
+      const vector<bool>& propagate_down,  
+      const vector<Blob<Dtype>*>& bottom) {  
+    // LOG(WARNING) << "Using CPU code as backup.";  
+    Backward_cpu(top, propagate_down, bottom);  
+    } 
+
+    //=====================================【9】========================================== 
+    //  1. 检查输入输出blob个数是否满足要求，每个层能处理的输入输出数据不一样
+    virtual void CheckBlobCounts(const vector<Blob<Dtype>*>& bottom, // 输入层
+                               const vector<Blob<Dtype>*>& top) {  // 输出层
+    if (ExactNumBottomBlobs() >= 0) {   
+      CHECK_EQ(ExactNumBottomBlobs(), bottom.size())  
+          << type() << " Layer takes " << ExactNumBottomBlobs()  
+          << " bottom blob(s) as input.";  
+    }// 保证输入bottom 数量和要求的相同
+
+    if (MinBottomBlobs() >= 0) {  
+      CHECK_LE(MinBottomBlobs(), bottom.size())  
+          << type() << " Layer takes at least " << MinBottomBlobs()  
+          << " bottom blob(s) as input.";  
+    }//保证输入的bottom数量大于或等于 要求的最小数量  
+
+    if (MaxBottomBlobs() >= 0) {  
+      CHECK_GE(MaxBottomBlobs(), bottom.size())  
+          << type() << " Layer takes at most " << MaxBottomBlobs()  
+          << " bottom blob(s) as input.";  
+    }//保证输入的bottom数量小于或等于 要求的最大数量 
+
+    if (ExactNumTopBlobs() >= 0) {  
+      CHECK_EQ(ExactNumTopBlobs(), top.size())  
+          << type() << " Layer produces " << ExactNumTopBlobs()  
+          << " top blob(s) as output.";  
+    }// 保证输入top数量和要求的相同  
+
+    if (MinTopBlobs() >= 0) {  
+      CHECK_LE(MinTopBlobs(), top.size())  
+          << type() << " Layer produces at least " << MinTopBlobs()  
+          << " top blob(s) as output.";  
+    }//保证输入的top数量大于或等于 要求的最小数量  
+
+    if (MaxTopBlobs() >= 0) {  
+      CHECK_GE(MaxTopBlobs(), top.size())  
+          << type() << " Layer produces at most " << MaxTopBlobs()  
+          << " top blob(s) as output.";  
+    }//保证输入的top数量小于或等于 要求的最大数量 
+
+    if (EqualNumBottomTopBlobs()) {  
+      CHECK_EQ(bottom.size(), top.size())  
+          << type() << " Layer produces one top blob as output for each "  
+          << "bottom blob input.";  
+    }//保证输入的bottom数量 和 输出的top数量相同  
+    } 
+
+    //=====================================【10】==========================================
+    // 4. 为每个top blob设置损失权重乘子，非LossLayer 层的top blob其值为零
+    // SetLoss是非常重要的一个步骤，是被SetUp调用来初始化top bottom的weights，
+    // 并且存储非零的loss weights 在diff blob里面 
+    inline void SetLossWeights(const vector<Blob<Dtype>*>& top) {  
+    const int num_loss_weights = layer_param_.loss_weight_size();  
+    if (num_loss_weights) {  
+      CHECK_EQ(top.size(), num_loss_weights) << "loss_weight must be "  
+          "unspecified or specified once per top blob.";  
+      for (int top_id = 0; top_id < top.size(); ++top_id) {  
+        const Dtype loss_weight = layer_param_.loss_weight(top_id);  
+        if (loss_weight == Dtype(0)) { continue; }//如果为0不对loss进行操作  
+        this->set_loss(top_id, loss_weight);  
+        const int count = top[top_id]->count();  
+        Dtype* loss_multiplier = top[top_id]->mutable_cpu_diff();  
+        caffe_set(count, loss_weight, loss_multiplier);//将loss_multiplier设为loss_weight  
+      }   
+    }  
+    }    
+    DISABLE_COPY_AND_ASSIGN(Layer);  
+    };  // class Layer  
+
+    //=====================================【11】==========================================
+    // 网络前向传播 调用接口 逻辑函数========
+    // 传播调用对应的Forward_cpu或者Forward_gpu
+    // 而我们知道Forward_cpu是纯虚函数，必须要实例化，
+    // 而Forward_gpu是虚函数，如果不实现，就会调用 Forward_cpu函数了。
+    // 所以前传（你必须实现自己的Forward_cpu，实现Forward_gpu是可选的） 
+    template <typename Dtype>  
+    inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype>*>& bottom,// 输入 层 
+    const vector<Blob<Dtype>*>& top) {  // 输出 层
+    Dtype loss = 0;   
+    // 根据bottom设置top的形状    
+    Reshape(bottom, top);  // 申请 内存 
+    // 设置运行模式CPU or GPU    
+    switch (Caffe::mode()) {    
+      case Caffe::CPU:    
+          // 调用CPU的前传    
+        Forward_cpu(bottom, top);    
+          // 前传计算完之后计算损失（只有最后一层才进行计算，其余层都不用）    
+        for (int top_id = 0; top_id < top.size(); ++top_id) {    
+          if (!this->loss(top_id)) { continue; }    
+          const int count = top[top_id]->count();    
+            // 获取前传的数据    
+          const Dtype* data = top[top_id]->cpu_data();    
+            // 获取梯度（\frac{\partial Loss}{\partial net}）    
+          const Dtype* loss_weights = top[top_id]->cpu_diff();    
+            // data与loss_weight的点积，即得损失函数关于当前层权重的偏导了    
+        // \frac{\partial Loss}{\partial net} * \frac{\partial net}{\frac{W}}    
+        // = \frac{\partial Loss}{\partial W}    
+          loss += caffe_cpu_dot(count, data, loss_weights);// cpu 计算点积
+        }   
+        break;    
+      case Caffe::GPU:    
+        // GPU前传    
+        Forward_gpu(bottom, top);    
+       #ifndef CPU_ONLY    
+        // 同上，只不过这里用GPU来计算点积了    
+        for (int top_id = 0; top_id < top.size(); ++top_id) {    
+          if (!this->loss(top_id)) { continue; }    
+          const int count = top[top_id]->count();    
+          // 获取GPU上的数据    
+          const Dtype* data = top[top_id]->gpu_data();    
+          const Dtype* loss_weights = top[top_id]->gpu_diff();    
+          Dtype blob_loss = 0;    
+          caffe_gpu_dot(count, data, loss_weights, &blob_loss); // gpu 计算点积   
+          loss += blob_loss;    
+        }    
+       #endif    
+        break;  
+      default:  
+        LOG(FATAL) << "Unknown caffe mode.";  
+    }  
+    return loss;  
+    }  
+
+    //=====================================【12】==========================================
+    // 网络 反向传播 调用接口 逻辑函数========
+    template <typename Dtype>  
+    inline void Layer<Dtype>::Backward(const vector<Blob<Dtype>*>& top,  // 输入 误差 从后向前传播
+    const vector<bool>& propagate_down,   // 更新标志 
+    const vector<Blob<Dtype>*>& bottom) { // 误差输出
+    switch (Caffe::mode()) {   
+      case Caffe::CPU:  
+        Backward_cpu(top, propagate_down, bottom);  
+        //根据blob top 的error 梯度（diff）计算bottom 的 error 梯度。 propagate_down 是长度   
+        //和bottom 相同的vector ，用于控制是否需要对对应的bottom 元素传播梯度。具体layer具体定义。  
+        break;  
+      case Caffe::GPU:  
+        Backward_gpu(top, propagate_down, bottom);  
+        break;  
+      default:  
+        LOG(FATAL) << "Unknown caffe mode.";  
+    }  
+    } 
+
+    //=====================================【12】==========================================
+    //Layer的序列化函数,将layer的层说明参数layer_param_，层权值和偏置  
+    //参数blobs_复制到LayerParameter对象，便于写到磁盘，  
+    // Serialize LayerParameter to protocol buffer  
+    template <typename Dtype>  
+    void Layer<Dtype>::ToProto(LayerParameter* param, bool write_diff) {  
+    param->Clear();  
+    param->CopyFrom(layer_param_); // 复制层说明参数layer_param_  
+    param->clear_blobs();  
+    // 复制层权值和偏置参数blobs_  
+    for (int i = 0; i < blobs_.size(); ++i) {  
+    blobs_[i]->ToProto(param->add_blobs(), write_diff);  
+    }  
+    }  
+
+    }  // namespace caffe  
+
+    #endif  // CAFFE_LAYER_H_  
+
+
