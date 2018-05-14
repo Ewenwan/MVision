@@ -1,4 +1,6 @@
-    
+
+[ Caffe框架源码剖析](https://blog.csdn.net/tianrolin)   
+
 # 2. caffe 模型配置文件 prototxt 详解
 [博客参考](https://blog.csdn.net/maweifei/article/details/72848185?locationNum=15&fps=1)
 
