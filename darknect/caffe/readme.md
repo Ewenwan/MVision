@@ -351,21 +351,58 @@
 #### 2.4.1.2通过卷积后的大小变化：
       输入：
            [n,i_w,i_h,W]
-           特征图大小 i_w,i_h
-           通道数量 W
-           个数 n
-      卷积核尺寸:
-       [k_w,k_h,W] × V
-           卷积核尺寸 [k_w,k_h,W]
-           个数       V
-      输出：
-      [n,o_w,o_h,V]
-           特征图大小 o_w,o_h
+           特征图大小 i_w,i_h
+           通道数量 W
+           个数 n
+      卷积核尺寸:
+           [k_w,k_h,W] × V        步长 [s_h,s_w]
+           卷积核尺寸 [k_w,k_h,W]
+           个数       V
+      输出：
+           [n,o_w,o_h,V]
+           特征图大小 o_w,o_h
            通道数量 V
            个数 n
       其中：
-           o_h = (i_h + 2×padh − kernelh)/ strideh + 1,
-           o_w = (o_w + 2×padw − kernelw)/ stridew + 1,
-      一般填充数量都会等于 (kernel - 1)/2
-      所以卷积核输出的特征图尺寸一般不会变换，变化的是 通道数量
+           o_h = (i_h + 2×padh − kernelh)/ s_h + 1,
+           o_w = (o_w + 2×padw − kernelw)/ s_w + 1,
+      一般填充数量都会等于 (kernel - 1)/2
+      所以卷积核输出的特征图尺寸一般不会变换，变化的是 通道数量
+      如果有步长，则，等于 原尺寸/步长
+### 2.4.2 池化层（Pooling）
+      类型：POOLING
+
+      例子：
+      layers { 
+          name: "pool1"        # 名字
+          type: POOLING        # 池化层类型
+          bottom: "conv1"      # 输入层
+          top: "pool1"         # 输出层
+          pooling_param {      # 池化层 参数
+              pool: MAX        # 最大值池化MAX  均值池化MEAN 
+              kernel_size: 3   # 池化核大小 pool over a 3x3 region   必须要的参数
+              stride: 2        # 步长 降低分辨率 step two pixels (in the bottom blob) between pooling regions 
+          }
+      }
+
+#### 2.4.2.1 可选参数：
+      pool [default MAX]：pooling的方法，目前有MAX, AVE, 和STOCHASTIC三种方法
+      pad (or pad_h and pad_w) [default 0]：指定在输入的每一遍加上多少个像素
+      stride (or stride_h and stride_w) [default 1]：指定过滤器的步长
+
+#### 2.4.2.2 通过池化后的大小变化 
+      输入：
+           [n,i_w,i_h,W]
+
+      池化核尺寸:
+           [k_w,k_h]  数量 W  步长 [s_h,s_w]
+      输出：
+           [n,o_w,o_h,W]
+      其中：
+           o_h = (i_h + 2×padh − k_h)/ s_h + 1,
+           o_w = (o_w + 2×padw − k_w)/ s_w + 1,
+      一般填充数量都会等于 (kernel - 1)/2
+      所以输出尺寸基本上 等于 原尺寸/步长
+
+## 2.5 损失层（Loss Layers）
 
