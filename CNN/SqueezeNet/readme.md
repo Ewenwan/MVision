@@ -6,6 +6,8 @@
 
 [论文源码 caffe model](https://github.com/DeepScale/SqueezeNet)
 
+[ShuffleNet在Caffe框架下的实现](https://blog.csdn.net/Chris_zhangrx/article/details/78277957)
+
 [PyTorch实现的SqeezeNet](https://github.com/pytorch/vision/blob/master/torchvision/models/squeezenet.py)
 
 # SqueezeNet的工作为以下几个方面：
