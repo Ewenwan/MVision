@@ -1,4 +1,4 @@
-// 添加中文显示 
+// 图像函数
 #include "image.h"
 #include "utils.h"
 #include "blas.h"
@@ -11,7 +11,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-// 添加
+// 添加======================================
 #ifdef OPENCV
 #define CHINESE//中文字体
 #endif
@@ -21,11 +21,11 @@ int windows = 0;
 float colors[6][3] = { {1,0,1}, {0,0,1},{0,1,1},{0,1,0},{1,1,0},{1,0,0} };
 
 float get_color(int c, int x, int max)
-{
+{//这个函数是为了实现颜色的获取，使用的地方是在 draw_detections 中
     float ratio = ((float)x/max)*5;
-    int i = floor(ratio);
-    int j = ceil(ratio);
-    ratio -= i;
+    int i = floor(ratio);// 向下取整
+    int j = ceil(ratio); // 向上取整
+    ratio -= i;// 小数部分
     float r = (1-ratio) * colors[i][c] + ratio*colors[j][c];
     //printf("%f\n", r);
     return r;
@@ -134,7 +134,7 @@ image tile_images(image a, image b, int dx)
     composite_image(b, c, a.w + dx, 0);
     return c;
 }
-
+// 英文标签
 image get_label(image **characters, char *string, int size)
 {
     size = size/10;
@@ -153,6 +153,7 @@ image get_label(image **characters, char *string, int size)
 }
 // ==========添加=========================
 #ifdef CHINESE
+// 中文标签
 // 图片名       类id   图片大小
 image get_label_cn(image **characters, int class, int size)
 {
@@ -189,11 +190,12 @@ void draw_label(image a, int r, int c, image label, const float *rgb)
         }
     }
 }
-
+// 画边框 
 void draw_box(image a, int x1, int y1, int x2, int y2, float r, float g, float b)
 {
     //normalize_image(a);
     int i;
+	//下面的操作是进行框边界的界定
     if(x1 < 0) x1 = 0;
     if(x1 >= a.w) x1 = a.w-1;
     if(x2 < 0) x2 = 0;
@@ -203,7 +205,7 @@ void draw_box(image a, int x1, int y1, int x2, int y2, float r, float g, float b
     if(y1 >= a.h) y1 = a.h-1;
     if(y2 < 0) y2 = 0;
     if(y2 >= a.h) y2 = a.h-1;
-
+    //画的是上下两条线
     for(i = x1; i <= x2; ++i){
         a.data[i + y1*a.w + 0*a.w*a.h] = r;
         a.data[i + y2*a.w + 0*a.w*a.h] = r;
@@ -214,6 +216,7 @@ void draw_box(image a, int x1, int y1, int x2, int y2, float r, float g, float b
         a.data[i + y1*a.w + 2*a.w*a.h] = b;
         a.data[i + y2*a.w + 2*a.w*a.h] = b;
     }
+	//画的是左右两条线 
     for(i = y1; i <= y2; ++i){
         a.data[x1 + i*a.w + 0*a.w*a.h] = r;
         a.data[x2 + i*a.w + 0*a.w*a.h] = r;
@@ -227,7 +230,7 @@ void draw_box(image a, int x1, int y1, int x2, int y2, float r, float g, float b
 }
 
 void draw_box_width(image a, int x1, int y1, int x2, int y2, int w, float r, float g, float b)
-{
+{//这个函数是实现画宽度为w的矩形框，这个宽度是往里面画，不是往外画
     int i;
     for(i = 0; i < w; ++i){
         draw_box(a, x1+i, y1+i, x2-i, y2-i, r, g, b);
@@ -235,14 +238,14 @@ void draw_box_width(image a, int x1, int y1, int x2, int y2, int w, float r, flo
 }
 
 void draw_bbox(image a, box bbox, int w, float r, float g, float b)
-{
+{//画box需要知道左上角的点和右下角的点
     int left  = (bbox.x-bbox.w/2)*a.w;
     int right = (bbox.x+bbox.w/2)*a.w;
     int top   = (bbox.y-bbox.h/2)*a.h;
     int bot   = (bbox.y+bbox.h/2)*a.h;
 
     int i;
-    for(i = 0; i < w; ++i){
+    for(i = 0; i < w; ++i){//这个是实现画宽度为w的框
         draw_box(a, left+i, top+i, right-i, bot-i, r, g, b);
     }
 }
@@ -257,18 +260,18 @@ image **load_alphabet()
         alphabets[j] = calloc(128, sizeof(image));
 /////////////////////////////////////
 		#ifdef CHINESE
-			for(i = 0; i < 80; i++)
-			{
-			   char buff[256];
-			   sprintf(buff, "data/labels/cn_%d_%d.png", i, j);
-			   alphabets[j][i] = load_image_color(buff, 0, 0);
-			}
+			   for(i = 0; i < 80; i++)//80类
+			   {
+				   char buff[256];
+				   sprintf(buff, "data/labels/cn_%d_%d.png", i, j);
+				   alphabets[j][i] = load_image_color(buff, 0, 0);
+			   }
 		#else		
-			for(i = 32; i < 127; ++i){
-			    char buff[256];
-			    sprintf(buff, "data/labels/%d_%d.png", i, j);
-			    alphabets[j][i] = load_image_color(buff, 0, 0);
-			}
+        for(i = 32; i < 127; ++i){
+            char buff[256];
+            sprintf(buff, "data/labels/%d_%d.png", i, j);
+            alphabets[j][i] = load_image_color(buff, 0, 0);
+        }
 		#endif
 //////////////////////////////////////////////////////////
     }
@@ -277,7 +280,7 @@ image **load_alphabet()
 
 //////// ========== 改 ========/////////////////////////////////////
 void draw_detections(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes)
-{
+{//classes是类别数 
     int i,j;
 
     for(i = 0; i < num; ++i){
@@ -333,11 +336,11 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
             if (alphabet) {
                 //image label = get_label(alphabet, labelstr, (im.h*.03));
-		#ifdef CHINESE
-			image label = get_label_cn(alphabet, class, (im.h*.03));
-		#else
-			image label = get_label(alphabet, names[class], (im.h*.03));
-		#endif
+				#ifdef CHINESE
+					image label = get_label_cn(alphabet, class, (im.h*.03));
+				#else
+					image label = get_label(alphabet, names[class], (im.h*.03));
+				#endif
                 draw_label(im, top + width, left, label, rgb);
                 free_image(label);
             }
@@ -393,7 +396,7 @@ void rotate_image_cw(image im, int times)
 }
 
 void flip_image(image a)
-{
+{//这个函数实现的是image额翻转（翻转的是根据a.w中心来进行的）
     int i,j,k;
     for(k = 0; k < a.c; ++k){
         for(i = 0; i < a.h; ++i){
@@ -581,6 +584,7 @@ void rgbgr_image(image im)
 }
 
 #ifdef OPENCV
+// 显示结果图片
 void show_image_cv(image p, const char *name, IplImage *disp)
 {
     int x,y,k;
@@ -618,18 +622,19 @@ void show_image_cv(image p, const char *name, IplImage *disp)
 }
 #endif
 
+// 未 编译opencv 的话 检测的结果 保存为图片
 void show_image(image p, const char *name)
 {
 #ifdef OPENCV
     IplImage *disp = cvCreateImage(cvSize(p.w,p.h), IPL_DEPTH_8U, p.c);
     image copy = copy_image(p);
     constrain_image(copy);
-    show_image_cv(copy, name, disp);
+    show_image_cv(copy, name, disp);//显示结果图片
     free_image(copy);
     cvReleaseImage(&disp);
 #else
     fprintf(stderr, "Not compiled with OpenCV, saving to %s.png instead\n", name);
-    save_image(p, name);
+    save_image(p, name);//保持图片
 #endif
 }
 
@@ -714,7 +719,7 @@ int fill_image_from_stream(CvCapture *cap, image im)
     rgbgr_image(im);
     return 1;
 }
-
+// 保存 jpg图片
 void save_image_jpg(image p, const char *name)
 {
     image copy = copy_image(p);
@@ -738,7 +743,7 @@ void save_image_jpg(image p, const char *name)
     free_image(copy);
 }
 #endif
-
+// 保存 png图片
 void save_image_png(image im, const char *name)
 {
     char buff[256];
@@ -862,7 +867,7 @@ image rotate_crop_image(image im, float rad, float s, int w, int h, float dx, fl
     }
     return rot;
 }
-
+// 旋转图片
 image rotate_image(image im, float rad)
 {
     int x, y, c;
@@ -1108,6 +1113,7 @@ float three_way_min(float a, float b, float c)
     return (a < b) ? ( (a < c) ? a : c) : ( (b < c) ? b : c) ;
 }
 
+// yuv 转 rgb
 void yuv_to_rgb(image im)
 {
     assert(im.c == 3);
@@ -1131,6 +1137,7 @@ void yuv_to_rgb(image im)
     }
 }
 
+// rgb 转 yuv
 void rgb_to_yuv(image im)
 {
     assert(im.c == 3);
@@ -1154,6 +1161,7 @@ void rgb_to_yuv(image im)
     }
 }
 
+// rgb 转 hsv 
 // http://www.cs.rit.edu/~ncs/color/t_convert.html
 void rgb_to_hsv(image im)
 {
@@ -1191,7 +1199,7 @@ void rgb_to_hsv(image im)
         }
     }
 }
-
+// hsv 转到 rgb
 void hsv_to_rgb(image im)
 {
     assert(im.c == 3);
@@ -1233,6 +1241,7 @@ void hsv_to_rgb(image im)
     }
 }
 
+// 彩色图 到 灰度图 3通道
 void grayscale_image_3c(image im)
 {
     assert(im.c == 3);
@@ -1250,7 +1259,7 @@ void grayscale_image_3c(image im)
         }
     }
 }
-
+// 彩色图到 灰度图 单通道 
 image grayscale_image(image im)
 {
     assert(im.c == 3);
@@ -1329,6 +1338,7 @@ image binarize_image(image im)
     return c;
 }
 
+// 饱和度 图像预处理
 void saturate_image(image im, float sat)
 {
     rgb_to_hsv(im);
@@ -1336,7 +1346,7 @@ void saturate_image(image im, float sat)
     hsv_to_rgb(im);
     constrain_image(im);
 }
-
+// 色调 
 void hue_image(image im, float hue)
 {
     rgb_to_hsv(im);
@@ -1349,7 +1359,7 @@ void hue_image(image im, float hue)
     hsv_to_rgb(im);
     constrain_image(im);
 }
-
+// 曝光度
 void exposure_image(image im, float sat)
 {
     rgb_to_hsv(im);
@@ -1357,7 +1367,7 @@ void exposure_image(image im, float sat)
     hsv_to_rgb(im);
     constrain_image(im);
 }
-
+// 扭曲
 void distort_image(image im, float hue, float sat, float val)
 {
     rgb_to_hsv(im);
