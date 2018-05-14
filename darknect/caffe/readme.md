@@ -440,7 +440,10 @@
 ## 2.5 损失层（Loss Layers）
       深度学习是通过最小化 网络输出和目标的 误差Loss 来 驱动学习。
       
-### 2.5.1 Softmax loss  softmax+Loss组成
+### 2.5.1 指数归一化 对数误差 Softmax loss  softmax+Loss组成
+
+      类型: SoftmaxWithLoss
+      
       Softmax Loss层应用于多标签分类。
       对于输入，计算了multinomial logistic loss。
       在概念上近似等于一个Softmax层加上一个multinomial logistic loss层。
@@ -450,4 +453,210 @@
       Loss = -log(aj)        指定类别 负对数 误差
       对指定类别的 输出概率(归一化后为0~1之间) 做log
       越接近1，越接近目标值，loss越趋近于0
-      在0~1之间 log为负数，所以在前面加了一个 符号
+      在0~1之间 log为负数，所以在前面加了一个 符号
+      
+### 2.5.2 欧氏距离误差   EuclideanLoss
+      类型: EuclideanLoss
+      Euclidean loss层计算了两个输入之差的平方和
+      sum(zi-yi)^2
+      
+### 2.5.3 HINGE_LOSS    “最大间隔”分类误差  （max margin）
+      最著名的应用是作为SVM的目标函数。
+      其二分类情况下，公式如下： 
+          l(y) =  max( 0, 1 − t⋅y)
+      其中，y是预测值（-1到1之间），t为目标值（±1）。
+      其含义为，y的值在-1到1之间就可以了，并不鼓励|y|>1，
+      即并不鼓励分类器过度自信，让某个可以正确分类的样本距离分割线的距离超过1并不会有任何奖励。
+      
+      类型: HingeLoss
+
+      例子：
+
+      带有L1正则化项:
+      L1 Normlayers { 
+          name: "loss" 
+          type: HINGE_LOSS 
+          bottom: "pred" 
+          bottom: "label"
+      } 
+
+      带有L2正则化项:
+      L2 Normlayers { 
+          name: "loss" 
+          type: HINGE_LOSS 
+          bottom: "pred" 
+          bottom: "label" 
+          top: "loss" 
+          hinge_loss_param { 
+              norm: L2 
+          }
+      }
+      可选参数：
+            norm [default L1]: 选择L1或者L2范数
+
+      输入：
+            n×c×h×w Predictions   预测值
+            n×1×1×1 Labels        真实标签
+      输出
+            1×1×1×1 Computed Loss
+
+### 2.5.4 Sigmoid 交叉熵损失函数 
+      类型：SigmoidCrossEntropyLoss
+      sigmod 将输出 映射到 0~1之间： pi = 1/(1+exp(-zi))
+      交叉熵损失： 1/n * sum (yi*log(pi))
+
+### 2.5.5 信息增益损失函数（InformationGain Loss）
+      类型:InfogainLoss
+      这是在文本处理中用到的损失函数.
+
+
+### 2.5.6 Accuracy and Top-k
+      类型：Accuracy
+
+      用来计算输出和目标的正确率，事实上这不是一个loss，而且没有backward这一步。
+      
+## 2.6 一般层（Common Layers）
+
+### 2.6.1 全连接层 Inner Product    FC
+      类型：InnerProduct
+
+      例子：
+      layer {
+        name: "fc8"            # 名字
+        type: "InnerProduct"   # 类型
+        # 权重学习率、衰减 learning rate and decay multipliers for the weights
+        param { lr_mult: 1 decay_mult: 1 }
+        # 偏置学习率、衰减 learning rate and decay multipliers for the biases
+        param { lr_mult: 2 decay_mult: 0 }
+        inner_product_param {
+          num_output: 1000     # 输  出 数量
+          weight_filler {
+            type: "gaussian"   # 权重初始化
+            std: 0.01
+          }
+          bias_filler {        # 偏置初始化
+            type: "constant"
+            value: 0
+          }
+        }
+        bottom: "fc7"
+        top: "fc8"
+      }
+
+      通过全连接层后的大小变化：
+
+      输入：n×ci×hi×wi   其实需要先经过 flatten层摊平 1*N * N*m --> 1*m
+      输出：n×co×1×1
+
+### 2.6.2 分割层 Splitting
+
+      类型：Split
+      Splitting层可以把一个输入blob分离成多个输出blobs。
+      这个用在当需要把一个blob输入到多个输出层的时候。
+
+### 2.6.3 摊平层  Flattening
+      类型：Flatten
+
+      Flatten层是把一个输入的大小为n * c * h * w变成一个简单的向量，其大小为 n * (c*h*w) * 1 * 1。
+
+### 2.6.4 变形层 Reshape
+类型：Reshape
+
+例子：
+layer {
+    name: "reshape"
+    type: "Reshape"
+    bottom: "input"
+    top: "output"
+    reshape_param {
+      shape {
+        dim: 0  # copy the dimension from below  直接从底层复制
+        dim: 2
+        dim: 3
+        dim: -1 # infer it from the other dimensions 从其他的数据里面推测这一维应该是多少。
+      }
+    }
+  }
+#### 2.6.4.1 说明  
+      输入：单独的一个blob，可以是任意维；
+
+      输出：同样的blob，但是它的维度已经被我们人为地改变，维度的数据由reshap_param定义。
+
+      可选参数：
+            shape
+      Reshape层被用于改变输入的维度，而不改变输入的具体数据。
+      就像Flatten层一样。只是维度被改变而已，这个过程不涉及数据的拷贝。
+
+      输出的维度由ReshapeParam proto控制。
+      可以直接使用数字进行指定。设定输入的某一维到输出blob中去。
+      此外，还有两个数字值得说一下：
+
+      0 直接从底层复制。例如，如果是底层是一个2 在它的第一维，那么顶层在它的第一维也有一个2。
+
+      -1 从其他的数据里面推测这一维应该是多少。
+
+### 2.6.5 链接层 Concatenation 通道扩展链接
+类型：Concat
+
+例子：
+layer {
+  name: "concat"
+  bottom: "in1"
+  bottom: "in2"
+  top: "out"
+  type: "Concat"
+  concat_param {
+    axis: 1
+  }
+}
+####  2.6.5.1 说明
+      可选参数：
+      ·axis [default 1]：0代表链接num，1代表链接channels
+
+      通过全连接层后的大小变化：
+
+      输入：
+            从1到K的每一个blob的大小：ni×ci×h×w  ni个   ci为通道数量
+
+      输出：
+            如果axis = 0: (n1+n2+...+nK)×c1×h×w，需要保证所有输入的ci相同。
+
+            如果axis = 1: n1×(c1+c2+...+cK)×h×w，需要保证所有输入的n_i 相同。
+
+      通过Concatenation层，可以把多个的blobs链接成一个blob。
+
+### 2.6.6 Slicing
+      类型：Slice
+
+      例子：
+      layer {
+        name: "slicer_label"
+        type: "Slice"
+        bottom: "label"
+        ## Example of label with a shape N x 3 x 1 x 1
+        top: "label1"
+        top: "label2"
+        top: "label3"
+        slice_param {
+          axis: 1
+          slice_point: 1
+          slice_point: 2
+        }
+      }
+      Slice层可以将输入层变成多个输出层。
+      这些输出层沿一个给定的维度存在。
+      axis指定了目标的轴，slice_point则指定了选择维度的序号。
+
+### 2.6.7   Elementwise Operations
+
+### 2.6.8 Argmax
+
+### 2.6.9 Softmax
+
+### 2.6.10 Mean-Variance Normalization
+
+
+
+
+
+
