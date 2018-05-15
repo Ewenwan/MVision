@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python3
-
+# 蒙特卡洛定位    离散数据   多峰值数据
 # 1维 2维 贝叶斯滤波  
 # 均匀分布 先验值
-# 测量     后验
-# 移动     噪声
+# 测量     后验   product     使用贝叶斯乘法 ， 原来位置上的 置信度 乘上一个系数
+# 移动     噪声   convolution 卷积  ，         多个位置上的置信度 的加权和
+
+# 蒙特卡洛定位    离散数据   多峰值数据
+# 卡尔曼滤波 定位 连续状态   单峰值数据 
+# 粒子滤波定位    连续状态   多峰值数据 
+
 
 ##########################################################
 #### 1维 #####################################
@@ -24,6 +29,7 @@ def sense(p,Z):
    q=[]# 新建一个列表
    for i in range(len(p)):
        hit = (p[i] == Z)
+	   # 直接是乘法 product 对于原来位置上的 置信度 乘上一个系数
        q.append(p[i]*(pHit*hit + (1-hit) * pMis))
    sum1 = sum(q) #求和
    for i in range(len(q)): 
@@ -38,6 +44,8 @@ pUndershot = 0.1 #少走一格的概率
 def move(p,U):
    q = []
    for i in range(len(p))：
+       # 全概率公式 加权和 卷积操作 
+       # 多个位置上的置信度 的加权和	   
        s =  pExact * p[ (i-U)%len(p)]      # 按指定位置走过来的
        s += pOvershot  * p[(i-U-1)%len(p)] # 走过一步到这里的
        s += pUndershot * p[(i-U+1)%len(p)] # 少走一步到这里的
@@ -64,17 +72,18 @@ def localize(colors,measurements,motions,sensor_right,p_move):
     sensor_error = 1.0 - sensor_right# 检测错误概率
     p_still = 1.0 - p_move# 保持不动概率 
     
-    ###### 2维移动 全概率公式###################
+    ###### 2维移动  全概率公式 加权和 卷积操作  ###################
     def motion_2d(p,motion):
         aux = [[0.0 for row in range(len(p[0]))] for col in range(len(p))] # 移动后的概率分布
         for i in range(len(p)):# 每一行
             for j in range(len(p[i])):# 每一列
 			    # motion[0] 表示上下移动（跨行） motion[1] 表示左右移动（跨列）
 				# 由移动过来的 + 当前静止不动的
+				# 这里是 卷积操作  多个位置上的置信度 的加权和
                 aux[i][j] = p_move * p[(i-motion[0])%len(p)][(j-motion[1])%len(p[i])] + p_still * p[i][j]
         return aux
     
-    ###### 2维 感知 传感 检测 贝叶斯  乘法#####################
+    ###### 2维 感知 传感 检测 贝叶斯乘法 #####################
     def sense_2d(p,colors,measurement):
         aux = [[0.0 for row in range(len(p[0]))] for col in range(len(p))] # 初始化 概率矩阵
         s = 0.0#和
@@ -82,6 +91,7 @@ def localize(colors,measurements,motions,sensor_right,p_move):
         for i in range(len(p)):#每一行
             for j in range(len(p[i])):#每一列
                 hit = (measurement == colors[i][j]) # 检测
+				# 直接是乘法 product 对于原来位置上的 置信度 乘上一个系数
                 aux[i][j] = p[i][j] * (hit * sensor_right + (1-hit) * sensor_error)
                 s += aux[i][j]
         # 归一化
