@@ -295,3 +295,16 @@
     show(p) # displays your answer
     
 # 二、 卡尔曼滤波  定位 连续状态  单峰值数据 
+## 1.高斯分布
+    f(x) = 1/sqrt(2*pi*西格玛^2) * exp(-1/2 * (x-u)^2/西格玛^2)
+    u:     x的均值
+    西格玛: 标准差 x-u 偏离均值的程度
+    西格玛大，变量x偏离中心均值的程度大，高斯曲线 矮胖
+    西格玛小，变量x偏离中心均值的程度小，高斯曲线 瘦高
+    
+    from math import *
+    
+    def gs(mn, sigma2, x):
+        return 1.0/sqrt(2.0*pi*sigma2)* exp(-0.5 * (x-mn)**2 / sigma2)
+    
+    print gs(10, 4., 10)  中心最大值
