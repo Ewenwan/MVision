@@ -403,6 +403,17 @@
     其余反应 各个变量之间的相关关系, 
     就上面的二元高斯分布而言，
     协方差越大，图像越扁，
-    也就是说两个维度之间越有联系。
+    也就是说两个维度之间越有联系。
+## 6. 卡尔曼滤波
 
-
+        # 运动预测 prediction
+        x = (F * x) + u # 状态转移
+        P = F * P * F.transpose()# 状态协方差传递
+        
+        # 测量过程 后验 补偿 measurement update
+        Z = matrix([measurements[n]])# 测量值
+        y = Z.transpose() - (H * x)  # 误差
+        S = H * P * H.transpose() + R#
+        K = P * H.transpose() * S.inverse()# 卡尔曼增益
+        x = x + (K * y)# 状态值 补偿
+        P = (I - (K * H)) * P# 状态协方差矩阵更新
