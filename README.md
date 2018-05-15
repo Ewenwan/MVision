@@ -2,6 +2,8 @@
 
 [机器人选修课](http://www.diag.uniroma1.it/%7Elanari/EIR/)
 
+[优达学城 机器人人工智能课程](https://classroom.udacity.com/courses/cs373)
+
 [学习无人驾驶车，你所必须知道的](https://zhuanlan.zhihu.com/p/27686577)
 
 [强化学习从入门到放弃的资料](https://zhuanlan.zhihu.com/p/34918639?utm_source=wechat_session&utm_medium=social&wechatShare=1&from=singlemessage&isappinstalled=0)
