@@ -247,7 +247,6 @@
                     aux[i][j] =  aux[i][j] / s
             return aux
 
-
         # >>> Insert your code here <<<
         if len(measurements)!=len(motions):
             print 'error! the length of measurements mush equals to motions'
@@ -255,8 +254,6 @@
         for i in range(len(motions)):#每一次移动
             p=motion_2d(p,motions[i])
             p=sense_2d(p,colors,measurements[i])
-
-
         return p
 
     def show(p):
@@ -287,10 +284,7 @@
     # [-1,0] 上移动一位
 
     sensor_right = 0.7#传感器测量正确的概率
-
     p_move = 0.8# 移动指令正确执行的概率
-
-
     p = localize(colors,measurements,motions,sensor_right, p_move)
     show(p) # displays your answer
     
@@ -301,14 +295,14 @@
     西格玛: 标准差 x-u 偏离均值的程度
     西格玛大，变量x偏离中心均值的程度大，高斯曲线 矮胖
     西格玛小，变量x偏离中心均值的程度小，高斯曲线 瘦高
-    
-    from math import *
-    
+
+    # python 实现
+    from math import *
     def gs(mn, sigma2, x):
         return 1.0/sqrt(2.0*pi*sigma2)* exp(-0.5 * (x-mn)**2 / sigma2)
-    
-    print gs(10, 4., 10)  中心最大值
-## 2. 两个1维高斯分布的 混合分布
+
+    print gs(10, 4., 10)  中心最大值
+## 2. 两个1维高斯分布的 混合分布  测量过程  先验值是高斯分布  测量过程也是高斯 测量结果
     x ：(u, t^2)
     y : (v, r^2)
     z= x+y : (m, q^2 )
@@ -318,3 +312,30 @@
 
     可以看到 混合后的分布 的均值在 两个均值之间  min(u,v) < m < max(u,v)
     方差 比钱两个都小  q^2 < min(t^2 , r^2) 混合曲线 变得更瘦高
+
+    # python 实现
+    from math import *
+    def update(mean1,var1,mean2,var2):
+        new_mean = (mean1*var2 + mean2*var1)/(var1+var2)
+        new_var  = 1.0/(1.0/var1 + 1.0/var2)
+        return  [new_mean, new_var]
+    print update(10.,8.,13.,2.)
+
+## 3. 运动高斯叠加 先验值是高斯分布  运动过程也是高斯
+    x ：(u, t^2)
+    y : (v, r^2)
+    x -> 运动y ->  z : (v, p^2 )
+
+    v   = u + v
+    p^2 = t^2 + r^2
+
+    # python 实现
+    from math import *
+    def perdect(mean1,var1,mean2,var2):
+        def update(mean1,var1,mean2,var2):
+        new_mean = mean1 + mean2 
+        new_var  = var1  + var2
+        return  [new_mean, new_var]
+    print update(10.,8.,13.,2.)
+
+    
