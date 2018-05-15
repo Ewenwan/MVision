@@ -371,18 +371,18 @@
     协方差矩阵   P = [n, n] n*n的矩阵 
     二维高斯分布 类似山峰
 ###  5.1 一维高斯分布
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/34.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/34.png)
 
 > 均值u, 标准差 西格玛，方差 西格玛平方
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/31.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/31.png)
 
     均值u 决定了 曲线在 坐标轴上的位置, 方差 决定了曲线的形状，
     方差越大，数据间差异越大，分布越广泛，曲线矮胖，
     反之，数据集中分布，曲线瘦高。
 
 ### 5.2 多维高斯分布
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/35.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/35.png)
 
 > 均值u 为n * 1的向量，n为维度数, 一维的方差 变成了多维度向量之间的协方差矩阵,
 
@@ -390,11 +390,11 @@
     多维时 x-u 为矩阵形式(其实为向量)，一维时直接平方即可，
     多维时，需要 矩阵转置 * 矩阵。
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/32.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/32.png)
 
 > 对应的协方差矩阵如下：
 
-![](https://github.com/Ewenwan/Mathematics/tree/master/pic/33.png)
+![](https://github.com/Ewenwan/Mathematics/blob/master/pic/33.png)
 
     协方差矩阵的主对角线，是各个变量本身的 方差，
     其余反应 各个变量之间的相关关系, 
