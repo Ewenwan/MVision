@@ -338,4 +338,31 @@
         return  [new_mean, new_var]
     print update(10.,8.,13.,2.)
 
-    
+## 4. 高斯分布 先验值  高斯分布分量过程  高斯分布运动过程
+
+    from math import *
+    # 测量过程  两个 高地分布叠加
+    def update(mean1,var1,mean2,var2):
+        new_mean = (mean1*var2 + mean2*var1)/(var1+var2)
+        new_var  = 1.0/(1.0/var1 + 1.0/var2)
+        return  [new_mean, new_var]
+    # 运动过程 两个高斯分布 简单线性 叠加
+    def perdect(mean1,var1,mean2,var2):
+        def update(mean1,var1,mean2,var2):
+        new_mean = mean1 + mean2 
+        new_var  = var1  + var2
+        return  [new_mean, new_var]
+    # 数据
+    measurements = [5., 6., 7., 9., 10.] # 测量过程 均值
+    motion = [1., 1., 2., 1., 1.]        # 运动过程 均值
+    measurement_sig = 4.                 # 测量过程 方差
+    motion_sig = 2.                      # 运动过程 方差
+    mu = 0.                              # 系统初始 
+    sig = 10000.                         # 系统初始方差
+
+    for i in range(len(measurements)):
+        [mu, sig] = update(mu, sig, measurements[i], measurement_sig)
+        # print 'update: ', [mu, sig]
+        [mu, sig] = predict(mu, sig, motion[i], motion_sig)
+        # print 'predict: ', [mu, sig]
+    print [mu, sig]
