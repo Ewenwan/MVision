@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # yolo的cfg文件 转成 caffe的prototxt文件，这是模型的配置文件，是描述模型的
 # detection layer 和  leaky 激活未支持
+# https://blog.csdn.net/u012235274/article/details/52120152 参考建立 leaky ReLU
 # 这里一些 学习率参数为加入
 # .proto和prototxt的区别：
 # 两个都是google protobuff的文件，proto用于定义结构体参数，.prototxt用于初始化proto中相应的结构体。
