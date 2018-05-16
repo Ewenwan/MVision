@@ -77,13 +77,14 @@ def darknet2caffe(cfgfile, weightfile, protofile, caffemodel):
     print('save caffemodel to %s' % caffemodel)
     net.save(caffemodel)
 
+# 载入卷积层 参数 
 def load_conv2caffe(buf, start, conv_param):
     weight = conv_param[0].data
     bias = conv_param[1].data
     conv_param[1].data[...] = np.reshape(buf[start:start+bias.size], bias.shape);   start = start + bias.size
     conv_param[0].data[...] = np.reshape(buf[start:start+weight.size], weight.shape); start = start + weight.size
     return start
-
+# 载入全连接层 参数
 def load_fc2caffe(buf, start, fc_param):
     weight = fc_param[0].data
     bias = fc_param[1].data
@@ -91,7 +92,7 @@ def load_fc2caffe(buf, start, fc_param):
     fc_param[0].data[...] = np.reshape(buf[start:start+weight.size], weight.shape); start = start + weight.size
     return start
 
-
+# 载入 卷积后的 BN 批归一化层 参数
 def load_conv_bn2caffe(buf, start, conv_param, bn_param, scale_param):
     conv_weight = conv_param[0].data
     running_mean = bn_param[0].data
@@ -107,6 +108,8 @@ def load_conv_bn2caffe(buf, start, conv_param, bn_param, scale_param):
     conv_param[0].data[...] = np.reshape(buf[start:start+conv_weight.size], conv_weight.shape); start = start + conv_weight.size
     return start
 
+
+# darknet cfg 转到 caffe prototxt
 def cfg2prototxt(cfgfile):
     blocks = parse_cfg(cfgfile)
 
@@ -116,6 +119,7 @@ def cfg2prototxt(cfgfile):
     layer_id = 1
     topnames = dict()
     for block in blocks:
+        # 数据层
         if block['type'] == 'net':
             props['name'] = 'Darkent2Caffe'
             props['input'] = 'data'
@@ -124,6 +128,7 @@ def cfg2prototxt(cfgfile):
             props['input_dim'].append(block['height'])
             props['input_dim'].append(block['width'])
             continue
+        # 卷积层
         elif block['type'] == 'convolutional':
             conv_layer = OrderedDict()
             conv_layer['bottom'] = bottom
@@ -147,7 +152,7 @@ def cfg2prototxt(cfgfile):
             conv_layer['convolution_param'] = convolution_param
             layers.append(conv_layer)
             bottom = conv_layer['top']
-
+            # BN
             if block['batch_normalize'] == '1':
                 bn_layer = OrderedDict()
                 bn_layer['bottom'] = bottom
@@ -174,7 +179,7 @@ def cfg2prototxt(cfgfile):
                 scale_param['bias_term'] = 'true'
                 scale_layer['scale_param'] = scale_param
                 layers.append(scale_layer)
-
+            # 激活
             if block['activation'] != 'linear':
                 relu_layer = OrderedDict()
                 relu_layer['bottom'] = bottom
@@ -191,6 +196,7 @@ def cfg2prototxt(cfgfile):
                 layers.append(relu_layer)
             topnames[layer_id] = bottom
             layer_id = layer_id+1
+        # max pool
         elif block['type'] == 'maxpool':
             max_layer = OrderedDict()
             max_layer['bottom'] = bottom
@@ -212,6 +218,7 @@ def cfg2prototxt(cfgfile):
             bottom = max_layer['top']
             topnames[layer_id] = bottom
             layer_id = layer_id+1
+        # 均值池化
         elif block['type'] == 'avgpool':
             avg_layer = OrderedDict()
             avg_layer['bottom'] = bottom
@@ -231,6 +238,7 @@ def cfg2prototxt(cfgfile):
             bottom = avg_layer['top']
             topnames[layer_id] = bottom
             layer_id = layer_id+1
+        # 预设框等 
         elif block['type'] == 'region':
             if True:
                 region_layer = OrderedDict()
@@ -251,11 +259,13 @@ def cfg2prototxt(cfgfile):
                 bottom = region_layer['top']
             topnames[layer_id] = bottom
             layer_id = layer_id + 1
+        # FP特征金字塔 远程连接层
         elif block['type'] == 'route':
             prev_layer_id = layer_id + int(block['layers'])
             bottom = topnames[prev_layer_id]
             topnames[layer_id] = bottom
             layer_id = layer_id + 1
+        # 
         elif block['type'] == 'shortcut':
             prev_layer_id1 = layer_id + int(block['from'])
             prev_layer_id2 = layer_id - 1
