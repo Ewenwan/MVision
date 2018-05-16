@@ -15,7 +15,7 @@ layer {
     num_output: 64
     kernel_size: 7
     stride: 2
-    pad: 1
+    pad: 3
     bias_term: false
   }
 }
@@ -42,6 +42,9 @@ layer {
   type: "ReLU"
   bottom: "scale1"
   top: "scale1"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "pool1"
@@ -90,6 +93,9 @@ layer {
   type: "ReLU"
   bottom: "scale2"
   top: "scale2"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "pool2"
@@ -111,7 +117,7 @@ layer {
     num_output: 128
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -138,6 +144,9 @@ layer {
   type: "ReLU"
   bottom: "scale3"
   top: "scale3"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv4"
@@ -175,6 +184,9 @@ layer {
   type: "ReLU"
   bottom: "scale4"
   top: "scale4"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv5"
@@ -185,7 +197,7 @@ layer {
     num_output: 256
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -212,6 +224,9 @@ layer {
   type: "ReLU"
   bottom: "scale5"
   top: "scale5"
+  relu_param{
+    negative_slope: 0.1
+  }
 }
 layer {
   name: "conv6"
@@ -249,6 +264,9 @@ layer {
   type: "ReLU"
   bottom: "scale6"
   top: "scale6"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "pool6"
@@ -270,7 +288,7 @@ layer {
     num_output: 256
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -297,6 +315,9 @@ layer {
   type: "ReLU"
   bottom: "scale7"
   top: "scale7"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv8"
@@ -334,6 +355,9 @@ layer {
   type: "ReLU"
   bottom: "scale8"
   top: "scale8"
+  relu_param{
+    negative_slope: 0.1
+  }  
 }
 layer {
   name: "conv9"
@@ -344,7 +368,7 @@ layer {
     num_output: 256
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -371,6 +395,9 @@ layer {
   type: "ReLU"
   bottom: "scale9"
   top: "scale9"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv10"
@@ -408,6 +435,9 @@ layer {
   type: "ReLU"
   bottom: "scale10"
   top: "scale10"
+  relu_param{
+    negative_slope: 0.1
+  }
 }
 layer {
   name: "conv11"
@@ -418,7 +448,7 @@ layer {
     num_output: 256
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -445,6 +475,9 @@ layer {
   type: "ReLU"
   bottom: "scale11"
   top: "scale11"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv12"
@@ -482,6 +515,9 @@ layer {
   type: "ReLU"
   bottom: "scale12"
   top: "scale12"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv13"
@@ -492,7 +528,7 @@ layer {
     num_output: 256
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -519,6 +555,9 @@ layer {
   type: "ReLU"
   bottom: "scale13"
   top: "scale13"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv14"
@@ -556,6 +595,9 @@ layer {
   type: "ReLU"
   bottom: "scale14"
   top: "scale14"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv15"
@@ -566,7 +608,7 @@ layer {
     num_output: 512
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -593,6 +635,9 @@ layer {
   type: "ReLU"
   bottom: "scale15"
   top: "scale15"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv16"
@@ -630,6 +675,9 @@ layer {
   type: "ReLU"
   bottom: "scale16"
   top: "scale16"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "pool16"
@@ -651,7 +699,7 @@ layer {
     num_output: 512
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -678,6 +726,9 @@ layer {
   type: "ReLU"
   bottom: "scale17"
   top: "scale17"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv18"
@@ -715,6 +766,9 @@ layer {
   type: "ReLU"
   bottom: "scale18"
   top: "scale18"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv19"
@@ -725,7 +779,7 @@ layer {
     num_output: 512
     kernel_size: 1
     stride: 1
-    pad: 1
+    pad: 0
     bias_term: false
   }
 }
@@ -752,6 +806,9 @@ layer {
   type: "ReLU"
   bottom: "scale19"
   top: "scale19"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv20"
@@ -789,6 +846,9 @@ layer {
   type: "ReLU"
   bottom: "scale20"
   top: "scale20"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv21"
@@ -826,6 +886,9 @@ layer {
   type: "ReLU"
   bottom: "scale21"
   top: "scale21"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv22"
@@ -863,6 +926,9 @@ layer {
   type: "ReLU"
   bottom: "scale22"
   top: "scale22"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv23"
@@ -900,6 +966,9 @@ layer {
   type: "ReLU"
   bottom: "scale23"
   top: "scale23"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "conv24"
@@ -937,6 +1006,9 @@ layer {
   type: "ReLU"
   bottom: "scale24"
   top: "scale24"
+  relu_param{
+    negative_slope: 0.1
+  } 
 }
 layer {
   name: "fc25"
@@ -944,8 +1016,17 @@ layer {
   bottom: "scale24"
   top: "fc25"
   inner_product_param {
-    num_output: 512
+    num_output: 4096
   }
+}
+layer {
+  name: "relu25"
+  type: "ReLU"
+  bottom: "fc25"
+  top: "fc25"
+  relu_param{
+    negative_slope: 0.1
+  }		
 }
 layer {
   name: "fc26"
@@ -953,15 +1034,6 @@ layer {
   bottom: "fc25"
   top: "fc26"
   inner_product_param {
-    num_output: 4096
-  }
-}
-layer {
-  name: "fc27"
-  type: "InnerProduct"
-  bottom: "fc26"
-  top: "fc27"
-  inner_product_param {
-    num_output: 1470
+    num_output: 1047
   }
 }
