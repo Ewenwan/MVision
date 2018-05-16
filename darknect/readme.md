@@ -4,6 +4,10 @@
   ## 0.项目主页
 [darknet yolov3](https://pjreddie.com/darknet/yolo/)
 
+[darknet yolov3 from scratch in PyTorch 详细](https://blog.paperspace.com/how-to-implement-a-yolo-object-detector-in-pytorch/)
+
+[yolov3 PyTorch github ](https://github.com/ayooshkathuria/YOLO_v3_tutorial_from_scratch)
+
 [darknet yolov2](https://pjreddie.com/darknet/yolov2/)
 
 [darknet yolov1](https://pjreddie.com/darknet/yolov1/)
