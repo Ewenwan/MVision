@@ -1,5 +1,7 @@
 #-*- coding:utf-8 -*-
 # darknet cfg & weights 转换到 caffe prototxt & caffemodel
+# 用法 
+# python darknet2caffe.py tiny-yolo-voc.cfg tiny-yolo-voc.weights tiny-yolo-voc.prototxt tiny-yolo-voc.caffemodel
 import sys
 # caffe 源码下 python
 sys.path.append('/data/xiaohang/caffe/python')
