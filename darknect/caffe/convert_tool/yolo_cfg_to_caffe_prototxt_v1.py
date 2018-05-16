@@ -10,6 +10,15 @@ import argparse # 命令行参数解析
 import logging  # 运行日志
 import os
 import sys
+'''
+(known types: AbsVal, Accuracy, ArgMax, BNLL, BatchNorm, BatchReindex
+ntrastiveLoss, Convolution, Crop, Data, Deconvolution, Dropout, DummyData, 
+ELU, Eltwise, Embed, EuclideanLoss, Exp, Filter, Flatten, HDF5Data, HDF5Output, 
+HingeLoss, Im2col, ImageData, InfogainL Input, LRN, LSTM, LSTMUnit, Log, 
+MVN, MemoryData, MultinomialLogisticLoss, PReLU, Parameter, Pooling, Power, 
+RNN, ReLU, Reduction, Reshape, SPP, Scale, Sigmoid, SigmoidCrossEntropyLoss, 
+SilenceSoftmaxWithLoss, Split, Swish, TanH, Threshold, Tile, WindowData)
+'''
 ###################################################################################
 # caffe 层描述格式 通用部分 #######################################################
 class CaffeLayerGenerator(object):
@@ -137,7 +146,7 @@ class CaffeScaleLayer(CaffeLayerGenerator):
 # 非线性激活层 y = max(0,x) ###############################################
 class CaffeReluLayer(CaffeLayerGenerator):
     def __init__(self, name, negslope=None):
-        super(CaffeReluLayer, self).__init__(name, 'Relu')
+        super(CaffeReluLayer, self).__init__(name, 'ReLU')
         self.negslope = negslope
     def write(self, f):
         param_str = ""
@@ -325,8 +334,8 @@ def convert(cfgfile, ptxtfile):
                 gen.add_scale_layer(items)
             if relu_followed:
                 gen.add_relu_layer(items)# 添加激活层
-		# [connected] 标签 全连接层
-        elif _section == 'connected':
+		# [connected] 标签 全连接层 1470
+        elif _section == 'connected': 
             gen.add_innerproduct_layer(items)
             if relu_followed:
                 gen.add_relu_layer(items)# 添加激活层
@@ -342,6 +351,10 @@ def convert(cfgfile, ptxtfile):
 		#  [dropout] 标签 分类 
         elif _section == 'softmax':
             gen.add_softmax_layer(items)
+		# [local]  标签 两次 fc  512  4096
+        elif _section == 'local':
+            gen.add_innerproduct_layer({'output':512})
+            gen.add_innerproduct_layer({'output':4096})			
         else:
             logging.error("{} layer is not supported".format(_section))
     #gen.finalize('result')
