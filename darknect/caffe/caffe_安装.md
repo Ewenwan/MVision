@@ -59,6 +59,7 @@
       ImportError: No module named caffe
       导入路径
       sudo echo export PYTHONPATH="~/caffe-master/python" >> ~/.bashrc caffe实际安装路径下python文件夹
+      sudo echo export PYTHONPATH="/home/wanyouwen/ewenwan/software/caffe-yolo/caffe/python" >> ~/.bashrc
       source ~/.bashrc
 
 
