@@ -44,7 +44,7 @@ layer {{{{
 class CaffeInputLayer(CaffeLayerGenerator):
     def __init__(self, name, channels, width, height):
         super(CaffeInputLayer, self).__init__(name, 'Input')
-        self.channels = channels#通道数量？
+        self.channels = channels#通道数量
         self.width = width# 宽度
         self.height = height# 高度
     def write(self, f):
@@ -227,7 +227,7 @@ class CaffeProtoGenerator:
         self.add_layer( self.layer )         # 网络 添加这一层
 	# 池化层 ######################################################
     def add_pooling_layer(self, ltype, items, global_pooling=None):
-	    # 池化层不计入层数量
+	# 池化层不计入层数量
         prev_blob = self.layer.top[0]  # 上一层输出 为 这一层的输入
         lname = "pool"+str(self.lnum)  # 层名字
         ksize = items['size'] if 'size' in items else None     # 池化核尺寸
@@ -239,7 +239,7 @@ class CaffeProtoGenerator:
         self.add_layer( self.layer )         # 网络 添加这一层
     # 批归一化层 #################################################
     def add_batchnorm_layer(self, items):
-	    # 批归一化层不计入层数量
+	# 批归一化层不计入层数量
         prev_blob = self.layer.top[0]  # 上一层输出 为 这一层的输入
         lname = "bn"+str(self.lnum)    # 层名字
         self.layer = CaffeBatchNormLayer( lname )
@@ -248,7 +248,7 @@ class CaffeProtoGenerator:
         self.add_layer( self.layer )         # 网络 添加这一层
 	# 尺度变换层 #################################################
     def add_scale_layer(self, items):
-	    # 尺度变换层不计入层数量
+        # 尺度变换层不计入层数量
         prev_blob = self.layer.top[0]  # 上一层输出 为 这一层的输入
         lname = "scale"+str(self.lnum) # 层名字
         self.layer = CaffeScaleLayer( lname )
@@ -256,17 +256,17 @@ class CaffeProtoGenerator:
         self.layer.top.append( lname )       # 本层输出
         self.add_layer( self.layer )         # 网络 添加这一层
 	# 非线性激活层 ###############################################
-    def add_relu_layer(self, items):
-	    # 非线性激活层不计入层数量
+    def add_relu_layer(self, items, leaky = 0.1):
+	# 非线性激活层不计入层数量
         prev_blob = self.layer.top[0] # 上一层输出 为 这一层的输入
         lname = "relu"+str(self.lnum) # 层名字
-        self.layer = CaffeReluLayer( lname )
+        self.layer = CaffeReluLayer( lname , leaky)# 添加激活层 max(0.1x,x)
         self.layer.bottom.append( prev_blob )# 本层输入 
         self.layer.top.append( prev_blob )   # loopback 名字不变
         self.add_layer( self.layer )         # 网络 添加这一层
     # 随机失活层 #################################################
     def add_dropout_layer(self, items):
-	    # 随机失活层 不计入层数量
+	# 随机失活层 不计入层数量
         prev_blob = self.layer.top[0]# 上一层输出 为 这一层的输入
         lname = "drop"+str(self.lnum)# 层名字
         self.layer = CaffeDropoutLayer( lname, items['probability'] )
@@ -275,7 +275,7 @@ class CaffeProtoGenerator:
         self.add_layer( self.layer )         # 网络 添加这一层
 	# 分类层 #####################################################
     def add_softmax_layer(self, items):
-	    # 分类层 不计入层数量
+	# 分类层 不计入层数量
         prev_blob = self.layer.top[0]# 上一层输出 为 这一层的输入
         lname = "prob"               # 层名字 
         self.layer = CaffeSoftmaxLayer( lname )
@@ -319,47 +319,48 @@ def convert(cfgfile, ptxtfile):
         batchnorm_followed = False
         relu_followed = False
         items = dict(parser.items(section))
-		# BN 
+        # BN 
         if 'batch_normalize' in items and items['batch_normalize']:
             batchnorm_followed = True
-	    # 激活 
+	# 激活 
         if 'activation' in items and items['activation'] != 'linear':
             relu_followed = True
         # [net] 标签 数据层  height=448 width=448 channels=3
         if _section == 'net':
             gen.add_input_layer(items)
-	    # [convolutional] 标签 圈基层
+	# [convolutional] 标签 圈基层
         elif _section == 'convolutional':
             gen.add_convolution_layer(items)
             if batchnorm_followed:       # 添加 BN层
                 gen.add_batchnorm_layer(items)
                 gen.add_scale_layer(items)
             if relu_followed:
-                gen.add_relu_layer(items)# 添加激活层
-		# [connected] 标签 全连接层 1470
+                gen.add_relu_layer(items, 0.1)# 添加激活层 max(0.1x,x)
+        # [connected] 标签 全连接层 1470
         elif _section == 'connected': 
             gen.add_innerproduct_layer(items)
             if relu_followed:
                 gen.add_relu_layer(items)# 添加激活层
-		# [maxpool] 标签 最大值池化层
+        # [maxpool] 标签 最大值池化层
         elif _section == 'maxpool':
             gen.add_pooling_layer('MAX', items)
-	    # [avgpool] 标签 均值池化层
+	# [avgpool] 标签 均值池化层
         elif _section == 'avgpool':
             gen.add_pooling_layer('AVE', items, global_pooling=True)
-	    # [dropout] 标签 随机失活层
+        # [dropout] 标签 随机失活层
         elif _section == 'dropout':
             gen.add_dropout_layer(items)
-		#  [dropout] 标签 分类 
+	#  [dropout] 标签 分类 
         elif _section == 'softmax':
             gen.add_softmax_layer(items)
-		# [local]  标签 两次 fc  512  4096
+	# [local]  标签 两次 fc  512  4096
         elif _section == 'local':
-            gen.add_innerproduct_layer({'output':512})
-            gen.add_innerproduct_layer({'output':4096})			
+            #gen.add_innerproduct_layer({'output':512})
+            gen.add_innerproduct_layer({'output':4096})
+	    gen.add_relu_layer(items, 0.1)# 添加激活层 max(0.1x,x)
         else:
             logging.error("{} layer is not supported".format(_section))
-    #gen.finalize('result')
+    gen.finalize('result')#替换
     gen.write(ptxtfile)
 
 def main():
