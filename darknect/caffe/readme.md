@@ -22,11 +22,15 @@
             你需要在caffe文件夹下make pycaffe，并设置PYTHONPATH环境变量。
 
 ### 1.2.1 yolo的cfg文件 转成 caffe的prototxt
-    python create_yolo_prototxt.py
+    python create_yolo_prototxt.py yolov1_test.prototxt  yolov1.cfg
 ### 1.2.2 yolo的weights文件转成caffe的caffemodel
-    python create_yolo_caffemodel.py -m yolo_train_val.prototxt -w yolo.weights -o yolo.caffemodel
+    python create_yolo_caffemodel.py -m yolov1_test.prototxt -w yolov1.weights -o yolov1.caffemodel
+### 1.2.3 检测 
+    python yolo_main.py -m model_filename -w weight_filename -i image_filename 
     
-    
+    python yolo_weight_to_caffemodel_v1.py -m yolov1_caffe_test.prototxt -w yolov1.weights -o yolov1_caffe.caffemodel 
+
+
 # 2. caffe 模型配置文件 prototxt 详解
 [博客参考](https://blog.csdn.net/maweifei/article/details/72848185?locationNum=15&fps=1)
 
