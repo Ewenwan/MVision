@@ -13,7 +13,10 @@ echo $LABEL_FILE
 
 # 2007 + 2012 trainval
 # source img
-LIST_FILE=$CAFFE_ROOT/data/yolo/trainval.txt
+# train
+# LIST_FILE=$CAFFE_ROOT/data/yolo/trainval.txt
+# 2007 test
+LIST_FILE=$CAFFE_ROOT/data/yolo/test_2007.txt
 
 echo "voc img list txt: "
 echo $LIST_FILE
