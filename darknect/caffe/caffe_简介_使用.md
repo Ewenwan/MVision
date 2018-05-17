@@ -93,6 +93,38 @@
             群组（group）：类似文件夹，可以包含多个数据集或下级群组；
             数据集（dataset）：数据内容，可以是多维数组，也可以是更复杂的数据类型。
 
+      layer {  
+        name: "data"  
+        type: "Data"  
+        top: "data"  
+        top: "label"  
+        include {  
+          phase: TRAIN     # 用于训练 
+        }  
+        transform_param {  
+          mirror: 1            # 镜像
+          crop_size: 227   #
+          # substract mean value（RGB three channel）: 
+          #these mean_values can equivalently be replaced with a mean.binaryproto file as   
+          # mean_file: name_of_mean_file.binaryproto  
+          mean_value: 104  # 去中心化（减去平均值）
+          mean_value: 117  
+          mean_value: 123  
+        }  
+        data_param {  
+          source: "examples/imagenet/ilsvrc12_train_lmdb"  # 数据库文件名
+          batch_size: 32   # 每次处理的样本数目
+          backend: LMDB    # 数据库类型，默认为LMDB，可选LevelDB
+          # rand_skip：在开始的时候跳过rand_skip个输入数据，这个对异步SGD有效
+        }   
+      }  
+
+
+      均值文件 name_of_mean_file.binaryproto 
+      cd ~/caffe  
+      build/tools/compute_image_mean examples/imagenet/ilsvr12_train_lmdb   
+      data/ilsvrc12/imagenet_mean.binaryproto  
+
 ### 2.1.3 vision_layers.hpp: 
       继承自父类Layer，定义与特征表达相关的子Layer，
       例如 卷积层ConvolutionLayer，池化层PoolingLayer和 LRNLayer等。
