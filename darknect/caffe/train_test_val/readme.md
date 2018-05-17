@@ -2,23 +2,22 @@
 
 
 
-      训练时用的 模型框架文件： gnet_train.prototxt
-      训练时用的 学习参数    ： gnet_solver.prototxt
+## 训练时用的 模型框架文件： gnet_train.prototxt
+##  训练时用的 学习参数    ： gnet_solver.prototxt
 
-      测试集上使用的测试模型：  gnet_test.prototxt
+## 测试集上使用的测试模型：  gnet_test.prototxt
 
-      检测识别模型：            gnet_deploy.prototxt
+## 检测识别模型：            gnet_deploy.prototxt
 
 
-      调用检测识别模型文件 和 权重文件 得到识别结果 show_det.py
+## 不调用检测识别模型文件 和 权重文件 得到识别结果 show_det.py
 
-      训练时使用的 bash脚本文件 : train.sh
+## 训练时使用的 bash脚本文件 : train.sh
       需要提供 一个 预训练的 模型权重文件
       bvlc_googlenet.caffemodel
       下载： http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel
 
-      再一个 voc / coco 数据集 的图片需要转换成 数据库文件 这样读写会比较快
-        lmdb/leveldb
+## 再一个 voc / coco 数据集 的图片需要转换成 数据库 lmdb/leveldb 文件 这样读写会比较快
 
       使用 ./convert.sh 转换 图片数据 到 lmdb/leveldb
         cd cafe/data/yolo
@@ -27,11 +26,12 @@
         # change related path in script convert.sh
         ./convert.sh 
 
-      上述有需要改动的地方
+### 上述有需要改动的地方
 
       /////////////////////////////////
       convert.sh 
-      #!/usr/bin/env sh
+      ////////////
+      #!/usr/bin/env sh
       # cafe main path
       CAFFE_ROOT=../..
       #/your/path/to/vocroot/
@@ -61,14 +61,12 @@
 
       /////////////////////////////// 
 
-      需要在 tools下新建 转换 voc标签框的文件 convert_box_data.cpp
+#### 需要在 tools下新建 转换 voc标签框的文件 convert_box_data.cpp
       见 https://github.com/yeahkun/caffe-yolo/blob/master/tools/convert_box_data.cpp
 
-      需要对 "caffe/util/io.hpp 做一定修改  添加一个函数
+      需要对
+      caffe/util/io.hpp 
+      caffe/src/caffe/util/io.cpp
+      做一定修改 
 
-
-
-      其他也有 添加
-
-
-      测试时使用的 bash脚本文件 :test.sh
+## 测试时使用的 bash脚本文件 :test.sh
