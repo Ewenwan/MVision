@@ -2,6 +2,7 @@
 # yolov1
 ## 转模型文件 
     python yolo_cfg_to_caffe_prototxt_v1.py yolov1_test.cfg yolov1_caffe_test.prototxt
+    python yolo_cfg_to_caffe_prototxt_v1.py yolov1_test.cfg yolov1_bn_caffe_test.prototxt
 ## 可视化
     cd caffe 
     python python/draw_net.py models/yolov1_caffe_test.prototxt yolov1_caffenet.png  
