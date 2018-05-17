@@ -12,10 +12,49 @@
 
 ## 不调用检测识别模型文件 和 权重文件 得到识别结果 show_det.py
 
-## 训练时使用的 bash脚本文件 : train.sh
+# 训练时使用的 bash脚本文件 : train.sh
       需要提供 一个 预训练的 模型权重文件
       bvlc_googlenet.caffemodel
       下载： http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel
+
+      ######  train.sh  ##############   
+      #!/usr/bin/env sh
+      # caffe main path
+      CAFFE_HOME=../..
+      # learning rate paramter
+      SOLVER=./gnet_solver.prototxt
+      # init weights 
+      WEIGHTS=/home/wanyouwen/ewenwan/software/caffe-yolo/weights/bvlc_googlenet.caffemodel
+      # training  --gpu=0,1,2,3,4,5,6,7
+      $CAFFE_HOME/build/tools/caffe train \
+          --solver=$SOLVER --weights=$WEIGHTS --gpu=0,1,2,3
+
+      ###### gnet_solver.prototxt  #######
+      net: "examples/yolo/gnet_train.prototxt"  # 网络配置文件
+          # 在这四个train_net_param, train_net, net_param, net字段中至少需要出现一个，
+          # 当出现多个时，就会按着(1) test_net_param, (2) test_net, (3) net_param/net 的顺序依次求解。
+      test_iter: 4952        # 迭代器
+      test_interval: 32000   # 是指测试间隔，每训练test_interval次，进行一次测试。
+      test_initialization: false  # 是指在第一次迭代前，计算初始的loss以确保内存可用
+      display: 20                 # 是信息显示间隔
+      average_loss: 100           # 用于显示在上次average_loss迭代中的平均损失
+      lr_policy: "multifixed"
+      #stagelr: 0.001
+      #stagelr: 0.01
+      #stagelr: 0.001
+      #stagelr: 0.0001
+      #stageiter: 520
+      #stageiter: 16000
+      #stageiter: 24000
+      #stageiter: 32000
+
+      max_iter: 32000
+      momentum: 0.9              # 动量 上次梯度更新的权重
+      weight_decay: 0.0005       # 权重衰减，防止过拟合
+      snapshot: 2000             # 快照  将训练出来的model和solver状态进行保存 
+      snapshot_prefix: "./models/gnet_yolo"# 保存路径
+      solver_mode: GPU# 运行模式
+
 
 ## 再一个 voc / coco 数据集 的图片需要转换成 数据库 lmdb/leveldb 文件 这样读写会比较快
 
