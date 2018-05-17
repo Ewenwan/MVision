@@ -24,8 +24,15 @@
         ln -s /your/path/to/VOCdevkit/ .
         python ./get_list.py
         # change related path in script convert.sh
-        ./convert.sh 
-
+        ./convert.sh 
+        
+      问题：
+      执行shell脚本时提示bad interpreter:No such file or directory的解决办法
+      
+      convert.sh 格式不正确
+      dos 转成 unix
+      notepad就可以转换
+      
 ### 上述有需要改动的地方
 
       /////////////////////////////////
