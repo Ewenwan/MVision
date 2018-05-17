@@ -1,12 +1,11 @@
 #!/usr/bin/env sh
-# test 
+# train
+# caffe main path
 CAFFE_HOME=../..
-
-PROTO=./gnet_test.prototxt
-MODEL=$1
-ITER=500
-GPU_ID=$2
-
-$CAFFE_HOME/build/tools/test_detection \
-    --model=$PROTO --iterations=$ITER \
-    --weights=$MODEL --gpu=$GPU_ID
+# learning rate paramter
+SOLVER=./gnet_solver.prototxt
+# init weights 
+WEIGHTS=/your/path/to/bvlc_googlenet.caffemodel
+# training  --gpu=0,1,2,3,4,5,6,7
+$CAFFE_HOME/build/tools/caffe train \
+    --solver=$SOLVER --weights=$WEIGHTS --gpu=0,1
