@@ -21,4 +21,6 @@
       eval_detection_layer.cpp
 
     caffe/include/caffe 下添加
-    data_reader.hpp
+        data_reader.hpp
+    caffe/src/caffe/ 下添加 
+        data_reader.cpp
