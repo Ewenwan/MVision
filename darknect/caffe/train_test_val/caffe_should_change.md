@@ -518,14 +518,37 @@
 
 ## 4.6 修改的 文件有
     caffe\src\caffe\proto\caffe.proto
-    caffe\include\caffe\layers\base_data_layer.hpp
-    caffe\include\caffe\layers\data_layer.hpp
-    dummy_data_layer.hpp
-    hdf5_data_layer.hpp
-    hdf5_output_layer.hpp
-    input_layer.hpp
 
-    caffe\include\caffe\data_transformer.hpp
+    caffe\include\caffe\layers\base_data_layer.hpp  
+        class BaseDataLayer : public Layer<Dtype> {} // 添加 bool box_label_;
+
+    caffe\include\caffe\layers\data_layer.hpp   // 可能不需要改 
+       //////// add ///////////////////////////////
+        #include "caffe/data_reader.hpp"
+       //////// add ///////////////////////////////
+
+    dummy_data_layer.hpp
+
+        // /////  add //////////////////////////////
+        // Data layers should be shared by multiple solvers in parallel
+        // virtual inline bool ShareInParallel() const { return true; }
+        /////////////////////////////////////////
+
+    hdf5_data_layer.hpp      // 可能不需要改 
+    hdf5_output_layer.hpp   // 可能不需要改 
+
+
+
+    input_layer.hpp
+        ///////  add  ///////////////////////////
+          // Data layers should be shared by multiple solvers in parallel
+        //virtual inline bool ShareInParallel() const { return true; }
+        ///////  add ////////////////////////////////////
+
+
+    caffe\include\caffe\data_transformer.hpp   需要修改 添加 BoxLabel 类
+    caffe\src\caffe\data_transformer.cpp
+
     layer.hpp
     parallel.hpp
     solver.hpp
@@ -539,7 +562,7 @@
     \caffe\src\caffe\util\blocking_queue.cpp
     \caffe\src\caffe\util\io.cpp
 
-    \caffe\src\caffe\data_transformer.cpp
+
     \caffe\src\caffe\layer.cpp
     \caffe\src\caffe\net.cpp
     \caffe\src\caffe\parallel.cpp  不一定要修改
