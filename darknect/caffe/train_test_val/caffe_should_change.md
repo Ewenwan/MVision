@@ -26,3 +26,22 @@
     caffe/src/caffe/ 下添加 
         data_reader.cpp
 
+# 3. 添加一些工具
+    caffe/tools 下添加
+       a. 数据转换
+        convert_box_data.cpp
+       b. 设备 队列
+        device_query.cpp
+       c. 模型微调 (finetune)
+        finetune_net.cpp
+       d. 网络速度检测
+        net_speed_benchmark.cpp
+       e. 测试 检测结果
+        test_detection.cpp
+       f. 测试 网络 
+        test_net.cpp
+       g. 检测网络
+        train_net.cpp
+
+    
+    
