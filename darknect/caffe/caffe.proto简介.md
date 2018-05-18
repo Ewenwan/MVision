@@ -248,7 +248,9 @@
       可以将每个.proto文件生成出一对.h和.cc的C++代码文件。
       生成后的文件可以直接加载到应用程序所在的工程项目中。
       如：MyMessage.proto 生成的文件为 MyMessage.pb.h 和 MyMessage.pb.cc。
- 
+
+[Caffe代码解析](http://alanse7en.github.io/caffedai-ma-jie-xi-2/)
+
  # caffe.proto 示例
     syntax = "proto2";
     // 第一行proto3表示用的是proto3，默认是proto2
