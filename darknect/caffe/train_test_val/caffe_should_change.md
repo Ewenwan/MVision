@@ -493,8 +493,8 @@ caffe/src/caffe/layers/  下   .hpp
 
       optional float diff_scale = 47 [default = 1]; 
 ## 4.4 最后重新编译caffe即可
-    可添加层参数 ：
-        layer {
+    可添加层参数 ：
+        layer {
           name: "diff_1"
           type: "DiffCutoff"
           bottom: "conv1"
@@ -502,14 +502,14 @@ caffe/src/caffe/layers/  下   .hpp
           diffcutoff_param {
             diff_scale: 0.0001
           }
-        }
+        }
 ## 4.5 忠告与建议
     （1）一定要注意大小写、一定要注意大小写、一定要注意大小写
 
     （2）不会写、不确定，就去找caffe现有的层来参考模仿
 
     （3）caffe数据操作的函数定义在src/caffe/util/math_functions.cpp, 
-    
+
     大家也可以参考这位同学的博客  
 (caffe数据操作的函数)[https://blog.csdn.net/seven_first/article/details/47378697]
     
