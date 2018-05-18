@@ -15,10 +15,9 @@ layer {
     mean_value: 123
   }
   data_param {
-    source: "../../data/yolo/lmdb/test2007_lmdb"
-    # source: "../../data/yolo/lmdb/trainval_lmdb"
+    source: "../../data/yolo/test_lmdb"
     batch_size: 10
-    side: 7
+    #side: 7
     backend: LMDB
   }
 }
