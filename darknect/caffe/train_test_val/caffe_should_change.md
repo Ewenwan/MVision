@@ -515,3 +515,31 @@
     大家也可以参考这位同学的博客  
 (caffe数据操作的函数)[https://blog.csdn.net/seven_first/article/details/47378697]
     
+
+## 4.6 修改的 文件有
+    caffe\src\caffe\proto\caffe.proto
+    caffe\include\caffe\layers\base_data_layer.hpp
+    caffe\include\caffe\layers\data_layer.hpp
+    dummy_data_layer.hpp
+    hdf5_data_layer.hpp
+    hdf5_output_layer.hpp
+    input_layer.hpp
+
+    caffe\include\caffe\data_transformer.hpp
+    layer.hpp
+    parallel.hpp
+    solver.hpp
+
+
+    caffe\src\caffe\solvers\adadelta_solver.cpp
+    nesterov_solver.cpp
+    sgd_solver.cpp
+
+
+
+
+
+
+
+
+
