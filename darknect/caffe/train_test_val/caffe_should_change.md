@@ -536,10 +536,14 @@
     sgd_solver.cpp
 
 
+    \caffe\src\caffe\util\blocking_queue.cpp
+    \caffe\src\caffe\util\io.cpp
 
-
-
-
+    \caffe\src\caffe\data_transformer.cpp
+    \caffe\src\caffe\layer.cpp
+    \caffe\src\caffe\net.cpp
+    \caffe\src\caffe\parallel.cpp  不一定要修改
+    solver.cpp                      不一定要修改
 
 
 
