@@ -479,5 +479,37 @@ caffe/src/caffe/layers/  下   .hpp
     }
 
 
+### 4.3.3 在message V1LayerParameter {}中添加以下内容
 
+    在enum LayerType {}中添加唯一ID，只要在这里不重复即可。
 
+       DIFF_CUTOFF=45;
+
+    外面接着添加，同样ID也是只要不重复即可
+
+      optional DiffCutoffParameter diffcutoff_param = 46;
+
+### 4.3.4  在message V0LayerParameter {}添加参数定义
+
+      optional float diff_scale = 47 [default = 1]; 
+## 4.4 最后重新编译caffe即可
+    可添加层参数 ：
+        layer {
+          name: "diff_1"
+          type: "DiffCutoff"
+          bottom: "conv1"
+          top: "diff_1"
+          diffcutoff_param {
+            diff_scale: 0.0001
+          }
+        }
+## 4.5 忠告与建议
+    （1）一定要注意大小写、一定要注意大小写、一定要注意大小写
+
+    （2）不会写、不确定，就去找caffe现有的层来参考模仿
+
+    （3）caffe数据操作的函数定义在src/caffe/util/math_functions.cpp, 
+    
+    大家也可以参考这位同学的博客  
+(caffe数据操作的函数)[https://blog.csdn.net/seven_first/article/details/47378697]
+    
