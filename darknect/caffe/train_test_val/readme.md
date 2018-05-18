@@ -114,6 +114,40 @@
       需要对
       caffe/util/io.hpp 
       caffe/src/caffe/util/io.cpp
-      做一定修改 
+      做一定修改 
+## 训练
+      ./train.sh
+      
+      出现的问题
+      0519 02:13:01.861333  9687 layer_factory.hpp:77] Creating layer data
+      I0519 02:13:01.861886  9687 net.cpp:84] Creating Layer data
+      I0519 02:13:01.861901  9687 net.cpp:380] data -> data
+      I0519 02:13:01.861933  9687 net.cpp:380] data -> label
+      I0519 02:13:01.866948  9704 db_lmdb.cpp:35] Opened lmdb ../../data/yolo/trainval_lmdb
+      I0519 02:13:01.873008  9687 box_data_layer.cpp:46] output data size: 64,3,448,448
+      F0519 02:13:01.963363  9687 blob.cpp:133] Check failed: data_ 
+      *** Check failure stack trace: ***
+          @     0x7f85615eddaa  (unknown)
+          @     0x7f85615edce4  (unknown)
+          @     0x7f85615ed6e6  (unknown)
+          @     0x7f85615f0687  (unknown)
+          @     0x7f8561db39de  caffe::Blob<>::mutable_cpu_data()
+          @     0x7f8561ca4dae  caffe::BasePrefetchingDataLayer<>::LayerSetUp()
+          @     0x7f8561dacc35  caffe::Net<>::Init()
+          @     0x7f8561daeb52  caffe::Net<>::Net()
+          @     0x7f8561c7c92e  caffe::Solver<>::InitTrainNet()
+          @     0x7f8561c7d973  caffe::Solver<>::Init()
+          @     0x7f8561c7dc4f  caffe::Solver<>::Solver()
+          @     0x7f8561c26fe1  caffe::Creator_SGDSolver<>()
+          @           0x40dc6e  caffe::SolverRegistry<>::CreateSolver()
+          @           0x40848d  train()
+          @           0x405fec  main
+          @     0x7f8560467f45  (unknown)
+          @           0x40685b  (unknown)
+          @              (nil)  (unknown)
+      Aborted
+
+      未解决
+
 
 ## 测试时使用的 bash脚本文件 :test.sh
