@@ -1,4 +1,9 @@
+
 # caffe.proto这个文件
+    它位于…\src\caffe\proto目录下，
+    在这个文件夹下还有一个.pb.cc和一个.pb.h文件
+    ，这两个文件都是由caffe.proto编译而来的。 
+    
     它定义了caffe中用到的许多结构化数据。
     caffe采用了Protocol Buffers的数据格式。
     那么，Protocol Buffers到底是什么东西呢？简单说：
@@ -260,3 +265,125 @@
     message BlobShape {
       repeated int64 dim = 1 [packed = true];
     }
+    
+# 在caffe.proto中定义了很多结构化数据，包括：
+
+    BlobProto
+    Datum
+    FillerParameter
+    NetParameter
+    SolverParameter
+    SolverState
+    LayerParameter
+    ConcatParameter
+    ConvolutionParameter
+    DataParameter
+    DropoutParameter
+    HDF5DataParameter
+    HDF5OutputParameter
+    ImageDataParameter
+    InfogainLossParameter
+    InnerProductParameter
+    LRNParameter
+    MemoryDataParameter
+    PoolingParameter
+    PowerParameter
+    WindowDataParameter
+    V0LayerParameter
+
+# 在yolo上  做的修改有
+
+    1. message SolverParameter {} 训练优化求解器参数 添加 一个新的学习策略 
+          optional int32 stepsize = 13;// 学习速率的衰减步长
+          // the stepsize for learning rate policy "multistep"
+          repeated int32 stepvalue = 34;
+
+          /////////////////////////////////////// 
+          /////// add ///////////////////////////////////
+          // for rate policy "multifixed"
+          repeated float stagelr = 50;
+          repeated int32 stageiter = 51;
+          ///////  add ////////////////////////////////////
+          //////////////////////////////////////////
+
+    2. 层参数  LayerParameter  添加 新的 参数  DetectionLossParameter   EvalDetectionParameter
+
+        ///////////////////////////////////////////////////////
+        message LayerParameter {}
+        ////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////
+        ////////////  add ///////////////////////////////////
+        // Yolo detection loss layer
+          optional DetectionLossParameter detection_loss_param = 200;
+          // Yolo detection evaluation layer
+          optional EvalDetectionParameter eval_detection_param = 201;
+        ////////////////// Add  ///////////////////////////////
+        //////////////////////////////////////////////////////
+
+
+    3. 添加两个新的message
+        /////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////
+        //////////////////////////////////// add  ///////////////
+        message DetectionLossParameter {
+          // Yolo detection loss layer
+          optional uint32 side = 1 [default = 7];
+          optional uint32 num_class = 2 [default = 20];
+          optional uint32 num_object = 3 [default = 2];
+          optional float object_scale = 4 [default = 1.0];
+          optional float noobject_scale = 5 [default = 0.5];
+          optional float class_scale = 6 [default = 1.0];
+          optional float coord_scale = 7 [default = 5.0];
+          optional bool sqrt = 8 [default = true];
+          optional bool constriant = 9 [default = false];
+        }
+        ///////////////////////////////////////////////////
+        message EvalDetectionParameter {
+          enum ScoreType {
+            OBJ = 0;
+            PROB = 1;
+            MULTIPLY = 2;
+          }
+          // Yolo detection evaluation layer
+          optional uint32 side = 1 [default = 7];
+          optional uint32 num_class = 2 [default = 20];
+          optional uint32 num_object = 3 [default = 2];
+          optional float threshold = 4 [default = 0.5];
+          optional bool sqrt = 5 [default = true];
+          optional bool constriant = 6 [default = true];
+          optional ScoreType score_type = 7 [default = MULTIPLY];
+          optional float nms = 8 [default = -1];
+        }
+        ////////////////////////////////// add ////////////
+        ///////////////////////////////////////////////////
+        ///////////////////////////////////////////////////
+
+    4. 数据参数 DataParameter 添加已有有关 yolo 预设格子参数  side
+    //////////////////////////////////////////////////////////////////
+    message DataParameter {}
+    /////////////////////////////////////////////////////////////////
+
+      optional uint32 prefetch = 10 [default = 4];
+
+    /////////////////////////////////////////////////////
+    //////////////////////////////// add ///////////////////////////////
+      repeated uint32 side = 11;
+    /////////////////////////////////  add //////////////
+    //////////////////////////////////////////////////////
+
+    5.  V1LayerParameter 更新   和 LayerParameter 类似
+    /////////////////////////////////////////////////////////////
+    // DEPRECATED: use LayerParameter.
+    message V1LayerParameter {}
+    /////////////////////////////////////////////////
+      optional LossParameter loss_param = 42;
+
+    ///////////////////////////////////////////////////////////// 
+      ///////////////////////////// add /////////////////////////
+      optional DetectionLossParameter detection_loss_param = 200;
+      optional EvalDetectionParameter eval_detection_param = 201;
+      /////////////////////////// add////////////////////////////
+    //////////////////////////////////////////////////////// ////
+
+      optional V0LayerParameter layer = 1;
