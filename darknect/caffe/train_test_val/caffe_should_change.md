@@ -522,6 +522,15 @@
     caffe\include\caffe\layers\base_data_layer.hpp  
         class BaseDataLayer : public Layer<Dtype> {} // 添加 bool box_label_;
 
+        base_data_layer.c 
+        BaseDataLayer<Dtype>::LayerSetUp{} add
+        //////////////////////////////////////////
+        /////////////////////// add  ////////////////
+        box_label_ = false;
+        //////////////////////////////////////////////
+        //////////////////////////////////////////////
+
+
     caffe\include\caffe\layers\data_layer.hpp   // 可能不需要改 
        //////// add ///////////////////////////////
         #include "caffe/data_reader.hpp"
