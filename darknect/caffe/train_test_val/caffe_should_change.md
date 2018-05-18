@@ -44,6 +44,9 @@
         train_net.cpp
 
 # 4. 添加新层的 一些注意事项
+
+[参考](https://blog.csdn.net/shuzfan/article/details/51322976)
+
 每一种层都对应一个同名cpp和hpp文件
 分别在:
 caffe/include/caffe/layer 下  .cpp
@@ -455,4 +458,26 @@ caffe/src/caffe/layers/  下   .hpp
     INSTANTIATE_CLASS(PoolingLayer);
 
     }  // namespace caffe
+
+## 4.3 修改src\caffe\proto\caffe.proto文件
+    这里我们要为我们新写的层添加参数和消息函数。
+    ### 4.3.1 如果层有参数 需要在 message LayerParameter {} 中添加 新参数信息
+    首先应该在message LayerParameter {}中添加新参数信息
+
+    添加信息时，首先要制定一个唯一ID，这个ID的可选值可以由这句话看出：
+    // LayerParameter next available layer-specific ID: 143 (last added: BatchCLuster)
+    message LayerParameter {
+    ... 
+
+    由上图可以看出，可选的ID为143。 
+    于是我们就可以添加这样一行：
+      optional DiffCutoffParameter diffcutoff_param = 143;
+
+### 4.3.2 在任意位置添加消息函数
+    message DiffCutoffParameter {
+      optional float diff_scale = 1 [default = 1]; //默认梯度不缩放
+    }
+
+
+
 
