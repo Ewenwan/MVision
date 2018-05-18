@@ -569,6 +569,21 @@
 
 
     \caffe\src\caffe\util\blocking_queue.cpp
+
+        //////////////////////// add ////////////////////
+        #include "caffe/data_reader.hpp"
+        ////////////////////////////////////////////
+
+        ///////////////// add ////////////////
+        template class BlockingQueue<Datum*>;
+        template class BlockingQueue<shared_ptr<DataReader::QueuePair> >;
+        template class BlockingQueue<P2PSync<float>*>;
+        template class BlockingQueue<P2PSync<double>*>;
+        ////////////////// add ////////////
+
+    }  // namespace caffe
+
+
     \caffe\src\caffe\util\io.cpp
 
 
