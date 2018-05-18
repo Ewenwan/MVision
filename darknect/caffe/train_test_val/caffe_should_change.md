@@ -56,7 +56,7 @@
 
 ## 4.1 例如 ：头文件编写 pooling_layer.hpp
 
-    // pooling_layer.hpp
+    // pooling_layer.hpp
     // 特别注意：命名的时候应严格一致和注意大小写，这一点是导致很多人加层失败的主要原因。
     #ifndef CAFFE_POOLING_LAYER_HPP_
     #define CAFFE_POOLING_LAYER_HPP_
