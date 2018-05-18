@@ -14,7 +14,11 @@
       box_data_layer.hpp
     caffe/src/caffe/layers/  下添加 
       box_data_layer.cpp
-    b. 检测loss层
+      
+      需要修改
+      
+      
+    b. 检测loss层
       detection_loss_layer.hpp
       detection_loss_layer.cpp
     c. 评估检测结果层
