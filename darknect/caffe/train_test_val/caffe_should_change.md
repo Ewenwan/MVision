@@ -47,10 +47,12 @@
 
 [参考](https://blog.csdn.net/shuzfan/article/details/51322976)
 
-每一种层都对应一个同名cpp和hpp文件
-分别在:
-caffe/include/caffe/layer 下  .cpp
-caffe/src/caffe/layers/  下   .hpp
+[参考2 ](https://blog.csdn.net/wfei101/article/details/76735760)
+
+    每一种层都对应一个同名cpp和hpp文件
+    分别在:
+    caffe/include/caffe/layer 下  .cpp
+    caffe/src/caffe/layers/  下   .hpp
 
 ## 4.1 例如 ：头文件编写 pooling_layer.hpp
 
