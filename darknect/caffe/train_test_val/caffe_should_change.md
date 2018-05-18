@@ -560,7 +560,11 @@
 
 
     caffe\include\caffe\data_transformer.hpp   需要修改 添加 BoxLabel 类
-    caffe\src\caffe\data_transformer.cpp
+            /////// add 
+            #include <opencv2/imgproc/imgproc.hpp>
+            /////// add        
+            等
+    caffe\src\caffe\data_transformer.cpp
 
     layer.hpp
     parallel.hpp
@@ -581,8 +585,8 @@
         ///////////////// add ////////////////
         template class BlockingQueue<Datum*>;
         template class BlockingQueue<shared_ptr<DataReader::QueuePair> >;
-        template class BlockingQueue<P2PSync<float>*>;
-        template class BlockingQueue<P2PSync<double>*>;
+        //template class BlockingQueue<P2PSync<float>*>;
+        //template class BlockingQueue<P2PSync<double>*>;
         ////////////////// add ////////////
 
     }  // namespace caffe
