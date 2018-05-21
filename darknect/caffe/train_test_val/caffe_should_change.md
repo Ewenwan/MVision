@@ -480,23 +480,23 @@
     由上图可以看出，可选的ID为143。 
     于是我们就可以添加这样一行：  
       optional DiffCutoffParameter diffcutoff_param = 143;
-    
-    yolo v1  检测层  和 评估层 
-    ////////////  add ////////////
+
+    yolo v1  检测层  和 评估层 
+    ////////////  add ////////////
     // Yolo detection loss layer
     optional DetectionLossParameter detection_loss_param = 200;
     // Yolo detection evaluation layer
     optional EvalDetectionParameter eval_detection_param = 201;
     ////////////////// Add 
-    
-    
-    yolov2   passthrough层 ReorgParameter  和  最后区域 Region层 RegionParameter
-    
+
+
+    yolov2   passthrough层 ReorgParameter  和  最后区域 Region层 RegionParameter
+
     ///////////////////////////////////// YOLO V2 ADD  /////////////
     optional ReorgParameter reorg_param = 148;
     optional RegionParameter region_param = 149;
     //////////////////////////////////////////////////////
-     
+
 ### 4.3.2 在任意位置添加 层 消息函数
     message DiffCutoffParameter {
       optional float diff_scale = 1 [default = 1]; //默认梯度不缩放
