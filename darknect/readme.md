@@ -246,7 +246,81 @@
       tvmonitor
 
     ===================================
-  ### 10.2 下载数据集：
+    
+[在自己的数据集上训练](https://www.yuthon.com/2016/11/26/Train-Caffe-YOLO-on-our-own-dataset/)、
+
+      其目录结构如下:
+          .
+      ├── VOC2007
+      │   ├── Annotations           // 放的是.xml文件
+      │   ├── ImageSets             // 稍微复杂
+      │   ├── JPEGImages            // 存放的是对应的.jpg图像
+      │   ├── SegmentationClass     // 语义分割类
+      │   └── SegmentationObject    // 语义分割区域
+      └── VOC2012
+          ├── Annotations
+          ├── ImageSets
+          ├── JPEGImages
+          ├── SegmentationClass
+          └── SegmentationObject
+
+      ImageSets目录中结构如下, 主要关注的是Main文件夹中的trainval.txt, train.txt , val.txt以及test.txt四个文件.
+
+      .
+      ├── Layout
+      │   ├── test.txt
+      │   ├── train.txt
+      │   ├── trainval.txt
+      │   └── val.txt
+      ├── Main
+      │   ├── aeroplane_test.txt
+      │   ├── aeroplane_train.txt
+      │   ├── aeroplane_trainval.txt
+      │   ├── aeroplane_val.txt
+      │   ├── ...
+      │   ├── test.txt       //重要
+      │   ├── train.txt      //重要    
+      │   ├── trainval.txt   //重要
+      │   └── val.txt        //重要
+      └── Segmentation
+          ├── test.txt
+          ├── train.txt
+          ├── trainval.txt
+          └── val.txt
+
+
+      调整自己数据集的格式 成 voc数据及格式：
+
+      1 . 首先是把之前杂乱的图片文件名重新整理, 如下所示:
+
+      .
+      ├── image00001.jpg
+      ├── image00002.jpg
+      ├── image00012.jpg
+      ├── ...
+      ├── image04524.jpg
+      ├── image04525.jpg
+      └── image04526.jpg
+      2. 随后用labelImg重新标注这些图. 标注完成后, 建立我们自己的数据集的结构, 
+        并且将图片和标注放到对应的文件夹里:
+        .
+        ├── ROB2017
+        │   ├── Annotations
+        │   ├── ImageSets
+        │   ├── JPEGImages
+        │   └── JPEGImages_original
+        └── scripts
+            ├── clean.py
+            ├── conf.json
+            ├── convert_png2jpg.py
+            └── split_dataset.py  
+
+      之后写了几个脚本, 其中clean.py用来清理未标注的图片; 
+      split_dataset.py用来分割训练集验证集测试集, 并且保存到ImageSets/Main中.
+
+
+
+  ### 10.2 下载数据集：
     wget https://pjreddie.com/media/files/VOCtrainval_11-May-2012.tar
     wget https://pjreddie.com/media/files/VOCtrainval_06-Nov-2007.tar
     wget https://pjreddie.com/media/files/VOCtest_06-Nov-2007.tar
