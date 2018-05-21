@@ -117,23 +117,170 @@
     =============================================
     =============================================
   ## 3.执行检测网络  标出框已经分类 和 置信度
-    ./darknet detect cfg/yolov3.cfg yolov3.weights data/dog.jpg
-    输出信息：
-    (模型结构 和 置信度 检测时间 等信息  cpu上 6-12s/张 )
-    layer     filters    size              input                output
-        0 conv     32  3 x 3 / 1   416 x 416 x   3   ->   416 x 416 x  32  0.299 BFLOPs
-        1 conv     64  3 x 3 / 2   416 x 416 x  32   ->   208 x 208 x  64  1.595 BFLOPs
-        .......
-      105 conv    255  1 x 1 / 1    52 x  52 x 256   ->    52 x  52 x 255  0.353 BFLOPs
-      106 detection
-    truth_thresh: Using default '1.000000'
-    Loading weights from yolov3.weights...Done!
-    data/dog.jpg: Predicted in 0.029329 seconds.
-    dog: 99%
-    truck: 93%
-    bicycle: 99%
 
-    ==============================================
+        a.  yolo v3 检测
+            ./darknet detect cfg/yolov3.cfg yolov3.weights data/dog.jpg
+            输出信息：
+            (模型结构 和 置信度 检测时间 等信息  cpu上 6-12s/张 )
+        layer     filters    size              input                output
+            0 conv     32  3 x 3 / 1   416 x 416 x   3   --->   416 x 416 x  32  0.299 GFLOPs  all: 0.299 GFLOPs
+            1 conv     64  3 x 3 / 2   416 x 416 x  32   --->   208 x 208 x  64  1.595 GFLOPs  all: 1.894 GFLOPs
+            2 conv     32  1 x 1 / 1   208 x 208 x  64   --->   208 x 208 x  32  0.177 GFLOPs  all: 2.071 GFLOPs
+            3 conv     64  3 x 3 / 1   208 x 208 x  32   --->   208 x 208 x  64  1.595 GFLOPs  all: 3.666 GFLOPs
+            4 res    1                 208 x 208 x  64   ->   208 x 208 x  64
+            5 conv    128  3 x 3 / 2   208 x 208 x  64   --->   104 x 104 x 128  1.595 GFLOPs  all: 5.261 GFLOPs
+            6 conv     64  1 x 1 / 1   104 x 104 x 128   --->   104 x 104 x  64  0.177 GFLOPs  all: 5.438 GFLOPs
+            7 conv    128  3 x 3 / 1   104 x 104 x  64   --->   104 x 104 x 128  1.595 GFLOPs  all: 7.033 GFLOPs
+            8 res    5                 104 x 104 x 128   ->   104 x 104 x 128
+            9 conv     64  1 x 1 / 1   104 x 104 x 128   --->   104 x 104 x  64  0.177 GFLOPs  all: 7.210 GFLOPs
+           10 conv    128  3 x 3 / 1   104 x 104 x  64   --->   104 x 104 x 128  1.595 GFLOPs  all: 8.805 GFLOPs
+           11 res    8                 104 x 104 x 128   ->   104 x 104 x 128
+           12 conv    256  3 x 3 / 2   104 x 104 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 10.400 GFLOPs
+           13 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 10.577 GFLOPs
+           14 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 12.172 GFLOPs
+           15 res   12                  52 x  52 x 256   ->    52 x  52 x 256
+           16 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 12.349 GFLOPs
+           17 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 13.944 GFLOPs
+           18 res   15                  52 x  52 x 256   ->    52 x  52 x 256
+           19 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 14.121 GFLOPs
+           20 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 15.716 GFLOPs
+           21 res   18                  52 x  52 x 256   ->    52 x  52 x 256
+           22 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 15.893 GFLOPs
+           23 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 17.488 GFLOPs
+           24 res   21                  52 x  52 x 256   ->    52 x  52 x 256
+           25 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 17.666 GFLOPs
+           26 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 19.260 GFLOPs
+           27 res   24                  52 x  52 x 256   ->    52 x  52 x 256
+           28 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 19.438 GFLOPs
+           29 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 21.033 GFLOPs
+           30 res   27                  52 x  52 x 256   ->    52 x  52 x 256
+           31 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 21.210 GFLOPs
+           32 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 22.805 GFLOPs
+           33 res   30                  52 x  52 x 256   ->    52 x  52 x 256
+           34 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 22.982 GFLOPs
+           35 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 24.577 GFLOPs
+           36 res   33                  52 x  52 x 256   ->    52 x  52 x 256
+           37 conv    512  3 x 3 / 2    52 x  52 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 26.172 GFLOPs
+           38 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 26.349 GFLOPs
+           39 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 27.944 GFLOPs
+           40 res   37                  26 x  26 x 512   ->    26 x  26 x 512
+           41 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 28.121 GFLOPs
+           42 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 29.716 GFLOPs
+           43 res   40                  26 x  26 x 512   ->    26 x  26 x 512
+           44 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 29.893 GFLOPs
+           45 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 31.488 GFLOPs
+           46 res   43                  26 x  26 x 512   ->    26 x  26 x 512
+           47 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 31.665 GFLOPs
+           48 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 33.260 GFLOPs
+           49 res   46                  26 x  26 x 512   ->    26 x  26 x 512
+           50 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 33.437 GFLOPs
+           51 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 35.032 GFLOPs
+           52 res   49                  26 x  26 x 512   ->    26 x  26 x 512
+           53 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 35.209 GFLOPs
+           54 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 36.804 GFLOPs
+           55 res   52                  26 x  26 x 512   ->    26 x  26 x 512
+           56 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 36.981 GFLOPs
+           57 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 38.576 GFLOPs
+           58 res   55                  26 x  26 x 512   ->    26 x  26 x 512
+           59 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 38.753 GFLOPs
+           60 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 40.348 GFLOPs
+           61 res   58                  26 x  26 x 512   ->    26 x  26 x 512
+           62 conv   1024  3 x 3 / 2    26 x  26 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 41.943 GFLOPs
+           63 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 42.120 GFLOPs
+           64 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 43.715 GFLOPs
+           65 res   62                  13 x  13 x1024   ->    13 x  13 x1024
+           66 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 43.893 GFLOPs
+           67 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 45.487 GFLOPs
+           68 res   65                  13 x  13 x1024   ->    13 x  13 x1024
+           69 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 45.665 GFLOPs
+           70 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 47.260 GFLOPs
+           71 res   68                  13 x  13 x1024   ->    13 x  13 x1024
+           72 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 47.437 GFLOPs
+           73 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 49.032 GFLOPs
+           74 res   71                  13 x  13 x1024   ->    13 x  13 x1024
+           75 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 49.209 GFLOPs
+           76 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 50.804 GFLOPs
+           77 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 50.981 GFLOPs
+           78 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 52.576 GFLOPs
+           79 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 52.753 GFLOPs
+           80 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 54.348 GFLOPs
+           81 conv    255  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 255  0.088 GFLOPs  all: 54.436 GFLOPs
+           82 detection
+           83 route  79
+           84 conv    256  1 x 1 / 1    13 x  13 x 512   --->    13 x  13 x 256  0.044 GFLOPs  all: 54.480 GFLOPs
+           85 upsample            2x    13 x  13 x 256   ->    26 x  26 x 256
+           86 route  85 61
+           87 conv    256  1 x 1 / 1    26 x  26 x 768   --->    26 x  26 x 256  0.266 GFLOPs  all: 54.746 GFLOPs
+           88 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 56.341 GFLOPs
+           89 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 56.518 GFLOPs
+           90 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 58.113 GFLOPs
+           91 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 58.290 GFLOPs
+           92 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 59.885 GFLOPs
+           93 conv    255  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 255  0.177 GFLOPs  all: 60.062 GFLOPs
+           94 detection
+           95 route  91
+           96 conv    128  1 x 1 / 1    26 x  26 x 256   --->    26 x  26 x 128  0.044 GFLOPs  all: 60.106 GFLOPs
+           97 upsample            2x    26 x  26 x 128   ->    52 x  52 x 128
+           98 route  97 36
+           99 conv    128  1 x 1 / 1    52 x  52 x 384   --->    52 x  52 x 128  0.266 GFLOPs  all: 60.372 GFLOPs
+          100 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 61.967 GFLOPs
+          101 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 62.144 GFLOPs
+          102 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 63.739 GFLOPs
+          103 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 63.916 GFLOPs
+          104 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 65.511 GFLOPs
+          105 conv    255  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 255  0.353 GFLOPs  all: 65.864 GFLOPs
+          106 detection
+        Loading weights from yolov3.weights...Done!
+        data/dog.jpg: Predicted in 0.025317 seconds.
+        dog: 99%
+        truck: 92%
+        bicycle: 99%
+
+
+        b. yolov2 检测
+           ./darknet detect cfg/yolov2.cfg yolov2.weights data/dog.jpg
+
+           layer     filters    size              input                output
+            0 conv     32  3 x 3 / 1   416 x 416 x   3   --->   416 x 416 x  32  0.299 GFLOPs  all: 0.299 GFLOPs
+            1 max          2 x 2 / 2   416 x 416 x  32   ->   208 x 208 x  32
+            2 conv     64  3 x 3 / 1   208 x 208 x  32   --->   208 x 208 x  64  1.595 GFLOPs  all: 1.894 GFLOPs
+            3 max          2 x 2 / 2   208 x 208 x  64   ->   104 x 104 x  64
+            4 conv    128  3 x 3 / 1   104 x 104 x  64   --->   104 x 104 x 128  1.595 GFLOPs  all: 3.489 GFLOPs
+            5 conv     64  1 x 1 / 1   104 x 104 x 128   --->   104 x 104 x  64  0.177 GFLOPs  all: 3.666 GFLOPs
+            6 conv    128  3 x 3 / 1   104 x 104 x  64   --->   104 x 104 x 128  1.595 GFLOPs  all: 5.261 GFLOPs
+            7 max          2 x 2 / 2   104 x 104 x 128   ->    52 x  52 x 128
+            8 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 6.856 GFLOPs
+            9 conv    128  1 x 1 / 1    52 x  52 x 256   --->    52 x  52 x 128  0.177 GFLOPs  all: 7.033 GFLOPs
+           10 conv    256  3 x 3 / 1    52 x  52 x 128   --->    52 x  52 x 256  1.595 GFLOPs  all: 8.628 GFLOPs
+           11 max          2 x 2 / 2    52 x  52 x 256   ->    26 x  26 x 256
+           12 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 10.223 GFLOPs
+           13 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 10.400 GFLOPs
+           14 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 11.995 GFLOPs
+           15 conv    256  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x 256  0.177 GFLOPs  all: 12.172 GFLOPs
+           16 conv    512  3 x 3 / 1    26 x  26 x 256   --->    26 x  26 x 512  1.595 GFLOPs  all: 13.767 GFLOPs
+           17 max          2 x 2 / 2    26 x  26 x 512   ->    13 x  13 x 512
+           18 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 15.362 GFLOPs
+           19 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 15.539 GFLOPs
+           20 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 17.134 GFLOPs
+           21 conv    512  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 512  0.177 GFLOPs  all: 17.311 GFLOPs
+           22 conv   1024  3 x 3 / 1    13 x  13 x 512   --->    13 x  13 x1024  1.595 GFLOPs  all: 18.906 GFLOPs
+           23 conv   1024  3 x 3 / 1    13 x  13 x1024   --->    13 x  13 x1024  3.190 GFLOPs  all: 22.096 GFLOPs
+           24 conv   1024  3 x 3 / 1    13 x  13 x1024   --->    13 x  13 x1024  3.190 GFLOPs  all: 25.286 GFLOPs
+           25 route  16
+           26 conv     64  1 x 1 / 1    26 x  26 x 512   --->    26 x  26 x  64  0.044 GFLOPs  all: 25.330 GFLOPs
+           27 reorg              / 2    26 x  26 x  64   ->    13 x  13 x 256
+           28 route  27 24
+           29 conv   1024  3 x 3 / 1    13 x  13 x1280   --->    13 x  13 x1024  3.987 GFLOPs  all: 29.317 GFLOPs
+           30 conv    425  1 x 1 / 1    13 x  13 x1024   --->    13 x  13 x 425  0.147 GFLOPs  all: 29.464 GFLOPs
+           31 detection
+        mask_scale: Using default '1.000000'
+        Loading weights from yolov2.weights...Done!
+        data/dog.jpg: Predicted in 0.009945 seconds.
+        dog: 81%
+        truck: 74%
+        bicycle: 83%
+
+    ==============================================
     ==============================================
   ## 4. 其他图片
     data/eagle.jpg, data/dog.jpg, data/person.jpg, data/horses.jpg
