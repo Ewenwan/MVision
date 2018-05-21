@@ -1,5 +1,15 @@
 [Caffe代码解析](http://alanse7en.github.io/caffedai-ma-jie-xi-2/)
 
+      caffe 中 BatchNorm层  要和  Scale 层一起用才有 批规范化的效果
+[参考 ](https://blog.csdn.net/Suan2014/article/details/79623495)
+> 批规范化：
+
+      1) 输入归一化 x_norm = (x-u)/std, 其中u和std是个累计计算的均值和方差。
+      2）y=alpha×x_norm + beta，对归一化后的x进行比例缩放和位移。其中alpha  和beta是通过迭代学习的。
+      caffe中的bn层其实只做了第一件事； 
+      scale 层做了第二件事；
+      scale层里为什么要设置bias_term=True，这个偏置就对应2）件事里的beta。
+
 # 1. yolo 模型转换到 caffe下
       1.1  yolov1的caffe实现
 [caffe-yolo v1 python](https://github.com/xingwangsfu/caffe-yolo)
