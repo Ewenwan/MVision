@@ -1,9 +1,9 @@
 # caffe 需要做的修改
-
+# 新添加的文件
 # 1. 数据转换 时
 
     caffe/util/io.hpp 
-    caffe/src/caffe/util/io.cpp 做一定修改
+    caffe/src/caffe/util/io.cpp 做一定修改  边框数据
 
     /tools v添加
     convert_box_data.cpp
@@ -21,9 +21,11 @@
     b. 检测loss层
       detection_loss_layer.hpp
       detection_loss_layer.cpp
+      
     c. 评估检测结果层
       eval_detection_layer.hpp
       eval_detection_layer.cpp
+      
     d. 数据读取层
     caffe/include/caffe 下添加
         data_reader.hpp
@@ -466,8 +468,8 @@
     }  // namespace caffe
 
 ## 4.3 修改src\caffe\proto\caffe.proto文件
-    这里我们要为我们新写的层添加参数和消息函数。
-    ### 4.3.1 如果层有参数 需要在 message LayerParameter {} 中添加 新参数信息
+    这里我们要为我们新写的层添加层参数 和  层消息函数。
+### 4.3.1 如果层有参数 需要在 message LayerParameter {} 中添加 新层 信息
     首先应该在message LayerParameter {}中添加新参数信息
 
     添加信息时，首先要制定一个唯一ID，这个ID的可选值可以由这句话看出：
@@ -476,13 +478,79 @@
     ... 
 
     由上图可以看出，可选的ID为143。 
-    于是我们就可以添加这样一行：
+    于是我们就可以添加这样一行：  
       optional DiffCutoffParameter diffcutoff_param = 143;
-
-### 4.3.2 在任意位置添加消息函数
+    
+    yolo v1  检测层  和 评估层 
+    ////////////  add ////////////
+    // Yolo detection loss layer
+    optional DetectionLossParameter detection_loss_param = 200;
+    // Yolo detection evaluation layer
+    optional EvalDetectionParameter eval_detection_param = 201;
+    ////////////////// Add 
+    
+    
+    yolov2   passthrough层 ReorgParameter  和  最后区域 Region层 RegionParameter
+    
+    ///////////////////////////////////// YOLO V2 ADD  /////////////
+    optional ReorgParameter reorg_param = 148;
+    optional RegionParameter region_param = 149;
+    //////////////////////////////////////////////////////
+     
+### 4.3.2 在任意位置添加 层 消息函数
     message DiffCutoffParameter {
       optional float diff_scale = 1 [default = 1]; //默认梯度不缩放
     }
+
+    //////////////////////////////////// yolov1 add  ///////////////
+    message DetectionLossParameter {
+      // Yolo detection loss layer
+      optional uint32 side = 1 [default = 7];
+      optional uint32 num_class = 2 [default = 20];
+      optional uint32 num_object = 3 [default = 2];
+      optional float object_scale = 4 [default = 1.0];
+      optional float noobject_scale = 5 [default = 0.5];
+      optional float class_scale = 6 [default = 1.0];
+      optional float coord_scale = 7 [default = 5.0];
+      optional bool sqrt = 8 [default = true];
+      optional bool constriant = 9 [default = false];
+    }
+    ///////////////////////////////////////////////////
+    message EvalDetectionParameter {
+      enum ScoreType {
+        OBJ = 0;
+        PROB = 1;
+        MULTIPLY = 2;
+      }
+      // Yolo detection evaluation layer
+      optional uint32 side = 1 [default = 7];
+      optional uint32 num_class = 2 [default = 20];
+      optional uint32 num_object = 3 [default = 2];
+      optional float threshold = 4 [default = 0.5];
+      optional bool sqrt = 5 [default = true];
+      optional bool constriant = 6 [default = true];
+      optional ScoreType score_type = 7 [default = MULTIPLY];
+      optional float nms = 8 [default = -1];
+    }
+    ////////////////////////////////// add ////////////
+
+
+    ///////////////////////// YOLO V2  add ////////////////////////////////////
+    // 区域参数
+    message RegionParameter {
+      optional uint32 classes = 1 [default = 20]; //分类的种类
+      optional uint32 coords = 2 [default = 4]; //box的坐标数
+      optional uint32 boxes_of_each_grid = 3 [default = 5]; //每个grid预测的boxes数
+      optional bool softmax = 4 [default = false];
+    }
+    //  passtrough层
+     message ReorgParameter {
+       optional uint32 stride = 1;// 步长
+       optional bool reverse = 2 [default = false];
+     }
+    ///////////////////////////////////////////////////////////////////////
+
+
 
 
 ### 4.3.3 在message V1LayerParameter {}中添加以下内容
@@ -524,10 +592,10 @@
     caffe\src\caffe\proto\caffe.proto
 
     caffe\include\caffe\layers\base_data_layer.hpp  
-        class BaseDataLayer : public Layer<Dtype> {} // 添加 bool box_label_;
+        class BaseDataLayer : public Layer<Dtype> {} // 添加 bool box_label_; 边框标签
 
         base_data_layer.c 
-        BaseDataLayer<Dtype>::LayerSetUp{} add
+        BaseDataLayer<Dtype>::LayerSetUp{}  
         //////////////////////////////////////////
         /////////////////////// add  ////////////////
         box_label_ = false;
@@ -566,15 +634,6 @@
             等
     caffe\src\caffe\data_transformer.cpp
 
-    layer.hpp
-    parallel.hpp
-    solver.hpp
-
-
-    caffe\src\caffe\solvers\adadelta_solver.cpp
-    nesterov_solver.cpp
-    sgd_solver.cpp
-
 
     \caffe\src\caffe\util\blocking_queue.cpp
 
@@ -585,8 +644,6 @@
         ///////////////// add ////////////////
         template class BlockingQueue<Datum*>;
         template class BlockingQueue<shared_ptr<DataReader::QueuePair> >;
-        //template class BlockingQueue<P2PSync<float>*>;
-        //template class BlockingQueue<P2PSync<double>*>;
         ////////////////// add ////////////
 
     }  // namespace caffe
