@@ -1,0 +1,16 @@
+net: "yolov1_caffe_train.prototxt"
+test_iter: 10
+test_interval: 2000
+#test_initialization: false
+display: 50
+average_loss: 25
+lr_policy: "step"
+base_lr: 0.001
+gamma: 0.1
+stepsize: 1000
+max_iter: 50000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 1000
+snapshot_prefix: "./yolo_models"
+solver_mode: GPU
