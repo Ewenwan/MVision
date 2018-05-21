@@ -72,4 +72,17 @@
 
 
 # yolov2
+[参考 ](https://github.com/hustzxd/z1)
+
+    对比 yolov2.cfg  yolov2_caffe.prototxt貌似少了一层卷积
+    在得到 conv13 卷积层结果之后 需要经过 一层 1*1卷积  64输出的卷积层(BN+SCALE+RELU)
+    26*26*512 ---->  26*26*64
+
+    在经过 passtrough层  变成 13*13*256
+    再和 conv 20圈基层之后的 13*13*1024  concat  结合 成  13*13*1280
+
+    在经过  3*3 1024 输出卷积  和 1*1 425输出((5+80)*5=425)
+
+
+
 # yolov3
