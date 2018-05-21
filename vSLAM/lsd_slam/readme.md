@@ -128,6 +128,15 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     此时需要定义误差函数及寻求误差函数对位姿变换的导数，变换到李代数上进行更新后再变换回李群上。
     而求解这个问题的方法就是高斯牛顿迭代法的各种变种。
     
+    根据上述两步骤 初步得到 变换矩阵T=[R t] 李群 SE(3) 李代数 se(3)  和逆深度 以及深度均值后
+    
+    根据匹配关系 优化变换矩阵 以及更新深度
+![](pic/LSD_SLAM1.png)
+![](pic/LSD_SLAM2.png)
+![](pic/LSD_SLAM3.png)
+    
+    
+    
 [数值优化算法](https://github.com/Ewenwan/Mathematics#%E6%95%B0%E5%80%BC%E4%BC%98%E5%8C%96) 
 ## 1. 函数f(x)的一阶泰勒展开
     对函数 f(x)一阶泰勒展开得 
