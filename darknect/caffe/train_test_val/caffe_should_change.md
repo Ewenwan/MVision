@@ -563,8 +563,8 @@
             /////// add 
             #include <opencv2/imgproc/imgproc.hpp>
             /////// add        
-            等
-    caffe\src\caffe\data_transformer.cpp
+            等
+    caffe\src\caffe\data_transformer.cpp
 
     layer.hpp
     parallel.hpp
@@ -585,8 +585,8 @@
         ///////////////// add ////////////////
         template class BlockingQueue<Datum*>;
         template class BlockingQueue<shared_ptr<DataReader::QueuePair> >;
-        //template class BlockingQueue<P2PSync<float>*>;
-        //template class BlockingQueue<P2PSync<double>*>;
+        //template class BlockingQueue<P2PSync<float>*>;
+        //template class BlockingQueue<P2PSync<double>*>;
         ////////////////// add ////////////
 
     }  // namespace caffe
