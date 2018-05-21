@@ -151,3 +151,6 @@
 
 
 ## 测试时使用的 bash脚本文件 :test.sh
+
+## caffe需要做的修改
+[caffe需要做的修改 ](caffe_should_change.md)
