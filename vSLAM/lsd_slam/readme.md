@@ -135,7 +135,17 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 ![](pic/LSD_SLAM2.png)
 ![](pic/LSD_SLAM3.png)
     
-    
+     1. 上述第一项是关于两帧之间变换矩阵的 误差函数 E()，
+         p为一个帧i上的关键点(最大梯度值大于阈值可以成为候选)，
+         Di为帧i上对应的逆深度，
+         fi为两帧变换关系,
+         sigma为误差的不确定度，作为分母，理解为加权系数
+     2. rp(p,fi) 表示 图像像素误差  Ii(p) - Ii(p')   p' = w(p,D,fi)为变换后的对应点坐标
+     3. sigma 与误差对逆深度导数 以及逆深度方差有关
+     4. ||r^2||det   误差计算分段函数方法，误差较小时 和较大时 不同的计算的fangfa
+
+
+
     
 [数值优化算法](https://github.com/Ewenwan/Mathematics#%E6%95%B0%E5%80%BC%E4%BC%98%E5%8C%96) 
 ## 1. 函数f(x)的一阶泰勒展开
