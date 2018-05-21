@@ -27,6 +27,7 @@
       reorg_layer.cu
       reorg_layer.hpp
 
+      util/ math_functions.hpp  需要修改
 
 
 [caffe-yolov2](https://github.com/gklz1982/caffe-yolov2)
