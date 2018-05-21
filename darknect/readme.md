@@ -401,6 +401,13 @@
     A：首先生成对应的中文标签，
     make_labels.py 修改代码中的字体，将其替换成指中文字体，如果提示提示缺少**模块，安装就行了。
     B：添加自己的读取标签和画框函数
+    
+[生成对应的中文标签](/tool/make_labels_cn.py)
+
+[修改的图像中午标签显示](/darkNet_src/image.c)
+
+[参考我的博客](https://blog.csdn.net/xiaoxiaowenqiang/article/details/80289577)
+
 ### Tips9: 图片上添加置信值
     如果编译时没有制定opencv，基本上很难实现。如果编译时指定了opencv,在画框的函数里面添加一下就行了。
 ### Tips10:图片保存名称
