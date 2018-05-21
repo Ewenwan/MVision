@@ -16,8 +16,18 @@
 
 [caffe-yolo v1  c++](https://github.com/yeahkun/caffe-yolo)
 
-      1.2. yolov2新添了route、reorg、region层，好在github上有人已经实现移植。
+      1.2. yolov2新添了route、reorg(passtrough层)、region层(最后输入解码)，好在github上有人已经实现移植。
 [移植yolo2到caffe框架](https://github.com/hustzxd/z1)
+
+      region_layer.cpp
+      region_layer.cu
+      region_layer.hpp
+
+      reorg_layer.cpp
+      reorg_layer.cu
+      reorg_layer.hpp
+
+
 
 [caffe-yolov2](https://github.com/gklz1982/caffe-yolov2)
 
