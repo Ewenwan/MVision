@@ -1,4 +1,3 @@
-// caffe\src\caffe\util\io.cpp
 #include <fcntl.h>
 ////////////////// 添加的头文件
 #include <boost/filesystem.hpp>
@@ -81,6 +80,7 @@ void WriteProtoToBinaryFile(const Message& proto, const char* filename) {
 #ifdef USE_OPENCV
 
 ////////////////////////////////////// 6 参数 ////
+// 变形到 指定 大小
 cv::Mat ReadImageToCVMat(const string& filename,
     const int height, const int width, const bool is_color,
     int* ori_w, int* ori_h) {
@@ -95,6 +95,7 @@ cv::Mat ReadImageToCVMat(const string& filename,
   *ori_w = cv_img_origin.cols;
   *ori_h = cv_img_origin.rows;
   if (height > 0 && width > 0) {
+    // 变形
     cv::resize(cv_img_origin, cv_img, cv::Size(width, height));
   } else {
     cv_img = cv_img_origin;
@@ -178,6 +179,7 @@ bool ReadBoxDataToDatum(const string& filename, const string& annoname,
     const map<string, int>& label_map, const int height, const int width, 
     const bool is_color, const std::string & encoding, Datum* datum) {
   int ori_w, ori_h;
+  // 图片 变形到指定格式
   cv::Mat cv_img = ReadImageToCVMat(filename, height, width, is_color, &ori_w, &ori_h);
   if (cv_img.data) {
     if (encoding.size()) {
@@ -202,15 +204,15 @@ bool ReadBoxDataToDatum(const string& filename, const string& annoname,
   }
 }
 #endif  // USE_OPENCV
-
+// 字符串标签 转换成 整数标签
 int name_to_label(const string& name, const map<string, int>& label_map) {
-  map<string, int>::const_iterator it = label_map.find(name);
+  map<string, int>::const_iterator it = label_map.find(name);//  map 查找
   if (it == label_map.end()) 
     return -1;
   else
-    return it->second;
+    return it->second;// 整数键值
 }
-
+// 转换标注文件 
 void ParseXmlToDatum(const string& annoname, const map<string, int>& label_map,
     int ori_w, int ori_h, Datum* datum) {
   ptree pt;
@@ -219,7 +221,7 @@ void ParseXmlToDatum(const string& annoname, const map<string, int>& label_map,
   try {
     height = pt.get<int>("annotation.size.height");
     width = pt.get<int>("annotation.size.width");
-    CHECK_EQ(ori_w, width);
+    CHECK_EQ(ori_w, width);// 在 范围内
     CHECK_EQ(ori_h, height);
   } catch (const ptree_error &e) {
     LOG(WARNING) << "When paring " << annoname << ": " << e.what();
@@ -228,23 +230,24 @@ void ParseXmlToDatum(const string& annoname, const map<string, int>& label_map,
   BOOST_FOREACH(ptree::value_type &v1, pt.get_child("annotation")) {
     if (v1.first == "object") {
       ptree object = v1.second;
-      int label(-1);
-      vector<float> box(4, 0);
+      int label(-1);// 一个类别标签
+      vector<float> box(4, 0);// 四个边框参数
       int difficult(0);
       BOOST_FOREACH(ptree::value_type &v2, object.get_child("")) {
         ptree pt2 = v2.second;
         if (v2.first == "name") {
-          string name = pt2.data();
+          string name = pt2.data();// 字符串 标签
           // map name to label
-          label = name_to_label(name, label_map);
+          label = name_to_label(name, label_map);// 字符串标签 转换成 整数标签
           if (label < 0) {
             LOG(FATAL) << "Anno file " << annoname << " -> unknown name: " << name;
           }
         } else if (v2.first == "bndbox") {
-          int xmin = pt2.get("xmin", 0);
+          int xmin = pt2.get("xmin", 0);// 左下角 坐标 (xmin,ymin)
           int ymin = pt2.get("ymin", 0);
-          int xmax = pt2.get("xmax", 0);
+          int xmax = pt2.get("xmax", 0);// 右上角 坐标 (xmax,ymax)
           int ymax = pt2.get("ymax", 0);
+           // 判断标签 合理性
           LOG_IF(WARNING, xmin < 0 || xmin > ori_w) << annoname << 
               " bounding box exceeds image boundary";
           LOG_IF(WARNING, xmax < 0 || xmax > ori_w) << annoname << 
@@ -257,19 +260,21 @@ void ParseXmlToDatum(const string& annoname, const map<string, int>& label_map,
               " bounding box exceeds image boundary";
           LOG_IF(WARNING, ymin > ymax) << annoname << 
               " bounding box exceeds image boundary";
+             // 边框中心点 坐标 所占 原图片大小的位置比例 
           box[0] = float(xmin + (xmax - xmin) / 2.) / ori_w;
           box[1] = float(ymin + (ymax - ymin) / 2.) / ori_h;
+             // 边框 尺寸 占据 原图片大小的比例
           box[2] = float(xmax - xmin) / ori_w;
           box[3] = float(ymax - ymin) / ori_h;
         } else if (v2.first == "difficult") {
-          difficult = atoi(pt2.data().c_str());
+          difficult = atoi(pt2.data().c_str());//  
         }
       }
       CHECK_GE(label, 0) << "label must start at 0";
-      datum->add_float_data(float(label));
+      datum->add_float_data(float(label));// 标签
       datum->add_float_data(float(difficult));
       for (int i = 0; i < 4; ++i) {
-        datum->add_float_data(box[i]);
+        datum->add_float_data(box[i]);// 边框数据
       }
     }
   }
