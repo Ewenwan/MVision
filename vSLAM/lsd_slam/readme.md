@@ -75,7 +75,18 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 ## 【2】深度估计 Depth Estimate 沿极线搜索得到匹配点对，根据运动矩阵得深度
     如果相机移动了足够远，那么就重新创建一个新的关键帧，否则就 匹配当前的关键帧 
 [视觉定位原理：对极几何与基本矩阵](https://blog.csdn.net/lancelot_vim/article/details/51724330)
+[基于灰度的模板匹配算法](https://blog.csdn.net/qq_18343569/article/details/49003993)
 
+    匹配点对 + 变换矩阵 根据三角测量得到深度
+    匹配点对使用的方法有：
+       1. 绝对差和平均值算法（Mean Absolute Differences，简称MAD算法）
+       2. 绝对误差和算法  （Sum of Absolute Differences，简称SAD算法）
+       3. 误差平方和平均值算法（Mean Square Differences，简称MSD算法）
+       4. 误差平方和算法（Sum of Squared Differences，简称SSD算法）
+       5. 归一化积相关算法（Normalized Cross Correlation，简称NCC算法），
+          与上面算法相似，依然是利用子图与模板图的灰度，
+          通过归一化的相关性度量公式来计算二者之间的匹配程度。
+          
 ### 深度估计主要有三个过程，分别是：
     1. 用立体视觉方法来从先前的帧得到新的深度估计
     2. 深度图帧与帧之间的传播
