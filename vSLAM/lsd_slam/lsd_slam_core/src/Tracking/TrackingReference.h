@@ -1,10 +1,13 @@
 /**
 * This file is part of LSD-SLAM.
 * 跟踪的第一步就是 为当前帧 旋转 跟踪的参考帧
-* 
-* 
-* 
-* 
+*  包含 每一层金字塔上的：
+* 1.   关键点位置坐标                                posData[i]                 (x,y,z)
+* 2.   关键点像素梯度信息                        gradData[i]                (dx, dy)
+* 3.   关键点像素值 和 逆深度方差信息   colorAndVarData[i]   (I, Var)
+* 4.   关键点位置对应的 灰度像素点        pointPosInXYGrid[i]  x + y*width
+*       上面四个都是指针数组
+* 5.   产生的 物理世界中的点的数量       numData[i]
 * 
 */
 
@@ -37,7 +40,7 @@ public:
 	TrackingReference();
 	// 类析构函数
 	~TrackingReference();
-	//  重要帧
+	//  导入 帧 更新帧的资源配置的记录
 	void importFrame(Frame* source);
         // 关键帧
 	Frame* keyframe;
@@ -45,8 +48,10 @@ public:
 	boost::shared_lock<boost::shared_mutex> keyframeLock;
 	// 帧ID 身份证 编号
 	int frameID;
+	
         // 创建点云
 	void makePointCloud(int level);
+	
 	// 清理 计数 numData[level] = 0;  内存 未清理
 	void clearAll();
 	void invalidate();
@@ -56,7 +61,7 @@ public:
 	Eigen::Vector2f* gradData[PYRAMID_LEVELS];	// (dx, dy)
 	// 每一个金字塔层级上2d像素点 对应的 像素值和 方差信息
 	Eigen::Vector2f* colorAndVarData[PYRAMID_LEVELS];	// (I, Var)
-	// 点位置对应的网格点
+	// 关键点位置对应的 灰度像素点        
 	int* pointPosInXYGrid[PYRAMID_LEVELS];	// x + y*width
 	int numData[PYRAMID_LEVELS];// 点云的记录数据
 
