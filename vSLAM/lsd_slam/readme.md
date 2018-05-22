@@ -43,9 +43,9 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
     
     根据匹配关系 优化变换矩阵 以及更新深度
-![](pic/LSD_SLAM1.png)
-![](pic/LSD_SLAM2.png)
-![](pic/LSD_SLAM3.png)
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/LSD_SLAM1.png)
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/LSD_SLAM2.png)
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/LSD_SLAM3.png)
     
      1. 上述第一项是关于两帧之间变换矩阵的 误差函数 E()，
          p为一个帧i上的关键点(最大梯度值大于阈值可以成为候选)，
@@ -191,7 +191,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
     首先我们需要插图关键帧到地图当中，要插入关键帧，自然需要知道什么时候需要插入，那么我们需要定义一个距离
 
-![](lsd9.png)
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/lsd9.png)
 
 
     这里的W是一个对角阵，表示每个维度的权重，我们设定一个阈值，假如 运动距离大于设定的阈值，
@@ -203,27 +203,27 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     可能会导致两帧之间的变换不那么准确，因此我们放出一个尺度的自由度，
     使用sim(3)来衡量两帧之间的变换，也就是说，我们需要找到一个sim(3)群中的变换kesi，
     使得下面定义这个误差最小：
-![](lsd10.png)
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/lsd10.png)
 
     式子中：
     匹配点坐标 误差和误差的不确定度 协方差
     
-![](lsd11.png)
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/lsd11.png)
  
     式子中：
     匹配点你深度 误差和误差的不确定度 协方差
        
- ![](lsd12.png)   
+ ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/lsd12.png)   
 
      那么如何去寻找要插入的位置呢？方法很简单，
      首先去寻找所有可能相似的关键帧，并计算视觉意义上的相似度，
      之后对这些帧进行排序，得到最相似的那几帧，
      然后根据上面那个方程算出sim(3),相似度衡量公式: 
- ![](lsd13.png)   
+ ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/lsd13.png)   
  
     如果这个数值足够小(这个相似度足够高)，那么这一帧便插入map中，
     最后执行图优化(g2o)边为连接关系，节点为关键帧，即优化： 
- ![](lsd14.png)   
+ ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/lsd14.png)   
 
 [数值优化算法](https://github.com/Ewenwan/Mathematics#%E6%95%B0%E5%80%BC%E4%BC%98%E5%8C%96) 
 ## 1. 函数f(x)的一阶泰勒展开
