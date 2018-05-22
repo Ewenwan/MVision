@@ -1,12 +1,35 @@
 /**
 * This file is part of LSD-SLAM.
 * 跟踪的第一步就是 为当前帧 旋转 跟踪的参考帧
+*  包含 每一层金字塔上的：
+* 1.   关键点位置坐标                                posData[i]                 (x,y,z)
+* 2.   关键点像素梯度信息                        gradData[i]                (dx, dy)
+* 3.   关键点像素值 和 逆深度方差信息   colorAndVarData[i]   (I, Var)
+* 4.   关键点位置对应的 灰度像素点        pointPosInXYGrid[i]  x + y*width
+*       上面四个都是指针数组
+* 5.   产生的 物理世界中的点的数量       numData[i]
 * 
+* 1. 关键点位置坐标 的产生
+*       P*T*K =  (u,v,1)    P 世界坐标系下的点坐标
+*       Q*I*K =  (u,v,1)    Q 当前坐标系下的点坐标
+*       Q  =  (X/Z，Y/Z，1)  这里Z就相当于 当前相机坐标系下 点的Z轴方向的深度值D
 * 
+*        (X，Y，Z) = D  *  (u,v,1)*K逆 =1/(1/D)* (u*fx_inv + cx_inv, v+fy_inv+cy_inv, 1)
 * 
+*       *posDataPT = (1.0f / pyrIdepthSource[idx]) * Eigen::Vector3f(fxInvLevel*x+cxInvLevel,fyInvLevel*y+cyInvLevel,1);
 * 
+* 2. 关键点像素梯度信息   的产生 
+*     在帧类中有计算直接取来就行了 
+*     *gradDataPT = pyrGradSource[idx].head<2>();
 * 
+* 3.  关键点像素值 和 逆深度方差信息
+*     分别在 帧的 图像金字塔 和 逆深度方差金字塔中已经存在，直接取过来
+*     *colorAndVarDataPT = Eigen::Vector2f(pyrColorSource[idx], pyrIdepthVarSource[idx]);
+* 4. 关键点位置对应的 灰度像素点   直接就是像素所在的位置编号  x + y*width
 * 
+* 5. 产生的 物理世界中的点的数量
+*    首尾指针位置之差就是  三维点 的数量
+* 	numData[level] = posDataPT - posData[level]; 
 */
 
 #include "Tracking/TrackingReference.h"
@@ -97,55 +120,60 @@ void TrackingReference::invalidate()
 // 
 void TrackingReference::makePointCloud(int level)
 {
+  // 指针 不为空
 	assert(keyframe != 0);
+  // 内存上锁
 	boost::unique_lock<boost::mutex> lock(accessMutex);
-
+ // 判断当前层的点云是否已经生成过
 	if(numData[level] > 0)
 		return;	// already exists.
-
-	int w = keyframe->width(level);
+// 当前层 的大小
+	int w = keyframe->width(level);// 
 	int h = keyframe->height(level);
-
+// 当前层的 相机内参数
 	float fxInvLevel = keyframe->fxInv(level);
 	float fyInvLevel = keyframe->fyInv(level);
 	float cxInvLevel = keyframe->cxInv(level);
 	float cyInvLevel = keyframe->cyInv(level);
-
-	const float* pyrIdepthSource = keyframe->idepth(level);
-	const float* pyrIdepthVarSource = keyframe->idepthVar(level);
-	const float* pyrColorSource = keyframe->image(level);
-	const Eigen::Vector4f* pyrGradSource = keyframe->gradients(level);
-
-	if(posData[level] == nullptr) posData[level] = new Eigen::Vector3f[w*h];
-	if(pointPosInXYGrid[level] == nullptr)
+// 逆深度 方差 像素值 梯度
+	const float* pyrIdepthSource = keyframe->idepth(level);// 逆深度
+	const float* pyrIdepthVarSource = keyframe->idepthVar(level);// 逆深度方差
+	const float* pyrColorSource = keyframe->image(level);// 像素 灰度值
+	const Eigen::Vector4f* pyrGradSource = keyframe->gradients(level);// 梯度 x方向梯度 y反向梯度等
+//  申请内存 位置点(x,y,z)  网格点  梯度  颜色和方差 信息申请内存
+	if(posData[level] == nullptr) posData[level] = new Eigen::Vector3f[w*h];// 位置点(x,y,z) 
+	if(pointPosInXYGrid[level] == nullptr)// 关键点位置对应的网格点    x + y*width
 		pointPosInXYGrid[level] = (int*)Eigen::internal::aligned_malloc(w*h*sizeof(int));;
-	if(gradData[level] == nullptr) gradData[level] = new Eigen::Vector2f[w*h];
-	if(colorAndVarData[level] == nullptr) colorAndVarData[level] = new Eigen::Vector2f[w*h];
+	if(gradData[level] == nullptr) gradData[level] = new Eigen::Vector2f[w*h];// 梯度信息    (dx, dy)
+	if(colorAndVarData[level] == nullptr) colorAndVarData[level] = new Eigen::Vector2f[w*h];// 关键点像素值 和 方差信息  (I, Var)
+// 获取起始指针 
+	Eigen::Vector3f* posDataPT = posData[level];// 位置
+	int* idxPT = pointPosInXYGrid[level];// 关键点位置对应的 灰度像素点 位置编号
+	Eigen::Vector2f* gradDataPT = gradData[level];// 梯度信息 
+	Eigen::Vector2f* colorAndVarDataPT = colorAndVarData[level];// 关键点像素值 和 方差信息
 
-	Eigen::Vector3f* posDataPT = posData[level];
-	int* idxPT = pointPosInXYGrid[level];
-	Eigen::Vector2f* gradDataPT = gradData[level];
-	Eigen::Vector2f* colorAndVarDataPT = colorAndVarData[level];
-
-	for(int x=1; x<w-1; x++)
-		for(int y=1; y<h-1; y++)
+	for(int x=1; x<w-1; x++)// 每一列
+		for(int y=1; y<h-1; y++)// 每一行
 		{
-			int idx = x + y*w;
-
+			int idx = x + y*w;// 像素的id编号
+               // 跳过逆深度信息 为0的点 或者方差小于0的点
 			if(pyrIdepthVarSource[idx] <= 0 || pyrIdepthSource[idx] == 0) continue;
-
+               // 像素位置* k逆*深度 得到 当前像极坐标系下的 3d点坐标
 			*posDataPT = (1.0f / pyrIdepthSource[idx]) * Eigen::Vector3f(fxInvLevel*x+cxInvLevel,fyInvLevel*y+cyInvLevel,1);
+	       // 图像中点 的x方向梯度 和y方向梯度，在帧类中有计算直接取来就行了 
 			*gradDataPT = pyrGradSource[idx].head<2>();
+	      // 分别在 帧的 图像金字塔 和 逆深度方差金字塔中已经存在，直接取过来	
 			*colorAndVarDataPT = Eigen::Vector2f(pyrColorSource[idx], pyrIdepthVarSource[idx]);
+	      // 就是像素点的编号  起始点为1 
 			*idxPT = idx;
-
+              // 指针++  移动到下一个存储位置
 			posDataPT++;
 			gradDataPT++;
 			colorAndVarDataPT++;
 			idxPT++;
 		}
 
-	numData[level] = posDataPT - posData[level];
+	numData[level] = posDataPT - posData[level];// 首尾指针位置之差就是  三维点 的数量
 }
 
 }
