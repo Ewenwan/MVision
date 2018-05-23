@@ -168,5 +168,97 @@
        应该是目前为止看到效果最好的方法了（CVPR2017里可能会有更好的效果） 
 [Deep Temporal Linear Encoding Networks](https://arxiv.org/pdf/1611.06678.pdf)
 
+#### key volume的自动识别
+[A Key Volume Mining Deep Framework for Action Recognition](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Zhu_A_Key_Volume_CVPR_2016_paper.pdf)
+
+    本文主要做的是key volume的自动识别。
+    通常都是将一整段动作视频进行学习，而事实上这段视频中有一些帧与动作的关系并不大。
+    因此进行关键帧的学习，再在关键帧上进行CNN模型的建立有助于提高模型效果。
+    本文达到了93%的正确率吗，为目前最高。
+    实验效果：UCF101-93.1%，HMDB51-63.3%
+
+### 数据数据的提纯
+    输入一方面指输入的数据类型和格式，也包括数据增强的相关操作。
+
+    双流网络中，空间网络通道的输入格式通常为单RGB图像或者是多帧RGB堆叠。
+    而空间网络一般是直接对ImageNet上经典的网络进行finetune。
+    虽然近年来对motion信息的关注逐渐上升，指责行为识别过度依赖背景和外貌特征，
+    而缺少对运动本身的建模，但是，事实上，运动既不是名词，
+    也不应该是动词，而应该是动词+名词的形式，例如：play+basketball，也可以是play+football。
+    所以，个人认为，虽然应该加大的时间信息的关注，但不可否认空间特征的重要作用。
+
+#### 空间流上 改进 提取关键帧
+    空间网络主要捕捉视频帧中重要的物体特征。
+    目前大部分公开数据集其实可以仅仅依赖单图像帧就可以完成对视频的分类，
+    而且往往不需要分割，那么，在这种情况下，
+    空间网络的输入就存在着很大的冗余，并且可能引入额外的噪声。
+
+    是否可以提取出视频中的关键帧来提升分类的水平呢？下面这篇论文就提出了一种提取关键帧的方法。
+
+[A Key Volume Mining Deep Framework for Action Recognition 【CVPR2016】](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Zhu_A_Key_Volume_CVPR_2016_paper.pdf)
+#### 提取关键帧 改进
+    虽然上面的方法可以集成到一个网络中训练，
+    但是思路是按照图像分类算法RCNN中需要分步先提出候选框，挑选出关键帧。
+    既然挑选前需要输入整个视频，可不可以省略挑选这个步骤，
+    直接在卷积/池化操作时，重点关注那些关键帧，而忽视那些冗余帧呢？
+    去年就有人提出这样的解决方法。
+[AdaScan: Adaptive Scan Pooling in Deep Convolutional Neural Networks for Human Action Recognition in Videos](https://arxiv.org/pdf/1611.08240.pdf)
+
+    注：AdaScan的效果一般，关键帧的质量比上面的Key Volume Mining效果要差一点。不过模型整体比较简单。
+#### 时间流   上输入的改进 光流信息
+    输入方面，空间网络目前主要集中在关键帧的研究上。
+    而对于temporal通道而言，则是更多人的关注焦点。
+    首先，光流的提取需要消耗大量的计算力和时间（有论文中提到几乎占据整个训练时间的90%）；
+    其次，光流包含的未必是最优的的运动特征。
+
+[On the Integration of Optical Flow and Action Recognition](https://arxiv.org/pdf/1712.08416.pdf)
+
+#### cnn网络自学习 光流提取 
+    那么，光流这种运动特征可不可以由网络自己学呢？
+[Hidden Two-Stream Convolutional Networks for Action Recognition](https://arxiv.org/pdf/1704.00389.pdf)
+
+    该论文主要参考了flownet，即使用神经网络学习生成光流图，然后作为temporal网络的输入。
+    该方法提升了光流的质量，而且模型大小也比flownet小很多。
+    有论文证明，光流质量的提高，尤其是对于边缘微小运动光流的提升，对分类有关键作用。
+    另一方面，该论文中也比较了其余的输入格式，如RGB diff。但效果没有光流好。
+
+    目前，除了可以考虑尝试新的数据增强方法外，如何训练出替代光流的运动特征应该是接下来的发展趋势之一。
 
 
+### 信息的融合
+    这里连接主要是指双流网络中时空信息的交互。
+    一种是单个网络内部各层之间的交互，如ResNet/Inception；
+    一种是双流网络之间的交互，包括不同fusion方式的探索，
+       目前值得考虑的是参照ResNet的结构，连接双流网络。
+#### 基于 ResNet 的双流融合
+    空间和时序网络的主体都是ResNet，
+    增加了从Motion Stream到Spatial Stream的交互。论文还探索多种方式。
+    
+[Spatiotemporal Multiplier Networks for Video Action Recognition](http://openaccess.thecvf.com/content_cvpr_2017/papers/Feichtenhofer_Spatiotemporal_Multiplier_Networks_CVPR_2017_paper.pdf)
+
+#### 金字塔 双流融合
+
+[Spatiotemporal Pyramid Network for Video Action Recognition](http://openaccess.thecvf.com/content_cvpr_2017/papers/Wang_Spatiotemporal_Pyramid_Network_CVPR_2017_paper.pdf)
+
+    行为识别的关键就在于如何很好的融合空间和时序上的特征。
+    作者发现，传统双流网络虽然在最后有fusion的过程，但训练中确实单独训练的，
+    最终结果的失误预测往往仅来源于某一网络，并且空间/时序网络各有所长。
+    论文分析了错误分类的原因：
+    空间网络在视频背景相似度高的时候容易失误，
+    时序网络在long-term行为中因为snippets length的长度限制容易失误。
+    那么能否通过交互，实现两个网络的互补呢？
+
+    该论文重点在于STCB模块，详情请参阅论文。
+    交互方面，在保留空间、时序流的同时，对时空信息进行了一次融合，最后三路融合，得出最后结果
+
+#### 这两篇论文从pooling的层面提高了双流的交互能力
+
+[Attentional Pooling for Action Recognition](https://papers.nips.cc/paper/6609-attentional-pooling-for-action-recognition.pdf)
+
+[ActionVLAD: Learning spatio-temporal aggregation for action classification](http://openaccess.thecvf.com/content_cvpr_2017/papers/Girdhar_ActionVLAD_Learning_Spatio-Temporal_CVPR_2017_paper.pdf)
+
+
+#### 基于ResNet的结构探索新的双流连接方式
+[Deep Convolutional Neural Networks with Merge-and-Run Mappings](https://arxiv.org/pdf/1611.07718.pdf)
+
+#### 
