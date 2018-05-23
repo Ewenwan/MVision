@@ -13,10 +13,9 @@
     caffe/include/caffe/layer 下添加 
       box_data_layer.hpp
     caffe/src/caffe/layers/  下添加 
-      box_data_layer.cpp
-
+      box_data_layer.cpp     也需要 调整有些数据类型变了 数值变指针
       需要修改
-
+      
 
     b. 检测loss层
       detection_loss_layer.hpp
@@ -593,10 +592,9 @@
 
     caffe\include\caffe\layers\base_data_layer.hpp  
         class BaseDataLayer : public Layer<Dtype> {} // 添加 bool box_label_; 边框标签
-
-        base_data_layer.c 
-        BaseDataLayer<Dtype>::LayerSetUp{}  
-        //////////////////////////////////////////
+        base_data_layer.c 均需要修改   添加了 多标签  边框标签
+        BaseDataLayer<Dtype>::LayerSetUp{}  
+         //////////////////////////////////////////
         /////////////////////// add  ////////////////
         box_label_ = false;
         //////////////////////////////////////////////
@@ -614,11 +612,6 @@
         // Data layers should be shared by multiple solvers in parallel
         // virtual inline bool ShareInParallel() const { return true; }
         /////////////////////////////////////////
-
-    hdf5_data_layer.hpp      // 可能不需要改 
-    hdf5_output_layer.hpp   // 可能不需要改 
-
-
 
     input_layer.hpp
         ///////  add  ///////////////////////////
