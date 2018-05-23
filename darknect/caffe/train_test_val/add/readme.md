@@ -11,10 +11,13 @@
     eval_detection_layer.cpp
     eval_detection_layer.hpp
 ### 需要重要修改的文件
-    base_data_layer.cpp
+    base_data_layer.cpp
     base_data_layer.cu
     base_data_layer.hpp
 
+    data_transformer.cpp
+    data_transformer.hpp
+    
 ## yolov2
 ### 1. passtrough层
     reorg_layer.cpp
