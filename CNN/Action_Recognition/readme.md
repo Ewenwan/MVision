@@ -1,5 +1,8 @@
 # Video Analysis 相关领域 之Action Recognition(行为识别)
 [论文总结参考](https://blog.csdn.net/whfshuaisi/article/details/79116265)
+
+[博客参考2](https://blog.csdn.net/wzmsltw/article/details/70239000)
+
 # 1. 任务特点及分析
 ## 目的
     给一个视频片段进行分类，类别通常是各类人的动作
