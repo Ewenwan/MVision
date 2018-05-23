@@ -11,7 +11,9 @@
 
 [有tensorflow的实现 v1](https://github.com/tensorflow/models/blob/master/slim/nets/mobilenet_v1.md)
 
-[caffe也有人实现 v1](https://github.com/shicai/MobileNet-Caffe)
+[caffe也有人实现 v1 v2](https://github.com/shicai/MobileNet-Caffe)
+
+[非官方Caffe v1](https://github.com/shicai/MobileNet-Caffe)
 
 [MobileNetV2-pytorch](https://github.com/Randl/MobileNetV2-pytorch)
 
