@@ -149,7 +149,6 @@ float SE3Tracker::checkPermaRefOverlap(
 			usageCount += depthChange < 1 ? depthChange : 1;// 按照最大值1  记录总和
 		}
 	}
-
 	pointUsage = usageCount / (float)reference->permaRefNumPts;//  变换 均值
 	return pointUsage;
 }
@@ -272,65 +271,74 @@ SE3 SE3Tracker::trackFrameOnPermaref(
 
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////// 最终要的跟踪匹配　函数////////////////////////////////////////////
 // tracks a frame.
 // first_frame has depth, second_frame DOES NOT have depth.
 SE3 SE3Tracker::trackFrame(
-		TrackingReference* reference,
-		Frame* frame,
-		const SE3& frameToReference_initialEstimate)
+		TrackingReference* reference,//  参考帧，第一帧　含有　逆深度信息
+		Frame* frame,//  当前帧　第二帧　　没有深度　需要匹配后　获取　
+		const SE3& frameToReference_initialEstimate)// 初始变换矩阵　　fram 到参考帧　的　变换矩阵
 {
-
+// 内存上锁
 	boost::shared_lock<boost::shared_mutex> lock = frame->getActiveLock();
 	diverged = false;
 	trackingWasGood = true;
-	affineEstimation_a = 1; affineEstimation_b = 0;
-
+	affineEstimation_a = 1; affineEstimation_b = 0;// 仿射变换参数
+// 保存　跟踪　信息
 	if(saveAllTrackingStages)
 	{
 		saveAllTrackingStages = false;
 		saveAllTrackingStagesInternal = true;
 	}
-	
+// 初始化　跟踪迭代信息	
 	if (plotTrackingIterationInfo)
 	{
-		const float* frameImage = frame->image();
-		for (int row = 0; row < height; ++ row)
-			for (int col = 0; col < width; ++ col)
+		const float* frameImage = frame->image();// 当前帧　第０层　图像
+		for (int row = 0; row < height; ++ row)// 每行
+			for (int col = 0; col < width; ++ col)// 每列
+			  // 按照初始图像像素灰度值　设置　颜色
 				setPixelInCvMat(&debugImageSecondFrame,getGrayCvPixel(frameImage[col+row*width]), col, row, 1);
 	}
 
 	// ============ track frame ============
+// 首先将初始估计记录下来(记录了参考帧到当前帧的 欧式变换矩阵)
+	// 参考帧 到 当前帧　 fram　的　变换矩阵
 	Sophus::SE3f referenceToFrame = frameToReference_initialEstimate.inverse().cast<float>();
-	NormalEquationsLeastSquares ls;
+	NormalEquationsLeastSquares ls;// 然后定义一个6自由度矩阵的误差判别计算对象ls
 
 
-	int numCalcResidualCalls[PYRAMID_LEVELS];
-	int numCalcWarpUpdateCalls[PYRAMID_LEVELS];
+	int numCalcResidualCalls[PYRAMID_LEVELS];// cell数量  5层　金字塔
+	int numCalcWarpUpdateCalls[PYRAMID_LEVELS];//　
 
-	float last_residual = 0;
+	float last_residual = 0;// 最终的残差
 
 
-	for(int lvl=SE3TRACKING_MAX_LEVEL-1;lvl >= SE3TRACKING_MIN_LEVEL;lvl--)
+	for(int lvl=SE3TRACKING_MAX_LEVEL-1;lvl >= SE3TRACKING_MIN_LEVEL;lvl--)// 在没一层金字塔上进行跟踪
 	{
+	  // 从最高层的　金字塔图像(尺寸最小)　开始　向下计算
 		numCalcResidualCalls[lvl] = 0;
 		numCalcWarpUpdateCalls[lvl] = 0;
-
+          // 首先得到参考帧的　3d 点云
 		reference->makePointCloud(lvl);
-
+// 计算匹配　点对　像素误差　　在这个函数中，把　buf_warped　相关的参数全部更新，并且更新了上次的相似变换参数等
 		callOptimized(calcResidualAndBuffers, (reference->posData[lvl], reference->colorAndVarData[lvl], SE3TRACKING_MIN_LEVEL == lvl ? reference->pointPosInXYGrid[lvl] : 0, reference->numData[lvl], frame, referenceToFrame, lvl, (plotTracking && lvl == SE3TRACKING_MIN_LEVEL)));
+		// buf_warped_size 记录了　匹配点数量　包括好的匹配点　和　不好的匹配点　数量　(只要投影后在图像范围内就可以)
 		if(buf_warped_size < MIN_GOODPERALL_PIXEL_ABSMIN * (width>>lvl)*(height>>lvl))
-		{
+		{//　如果匹配点数量过少，已经少于了这一层图像像素数量的1%)，那么我们认为差别太大，Tracking失败，返回一个空的SE3
+		  // 　
 			diverged = true;
-			trackingWasGood = false;
-			return SE3();
+			trackingWasGood = false;// Tracking失败
+			return SE3();// 返回一个空的SE3
 		}
-
+// 使用　仿射变换参数
+// 如果使用了，那么把通过calcResidualAndBuffers函数更新的affineEstimation_a_lastIt以及affineEstimation_b_lastIt，赋值给仿射变换系数
 		if(useAffineLightningEstimation)
 		{
 			affineEstimation_a = affineEstimation_a_lastIt;
 			affineEstimation_b = affineEstimation_b_lastIt;
 		}
+// 然后调用calcWeightsAndResidual得到误差，并记录调用次数
 		float lastErr = callOptimized(calcWeightsAndResidual,(referenceToFrame));
 
 		numCalcResidualCalls[lvl]++;
@@ -447,7 +455,6 @@ SE3 SE3Tracker::trackFrame(
 		}
 	}
 
-
 	if(plotTracking)
 		Util::displayImage("TrackingResidual", debugImageResiduals, false);
 
@@ -484,7 +491,8 @@ SE3 SE3Tracker::trackFrame(
 }
 
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////
 #if defined(ENABLE_SSE)
 float SE3Tracker::calcWeightsAndResidualSSE(
 		const Sophus::SE3f& referenceToFrame)
@@ -571,9 +579,6 @@ float SE3Tracker::calcWeightsAndResidualSSE(
 	return sumRes / ((buf_warped_size >> 2)<<2);
 }
 #endif
-
-
-
 #if defined(ENABLE_NEON)
 float SE3Tracker::calcWeightsAndResidualNEON(
 		const Sophus::SE3f& referenceToFrame)
@@ -742,26 +747,29 @@ float SE3Tracker::calcWeightsAndResidualNEON(
 	return sumRes / buf_warped_size;
 }
 #endif
-// 计算权重 
+// 计算权重  和　像素匹配误差
 float SE3Tracker::calcWeightsAndResidual(
-		const Sophus::SE3f& referenceToFrame)
+		const Sophus::SE3f& referenceToFrame)// 参考帧　到　当前帧　欧式变换矩阵
 {
+  // 平移向量
 	float tx = referenceToFrame.translation()[0];
 	float ty = referenceToFrame.translation()[1];
 	float tz = referenceToFrame.translation()[2];
 
 	float sumRes = 0;
 
-	for(int i=0;i<buf_warped_size;i++)
+	for(int i=0;i<buf_warped_size;i++)// 对于初步匹配得　每一个　匹配点
 	{
+	  // 参考帧　映射到　当前帧坐标系下的　3d 坐标
 		float px = *(buf_warped_x+i);	// x'
 		float py = *(buf_warped_y+i);	// y'
 		float pz = *(buf_warped_z+i);	// z'
-		float d = *(buf_d+i);	// d
-		float rp = *(buf_warped_residual+i); // r_p
-		float gx = *(buf_warped_dx+i);	// \delta_x I
-		float gy = *(buf_warped_dy+i);  // \delta_y I
-		float s = settings.var_weight * *(buf_idepthVar+i);	// \sigma_d^2
+		
+		float d = *(buf_d+i);	// d  　　　　　　　　	参考帧 Z轴 倒数  = 参考帧 逆深度
+		float rp = *(buf_warped_residual+i); // r_p 　　	匹配点对 像素匹配误差
+		float gx = *(buf_warped_dx+i);	// \delta_x I　	当前帧　亚像素　梯度值gx　仿射变换后(  乘以　相机内参数)
+		float gy = *(buf_warped_dy+i);  // \delta_y I       	gy
+		float s = settings.var_weight  *  *(buf_idepthVar+i);	// \sigma_d^2    参考帧 逆深度 方差  平方
 
 
 		// calc dw/dd (first 2 components):
@@ -779,12 +787,13 @@ float SE3Tracker::calcWeightsAndResidual(
 
 		sumRes += wh * w_p * rp*rp;
 
-
 		*(buf_weight_p+i) = wh * w_p;
 	}
 
 	return sumRes / buf_warped_size;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 // 如果要可视化Tracking的迭代过程，那么第一步自然是把debug相关的参数都设置进去，
 // 否则直接进行下一步，这个操作是通过调用calcResidualAndBuffers_debugStart()实现的
@@ -802,8 +811,10 @@ void SE3Tracker::calcResidualAndBuffers_debugStart()
 	}
 }
 
+// 完成匹配误差计算  保存误差信息图片
 void SE3Tracker::calcResidualAndBuffers_debugFinish(int w)
 {
+  // 显示跟踪 优化迭代信息
 	if(plotTrackingIterationInfo)
 	{
 		Util::displayImage( "Weights", debugImageWeights );
@@ -811,7 +822,6 @@ void SE3Tracker::calcResidualAndBuffers_debugFinish(int w)
 		Util::displayImage( "Intensities of second_frame at transformed positions", debugImageOldImageSource );
 		Util::displayImage( "Intensities of second_frame at pointcloud in first_frame", debugImageOldImageWarped );
 		Util::displayImage( "Residuals", debugImageResiduals );
-
 
 		// wait for key and handle it
 		bool looping = true;
@@ -830,26 +840,30 @@ void SE3Tracker::calcResidualAndBuffers_debugFinish(int w)
 			if(key == ' ')
 				looping = false;
 			else
-				handleKey(k);
+				handleKey(k);// 处理
 		}
 	}
-
+// 保存跟踪迭代信息　图像
 	if(saveAllTrackingStagesInternal)
 	{
 		char charbuf[500];
 
-		snprintf(charbuf,500,"save/%sresidual-%d-%d.png",packagePath.c_str(),w,iterationNumber);
-		cv::imwrite(charbuf,debugImageResiduals);
+		snprintf(charbuf,500,"save/%sresidual-%d-%d.png",packagePath.c_str(),w,iterationNumber);// 格式化字符串 图片名
+		cv::imwrite(charbuf,debugImageResiduals);// 写图片  参差
 
 		snprintf(charbuf,500,"save/%swarped-%d-%d.png",packagePath.c_str(),w,iterationNumber);
 		cv::imwrite(charbuf,debugImageOldImageWarped);
 
 		snprintf(charbuf,500,"save/%sweights-%d-%d.png",packagePath.c_str(),w,iterationNumber);
-		cv::imwrite(charbuf,debugImageWeights);
+		cv::imwrite(charbuf,debugImageWeights);// 权重图片
 
-		printf("saved three images for lvl %d, iteration %d\n",w,iterationNumber);
+		printf("saved three images for lvl %d, iteration %d\n",w,iterationNumber);// 打印信息
 	}
 }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////  跟踪完成获取　变换矩阵　和　3d 点后 反投影到当前帧　　计算　灰度匹配误差 ////////////////////////////
 // calcResidualAndBuffers  X86平台 SSE指令集优化
 #if defined(ENABLE_SSE)
 float SE3Tracker::calcResidualAndBuffersSSE(
@@ -885,15 +899,29 @@ float SE3Tracker::calcResidualAndBuffersNEON(
 // #ifndef又和#if !defined()的用法一致。
 
 // 优化相关的函数，参数共有8个，在后面可以看到，其他函数通过  callOptimized 这个宏调用了这个函数进行优化操作
+// 匹配帧通过 变换矩阵 和 相机内参数 投影到 当前图像平面上(值为float小数)
+// 而原图像上的像素点坐标为 整数值，每一个像素位置对应有，梯度信息
+// 那么 浮点数像素坐标对应的像素 是多少呢，根据浮点数坐标 四周的四个整数点坐标的梯度 加权和　后计算　灰度匹配误差
+// 根据变换矩阵和原3D点和灰度值　计算匹配点对之间得　像素匹配误差　　以及　匹配点对　好坏标志图
+/*
+ input:
+ refPoint　　　 			参考帧 3d坐标 起始 地址指针
+ refColVar　　　			参考帧 灰度和 逆深度方差 起始地址
+ idxBuf　　　　			 匹配点好坏标志图 指针
+ frame　　　　			当前帧　指针
+ referenceToFrame　　 	参考帧　变换到　当前帧下得　欧式变换矩阵　引用　
+ level　　　　　　　　　	金字塔层级
+ plotResidual　　　　		匹配误差图标志
+ */
 float SE3Tracker::calcResidualAndBuffers(
-		const Eigen::Vector3f* refPoint,
-		const Eigen::Vector2f* refColVar,
-		int* idxBuf,
-		int refNum,
-		Frame* frame,
-		const Sophus::SE3f& referenceToFrame,
+		const Eigen::Vector3f* refPoint,// 参考帧 3d坐标 起始 地址
+		const Eigen::Vector2f* refColVar,// 参考帧 灰度和 逆深度方差 起始地址
+		int* idxBuf,// 匹配点好坏标志图 指针
+		int refNum,// 参考帧 3d点数量
+		Frame* frame,// 当前帧
+		const Sophus::SE3f& referenceToFrame,// 参考帧　变换到　当前帧下得　欧式变换矩阵　
 		int level,// 金字塔层级
-		bool plotResidual)
+		bool plotResidual)//显示　匹配误差图标志
 {
 // 如果要可视化Tracking的迭代过程，那么第一步自然是把debug相关的参数都设置进去，
 // 否则直接进行下一步，这个操作是通过调用calcResidualAndBuffers_debugStart()实现的
@@ -919,7 +947,7 @@ float SE3Tracker::calcResidualAndBuffers(
 // 然后定义后续所要使用的变量
 	int idx=0;
 	float sumResUnweighted = 0;
-	bool* isGoodOutBuffer = idxBuf != 0 ? frame->refPixelWasGood() : 0;
+	bool* isGoodOutBuffer = idxBuf != 0 ? frame->refPixelWasGood() : 0;// 匹配点 对 匹配效果好坏
 	int goodCount = 0;
 	int badCount = 0;
 	float sumSignedRes = 0;
@@ -945,88 +973,96 @@ float SE3Tracker::calcResidualAndBuffers(
 		}
 // 使用 当前点 右方点  右下方点 正下方点 的灰度梯度信息 以及 相应位置差值作为权重值 线性加权获取加权梯度信息
 // 然后差值得到亚像素精度级别的 梯度(注意深度的第三个维度是图像数据)
+// 浮点数像素坐标对应的像素 是多少呢，根据浮点数坐标 四周的四个整数点坐标的梯度 加权和
 		Eigen::Vector3f resInterp = getInterpolatedElement43(frame_gradients, u_new, v_new, w);
-
-		float c1 = affineEstimation_a * (*refColVar)[0] + affineEstimation_b;
-		float c2 = resInterp[2];
-		float residual = c1 - c2;
-
-		float weight = fabsf(residual) < 5.0f ? 1 : 5.0f / fabsf(residual);
-		sxx += c1*c1*weight;
-		syy += c2*c2*weight;
-		sx += c1*weight;
-		sy += c2*weight;
-		sw += weight;
-
+		
+// 之后把参考图像数据做一次 仿射操作，
+		float c1 = affineEstimation_a * (*refColVar)[0] + affineEstimation_b;// 参考帧 灰度[0]  ;   逆深度方差[1] 
+		float c2 = resInterp[2];//  当前帧 亚像素 第三维度是图像 灰度值
+		float residual = c1 - c2;// 匹配点对 的灰度  误差值
+// 通过差值自适应算得权重     也就是说，误差越大(匹配效果差)，权重越小 
+		float weight = fabsf(residual) < 5.0f ? 1 : 5.0f / fabsf(residual);// 误差倒数为权重，误差小于5的分子为1 ， 大于5的分子为5 
+     // 这些参数用来迭代计算 下一次　的　仿射变换系数　
+		sxx += c1*c1*weight;// 参考帧 灰度值平方和               带误差倒数 权重
+		syy += c2*c2*weight;// 匹配帧 亚像素 灰度值平方 和 带误差倒数 权重
+		sx += c1*weight;// 参考帧 灰度值 和                             带误差倒数 权重
+		sy += c2*weight;// 匹配帧 亚像素 灰度值 和                带误差倒数 权重
+		sw += weight;//  误差倒数 权重  和
+		
+// 然后判断这个匹配点是好是坏，也是个自适应的阈值，这个阈值为一个最大的差异常数，加上 梯度值平和 乘以一个比例系数，  
+              // 这个和 匹配点对 的灰度误差值平方  比较，如果残差的平方小于它，那么认为这个点的估计比较好，然后再把这个判断赋值给isGoodOutBuffer[*idxBuf]
+               // 匹配点对 的灰度  误差值 平和  小于  与 当前帧 点 的x和y方向梯度平和 相关数  时  为好的匹配点
 		bool isGood = residual*residual / (MAX_DIFF_CONSTANT + MAX_DIFF_GRAD_MULT*(resInterp[0]*resInterp[0] + resInterp[1]*resInterp[1])) < 1;
-
 		if(isGoodOutBuffer != 0)
-			isGoodOutBuffer[*idxBuf] = isGood;
+			isGoodOutBuffer[*idxBuf] = isGood;// 记录 匹配点对好坏标志
+// 之后记录计算得到的这一帧改变的值
+		*(buf_warped_x+idx) = Wxp(0);// 参考帧 3d点 通过R,t变换矩阵 变换到 当前图像坐标系下的坐标值  X
+		*(buf_warped_y+idx) = Wxp(1);// Y
+		*(buf_warped_z+idx) = Wxp(2);// Z
+		
+                // 乘法实际上是投影到图像坐标，即相机参数乘以差之后的梯度值  ？？？ 本身就是 当前帧的梯度 只是取了亚像素梯度 为毛要乘以 相机参数
+		*(buf_warped_dx+idx) = fx_l * resInterp[0];// 当前帧匹配点亚像素 梯度dx
+		*(buf_warped_dy+idx) = fy_l * resInterp[1];// 匹配点亚像素 梯度dy
+		*(buf_warped_residual+idx) = residual;// 对应 匹配点 像素误差
 
-		*(buf_warped_x+idx) = Wxp(0);
-		*(buf_warped_y+idx) = Wxp(1);
-		*(buf_warped_z+idx) = Wxp(2);
+		*(buf_d+idx) = 1.0f / (*refPoint)[2];// 参考帧 Z轴 倒数  = 参考帧逆深度
+		*(buf_idepthVar+idx) = (*refColVar)[1];// 参考帧逆深度方差
+		idx++;// 点 ++
 
-		*(buf_warped_dx+idx) = fx_l * resInterp[0];
-		*(buf_warped_dy+idx) = fy_l * resInterp[1];
-		*(buf_warped_residual+idx) = residual;
-
-		*(buf_d+idx) = 1.0f / (*refPoint)[2];
-		*(buf_idepthVar+idx) = (*refColVar)[1];
-		idx++;
-
-
+// 之后再记录 匹配点像素误差的平方和，以 及匹配点像素误差值(带符号)
 		if(isGood)
 		{
-			sumResUnweighted += residual*residual;
-			sumSignedRes += residual;
-			goodCount++;
+			sumResUnweighted += residual*residual;// 较好的  匹配点像素误差的平方和
+			sumSignedRes += residual;// 较好的 匹配点像素误差和
+			goodCount++;// 较好的匹配点对 计数
 		}
 		else
-			badCount++;
-
+			badCount++;// 不好的匹配点对 计数
+// 匹配点 变换前后 深度得变换  checkPermaRefOverlap()函数也有类似的计算 
 		float depthChange = (*refPoint)[2] / Wxp[2];	// if depth becomes larger: pixel becomes "smaller", hence count it less.
-		usageCount += depthChange < 1 ? depthChange : 1;
+		usageCount += depthChange < 1 ? depthChange : 1;//   记录深度改变的比例
 
-
+// 调试  如果设置了画图，就把他们可视化出来
 		// DEBUG STUFF
 		if(plotTrackingIterationInfo || plotResidual)
 		{
 			// for debug plot only: find x,y again.
 			// horribly inefficient, but who cares at this point...
-			Eigen::Vector3f point = KLvl * (*refPoint);
+			Eigen::Vector3f point = KLvl * (*refPoint);// 参考帧下 3d点对应的 像素点2d坐标
 			int x = point[0] / point[2] + 0.5f;
 			int y = point[1] / point[2] + 0.5f;
 
 			if(plotTrackingIterationInfo)
 			{
-				setPixelInCvMat(&debugImageOldImageSource,getGrayCvPixel((float)resInterp[2]),u_new+0.5,v_new+0.5,(width/w));
-				setPixelInCvMat(&debugImageOldImageWarped,getGrayCvPixel((float)resInterp[2]),x,y,(width/w));
+			  // 设置参考帧和 当前帧 关键点的 图像  使用 亚像素灰度值作为 点颜色
+				setPixelInCvMat(&debugImageOldImageSource,getGrayCvPixel((float)resInterp[2]),u_new+0.5,v_new+0.5,(width/w));// 当前图像下的 关键点2d 坐标
+				setPixelInCvMat(&debugImageOldImageWarped,getGrayCvPixel((float)resInterp[2]),x,y,(width/w));// 参考帧下得 关键点2d 坐标
 			}
-			if(isGood)
-				setPixelInCvMat(&debugImageResiduals,getGrayCvPixel(residual+128),x,y,(width/w));
+			if(isGood)// 匹配点对灰度像素匹配误差较小  显示  匹配误差图像
+				setPixelInCvMat(&debugImageResiduals,getGrayCvPixel(residual+128),x,y,(width/w));// 误差越小 颜色越靠中间颜色 
 			else
-				setPixelInCvMat(&debugImageResiduals,cv::Vec3b(0,0,255),x,y,(width/w));
+				setPixelInCvMat(&debugImageResiduals,cv::Vec3b(0,0,255),x,y,(width/w));// 误差较大的点 显示蓝色 rgb
 
 		}
 	}
 
-	buf_warped_size = idx;
+	buf_warped_size = idx;// 匹配点数量＝　包括好的匹配点　和　不好的匹配点　数量
 
-	pointUsage = usageCount / (float)refNum;
-	lastGoodCount = goodCount;
-	lastBadCount = badCount;
-	lastMeanRes = sumSignedRes / goodCount;
-
+	pointUsage = usageCount / (float)refNum;// 深度改变均值
+	lastGoodCount = goodCount;// 好的匹配点计数
+	lastBadCount = badCount;// 不好得匹配点计数
+	lastMeanRes = sumSignedRes / goodCount;// 匹配点像素误差均值
+	
+// 计算迭代之后得到的　下一次得仿射变换系数
 	affineEstimation_a_lastIt = sqrtf((syy - sy*sy/sw) / (sxx - sx*sx/sw));
 	affineEstimation_b_lastIt = (sy - affineEstimation_a_lastIt*sx)/sw;
 
-	calcResidualAndBuffers_debugFinish(w);
+	calcResidualAndBuffers_debugFinish(w);// 主要用来　保存调试信息　图像
 
-	return sumResUnweighted / goodCount;
+	return sumResUnweighted / goodCount; // 匹配点像素误差的平方和 均值
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #if defined(ENABLE_SSE)
 Vector6 SE3Tracker::calculateWarpUpdateSSE(
 		NormalEquationsLeastSquares &ls)
@@ -1319,3 +1355,4 @@ Vector6 SE3Tracker::calculateWarpUpdate(
 
 
 }
+
