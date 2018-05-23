@@ -117,8 +117,12 @@
       做一定修改 
 ## 训练
       ./train.sh
-      
-      出现的问题
+      数据 添加了 框标签   以下需要修改
+         base_data_layer.cpp
+         base_data_layer.cu
+         box_data_layer.cpp
+         
+      出现的问题
       0519 02:13:01.861333  9687 layer_factory.hpp:77] Creating layer data
       I0519 02:13:01.861886  9687 net.cpp:84] Creating Layer data
       I0519 02:13:01.861901  9687 net.cpp:380] data -> data
