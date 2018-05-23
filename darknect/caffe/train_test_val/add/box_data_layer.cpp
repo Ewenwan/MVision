@@ -37,7 +37,9 @@ void BoxDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   // Reshape top[0] and prefetch_data according to the batch_size.
   top_shape[0] = batch_size;
   top[0]->Reshape(top_shape);
-  for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
+  ////// 重大变化   一个图像 多了许多边框标签////////////////
+  // 使用  prefetch_.size()获取 向量大小
+  for (int i = 0; i < this->prefetch_.size(); ++i) {
 /// Batch<Dtype> prefetch_[PREFETCH_COUNT];  // 数组
 // 换成了 vector<shared_ptr<Batch<Dtype> > > prefetch_; 向量指针
     //this->prefetch_[i].data_.Reshape(top_shape);
@@ -58,9 +60,13 @@ void BoxDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     }
     CHECK_EQ(sides_.size(), top.size() - 1) << 
       "side num not equal to top size";
-    for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
+	  
+  ////// 重大变化   一个图像 多了许多边框标签////////////////
+  // 使用  prefetch_.size()获取 向量大小
+    for (int i = 0; i < this->prefetch_.size(); ++i) {
 // 换成了 vector<shared_ptr<Batch<Dtype> > > prefetch_; 向量指针
       // this->prefetch_[i].multi_label_.clear();
+      // 注意 multi_label_[k]也变成了 指针 不过这里的 .使用的是向量的 方法
       this->prefetch_[i]->multi_label_.clear(); 
     }
     for (int i = 0; i < sides_.size(); ++i) {
@@ -68,11 +74,13 @@ void BoxDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       int label_size = sides_[i] * sides_[i] * (1 + 1 + 1 + 4);
       label_shape.push_back(label_size);
       top[i+1]->Reshape(label_shape);
-      for (int j = 0; j < this->PREFETCH_COUNT; ++j) {
+	  
+      for (int j = 0; j < this->prefetch_.size(); ++j) {
         shared_ptr<Blob<Dtype> > tmp_blob;
         tmp_blob.reset(new Blob<Dtype>(label_shape));
 // 换成了 vector<shared_ptr<Batch<Dtype> > > prefetch_; 向量指针
     //  this->prefetch_[j].multi_label_.push_back(tmp_blob);
+    // 注意 multi_label_[k]也变成了 指针 不过这里的 .使用的是向量的 方法
         this->prefetch_[j]->multi_label_.push_back(tmp_blob);
       }
     }
