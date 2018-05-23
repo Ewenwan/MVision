@@ -39,9 +39,9 @@ public:
 // 还有huber距离所需参数等
 
 // 调试矩阵 debug images  可视化Tracking的迭代过程 需要的 img
-	cv::Mat debugImageResiduals;// 残差
+	cv::Mat debugImageResiduals;// 匹配点 灰度匹配误差
 	cv::Mat debugImageWeights;
-	cv::Mat debugImageSecondFrame;
+	cv::Mat debugImageSecondFrame;// 跟踪时得第二帧　图像
 	cv::Mat debugImageOldImageSource;
 	cv::Mat debugImageOldImageWarped;
 
@@ -82,19 +82,21 @@ public:
 	bool trackingWasGood;
 private:
 
-	float* buf_warped_residual;
-	float* buf_warped_dx;
+	float* buf_warped_residual;// 匹配点 像素匹配误差
+	float* buf_warped_dx;// 当前帧　亚像素　梯度值　仿射变换后(  乘以　相机内参数)
 	float* buf_warped_dy;
-	float* buf_warped_x;
+	float* buf_warped_x;//  参考帧 3d点 通过R,t变换矩阵 变换到 当前图像坐标系下的坐标值
 	float* buf_warped_y;
 	float* buf_warped_z;
 
-	float* buf_d;
-	float* buf_idepthVar;
+	float* buf_d;                 // 参考帧 Z轴 倒数  = 参考帧 逆深度
+	float* buf_idepthVar;  // 参考帧 逆深度 方差
 	float* buf_weight_p;
 
-	int buf_warped_size;
-
+	int buf_warped_size;// 匹配点数量记录　包括好的匹配点　和　不好的匹配点　数量
+	
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 根据变换矩阵和原3D点和灰度值　计算匹配点对之间 的　匹配点对像素匹配误差　　以及　匹配点对好坏标志图
 	float calcResidualAndBuffers(
 			const Eigen::Vector3f* refPoint,
 			const Eigen::Vector2f* refColVar,
@@ -128,8 +130,10 @@ private:
 			int level,
 			bool plotResidual = false);
 #endif
-
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+////////////////////////////////////////////////////////////////////////////////////////////
 	float calcWeightsAndResidual(
 			const Sophus::SE3f& referenceToFrame);
 // x86架构下 SSE指令集优化	
@@ -142,8 +146,9 @@ private:
 	float calcWeightsAndResidualNEON(
 			const Sophus::SE3f& referenceToFrame);
 #endif
-
-
+////////////////////////////////////////////////////////////////////////////////////////////
+	
+///////////////////////////////////////////////////////////////////////////////////////////
 	Vector6 calculateWarpUpdate(
 			NormalEquationsLeastSquares &ls);
 // x86架构下 SSE指令集优化
@@ -156,8 +161,12 @@ private:
 	Vector6 calculateWarpUpdateNEON(
 			NormalEquationsLeastSquares &ls);
 #endif
-
+////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+// 如果要可视化Tracking的迭代过程，那么第一步自然是把debug相关的参数都设置进去
 	void calcResidualAndBuffers_debugStart();
+// 完成匹配误差计算  保存误差信息图片	
 	void calcResidualAndBuffers_debugFinish(int w);
 
 	// used for image saving
