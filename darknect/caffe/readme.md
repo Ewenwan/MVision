@@ -32,6 +32,10 @@
 
 [caffe-yolov2](https://github.com/gklz1982/caffe-yolov2)
 
+## 上面 的两个 caffe 的实现下载后需要修改 cudnn.hpp文件 和CMAKE文件
+      \include\caffe\util\cudnn.hpp
+      Makefile.config
+      修改后的文件 见 文件夹
 
 ## 1.2 三个文件的作用
       1. create_yolo_prototxt.py ：  
