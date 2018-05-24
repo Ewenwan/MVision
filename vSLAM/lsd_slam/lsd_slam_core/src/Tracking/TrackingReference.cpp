@@ -2,10 +2,10 @@
 * This file is part of LSD-SLAM.
 * 跟踪的第一步就是 为当前帧 旋转 跟踪的参考帧
 *  包含 每一层金字塔上的：
-* 1.   关键点位置坐标                                posData[i]                 (x,y,z)
-* 2.   关键点像素梯度信息                        gradData[i]                (dx, dy)
-* 3.   关键点像素值 和 逆深度方差信息   colorAndVarData[i]   (I, Var)
-* 4.   关键点位置对应的 灰度像素点        pointPosInXYGrid[i]  x + y*width
+* 1.   关键点位置坐标                   posData[i]           (x,y,z)
+* 2.   关键点像素梯度信息               gradData[i]          (dx, dy)
+* 3.   关键点像素值 和 逆深度方差信息    colorAndVarData[i]   (I, Var)
+* 4.   关键点位置对应的 灰度像素点       pointPosInXYGrid[i]  x + y*width
 *       上面四个都是指针数组
 * 5.   产生的 物理世界中的点的数量       numData[i]
 * 
@@ -29,7 +29,7 @@
 * 
 * 5. 产生的 物理世界中的点的数量
 *    首尾指针位置之差就是  三维点 的数量
-* 	numData[level] = posDataPT - posData[level]; 
+*    numData[level] = posDataPT - posData[level]; 
 */
 
 #include "Tracking/TrackingReference.h"
