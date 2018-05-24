@@ -88,6 +88,8 @@
 #### 提出 
 [“Two-Stream Convolutional Networks for Action Recognition in Videos”（2014NIPS）](https://arxiv.org/pdf/1406.2199.pdf)
 
+[论文博客翻译](https://blog.csdn.net/liuxiao214/article/details/78377791)
+
     Two Stream方法最初在这篇文章中被提出，
     基本原理为:
         1. 对视频序列中每两帧计算密集光流，得到密集光流的序列（即temporal信息）。
