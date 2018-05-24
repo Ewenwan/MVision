@@ -40,7 +40,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
 ================================================
 ## 【1】 Tracking 跟踪 运动变换矩阵求解 对极几何 求解 基本矩阵 F 得到Rt矩阵 两组单目相机 2D图像 
-
+[SE3跟踪参考](https://blog.csdn.net/kokerf/article/details/78005934)
     
     根据匹配关系 优化变换矩阵 以及更新深度
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/pic/LSD_SLAM1.png)
