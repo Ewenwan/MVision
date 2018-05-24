@@ -2,8 +2,74 @@
 * This file is part of LSD-SLAM.
 * 欧式变换 SE(3) R,t 匹配跟踪
 * https://blog.csdn.net/lancelot_vim/article/details/51758870
+* https://blog.csdn.net/kokerf/article/details/78005934
 * 这个类是Tracking算法的核心类，里面定义了和刚体运动相关的Traqcking所需要得数据和算法
-*  
+* 
+* 
+* LSD-SLAM的Tracking是算法框架中三大部分之一。其主要实现函数为SlamSystem::trackFrame
+* 这个函数的代码主要分为如下几个步骤实现：
+*  1.  构造新的图像帧： 把当前图像构建为新的图像帧
+*  2.  更新参考帧：        如果当前参考帧不是最近的关键帧，则更新参考帧
+*  3.  初始化位姿：        把上一帧与参考帧的位姿当做初始位姿
+*  4.  SE3求解：             调用SE3Tracker计算当前帧和参考帧间的位姿变换
+*  5.  判断是否跟踪失败：根据跟踪的像素点个数多少以及跟踪质量来判断
+*  6.  关键帧筛选：            通过计算得分确定是否构造新的关键帧
+* 
+* 
+*  这里　是　SE3跟踪求解　　欧式变换矩阵求解　
+* 
+* LSD-SLAM在位姿估计中采用了直接法，也就是通过最小化光度误差来求解两帧图像间的位姿变化。
+* 并且采用了LM算法迭代求解。
+* LSD-SLAM在求解两帧图像间的SE3变换主要在SE3Tracker类中进行实现。
+* 该类中有四个函数比较重要，分别为
+*  1.  SE3Tracker::trackFrame                          主调函数
+*  2. SE3Tracker::calcResidualAndBuffers      被调用计算　参考帧3d点变换到当前帧图像坐标系下的残差(灰度误差)　和　梯度(对应点像素梯度)　
+*  3. SE3Tracker::calcWeightsAndResidual　 被调用计算
+*  4. SE3Tracker::calculateWarpUpdate
+* 
+*1.  SE3Tracker::trackFrame  
+*  图像金字塔迭代level-4到level-1
+*	Step1: 对参考帧当前层构造点云(reference->makePointCloud) 
+*                  利用逆深度信息　和　相应的像素坐标 以及相机内参数得到　在参考帧坐标下的3d点    
+*                  (X，Y，Z) = D  *  (u,v,1)*K逆 =1/(1/D)* (u*fx_inv + cx_inv, v+fy_inv+cy_inv, 1)
+*	Step2: 计算变换到当前帧的残差和梯度(calcResidualAndBuffers)
+*                 计算参考帧3d点变换到当前帧图像坐标系下的残差(灰度误差)　和　梯度(对应点像素梯度)　
+*                  1. 参考帧3d点 R，t变换到 当前相机坐标系下 
+*                         Eigen::Vector3f Wxp = rotMat * (*refPoint) + transVec;
+* 		    2. 再 投影到 当前相机 像素平面下
+* 		            float u_new = (Wxp[0]/Wxp[2])*fx_l + cx_l;// float 浮点数类型
+* 		            float v_new = (Wxp[1]/Wxp[2])*fy_l + cy_l;
+*                  3. 根据浮点数坐标 四周的四个整数点坐标的梯度 使用位置差加权进行求和得到亚像素灰度值　和　亚像素　梯度值
+*                      	int ix = (int)x;// 取整数    左上方点
+*				int iy = (int)y;
+*				float dx = x - ix;// 差值
+*				float dy = y - iy;
+*				float dxdy = dx*dy;
+*				// map 像素梯度  指针
+*				const Eigen::Vector4f* bp = mat +ix+iy*width;// 左上方点　像素位置 梯度的 指针
+*				// 使用 左上方点 右上方点  右下方点 左下方点 的灰度梯度信息 以及 相应位置差值作为权重值 线性加权获取　亚像素梯度信息
+*				return dxdy * *(const Eigen::Vector3f*)(bp+1+width)// 右下方点
+*					+ (dy-dxdy) * *(const Eigen::Vector3f*)(bp+width)// 左下方点
+*					+ (dx-dxdy) * *(const Eigen::Vector3f*)(bp+1)// 右上方点
+*						+ (1-dx-dy+dxdy) * *(const Eigen::Vector3f*)(bp);// 左上方点
+* 　　　　  4.  记录变换　
+* 　　　　　　　　a. 对参考帧灰度　进行一次仿射变换后　和　当前帧亚像素灰度做差得到　残差(灰度误差)
+*                                b. 对两帧下　3d点坐标的　Z轴深度值　的变化比例
+*	Step3: 计算 方差归一化加权残差和　使用误差方差对方差归一化 后求和 (calcWeightsAndResidual)
+* 
+*	Step4: 计算雅克比向量以及A和b(calculateWarpUpdate)
+* 
+*	Step5: 计算得到收敛的delta，并且更新SE3(inc = A.ldlt().solve(b))
+* 
+*	重复Step2-Step5直到收敛或者达到最大迭代次数
+* 
+* 计算下一层金字塔
+* 
+* 
+* 
+* 
+* 
+* 
 */
 
 #include "SE3Tracker.h"
@@ -272,13 +338,17 @@ SE3 SE3Tracker::trackFrameOnPermaref(
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-////////////////// 最终要的跟踪匹配　函数////////////////////////////////////////////
+////////////////// 最重要的跟踪匹配　函数////////////////////////////////////////////
+// SE3Tracker::trackFrame函数的主体是一个for循环，从图像金字塔的高层level-4开始遍历直到底层level-1。
+// 在循环内实现加权高斯牛顿优化算法（Weighted Gauss-Newton Optimization），
+// 其实就是增加了鲁棒函数的高斯牛顿。
 // tracks a frame.
 // first_frame has depth, second_frame DOES NOT have depth.
 SE3 SE3Tracker::trackFrame(
 		TrackingReference* reference,//  参考帧，第一帧　含有　逆深度信息
 		Frame* frame,//  当前帧　第二帧　　没有深度　需要匹配后　获取　
 		const SE3& frameToReference_initialEstimate)// 初始变换矩阵　　fram 到参考帧　的　变换矩阵
+// 对于初始位姿，LSD-SLAM中使用了上一帧和参考帧间的位姿作为当前位姿估计的初值
 {
 // 内存上锁
 	boost::shared_lock<boost::shared_mutex> lock = frame->getActiveLock();
@@ -306,39 +376,39 @@ SE3 SE3Tracker::trackFrame(
 	// 参考帧 到 当前帧　 fram　的　变换矩阵
 	Sophus::SE3f referenceToFrame = frameToReference_initialEstimate.inverse().cast<float>();
 	NormalEquationsLeastSquares ls;// 然后定义一个6自由度矩阵的误差判别计算对象ls
-
-
+	
 	int numCalcResidualCalls[PYRAMID_LEVELS];// cell数量  5层　金字塔
 	int numCalcWarpUpdateCalls[PYRAMID_LEVELS];//　
 
 	float last_residual = 0;// 最终的残差
 
-
+// 函数的主体是一个for循环
 	for(int lvl=SE3TRACKING_MAX_LEVEL-1;lvl >= SE3TRACKING_MIN_LEVEL;lvl--)// 在没一层金字塔上进行跟踪
 	{
-	  // 从最高层的　金字塔图像(尺寸最小)　开始　向下计算
+           // 从最高层的　金字塔图像(尺寸最小)　开始　向下计算
+	     // 从图像金字塔的高层level-4开始遍历直到底层level-1
 		numCalcResidualCalls[lvl] = 0;
 		numCalcWarpUpdateCalls[lvl] = 0;
-          // 首先得到参考帧的　3d 点云
+// 【１】 有参考帧逆深度信息和对应像素点坐标　计算　在参考帧坐标系下的3d 点
 		reference->makePointCloud(lvl);
-// 计算匹配　点对　像素误差　　在这个函数中，把　buf_warped　相关的参数全部更新，并且更新了上次的相似变换参数等
+//【２】计算参考帧3d点变换到当前帧图像坐标系下的残差(灰度误差)　和　梯度(对应点像素梯度)　
+		// 计算匹配　点对　像素误差　　在这个函数中，把　buf_warped　相关的参数全部更新，并且更新了上次的相似变换参数等
 		callOptimized(calcResidualAndBuffers, (reference->posData[lvl], reference->colorAndVarData[lvl], SE3TRACKING_MIN_LEVEL == lvl ? reference->pointPosInXYGrid[lvl] : 0, reference->numData[lvl], frame, referenceToFrame, lvl, (plotTracking && lvl == SE3TRACKING_MIN_LEVEL)));
 		// buf_warped_size 记录了　匹配点数量　包括好的匹配点　和　不好的匹配点　数量　(只要投影后在图像范围内就可以)
 		if(buf_warped_size < MIN_GOODPERALL_PIXEL_ABSMIN * (width>>lvl)*(height>>lvl))
 		{//　如果匹配点数量过少，已经少于了这一层图像像素数量的1%)，那么我们认为差别太大，Tracking失败，返回一个空的SE3
-		  // 　
 			diverged = true;
 			trackingWasGood = false;// Tracking失败
 			return SE3();// 返回一个空的SE3
 		}
-// 使用　仿射变换参数
-// 如果使用了，那么把通过calcResidualAndBuffers函数更新的affineEstimation_a_lastIt以及affineEstimation_b_lastIt，赋值给仿射变换系数
+        // 使用　仿射变换参数
+        // 如果使用了，那么把通过calcResidualAndBuffers函数更新的affineEstimation_a_lastIt以及affineEstimation_b_lastIt，赋值给仿射变换系数
 		if(useAffineLightningEstimation)
 		{
 			affineEstimation_a = affineEstimation_a_lastIt;
 			affineEstimation_b = affineEstimation_b_lastIt;
 		}
-// 然后调用calcWeightsAndResidual得到误差，并记录调用次数
+// 【３】使用误差方差对方差归一化 后求和　　调用calcWeightsAndResidual得到误差，并记录调用次数
 		float lastErr = callOptimized(calcWeightsAndResidual,(referenceToFrame));
 
 		numCalcResidualCalls[lvl]++;
@@ -747,11 +817,14 @@ float SE3Tracker::calcWeightsAndResidualNEON(
 	return sumRes / buf_warped_size;
 }
 #endif
+
+////////////////////////////////////////////////////////////////////////////////
+//  使用　误差方差对方差归一化 后求和
 // 计算权重  和　像素匹配误差
 float SE3Tracker::calcWeightsAndResidual(
 		const Sophus::SE3f& referenceToFrame)// 参考帧　到　当前帧　欧式变换矩阵
 {
-  // 平移向量
+  // 参考帧　到　当前帧　平移向量
 	float tx = referenceToFrame.translation()[0];
 	float ty = referenceToFrame.translation()[1];
 	float tz = referenceToFrame.translation()[2];
@@ -760,7 +833,7 @@ float SE3Tracker::calcWeightsAndResidual(
 
 	for(int i=0;i<buf_warped_size;i++)// 对于初步匹配得　每一个　匹配点
 	{
-	  // 参考帧　映射到　当前帧坐标系下的　3d 坐标
+	  // 参考帧　映射到　当前帧　坐标系下的　3d 坐标
 		float px = *(buf_warped_x+i);	// x'
 		float py = *(buf_warped_y+i);	// y'
 		float pz = *(buf_warped_z+i);	// z'
@@ -773,7 +846,7 @@ float SE3Tracker::calcWeightsAndResidual(
 
 
 		// calc dw/dd (first 2 components):
-		float g0 = (tx * pz - tz * px) / (pz*pz*d);
+		float g0 = (tx * pz - tz * px) / (pz*pz*d);//   分母为　当前坐标系下　深度平方/参考帧深度
 		float g1 = (ty * pz - tz * py) / (pz*pz*d);
 
 
