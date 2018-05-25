@@ -2,6 +2,8 @@
 
 [lad源码解析 参考解析](https://blog.csdn.net/lancelot_vim)
 
+[LSD-SLAM笔记 优秀](https://blog.csdn.net/kokerf/article/details/78005934)
+
 [lad算法分析 代码分析 安装 非ros改造](http://www.cnblogs.com/hitcm/category/763753.html)
 
 [算法数学基础](https://blog.csdn.net/xdEddy/article/details/78009748)
