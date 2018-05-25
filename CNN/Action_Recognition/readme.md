@@ -145,9 +145,14 @@
            Xi'' = sqrt(Xi')
         这样做能够给最后的分类准确率带来大概0.5%的提升
     3. 特征编码—Fisher Vector
-        特征编码阶段iDT算法不再使用Bag of Features方法，
+        特征编码阶段iDT算法不再使用Bag of Features/ BOVM方法，
+        (提取图像的SIFT特征，通过（KMeans聚类）,VQ矢量量化，构建视觉词典（码本）)
+        
         而是使用效果更好的Fisher Vector编码.
-
+        FV采用混合高斯模型（GMM）构建码本，
+        但是FV不只是存储视觉词典的在一幅图像中出现的频率，
+        并且FV还统计视觉词典与局部特征（如SIFT）的差异
+        
         Fisher Vector同样也是先用大量特征训练码书，再用码书对特征进行编码。
 
         在iDT中使用的Fisher Vector的各个参数为：
@@ -162,6 +167,37 @@
     4. 其他改进思想 
        原先是沿着轨迹提取手工设计的特征，可以沿着轨迹利用CNN提取特征。
        
+#### Fisher Vector 特征编码
+[VLFeat数学推导](http://www.vlfeat.org/api/fisher-fundamentals.html)
+
+    FV采用GMM构建视觉词典，为了可视化，这里采用二维的数据，
+    然这里的数据可以是SIFT或其它局部特征，
+    具体实现代码如下：
+
+    %采用GMM模型对数据data进行拟合，构建视觉词典  
+    numFeatures = 5000 ;            %样本数  
+    dimension = 2 ;                 %特征维数  
+    data = rand(dimension,numFeatures) ; %这里随机生成一些数据，这里data可以是SIFT或其它局部特征  
+
+    numClusters = 30 ;  %视觉词典大小  
+    [means, covariances, priors] = vl_gmm(data, numClusters); %GMM拟合data数据分布，构建视觉词典  
+
+    这里得到的means、covariances、priors分别为GMM的均值向量，协方差矩阵和先验概率，也就是GMM的参数。
+
+    这里用GMM构建视觉词典也存在一个问题，这是GMM模型固有的问题，
+    就是当GMM中的高斯函数个数，也就是聚类数，也就是numClusters，
+    若与真实的聚类数不一致的话，
+    GMM表现的不是很好（针对期望最大化EM方法估计参数），具体请参见GMM。
+
+    接下来，我们创建另一组随机向量，这些向量用Fisher Vector和刚获得的GMM来编码，
+    具体代码如下：
+
+    numDataToBeEncoded = 1000;  
+    dataToBeEncoded = rand(dimension,numDataToBeEncoded);    %2*1000维数据
+    % 进行FV编码
+    encoding = vl_fisher(datatoBeEncoded, means, covariances, priors);
+
+
 ## 3.2 深度学习方法
 ### 时空双流网络结构  Two Stream Network及衍生方法
 #### 提出 
