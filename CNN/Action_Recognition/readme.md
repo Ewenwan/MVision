@@ -98,8 +98,23 @@
         b.  使用字典单词对测试数据进行量化编码，得到固定长度大小的向量，可使用VQ或则SOMP算法。
     D. 使用SVM进行分类
         对编码量化之后的特征向量使用SVM支持向量机进行分类。
-
-
+#### iDT（improved dense trajectories) 改进
+    1. 剔除相机运动引起的背景光流
+        a. 使用SURF特征算法匹配前后两帧的 匹配点对，这里会使用人体检测，剔除人体区域的匹配点，运动量大，影响较大；
+        b. 利用RANSAC 随机采样序列一致性算法估计 前后两帧的 单应投影变换矩阵 I(t+1) = H * I(t)；
+        c. 计算相机运动引起的光流 [u',v'] = I(t+1)' - I(t)
+        d. 使用光流算法计算 t帧的光流 Ft
+           假设1：光照亮度恒定：
+                  I(x, y, t) =  I(x+dx, y+dy, t+dt) 
+                 泰勒展开：
+                  I(x+dx, y+dy, t+dt) =  
+                                        I(x, y, t) + dI/dx * dx + dI/dy * dy + dI/dt * dt
+                                      =  I(x, y, t) + Ix * dx  + Iy * dy + It * dt
+                 得到：
+                      Ix * dx  + Iy * dy + It * dt = 0
+                 因为 像素水平方向的运动速度 u=dx/dt,  像素垂直方向的运动速度 v=dy/dt
+                 等式两边同时除以 dt ,得到：
+    
 ## 3.2 深度学习方法
 ### 时空双流网络结构  Two Stream Network及衍生方法
 #### 提出 
