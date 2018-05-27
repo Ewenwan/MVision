@@ -5,7 +5,6 @@
 * https://blog.csdn.net/kokerf/article/details/78005934
 * 这个类是Tracking算法的核心类，里面定义了和刚体运动相关的Traqcking所需要得数据和算法
 * 
-* 
 * LSD-SLAM的Tracking是算法框架中三大部分之一。其主要实现函数为SlamSystem::trackFrame
 * 这个函数的代码主要分为如下几个步骤实现：
 *  1.  构造新的图像帧： 把当前图像构建为新的图像帧
@@ -15,107 +14,152 @@
 *  5.  判断是否跟踪失败：根据跟踪的像素点个数多少以及跟踪质量来判断
 *  6.  关键帧筛选：            通过计算得分确定是否构造新的关键帧
 * 
-* 
 *  这里　是　SE3跟踪求解　　欧式变换矩阵求解　
 * 
 * LSD-SLAM在位姿估计中采用了直接法，也就是通过最小化光度误差来求解两帧图像间的位姿变化。
 * 并且采用了LM算法迭代求解。
+* 
+* 误差函数　E(se3) = SUM((Iref(pi) - I(W(pi,Dref(pi),se3))^2)
+* (参考帧下的像素值-参考帧3d点变换到当前帧下的像素值)^2　
+* 也就是 所有匹配点　的光度误差和
+* 
+* 1. 首先在参考帧下根据深度信息计算出3d点云
+* 2. 其次，计算参考帧下的点变换到当前帧下的亚像素像素值，进而计算初始　光度匹配误差err
+* 3. 再次，利用误差对单个3d点的导数信息计算单个误差的可信程度，进行加权后方差归一化，得到权重ｗ，为了减少外点（outliers）对算法的影响
+* 4. 然后，利用误差函数对误差向量求导数，求得各个点的误差之间的　协方差矩阵，也是雅克比矩阵Ｊ,计算系数A 和 b 
+* 5. 最后计算　变换矩阵　se3的　更新量 dse3　
+* 　　　　　　  dse3 = -(J转置*J)逆矩阵*J转置*w*err  直接求逆矩阵计算量较大
+*              也可以写成：
+* 　　　      　J转置*J * dse3 = -J转置*w*error
+*              紧凑形式：
+* 　　　　　　  A * dse3 = b
+*       使用　LDLT分解 A = LDU＝LDL转置＝LDLT，求解线性方程组　A * x = b
+*       记录　ｕ　＝　LD，　D为对角矩阵　L为下三角矩阵　L转置为上三角矩阵
+*             v  ＝  L转置
+*       将A分解为上面两个矩阵　相乘　A = u * v
+*       Ax = b就可以化为u(v*x) = u*y = b
+*       先求解　y
+*       得到　  y = v*x
+*       再求解　x 即　dse3 是欧式变换矩阵se3的更新量
+* 
+*       for(int i=0;i<6;i++) A(i,i) *= 1+LM_lambda;// (A+λI)  　列文伯格马尔夸克更新算法　LM 调整量　
+*       Vector6 inc = A.ldlt().solve(b);// LDLT矩阵分解求解　dse3 李代数更新量
+* 
+* 6. 然后对　变换矩阵　左乘　se3指数映射　进行　更新　
+* 　　se3　指数映射到SE3 通过　李群乘法直接　对　变换矩阵　左乘更新　
+* 　　Sophus::SE3f new_referenceToFrame = Sophus::SE3f::exp((inc)) * referenceToFrame;　　　　
+* 
 * LSD-SLAM在求解两帧图像间的SE3变换主要在SE3Tracker类中进行实现。
 * 该类中有四个函数比较重要，分别为
-*  1.  SE3Tracker::trackFrame                          主调函数
-*  2. SE3Tracker::calcResidualAndBuffers      被调用计算　参考帧3d点变换到当前帧图像坐标系下的残差(灰度误差)　和　梯度(对应点像素梯度)　
-*  3. SE3Tracker::calcWeightsAndResidual　 被调用计算
-*  4. SE3Tracker::calculateWarpUpdate
+*  1. SE3Tracker::trackFrame             主调函数
+*  2. SE3Tracker::calcResidualAndBuffers  被调用计算　
+*      初始误差　err 参考帧3d点变换到当前帧图像坐标系下的残差(灰度误差)　和　梯度(对应点像素梯度)　
+*     
+*  3. SE3Tracker::calcWeightsAndResidual　被调用计算    
+*     误差可信度权重w　并对误差方差归一化得到加权平均后的误差
+*  4. SE3Tracker::calculateWarpUpdate　　 被调用计算    
+*　　　误差关系矩阵　协方差矩阵　雅克比矩阵J　以及A=J转置*J b=-J转置*w*error 求接线性方程组
 * 
 *1.  SE3Tracker::trackFrame  
 *  图像金字塔迭代level-4到level-1
-*	Step1: 对参考帧当前层构造点云(reference->makePointCloud) 
+*       Step1: 对参考帧当前层构造点云(reference->makePointCloud) 
 *                  利用逆深度信息　和　相应的像素坐标 以及相机内参数得到　在参考帧坐标下的3d点    
 *                  (X，Y，Z) = D  *  (u,v,1)*K逆 =1/(1/D)* (u*fx_inv + cx_inv, v+fy_inv+cy_inv, 1)
-*	Step2: 计算变换到当前帧的残差和梯度(calcResidualAndBuffers)
-*                 计算参考帧3d点变换到当前帧图像坐标系下的残差(灰度误差)　和　梯度(对应点像素梯度)　
-*                  1. 参考帧3d点 R，t变换到 当前相机坐标系下 
-* 	　　　　　Eigen::Matrix3f rotMat = referenceToFrame.rotationMatrix();// 旋转矩阵
-*	　　　　　Eigen::Vector3f transVec = referenceToFrame.translation();// 平移向量
-*                         Eigen::Vector3f Wxp = rotMat * (*refPoint) + transVec;// 欧式变换
-* 		    2. 再 投影到 当前相机 像素平面下
-* 		            float u_new = (Wxp[0]/Wxp[2])*fx_l + cx_l;// float 浮点数类型
-* 		            float v_new = (Wxp[1]/Wxp[2])*fy_l + cy_l;
-*                  3. 根据浮点数坐标 四周的四个整数点坐标的梯度 使用位置差加权进行求和得到亚像素灰度值　和　亚像素　梯度值
-*                              x=u_new;
-*                              y=v_new;
-*                      	int ix = (int)x;// 取整数    左上方点
-*				int iy = (int)y;
-*				float dx = x - ix;// 差值
-*				float dy = y - iy;
-*				float dxdy = dx*dy;
-*				// map 像素梯度  指针
-*				const Eigen::Vector4f* bp = mat +ix+iy*width;// 左上方点　像素位置 梯度的 指针
-*				// 使用 左上方点 右上方点  右下方点 左下方点 的灰度梯度信息 以及 相应位置差值作为权重值 线性加权获取　亚像素梯度信息
-*				resInterp  =  dxdy * *(const Eigen::Vector3f*)(bp+1+width)// 右下方点
-*					+ (dy-dxdy) * *(const Eigen::Vector3f*)(bp+width)// 左下方点
-*					+ (dx-dxdy) * *(const Eigen::Vector3f*)(bp+1)// 右上方点
-*						+ (1-dx-dy+dxdy) * *(const Eigen::Vector3f*)(bp);// 左上方点
+*       Step2: 计算变换到当前帧的残差和梯度(calcResidualAndBuffers)
+*          计算参考帧3d点变换到当前帧图像坐标系下的残差(灰度误差)　和　梯度(对应点像素梯度)　
+*          1. 参考帧3d点 R，t变换到 当前相机坐标系下 
+*           　　　Eigen::Matrix3f rotMat = referenceToFrame.rotationMatrix();// 旋转矩阵
+*         　　　　Eigen::Vector3f transVec = referenceToFrame.translation();// 平移向量
+*                Eigen::Vector3f Wxp = rotMat * (*refPoint) + transVec;// 欧式变换
+*          2. 再 投影到 当前相机 像素平面下
+*                float u_new = (Wxp[0]/Wxp[2])*fx_l + cx_l;// float 浮点数类型
+*                float v_new = (Wxp[1]/Wxp[2])*fy_l + cy_l;
+*          3. 根据浮点数坐标 四周的四个整数点坐标的梯度 使用位置差加权进行求和得到亚像素灰度值　和　亚像素　梯度值
+*                 x=u_new;
+*                 y=v_new;
+*                 int ix = (int)x;// 取整数    左上方点
+*                 int iy = (int)y;
+*                 float dx = x - ix;// 差值
+*                 float dy = y - iy;
+                  float dxdy = dx*dy;
+*                 // map 像素梯度  指针
+*                 const Eigen::Vector4f* bp = mat +ix+iy*width;// 左上方点　像素位置 梯度的 指针
+* // 使用 左上方点 右上方点  右下方点 左下方点 的灰度梯度信息 以及 相应位置差值作为权重值 线性加权获取　亚像素梯度信息
+*               resInterp  =  dxdy * *(const Eigen::Vector3f*)(bp+1+width)// 右下方点
+*                          + (dy-dxdy) * *(const Eigen::Vector3f*)(bp+width)// 左下方点
+*                          + (dx-dxdy) * *(const Eigen::Vector3f*)(bp+1)// 右上方点
+*                          + (1-dx-dy+dxdy) * *(const Eigen::Vector3f*)(bp);// 左上方点
 * 
-*                             需要注意的是，在给梯度变量赋值的时候，这里乘了焦距
-* 　　　　　　　这里求得　亚像素梯度之后　又乘上了　相机内参数，因为在求　误差偏导数时需要　需要用到　dx*fx　　dy*fy  
-* 		                         *(buf_warped_dx+idx) = fx_l * resInterp[0];// 当前帧匹配点亚像素 梯度　gx = dx*fx  
-*		                         *(buf_warped_dy+idx) = fy_l * resInterp[1];// 匹配点亚像素 梯度               gy = dy*fy
-*		                         *(buf_warped_residual+idx) = residual;// 对应 匹配点 像素误差
-*                                      　 这里的　  dx= resInterp[0],  dy =  resInterp[0] 亚像素梯度
+*        需要注意的是，在给梯度变量赋值的时候，这里乘了焦距
+* 　　　　这里求得　亚像素梯度之后　又乘上了　相机内参数，因为在求　误差偏导数时需要　需要用到　dx*fx　　dy*fy  
+*               *(buf_warped_dx+idx) = fx_l * resInterp[0];// 当前帧匹配点亚像素 梯度　gx = dx*fx  
+*               *(buf_warped_dy+idx) = fy_l * resInterp[1];// 匹配点亚像素 梯度               gy = dy*fy
+*               *(buf_warped_residual+idx) = residual;// 对应 匹配点 像素误差
+*               这里的　  dx= resInterp[0],  dy =  resInterp[0] 亚像素梯度
 * 
-* 		                         *(buf_d+idx) = 1.0f / (*refPoint)[2]       ;// 参考帧 Z轴 倒数  = 参考帧逆深度
-*  		                         *(buf_idepthVar+idx) = (*refColVar)[1];// 参考帧逆深度方差
+*                (buf_d+idx) = 1.0f / (*refPoint)[2]       ;// 参考帧 Z轴 倒数  = 参考帧逆深度
+*               *(buf_idepthVar+idx) = (*refColVar)[1];// 参考帧逆深度方差
 * 　　　　  4.  记录变换　
-* 　　　　　　　　a. 对参考帧灰度　进行一次仿射变换后　和　当前帧亚像素灰度做差得到　残差(灰度误差)
-*                                      现在求得的残差只是纯粹的光度误差
-* 　　　　　　　　      float c1 = affineEstimation_a * (*refColVar)[0] + affineEstimation_b;// 参考帧 灰度[0]  仿射变换后
-*		                        float c2 = resInterp[2];//  当前帧 亚像素 第三维度是图像 灰度值
-*		                        float residual = c1 - c2;// 匹配点对 的灰度  误差值　　
-*		                        
-*		                        疑问1：代码中对参考帧的灰度做了一个仿射变换的处理，这里的原理是什么？
-*		                                     在SVO代码中的确有考虑到两帧见位姿相差过大，因此通过在空间上的仿射变换之后再求灰度的操作。
-*		                                     但是在这里的代码中没有看出具体原理。
-*                                b. 对两帧下　3d点坐标的　Z轴深度值　的变化比例
-*                                            float depthChange = (*refPoint)[2] / Wxp[2];
-*		                              usageCount += depthChange < 1 ? depthChange : 1;//   记录深度改变的比例  
-*　　　　　　　　 c. 匹配点总数
-*                                   buf_warped_size = idx;// 匹配点数量＝　包括好的匹配点　和　不好的匹配点　数量　　　　　　　　　
-*	Step3: 计算 方差归一化加权残差和　使用误差方差　对　误差归一化 后求和 (calcWeightsAndResidual)
-*                 计算误差权重，归一化方差以及Huber-weight，最终把这个系数存在数组　buf_weight_p　中
-*　　　　　　 每个像素点都有一个光度匹配误差，而每个点匹配的可信度根据其偏导数可以求得，
-*　　　　　　加权每一个误差　然后求所有点　光度匹配误差的均值
-* 　　　　误差导数　drpdd = dr =  -(dx*fx　*　(tx*z' - tz*x')/(z'^2*d)  + dy*fy　*　(ty*z' - tz*y')/(z'^2*d))
-*                                                       =  -(gx　*　(tx*z' - tz*x')/(z'^2*d)  + gy　*　(ty*z' - tz*y')/(z'^2*d))
-*	                                                      dx, dy 为参考帧3d点映射到当前帧图像平面后的梯度
-* 	      　　　　　　　　　　　　  fx,  fy 相机内参数
-* 	      　　　　　　　　　　　　  tx,ty,tz 为参考帧到当前帧的平移变换(忽略旋转变换)　t  = translation()
-* 	     　　　　　　　　　　　　   x',y',z'  为参考帧3d点变换到当前帧坐标系下的3d点     x' = Wxp[0] , y' = Wxp[1] , z' = Wxp[2] 
-* 	      　　　　　　　　　　　　  d = d = *(buf_d) 为参考帧3d点在参考帧下的逆深度
-*                                                            gx = *(buf_warped_dx)
-*                                                            gy = *(buf_warped_dy)
-*               方差平方                                        float s = settings.var_weight  *  *(buf_idepthVar+i);	  //    参考帧 逆深度方差  平方
-* 　          误差权重为加权方差平方的倒数  float w_p = 1.0f / ((cameraPixelNoise2) + s * drpdd * drpdd);// 误差权重 方差倒数
-*               初步误差　　　　                         rp =*( buf_warped_residual) ; //初步误差
-*               加权的误差                                    float weighted_rp = fabs(rp*sqrtf(w_p));// |r|加权的误差
-*               Huber-weight  
-*		                                                       float wh = fabs(weighted_rp < (settings.huber_d/2) ? 1 : (settings.huber_d/2) / weighted_rp);
-*               记录　　　　　　　　　　　　*(buf_weight_p+i) = wh * w_p;    // 乘上 Huber-weight 权重 的最终误差
-* 　　　   求和　　　　　　　　　　　　sumRes += wh * w_p * rp*rp;
-*               取均值　　　　　　　　　　　return sumRes / buf_warped_size;　　　　　　　　　　　
-		
-*	Step4: 计算雅克比向量以及A和b(calculateWarpUpdate)
+* 　　　　　　　a. 对参考帧灰度　进行一次仿射变换后　和　当前帧亚像素灰度做差得到　残差(灰度误差)
+*                  现在求得的残差只是纯粹的光度误差
+* 　　　　　　　　   float c1 = affineEstimation_a * (*refColVar)[0] + affineEstimation_b;// 参考帧 灰度[0]  仿射变换后
+*                   float c2 = resInterp[2];//  当前帧 亚像素 第三维度是图像 灰度值
+*                  float residual = c1 - c2;// 匹配点对 的灰度  误差值　　
+*                                      
+*               疑问1：代码中对参考帧的灰度做了一个仿射变换的处理，这里的原理是什么？
+*                     在SVO代码中的确有考虑到两帧见位姿相差过大，因此通过在空间上的仿射变换之后再求灰度的操作。
+*                     但是在这里的代码中没有看出具体原理。
+*             b. 对两帧下　3d点坐标的　Z轴深度值　的变化比例
+*                     float depthChange = (*refPoint)[2] / Wxp[2];
+*                     usageCount += depthChange < 1 ? depthChange : 1;//   记录深度改变的比例  
+*　　　　　　  c. 匹配点总数
+*                  buf_warped_size = idx;// 匹配点数量＝　包括好的匹配点　和　不好的匹配点　数量　　　　　　　　　
+*         Step3: 计算 方差归一化加权残差和　使用误差方差　对　误差归一化 后求和 (calcWeightsAndResidual)
+*              计算误差权重，归一化方差以及Huber-weight，最终把这个系数存在数组　buf_weight_p　中
+*　　　　　　   每个像素点都有一个光度匹配误差，而每个点匹配的可信度根据其偏导数可以求得，
+*　　　　　　   加权每一个误差　然后求所有点　光度匹配误差的均值
+* 　　　　      误差导数　drpdd = dr= -(dx*fx　*　(tx*z' - tz*x')/(z'^2*d)  + dy*fy　*　(ty*z' - tz*y')/(z'^2*d))
+*                                = -(gx　*　(tx*z' - tz*x')/(z'^2*d)  + gy　*　(ty*z' - tz*y')/(z'^2*d))
+*                      dx, dy 为参考帧3d点映射到当前帧图像平面后的梯度
+*             　　　　　fx,  fy 相机内参数
+*             　　　　　tx,ty,tz 为参考帧到当前帧的平移变换(忽略旋转变换)　
+                                t  = translation()
+*            　　　　　 x',y',z'  为参考帧3d点变换到当前帧坐标系下的3d点     
+                                 x' = Wxp[0] , y' = Wxp[1] , z' = Wxp[2] 
+*             　　　　　d = d = *(buf_d) 为参考帧3d点在参考帧下的逆深度
+*                      gx = *(buf_warped_dx)
+*                      gy = *(buf_warped_dy)
+*              方差平方   float s = settings.var_weight  *  *(buf_idepthVar+i);//    参考帧 逆深度方差  平方
+* 　           误差权重为加权方差平方的倒数  float w_p = 1.0f / ((cameraPixelNoise2) + s * drpdd * drpdd);// 误差权重 方差倒数
+*              初步误差　　　　             rp =*( buf_warped_residual) ; //初步误差
+*              加权的误差                  float weighted_rp = fabs(rp*sqrtf(w_p));// |r|加权的误差
+*              Huber-weight权重  
+*              float wh = fabs(weighted_rp < (settings.huber_d/2) ? 1 : (settings.huber_d/2) / weighted_rp);
+*              记录　*(buf_weight_p+i) = wh * w_p;    // 乘上 Huber-weight 权重 得到最终误差权重避免外点的影响
+* 　　　       求和　 sumRes += wh * w_p * rp*rp;　// 加权误差和
+*             取均值　return sumRes / buf_warped_size;// 返回加权误差均值　　　　　　　　　
+		lastErr =  sumRes / buf_warped_size;
+*      Step4: 计算雅克比向量以及A和b(calculateWarpUpdate)
+* 　　　　　　J转置*J * dse3 = -J转置*w*lastErr
+*  　　　　　  对于参考帧中的一个3D点pi位置处的残差求雅可比，这里需要使用链式求导法则 
+*                       Ji =      1/z'*dx*fx + 0* dy *fy
+*                                  0* dx *fx +  1/z' *dy *fy
+*                         -1 *    -x'/z'^2 *dx*fx  - y'/z'^2 *dy*fy 
+*                                 -x'*y'/z'^2 *dx*fx - (1+y'^2/z'^2) *dy*fy
+*                                 (1+x'^2/z'^2)*dx*fx + x'*y'/z'^2*dy*fy
+*                                - y'/z' *dx*fx + x'/z' * dy*fy
+*
+*                       A = J *J转置*(*(buf_weight_p+i))
+*                       b = -J转置*(*(buf_weight_p+i))*lastErr
 * 
-*	Step5: 计算得到收敛的delta，并且更新SE3(inc = A.ldlt().solve(b))
-* 
-*	重复Step2-Step5直到收敛或者达到最大迭代次数
+*      Step5: 计算得到收敛的delta，并且更新SE3(dse3 = A.ldlt().solve(b))
+* 　　　　 for(int i=0;i<6;i++) A(i,i) *= 1+LM_lambda;// (A+λI)  　列文伯格马尔夸克更新算法　LM 调整量　
+*          Vector6 inc = A.ldlt().solve(b);// LDLT矩阵分解求解　dse3 李代数更新量
+　　　　　　Sophus::SE3f new_referenceToFrame = Sophus::SE3f::exp((inc)) * referenceToFrame;　
+* 　　　　
+*      重复Step2-Step5直到收敛或者达到最大迭代次数
 * 
 * 计算下一层金字塔
-* 
-* 
-* 
-* 
-* 
 * 
 */
 
@@ -381,9 +425,6 @@ SE3 SE3Tracker::trackFrameOnPermaref(
 	return toSophus(referenceToFrame);
 }
 
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////// 最重要的跟踪匹配　函数////////////////////////////////////////////
 // SE3Tracker::trackFrame函数的主体是一个for循环，从图像金字塔的高层level-4开始遍历直到底层level-1。
@@ -430,7 +471,7 @@ SE3 SE3Tracker::trackFrame(
 	float last_residual = 0;// 最终的残差
 
 // 函数的主体是一个for循环
-	for(int lvl=SE3TRACKING_MAX_LEVEL-1;lvl >= SE3TRACKING_MIN_LEVEL;lvl--)// 在没一层金字塔上进行跟踪
+	for(int lvl=SE3TRACKING_MAX_LEVEL-1;lvl >= SE3TRACKING_MIN_LEVEL;lvl--)// 在每一层金字塔上进行跟踪
 	{
            // 从最高层的　金字塔图像(尺寸最小)　开始　向下计算
 	     // 从图像金字塔的高层level-4开始遍历直到底层level-1
@@ -456,21 +497,21 @@ SE3 SE3Tracker::trackFrame(
 			affineEstimation_b = affineEstimation_b_lastIt;
 		}
 // 【３】使用误差协方差(误差求导) 对方差归一化 后求和　调用calcWeightsAndResidual得到误差，并记录调用次数
+              // 以及误差权重矩阵　　避免外点的影响 
 		float lastErr = callOptimized(calcWeightsAndResidual,(referenceToFrame));
 
 		numCalcResidualCalls[lvl]++;
 
-
-		float LM_lambda = settings.lambdaInitial[lvl];
-
+		float LM_lambda = settings.lambdaInitial[lvl];// λ 　LM优化的　调整量
+// 【４】每一层进行 LM优化　(A+λI)x=b　在最大迭代次数范围内进行优化　
 		for(int iteration=0; iteration < settings.maxItsPerLvl[lvl]; iteration++)
 		{
-
+                 // 计算　加权平均误差　以及误差权重
 			callOptimized(calculateWarpUpdate,(ls));
 
 			numCalcWarpUpdateCalls[lvl]++;
 
-			iterationNumber = iteration;
+			iterationNumber = iteration;//　迭代次数
 
 			int incTry=0;
 			while(true)
@@ -478,10 +519,11 @@ SE3 SE3Tracker::trackFrame(
 				// solve LS system with current lambda
 				Vector6 b = -ls.b;
 				Matrix6x6 A = ls.A;
-				for(int i=0;i<6;i++) A(i,i) *= 1+LM_lambda;
-				Vector6 inc = A.ldlt().solve(b);
+			// 列文伯格马尔夸克优化算法更新
+				for(int i=0;i<6;i++) A(i,i) *= 1+LM_lambda;// (A+λI)  LM 调整量　
+				Vector6 inc = A.ldlt().solve(b);// LDLT矩阵分解求解　dse3 李代数更新量
 				incTry++;
-
+                         // 对　变换矩阵　左乘　se3指数映射　进行　更新　
 				// apply increment. pretty sure this way round is correct, but hard to test.
 				Sophus::SE3f new_referenceToFrame = Sophus::SE3f::exp((inc)) * referenceToFrame;
 				//Sophus::SE3f new_referenceToFrame = referenceToFrame * Sophus::SE3f::exp((inc));
@@ -490,28 +532,28 @@ SE3 SE3Tracker::trackFrame(
 				// re-evaluate residual
 				callOptimized(calcResidualAndBuffers, (reference->posData[lvl], reference->colorAndVarData[lvl], SE3TRACKING_MIN_LEVEL == lvl ? reference->pointPosInXYGrid[lvl] : 0, reference->numData[lvl], frame, new_referenceToFrame, lvl, (plotTracking && lvl == SE3TRACKING_MIN_LEVEL)));
 				if(buf_warped_size < MIN_GOODPERALL_PIXEL_ABSMIN* (width>>lvl)*(height>>lvl))
-				{
+				{// 匹配点数量记录　包括好的匹配点　和　不好的匹配点　数量
+				  // 匹配点数量少于阈值　　优化失败
 					diverged = true;
-					trackingWasGood = false;
-					return SE3();
+					trackingWasGood = false;// 优化失败
+					return SE3();//　返回空
 				}
-
+                               // 新变换下的误差
 				float error = callOptimized(calcWeightsAndResidual,(new_referenceToFrame));
 				numCalcResidualCalls[lvl]++;
-
-
 				// accept inc?
-				if(error < lastErr)
+		// 误差变小了
+				if(error < lastErr)// 误差变小了
 				{
 					// accept inc
+				       // 更新　新求解的　变换矩阵 
 					referenceToFrame = new_referenceToFrame;
 					if(useAffineLightningEstimation)
-					{
+					{// 更新　仿射变换系数
 						affineEstimation_a = affineEstimation_a_lastIt;
 						affineEstimation_b = affineEstimation_b_lastIt;
 					}
-
-
+					// 打印调试信息
 					if(enablePrintDebugInfo && printTrackingIterationInfo)
 					{
 						// debug output
@@ -544,6 +586,7 @@ SE3 SE3Tracker::trackFrame(
 
 					break;
 				}
+		// 误差反而没有减少
 				else
 				{
 					if(enablePrintDebugInfo && printTrackingIterationInfo)
@@ -562,7 +605,7 @@ SE3 SE3Tracker::trackFrame(
 						iteration = settings.maxItsPerLvl[lvl];
 						break;
 					}
-
+                                        // 调整 LM 参数
 					if(LM_lambda == 0)
 						LM_lambda = 0.2;
 					else
@@ -609,7 +652,19 @@ SE3 SE3Tracker::trackFrame(
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// 每个像素点都有一个光度匹配误差，而每个点匹配的可信度根据其偏导数可以求得，
+// 加权每一个误差　然后求所有点　光度匹配误差的均值
+// 再者　计算误差的权重，在优化更新函数中作为权重
+	
+// 使用　误差方差对方差归一化 后求和
+// 计算权重  和　像素匹配误差
+// 该函数的功能是计算归一化方差的光度误差系数，也就是计算公式(14)，
+// 并且乘以了Huber-weight，最终把这个系数存在数组buf_weight_p中。
+// 可能是考虑参考帧到当前帧的位姿变换比较小，
+// 所以作者只考虑了位移t而忽略旋转R。
+// 这样使得式子(14)中的偏导的形式简单了很多。
+// 这里主要求　误差函数的导数　即得到　误差的协方差矩阵
 #if defined(ENABLE_SSE)
 float SE3Tracker::calcWeightsAndResidualSSE(
 		const Sophus::SE3f& referenceToFrame)
@@ -696,6 +751,7 @@ float SE3Tracker::calcWeightsAndResidualSSE(
 	return sumRes / ((buf_warped_size >> 2)<<2);
 }
 #endif
+	
 #if defined(ENABLE_NEON)
 float SE3Tracker::calcWeightsAndResidualNEON(
 		const Sophus::SE3f& referenceToFrame)
@@ -864,14 +920,12 @@ float SE3Tracker::calcWeightsAndResidualNEON(
 	return sumRes / buf_warped_size;
 }
 #endif
-
-
-
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
 // 每个像素点都有一个光度匹配误差，而每个点匹配的可信度根据其偏导数可以求得，
 // 加权每一个误差　然后求所有点　光度匹配误差的均值
-
-//  使用　误差方差对方差归一化 后求和
+// 再者　计算误差的权重，在优化更新函数中作为权重
+	
+// 使用　误差方差对方差归一化 后求和
 // 计算权重  和　像素匹配误差
 // 该函数的功能是计算归一化方差的光度误差系数，也就是计算公式(14)，
 // 并且乘以了Huber-weight，最终把这个系数存在数组buf_weight_p中。
@@ -923,12 +977,14 @@ float SE3Tracker::calcWeightsAndResidual(
                 // 其实在实现的时候，这里给的权重就是Huber-weight。 
 		float wh = fabs(weighted_rp < (settings.huber_d/2) ? 1 : (settings.huber_d/2) / weighted_rp);
 
-		sumRes += wh * w_p * rp*rp;
-
+		//sumRes += wh * w_p * rp*rp;
+		//*(buf_weight_p+i) = wh * w_p;// // 乘上 Huber-weight 权重 的最终误差
 		*(buf_weight_p+i) = wh * w_p;// // 乘上 Huber-weight 权重 的最终误差
+		sumRes += *(buf_weight_p+i) * rp*rp;// 加权误差和
+		
 	}
 
-	return sumRes / buf_warped_size;
+	return sumRes / buf_warped_size;// 返回加权误差均值
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1043,13 +1099,13 @@ float SE3Tracker::calcResidualAndBuffersNEON(
 // 根据变换矩阵和原3D点和灰度值　计算匹配点对之间得　像素匹配误差　　以及　匹配点对　好坏标志图
 /*
  input:
- refPoint　　　 			参考帧 3d坐标 起始 地址指针
- refColVar　　　			参考帧 灰度和 逆深度方差 起始地址
- idxBuf　　　　			 匹配点好坏标志图 指针
- frame　　　　			当前帧　指针
- referenceToFrame　　 	参考帧　变换到　当前帧下得　欧式变换矩阵　引用　
- level　　　　　　　　　	金字塔层级
- plotResidual　　　　		匹配误差图标志
+ refPoint　　　 	 参考帧 3d坐标 起始 地址指针
+ refColVar　　　	 参考帧 灰度和 逆深度方差 起始地址
+ idxBuf　　　　	匹配点好坏标志图 指针
+ frame　　　　	当前帧　指针
+ referenceToFrame　参考帧　变换到　当前帧下得　欧式变换矩阵　引用　
+ level　　　　　　　金字塔层级
+ plotResidual　　　匹配误差图标志
  */
 float SE3Tracker::calcResidualAndBuffers(
 		const Eigen::Vector3f* refPoint,// 参考帧 3d坐标 起始 地址
@@ -1204,7 +1260,21 @@ float SE3Tracker::calcResidualAndBuffers(
 	return sumResUnweighted / goodCount; // 匹配点像素误差的平方和 均值
 }
 
+	
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 计算雅克比矩阵J　线性方程系数A,和偏置b，使用LDLT矩阵分解求解方程得到　李代数更新量 dse3
+// 利用误差函数对误差向量求导数，求得各个点的误差之间的　协方差矩阵，也是雅克比矩阵Ｊ
+// 是计算雅可比以及最小二乘方程的系数
+// 对于参考帧中的一个3D点pi位置处的残差求雅可比，这里需要使用链式求导法则 
+// Ji =      1/z' *dx *fx + 0* dy *fy
+//                 0*dx *fx +  1/z' *dy *fy
+//   -1 *   - x'/z'^2 *dx*fx  - y'/z'^2 *dy*fy 
+//            - x'*y'/z'^2 *dx*fx - (1+y'^2/z'^2) *dy*fy
+//             (1+x'^2/z'^2)*dx*fx + x'*y'/z'^2*dy*fy
+//              - y'/z' *dx*fx + x'/z' * dy*fy
+// A = J *J转置*(*(buf_weight_p+i))
+// b = -J转置*(*(buf_weight_p+i))*lastErr
+// Vector6 inc = A.ldlt().solve(b);// LDLT矩阵分解求解　dse3 李代数更新量
 #if defined(ENABLE_SSE)
 Vector6 SE3Tracker::calculateWarpUpdateSSE(
 		NormalEquationsLeastSquares &ls)
@@ -1449,7 +1519,19 @@ Vector6 SE3Tracker::calculateWarpUpdateNEON(
 }
 #endif
 
-
+// 计算雅克比矩阵J　线性方程系数A,和偏置b，使用LDLT矩阵分解求解方程得到　李代数更新量 dse3
+// 利用误差函数对误差向量求导数，求得各个点的误差之间的　协方差矩阵，也是雅克比矩阵Ｊ
+// 是计算雅可比以及最小二乘方程的系数
+// 对于参考帧中的一个3D点pi位置处的残差求雅可比，这里需要使用链式求导法则 
+// Ji =      1/z' *dx *fx + 0* dy *fy
+//                 0*dx *fx +  1/z' *dy *fy
+//   -1 *   - x'/z'^2 *dx*fx  - y'/z'^2 *dy*fy 
+//            - x'*y'/z'^2 *dx*fx - (1+y'^2/z'^2) *dy*fy
+//             (1+x'^2/z'^2)*dx*fx + x'*y'/z'^2*dy*fy
+//              - y'/z' *dx*fx + x'/z' * dy*fy
+// A = J *J转置*(*(buf_weight_p+i))
+// b = -J转置*(*(buf_weight_p+i))*lastErr
+// Vector6 inc = A.ldlt().solve(b);// LDLT矩阵分解求解　dse3 李代数更新量
 Vector6 SE3Tracker::calculateWarpUpdate(
 		NormalEquationsLeastSquares &ls)
 {
@@ -1460,16 +1542,16 @@ Vector6 SE3Tracker::calculateWarpUpdate(
 	ls.initialize(width*height);
 	for(int i=0;i<buf_warped_size;i++)
 	{
-		float px = *(buf_warped_x+i);
-		float py = *(buf_warped_y+i);
-		float pz = *(buf_warped_z+i);
-		float r =  *(buf_warped_residual+i);
-		float gx = *(buf_warped_dx+i);
-		float gy = *(buf_warped_dy+i);
+		float px = *(buf_warped_x+i);//x'
+		float py = *(buf_warped_y+i);//y'
+		float pz = *(buf_warped_z+i);//z'
+		float r =  *(buf_warped_residual+i);//误差
+		float gx = *(buf_warped_dx+i);// dx*fx
+		float gy = *(buf_warped_dy+i);//dy*fx
 		// step 3 + step 5 comp 6d error vector
 
-		float z = 1.0f / pz;
-		float z_sqr = 1.0f / (pz*pz);
+		float z = 1.0f / pz;// 1/z'
+		float z_sqr = 1.0f / (pz*pz);//1/z'^2
 		Vector6 v;
 		v[0] = z*gx + 0;
 		v[1] = 0 +         z*gy;
@@ -1483,18 +1565,19 @@ Vector6 SE3Tracker::calculateWarpUpdate(
 			  (px * z) * gy;
 
 		// step 6: integrate into A and b:
-		ls.update(v, r, *(buf_weight_p+i));
+			  // J转置*J * dse3 = -J转置*w*error
+			  // v为求得的雅克比矩阵J  r为误差  *(buf_weight_p+i)为误差权重 
+		ls.update(v, r, *(buf_weight_p+i));// 这里计算的是　A 和　b的和　以及加权误差平方和　error 
 	}
+// 欧式变换矩阵se3 更新后的量　
 	Vector6 result;
-
 	// solve ls
+	// 对求得的　A 和　b的和以及加权误差平方和　error 　求均值
 	ls.finish();
+	// LDLT求解线性方程组 A*x=b    x = A.ldlt().solve(b);
 	ls.solve(result);
-
 	return result;
-}
-
-
+ }
 
 }
 
