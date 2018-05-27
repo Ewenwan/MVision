@@ -114,7 +114,7 @@
       *  4. SE3Tracker::calculateWarpUpdate　　 被调用计算    
       *　　 误差关系矩阵　协方差矩阵　雅克比矩阵J　以及A=J转置*J b=-J转置*w*error 求接线性方程组
 
-### *1.  SE3Tracker::trackFrame  
+###  SE3Tracker::trackFrame  
       *  图像金字塔迭代level-4到level-1
       
       *       Step1: 对参考帧当前层构造点云(reference->makePointCloud) 
