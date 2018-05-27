@@ -35,11 +35,15 @@
 *	Step2: 计算变换到当前帧的残差和梯度(calcResidualAndBuffers)
 *                 计算参考帧3d点变换到当前帧图像坐标系下的残差(灰度误差)　和　梯度(对应点像素梯度)　
 *                  1. 参考帧3d点 R，t变换到 当前相机坐标系下 
-*                         Eigen::Vector3f Wxp = rotMat * (*refPoint) + transVec;
+* 	　　　　　Eigen::Matrix3f rotMat = referenceToFrame.rotationMatrix();// 旋转矩阵
+*	　　　　　Eigen::Vector3f transVec = referenceToFrame.translation();// 平移向量
+*                         Eigen::Vector3f Wxp = rotMat * (*refPoint) + transVec;// 欧式变换
 * 		    2. 再 投影到 当前相机 像素平面下
 * 		            float u_new = (Wxp[0]/Wxp[2])*fx_l + cx_l;// float 浮点数类型
 * 		            float v_new = (Wxp[1]/Wxp[2])*fy_l + cy_l;
 *                  3. 根据浮点数坐标 四周的四个整数点坐标的梯度 使用位置差加权进行求和得到亚像素灰度值　和　亚像素　梯度值
+*                              x=u_new;
+*                              y=v_new;
 *                      	int ix = (int)x;// 取整数    左上方点
 *				int iy = (int)y;
 *				float dx = x - ix;// 差值
@@ -48,15 +52,58 @@
 *				// map 像素梯度  指针
 *				const Eigen::Vector4f* bp = mat +ix+iy*width;// 左上方点　像素位置 梯度的 指针
 *				// 使用 左上方点 右上方点  右下方点 左下方点 的灰度梯度信息 以及 相应位置差值作为权重值 线性加权获取　亚像素梯度信息
-*				return dxdy * *(const Eigen::Vector3f*)(bp+1+width)// 右下方点
+*				resInterp  =  dxdy * *(const Eigen::Vector3f*)(bp+1+width)// 右下方点
 *					+ (dy-dxdy) * *(const Eigen::Vector3f*)(bp+width)// 左下方点
 *					+ (dx-dxdy) * *(const Eigen::Vector3f*)(bp+1)// 右上方点
 *						+ (1-dx-dy+dxdy) * *(const Eigen::Vector3f*)(bp);// 左上方点
+* 
+*                             需要注意的是，在给梯度变量赋值的时候，这里乘了焦距
+* 　　　　　　　这里求得　亚像素梯度之后　又乘上了　相机内参数，因为在求　误差偏导数时需要　需要用到　dx*fx　　dy*fy  
+* 		                         *(buf_warped_dx+idx) = fx_l * resInterp[0];// 当前帧匹配点亚像素 梯度　gx = dx*fx  
+*		                         *(buf_warped_dy+idx) = fy_l * resInterp[1];// 匹配点亚像素 梯度               gy = dy*fy
+*		                         *(buf_warped_residual+idx) = residual;// 对应 匹配点 像素误差
+*                                      　 这里的　  dx= resInterp[0],  dy =  resInterp[0] 亚像素梯度
+* 
+* 		                         *(buf_d+idx) = 1.0f / (*refPoint)[2]       ;// 参考帧 Z轴 倒数  = 参考帧逆深度
+*  		                         *(buf_idepthVar+idx) = (*refColVar)[1];// 参考帧逆深度方差
 * 　　　　  4.  记录变换　
 * 　　　　　　　　a. 对参考帧灰度　进行一次仿射变换后　和　当前帧亚像素灰度做差得到　残差(灰度误差)
+*                                      现在求得的残差只是纯粹的光度误差
+* 　　　　　　　　      float c1 = affineEstimation_a * (*refColVar)[0] + affineEstimation_b;// 参考帧 灰度[0]  仿射变换后
+*		                        float c2 = resInterp[2];//  当前帧 亚像素 第三维度是图像 灰度值
+*		                        float residual = c1 - c2;// 匹配点对 的灰度  误差值　　
+*		                        
+*		                        疑问1：代码中对参考帧的灰度做了一个仿射变换的处理，这里的原理是什么？
+*		                                     在SVO代码中的确有考虑到两帧见位姿相差过大，因此通过在空间上的仿射变换之后再求灰度的操作。
+*		                                     但是在这里的代码中没有看出具体原理。
 *                                b. 对两帧下　3d点坐标的　Z轴深度值　的变化比例
-*	Step3: 计算 方差归一化加权残差和　使用误差方差对方差归一化 后求和 (calcWeightsAndResidual)
-* 
+*                                            float depthChange = (*refPoint)[2] / Wxp[2];
+*		                              usageCount += depthChange < 1 ? depthChange : 1;//   记录深度改变的比例  
+*　　　　　　　　 c. 匹配点总数
+*                                   buf_warped_size = idx;// 匹配点数量＝　包括好的匹配点　和　不好的匹配点　数量　　　　　　　　　
+*	Step3: 计算 方差归一化加权残差和　使用误差方差　对　误差归一化 后求和 (calcWeightsAndResidual)
+*                 计算误差权重，归一化方差以及Huber-weight，最终把这个系数存在数组　buf_weight_p　中
+*　　　　　　 每个像素点都有一个光度匹配误差，而每个点匹配的可信度根据其偏导数可以求得，
+*　　　　　　加权每一个误差　然后求所有点　光度匹配误差的均值
+* 　　　　误差导数　drpdd = dr =  -(dx*fx　*　(tx*z' - tz*x')/(z'^2*d)  + dy*fy　*　(ty*z' - tz*y')/(z'^2*d))
+*                                                       =  -(gx　*　(tx*z' - tz*x')/(z'^2*d)  + gy　*　(ty*z' - tz*y')/(z'^2*d))
+*	                                                      dx, dy 为参考帧3d点映射到当前帧图像平面后的梯度
+* 	      　　　　　　　　　　　　  fx,  fy 相机内参数
+* 	      　　　　　　　　　　　　  tx,ty,tz 为参考帧到当前帧的平移变换(忽略旋转变换)　t  = translation()
+* 	     　　　　　　　　　　　　   x',y',z'  为参考帧3d点变换到当前帧坐标系下的3d点     x' = Wxp[0] , y' = Wxp[1] , z' = Wxp[2] 
+* 	      　　　　　　　　　　　　  d = d = *(buf_d) 为参考帧3d点在参考帧下的逆深度
+*                                                            gx = *(buf_warped_dx)
+*                                                            gy = *(buf_warped_dy)
+*               方差平方                                        float s = settings.var_weight  *  *(buf_idepthVar+i);	  //    参考帧 逆深度方差  平方
+* 　          误差权重为加权方差平方的倒数  float w_p = 1.0f / ((cameraPixelNoise2) + s * drpdd * drpdd);// 误差权重 方差倒数
+*               初步误差　　　　                         rp =*( buf_warped_residual) ; //初步误差
+*               加权的误差                                    float weighted_rp = fabs(rp*sqrtf(w_p));// |r|加权的误差
+*               Huber-weight  
+*		                                                       float wh = fabs(weighted_rp < (settings.huber_d/2) ? 1 : (settings.huber_d/2) / weighted_rp);
+*               记录　　　　　　　　　　　　*(buf_weight_p+i) = wh * w_p;    // 乘上 Huber-weight 权重 的最终误差
+* 　　　   求和　　　　　　　　　　　　sumRes += wh * w_p * rp*rp;
+*               取均值　　　　　　　　　　　return sumRes / buf_warped_size;　　　　　　　　　　　
+		
 *	Step4: 计算雅克比向量以及A和b(calculateWarpUpdate)
 * 
 *	Step5: 计算得到收敛的delta，并且更新SE3(inc = A.ldlt().solve(b))
@@ -408,7 +455,7 @@ SE3 SE3Tracker::trackFrame(
 			affineEstimation_a = affineEstimation_a_lastIt;
 			affineEstimation_b = affineEstimation_b_lastIt;
 		}
-// 【３】使用误差方差对方差归一化 后求和　　调用calcWeightsAndResidual得到误差，并记录调用次数
+// 【３】使用误差协方差(误差求导) 对方差归一化 后求和　调用calcWeightsAndResidual得到误差，并记录调用次数
 		float lastErr = callOptimized(calcWeightsAndResidual,(referenceToFrame));
 
 		numCalcResidualCalls[lvl]++;
@@ -818,9 +865,20 @@ float SE3Tracker::calcWeightsAndResidualNEON(
 }
 #endif
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
+// 每个像素点都有一个光度匹配误差，而每个点匹配的可信度根据其偏导数可以求得，
+// 加权每一个误差　然后求所有点　光度匹配误差的均值
+
 //  使用　误差方差对方差归一化 后求和
 // 计算权重  和　像素匹配误差
+// 该函数的功能是计算归一化方差的光度误差系数，也就是计算公式(14)，
+// 并且乘以了Huber-weight，最终把这个系数存在数组buf_weight_p中。
+// 可能是考虑参考帧到当前帧的位姿变换比较小，
+// 所以作者只考虑了位移t而忽略旋转R。
+// 这样使得式子(14)中的偏导的形式简单了很多。
+// 这里主要求　误差函数的导数　即得到　误差的协方差矩阵
 float SE3Tracker::calcWeightsAndResidual(
 		const Sophus::SE3f& referenceToFrame)// 参考帧　到　当前帧　欧式变换矩阵
 {
@@ -830,7 +888,8 @@ float SE3Tracker::calcWeightsAndResidual(
 	float tz = referenceToFrame.translation()[2];
 
 	float sumRes = 0;
-
+// 每个像素点都有一个光度匹配误差，而每个点匹配的可信度根据其偏导数可以求得，
+// 加权每一个误差　然后求所有点　光度匹配误差的均值 
 	for(int i=0;i<buf_warped_size;i++)// 对于初步匹配得　每一个　匹配点
 	{
 	  // 参考帧　映射到　当前帧　坐标系下的　3d 坐标
@@ -840,27 +899,33 @@ float SE3Tracker::calcWeightsAndResidual(
 		
 		float d = *(buf_d+i);	// d  　　　　　　　　	参考帧 Z轴 倒数  = 参考帧 逆深度
 		float rp = *(buf_warped_residual+i); // r_p 　　	匹配点对 像素匹配误差
-		float gx = *(buf_warped_dx+i);	// \delta_x I　	当前帧　亚像素　梯度值gx　仿射变换后(  乘以　相机内参数)
-		float gy = *(buf_warped_dy+i);  // \delta_y I       	gy
+		
+		float gx = *(buf_warped_dx+i);	// \delta_x I　	gx = dx*fx当前帧　亚像素梯度值gx仿射变换后(  乘以　相机内参数)
+		float gy = *(buf_warped_dy+i);  // \delta_y I       	gy = gy*fy
+		
 		float s = settings.var_weight  *  *(buf_idepthVar+i);	// \sigma_d^2    参考帧 逆深度 方差  平方
-
+// 参考帧3D点通过Rt映射到当前帧坐标系下在通过相机内参数映射到当前帧图像平面上
+// 的到所谓的光度误差　该误差对参考帧p点处的逆深度D求偏导数得到
+// dE =  -(dx*fx　*　(tx*z' - tz*x')/(z'^2*d)  + dy*fy　*　(ty*z' - tz*y')/(z'^2*d))
 
 		// calc dw/dd (first 2 components):
-		float g0 = (tx * pz - tz * px) / (pz*pz*d);//   分母为　当前坐标系下　深度平方/参考帧深度
+		float g0 = (tx * pz - tz * px) / (pz*pz*d);//   
 		float g1 = (ty * pz - tz * py) / (pz*pz*d);
-
-
-		// calc w_p
+		
+		// 误差　偏导数的结果　calc w_p
+		// 正如源码所注释，这里省略了负号
 		float drpdd = gx * g0 + gy * g1;	// ommitting the minus
-		float w_p = 1.0f / ((cameraPixelNoise2) + s * drpdd * drpdd);
+		
+		float w_p = 1.0f / ((cameraPixelNoise2) + s * drpdd * drpdd);// 误差权重 方差倒数
 
-		float weighted_rp = fabs(rp*sqrtf(w_p));
-
+		float weighted_rp = fabs(rp*sqrtf(w_p));// |r|加权的误差
+		// 为了减少外点（outliers）对算法的影响，论文中使用了迭代变权重最小二乘
+                // 其实在实现的时候，这里给的权重就是Huber-weight。 
 		float wh = fabs(weighted_rp < (settings.huber_d/2) ? 1 : (settings.huber_d/2) / weighted_rp);
 
 		sumRes += wh * w_p * rp*rp;
 
-		*(buf_weight_p+i) = wh * w_p;
+		*(buf_weight_p+i) = wh * w_p;// // 乘上 Huber-weight 权重 的最终误差
 	}
 
 	return sumRes / buf_warped_size;
@@ -1050,6 +1115,9 @@ float SE3Tracker::calcResidualAndBuffers(
 		Eigen::Vector3f resInterp = getInterpolatedElement43(frame_gradients, u_new, v_new, w);
 		
 // 之后把参考图像数据做一次 仿射操作，
+		// 疑问1：代码中对参考帧的灰度做了一个仿射变换的处理，这里的原理是什么？
+		//在SVO代码中的确有考虑到两帧见位姿相差过大，因此通过在空间上的仿射变换之后再求灰度的操作。
+		// 但是在这里的代码中没有看出具体原理。
 		float c1 = affineEstimation_a * (*refColVar)[0] + affineEstimation_b;// 参考帧 灰度[0]  ;   逆深度方差[1] 
 		float c2 = resInterp[2];//  当前帧 亚像素 第三维度是图像 灰度值
 		float residual = c1 - c2;// 匹配点对 的灰度  误差值
@@ -1073,9 +1141,10 @@ float SE3Tracker::calcResidualAndBuffers(
 		*(buf_warped_y+idx) = Wxp(1);// Y
 		*(buf_warped_z+idx) = Wxp(2);// Z
 		
-                // 乘法实际上是投影到图像坐标，即相机参数乘以差之后的梯度值  ？？？ 本身就是 当前帧的梯度 只是取了亚像素梯度 为毛要乘以 相机参数
-		*(buf_warped_dx+idx) = fx_l * resInterp[0];// 当前帧匹配点亚像素 梯度dx
-		*(buf_warped_dy+idx) = fy_l * resInterp[1];// 匹配点亚像素 梯度dy
+// 这里求得　亚像素梯度之后　又乘上了　相机内参数，因为在求　误差偏导数时需要　需要用到　dx*fx　　dy*fy  
+		// calcWeightsAndResidual 求误差导数来求　误差的协方差矩阵　后归一化误差
+		*(buf_warped_dx+idx) = fx_l * resInterp[0];// 当前帧匹配点亚像素 梯度 gx = dx*fx
+		*(buf_warped_dy+idx) = fy_l * resInterp[1];// 匹配点亚像素 梯度             gy = dy*fy  
 		*(buf_warped_residual+idx) = residual;// 对应 匹配点 像素误差
 
 		*(buf_d+idx) = 1.0f / (*refPoint)[2];// 参考帧 Z轴 倒数  = 参考帧逆深度
