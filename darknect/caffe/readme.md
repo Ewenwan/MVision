@@ -1,5 +1,7 @@
 [Caffe代码解析](http://alanse7en.github.io/caffedai-ma-jie-xi-2/)
 
+[caffe网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
+
       caffe 中 BatchNorm层  要和  Scale 层一起用才有 批规范化的效果
 [参考 ](https://blog.csdn.net/Suan2014/article/details/79623495)
 > 批规范化：
