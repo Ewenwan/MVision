@@ -1,7 +1,17 @@
-# Video Analysis 相关领域 之Action Recognition(行为识别)
+# Video Analysis 相关领域 之Action Recognition(行为识别)  类似图像目标识别
+    行为识别就是对时域预先分割好的序列判定其所属行为动作的类型，即“读懂行为”。   
+# 行为检测                                                类似图像目标检测
+    但在现实应用中更容易遇到的情况是序列尚未在时域分割（Untrimmed），
+    因此需要同时对行为动作进行时域定位（分割）和类型判定，这类任务一般称为行为检测。
+    传统 DTW 动态时间规整 分割视频
+    现在 利用RNN网络对未分割序列进行行为检测（行为动作的起止点的定位 和 行为动作类型的判定）
+
 [论文总结参考](https://blog.csdn.net/whfshuaisi/article/details/79116265)
 
 [博客参考2](https://blog.csdn.net/wzmsltw/article/details/70239000)
+
+[微软亚洲研究院 行为识别：让机器学会“察言观色”第一步](http://blog.sina.com.cn/s/blog_4caedc7a0102wrkz.html)
+
 
 # 1. 任务特点及分析
 ## 目的
@@ -244,6 +254,7 @@
 
 ## 3.2 深度学习方法
 ### 时空双流网络结构  Two Stream Network及衍生方法
+    空时注意力模型（Attention）之于行为识别
 #### 提出 
 [“Two-Stream Convolutional Networks for Action Recognition in Videos”（2014NIPS）](https://arxiv.org/pdf/1406.2199.pdf)
 
@@ -306,6 +317,11 @@
     这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
     实验效果：UCF101-88.6% 
     
+#### LSTM网络框架和关节点共现性（Co-occurrence）的挖掘之于行为识别
+ 
+#### RNN 基于联合分类和回归的循环神经网络之于行为动作检测
+
+
 ###  3D卷积 C3D Network
 #### 提出 C3D
 [Learning spatiotemporal features with 3d convolutional networks](https://arxiv.org/pdf/1412.0767.pdf)
