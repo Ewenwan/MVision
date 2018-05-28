@@ -319,7 +319,26 @@
     这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
     实验效果：UCF101-88.6% 
     
-    
+### 行为识别 人体骨架检测+LSTM
+    人体骨架怎么获得呢？
+    主要有两个途径：
+    通过RGB图像进行关节点估计（Pose Estimation）获得[3][4]，
+    或是通过深度摄像机直接获得（例如Kinect）。
+    每一时刻（帧）骨架对应人体的K个关节点所在的坐标位置信息，一个时间序列由若干帧组成。
+[3 骨架获取 Stacked Hourglass Networks for Human Pose Estimation](https://arxiv.org/pdf/1603.06937.pdf)
+
+[论文分析 使用全卷积网络解决人体姿态分析问题 ](https://blog.csdn.net/shenxiaolu1984/article/details/51428392)
+
+
+[4 骨架获取 Realtime Multi-person 2D Pose Estimation using Part Affinity Fields](https://arxiv.org/pdf/1611.08050.pdf)
+
+[基于部分亲和字段PAF(Part Affinity Field)的2D图像姿态估计 博客参考](https://blog.csdn.net/qq_14845119/article/details/72526737)
+
+
+[博客1](https://blog.csdn.net/heyc861221/article/details/80128180)
+
+[博客2](https://blog.csdn.net/yengjie2200/article/details/68063605)
+#### 1. 空时注意力模型（Attention）之于行为识别
     LSTM网络框架和关节点共现性（Co-occurrence）的挖掘之于行为识别。
     时域注意力模型：
         设计了时域注意力模型，通过一个LSTM子网络来自动学习和获知序列中不同帧的重要性，
@@ -329,9 +348,10 @@
         设计了一个LSTM子网络，依据序列的内容自动给不同关节点分配不同的重要性，即给予不同的注意力。
         由于注意力是基于内容的，即当前帧信息和历史信息共同决定的，
         因此，在同一个序列中，关节点重要性的分配可以随着时间的变化而改变。
+#### 2. 
     
     
-#### RNN 基于联合分类和回归的循环神经网络之于行为动作检测
+#### 3. RNN 基于联合分类和回归的循环神经网络之于行为动作检测
 
 
 ###  3D卷积 C3D Network
