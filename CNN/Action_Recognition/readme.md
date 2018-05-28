@@ -314,11 +314,23 @@
 #### LSTM 结构融合双流特征
 [Beyond Short Snippets: Deep Networks for Video Classification Joe](https://arxiv.org/pdf/1503.08909.pdf)
 
+[Understanding LSTM Networks](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+
     这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
     实验效果：UCF101-88.6% 
     
-#### LSTM网络框架和关节点共现性（Co-occurrence）的挖掘之于行为识别
- 
+    
+    LSTM网络框架和关节点共现性（Co-occurrence）的挖掘之于行为识别。
+    时域注意力模型：
+        设计了时域注意力模型，通过一个LSTM子网络来自动学习和获知序列中不同帧的重要性，
+        使重要的帧在分类中起更大的作用，以优化识别的精度。
+        
+    空域注意力：
+        设计了一个LSTM子网络，依据序列的内容自动给不同关节点分配不同的重要性，即给予不同的注意力。
+        由于注意力是基于内容的，即当前帧信息和历史信息共同决定的，
+        因此，在同一个序列中，关节点重要性的分配可以随着时间的变化而改变。
+    
+    
 #### RNN 基于联合分类和回归的循环神经网络之于行为动作检测
 
 
