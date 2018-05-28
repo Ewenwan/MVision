@@ -339,6 +339,8 @@
 
 [博客2](https://blog.csdn.net/yengjie2200/article/details/68063605)
 #### 1. 空时注意力模型（Attention）之于行为识别
+[An End-to-End Spatio-Temporal Attention Model for Human Action Recognition from Skeleton Data](https://arxiv.org/pdf/1611.06067v1.pdf)
+
     LSTM网络框架和关节点共现性（Co-occurrence）的挖掘之于行为识别。
     时域注意力模型：
         设计了时域注意力模型，通过一个LSTM子网络来自动学习和获知序列中不同帧的重要性，
@@ -348,11 +350,11 @@
         设计了一个LSTM子网络，依据序列的内容自动给不同关节点分配不同的重要性，即给予不同的注意力。
         由于注意力是基于内容的，即当前帧信息和历史信息共同决定的，
         因此，在同一个序列中，关节点重要性的分配可以随着时间的变化而改变。
-#### 2. 
-    
+#### 2. LSTM网络框架和关节点共现性（Co-occurrence）的挖掘之于行为识别
+[Co-Occurrence Feature Learning for Skeleton Based Action Recognition Using Regularized Deep LSTM Networks](https://arxiv.org/pdf/1603.07772.pdf)
     
 #### 3. RNN 基于联合分类和回归的循环神经网络之于行为动作检测
-
+[Online Human Action Detection Using Joint Classification-Regression Recurrent Neural Networks](http://www.icst.pku.edu.cn/F/course/icb/v2/Pub%20Files/2016/LiYanghao_eccv-2016.pdf)
 
 ###  3D卷积 C3D Network
 #### 提出 C3D
