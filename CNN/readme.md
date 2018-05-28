@@ -1,4 +1,6 @@
 # 卷积神经网络
+[网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
+
 [各种卷积方式](https://github.com/vdumoulin/conv_arithmetic)
 
 [TensorFlow学习（九）：各种卷积网络](https://blog.csdn.net/xierhacker/article/details/53174594)
