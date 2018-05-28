@@ -5,7 +5,7 @@
 
     微软HoloLens技术解谜：还原三维场景  双目视觉+slam
     ICP点云匹配
-[微软HoloLens技术 三维重建技术](http://tech.163.com/15/0126/12/AGSR0B9L00094ODU.html)
+[微软HoloLens技术 三维重建技术](https://blog.csdn.net/hunter_wwq/article/details/43308795)
 
 [KinectFusion: Real-time 3D Reconstruction and Interaction Using a Moving Depth Camera*](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/kinectfusion-uist-comp.pdf)
 
