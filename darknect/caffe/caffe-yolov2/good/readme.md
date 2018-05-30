@@ -9,3 +9,7 @@
 
 # 训练
     ./my_train_darknet_v2.sh
+# 检测图片
+    python2 show_dect_yolo_v2.py
+# 测试数据集
+     python2 test_yolo_v2_write_result.py
