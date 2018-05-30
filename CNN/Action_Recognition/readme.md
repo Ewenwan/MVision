@@ -256,7 +256,9 @@
     
     3) HMM
 [博客参考](https://www.cnblogs.com/skyme/p/4651331.html)
-    
+
+[维特比算法 最大可能的隐含状态连 代码](https://github.com/Ewenwan/Viterbi)
+
     4) 深度学习的方法分割动作 
 
 
