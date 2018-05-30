@@ -1,0 +1,22 @@
+net: "squeezenet_ssd_voc_train.prototxt"
+base_lr: 0.0001
+display: 10
+max_iter: 220000
+lr_policy: "multistep"
+gamma: 0.5
+weight_decay: 0.0
+snapshot: 1000
+snapshot_prefix: "snapshot/squeezenet"
+solver_mode: GPU
+debug_info: false
+snapshot_after_train: true
+test_initialization: false
+average_loss: 10
+stepvalue: 20000
+stepvalue: 50000
+stepvalue: 100000
+iter_size: 1
+type: "RMSProp"
+eval_type: "detection"
+ap_version: "11point"
+
