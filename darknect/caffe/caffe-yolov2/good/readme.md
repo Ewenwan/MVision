@@ -5,5 +5,7 @@
 
 # yolov2.weights 去官网下载
 
+# 训练基于 yolov2.weights 作为初始权重开始训练效果会好
+
 # 训练
     ./my_train_darknet_v2.sh
