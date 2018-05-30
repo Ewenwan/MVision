@@ -259,6 +259,8 @@
 
 [维特比算法 最大可能的隐含状态连 代码](https://github.com/Ewenwan/Viterbi)
 
+[hmm python代码](https://github.com/Ewenwan/hmm)
+
     4) 深度学习的方法分割动作 
 
 
