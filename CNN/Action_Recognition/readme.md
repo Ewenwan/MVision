@@ -293,6 +293,8 @@
 #### TSN 结构 
 [Temporal Segment Networks: Towards Good Practices for Deep Action Recognition](https://arxiv.org/pdf/1608.00859.pdf)
 
+[caffe code](https://github.com/yjxiong/temporal-segment-networks)
+
     这篇文章是港中文Limin Wang大神的工作，他在这方面做了很多很棒的工作，
     可以followt他的主页：http://wanglimin.github.io/ 。
 
