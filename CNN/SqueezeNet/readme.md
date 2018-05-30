@@ -6,6 +6,10 @@
 
 [论文源码 caffe model](https://github.com/DeepScale/SqueezeNet)
 
+    注：代码只放出了prototxt文件和训练好的caffemodel，
+    因为整个网络都是基于caffe的，有这两样东西就足够了。 
+ 
+
 [ShuffleNet在Caffe框架下的实现](https://blog.csdn.net/Chris_zhangrx/article/details/78277957)
 
 [PyTorch实现的SqeezeNet](https://github.com/pytorch/vision/blob/master/torchvision/models/squeezenet.py)
