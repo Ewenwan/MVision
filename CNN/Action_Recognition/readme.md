@@ -255,6 +255,7 @@
     2) CDP
     
     3) HMM
+[博客参考](https://www.cnblogs.com/skyme/p/4651331.html)
     
     4) 深度学习的方法分割动作 
 
