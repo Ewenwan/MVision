@@ -249,7 +249,14 @@
         Fisher Vector还包含了1阶(期望)信息、2阶(方差信息)，
         因此FisherVector可以更加充分地表示一幅图片。
 #### d. 视频分割 类似语言识别中的 间隔点检测
-    动态时间规整DTW
+    1) 动态时间规整DTW
+[博客参考](https://blog.csdn.net/qcyfred/article/details/53824507)
+
+    2) CDP
+    
+    3) HMM
+    
+    4) 深度学习的方法分割动作 
 
 
 ## 3.2 深度学习方法
