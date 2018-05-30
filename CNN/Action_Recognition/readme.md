@@ -332,7 +332,10 @@
 
     这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
     实验效果：UCF101-88.6% 
-    
+
+[LSTM ResNet cnn TSN](https://github.com/woodfrog/ActionRecognition)
+
+
 ### 行为识别 人体骨架检测+LSTM
     人体骨架怎么获得呢？
     主要有两个途径：
