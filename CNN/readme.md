@@ -9,7 +9,9 @@
 
 [Tensflow Net MODEL 官方实现](https://github.com/tensorflow/models/tree/master/research/slim/nets)
 
-# 损失函数 交叉熵CrossEntropy 以及  Focal Loss 
+[反向传播神经网络及应用](https://github.com/Ewenwan/neural_net)
+
+# 损失函数 交叉熵CrossEntropy 以及 Focal Loss 
 [交叉熵损失 Focal Loss 博客介绍](http://www.cnblogs.com/xuanyuyt/p/7444468.html)
 
 [Focal Loss 导数 反向传播](https://github.com/Ewenwan/paper-note/blob/master/focal_loss.pdf)
