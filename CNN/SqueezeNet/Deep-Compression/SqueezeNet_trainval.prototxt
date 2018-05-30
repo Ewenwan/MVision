@@ -1,0 +1,696 @@
+name: "FireNet"
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    mirror: true
+    crop_size: 227
+    mean_value: 104
+    mean_value: 117
+    mean_value: 123
+  }
+  data_param {
+    source: "/ssd/dataset/ilsvrc12_train_lmdb/"
+    batch_size: 32
+    backend: LMDB
+  }
+}
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    mirror: false
+    crop_size: 227
+    mean_value: 104
+    mean_value: 117
+    mean_value: 123
+  }
+  data_param {
+    source: "/ssd/dataset/ilsvrc12_val_lmdb/"
+    batch_size: 50
+    backend: LMDB
+  }
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  convolution_param {
+    num_output: 96
+    kernel_size: 7
+    stride: 2
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "relu_conv1"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "fire2/conv1x1_1"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "fire2/conv1x1_1"
+  convolution_param {
+    num_output: 16
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire2/relu_conv1x1_1"
+  type: "ReLU"
+  bottom: "fire2/conv1x1_1"
+  top: "fire2/conv1x1_1"
+}
+layer {
+  name: "fire2/conv1x1_2"
+  type: "Convolution"
+  bottom: "fire2/conv1x1_1"
+  top: "fire2/conv1x1_2"
+  convolution_param {
+    num_output: 64
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire2/relu_conv1x1_2"
+  type: "ReLU"
+  bottom: "fire2/conv1x1_2"
+  top: "fire2/conv1x1_2"
+}
+layer {
+  name: "fire2/conv3x3_2"
+  type: "Convolution"
+  bottom: "fire2/conv1x1_1"
+  top: "fire2/conv3x3_2"
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire2/relu_conv3x3_2"
+  type: "ReLU"
+  bottom: "fire2/conv3x3_2"
+  top: "fire2/conv3x3_2"
+}
+layer {
+  name: "fire2/concat"
+  type: "Concat"
+  bottom: "fire2/conv1x1_2"
+  bottom: "fire2/conv3x3_2"
+  top: "fire2/concat"
+}
+layer {
+  name: "fire3/conv1x1_1"
+  type: "Convolution"
+  bottom: "fire2/concat"
+  top: "fire3/conv1x1_1"
+  convolution_param {
+    num_output: 16
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire3/relu_conv1x1_1"
+  type: "ReLU"
+  bottom: "fire3/conv1x1_1"
+  top: "fire3/conv1x1_1"
+}
+layer {
+  name: "fire3/conv1x1_2"
+  type: "Convolution"
+  bottom: "fire3/conv1x1_1"
+  top: "fire3/conv1x1_2"
+  convolution_param {
+    num_output: 64
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire3/relu_conv1x1_2"
+  type: "ReLU"
+  bottom: "fire3/conv1x1_2"
+  top: "fire3/conv1x1_2"
+}
+layer {
+  name: "fire3/conv3x3_2"
+  type: "Convolution"
+  bottom: "fire3/conv1x1_1"
+  top: "fire3/conv3x3_2"
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire3/relu_conv3x3_2"
+  type: "ReLU"
+  bottom: "fire3/conv3x3_2"
+  top: "fire3/conv3x3_2"
+}
+layer {
+  name: "fire3/concat"
+  type: "Concat"
+  bottom: "fire3/conv1x1_2"
+  bottom: "fire3/conv3x3_2"
+  top: "fire3/concat"
+}
+layer {
+  name: "fire4/conv1x1_1"
+  type: "Convolution"
+  bottom: "fire3/concat"
+  top: "fire4/conv1x1_1"
+  convolution_param {
+    num_output: 32
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire4/relu_conv1x1_1"
+  type: "ReLU"
+  bottom: "fire4/conv1x1_1"
+  top: "fire4/conv1x1_1"
+}
+layer {
+  name: "fire4/conv1x1_2"
+  type: "Convolution"
+  bottom: "fire4/conv1x1_1"
+  top: "fire4/conv1x1_2"
+  convolution_param {
+    num_output: 128
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire4/relu_conv1x1_2"
+  type: "ReLU"
+  bottom: "fire4/conv1x1_2"
+  top: "fire4/conv1x1_2"
+}
+layer {
+  name: "fire4/conv3x3_2"
+  type: "Convolution"
+  bottom: "fire4/conv1x1_1"
+  top: "fire4/conv3x3_2"
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire4/relu_conv3x3_2"
+  type: "ReLU"
+  bottom: "fire4/conv3x3_2"
+  top: "fire4/conv3x3_2"
+}
+layer {
+  name: "fire4/concat"
+  type: "Concat"
+  bottom: "fire4/conv1x1_2"
+  bottom: "fire4/conv3x3_2"
+  top: "fire4/concat"
+}
+layer {
+  name: "pool4"
+  type: "Pooling"
+  bottom: "fire4/concat"
+  top: "pool4"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "fire5/conv1x1_1"
+  type: "Convolution"
+  bottom: "pool4"
+  top: "fire5/conv1x1_1"
+  convolution_param {
+    num_output: 32
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire5/relu_conv1x1_1"
+  type: "ReLU"
+  bottom: "fire5/conv1x1_1"
+  top: "fire5/conv1x1_1"
+}
+layer {
+  name: "fire5/conv1x1_2"
+  type: "Convolution"
+  bottom: "fire5/conv1x1_1"
+  top: "fire5/conv1x1_2"
+  convolution_param {
+    num_output: 128
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire5/relu_conv1x1_2"
+  type: "ReLU"
+  bottom: "fire5/conv1x1_2"
+  top: "fire5/conv1x1_2"
+}
+layer {
+  name: "fire5/conv3x3_2"
+  type: "Convolution"
+  bottom: "fire5/conv1x1_1"
+  top: "fire5/conv3x3_2"
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire5/relu_conv3x3_2"
+  type: "ReLU"
+  bottom: "fire5/conv3x3_2"
+  top: "fire5/conv3x3_2"
+}
+layer {
+  name: "fire5/concat"
+  type: "Concat"
+  bottom: "fire5/conv1x1_2"
+  bottom: "fire5/conv3x3_2"
+  top: "fire5/concat"
+}
+layer {
+  name: "fire6/conv1x1_1"
+  type: "Convolution"
+  bottom: "fire5/concat"
+  top: "fire6/conv1x1_1"
+  convolution_param {
+    num_output: 48
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire6/relu_conv1x1_1"
+  type: "ReLU"
+  bottom: "fire6/conv1x1_1"
+  top: "fire6/conv1x1_1"
+}
+layer {
+  name: "fire6/conv1x1_2"
+  type: "Convolution"
+  bottom: "fire6/conv1x1_1"
+  top: "fire6/conv1x1_2"
+  convolution_param {
+    num_output: 192
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire6/relu_conv1x1_2"
+  type: "ReLU"
+  bottom: "fire6/conv1x1_2"
+  top: "fire6/conv1x1_2"
+}
+layer {
+  name: "fire6/conv3x3_2"
+  type: "Convolution"
+  bottom: "fire6/conv1x1_1"
+  top: "fire6/conv3x3_2"
+  convolution_param {
+    num_output: 192
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire6/relu_conv3x3_2"
+  type: "ReLU"
+  bottom: "fire6/conv3x3_2"
+  top: "fire6/conv3x3_2"
+}
+layer {
+  name: "fire6/concat"
+  type: "Concat"
+  bottom: "fire6/conv1x1_2"
+  bottom: "fire6/conv3x3_2"
+  top: "fire6/concat"
+}
+layer {
+  name: "fire7/conv1x1_1"
+  type: "Convolution"
+  bottom: "fire6/concat"
+  top: "fire7/conv1x1_1"
+  convolution_param {
+    num_output: 48
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire7/relu_conv1x1_1"
+  type: "ReLU"
+  bottom: "fire7/conv1x1_1"
+  top: "fire7/conv1x1_1"
+}
+layer {
+  name: "fire7/conv1x1_2"
+  type: "Convolution"
+  bottom: "fire7/conv1x1_1"
+  top: "fire7/conv1x1_2"
+  convolution_param {
+    num_output: 192
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire7/relu_conv1x1_2"
+  type: "ReLU"
+  bottom: "fire7/conv1x1_2"
+  top: "fire7/conv1x1_2"
+}
+layer {
+  name: "fire7/conv3x3_2"
+  type: "Convolution"
+  bottom: "fire7/conv1x1_1"
+  top: "fire7/conv3x3_2"
+  convolution_param {
+    num_output: 192
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire7/relu_conv3x3_2"
+  type: "ReLU"
+  bottom: "fire7/conv3x3_2"
+  top: "fire7/conv3x3_2"
+}
+layer {
+  name: "fire7/concat"
+  type: "Concat"
+  bottom: "fire7/conv1x1_2"
+  bottom: "fire7/conv3x3_2"
+  top: "fire7/concat"
+}
+layer {
+  name: "fire8/conv1x1_1"
+  type: "Convolution"
+  bottom: "fire7/concat"
+  top: "fire8/conv1x1_1"
+  convolution_param {
+    num_output: 64
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire8/relu_conv1x1_1"
+  type: "ReLU"
+  bottom: "fire8/conv1x1_1"
+  top: "fire8/conv1x1_1"
+}
+layer {
+  name: "fire8/conv1x1_2"
+  type: "Convolution"
+  bottom: "fire8/conv1x1_1"
+  top: "fire8/conv1x1_2"
+  convolution_param {
+    num_output: 256
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire8/relu_conv1x1_2"
+  type: "ReLU"
+  bottom: "fire8/conv1x1_2"
+  top: "fire8/conv1x1_2"
+}
+layer {
+  name: "fire8/conv3x3_2"
+  type: "Convolution"
+  bottom: "fire8/conv1x1_1"
+  top: "fire8/conv3x3_2"
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire8/relu_conv3x3_2"
+  type: "ReLU"
+  bottom: "fire8/conv3x3_2"
+  top: "fire8/conv3x3_2"
+}
+layer {
+  name: "fire8/concat"
+  type: "Concat"
+  bottom: "fire8/conv1x1_2"
+  bottom: "fire8/conv3x3_2"
+  top: "fire8/concat"
+}
+layer {
+  name: "pool8"
+  type: "Pooling"
+  bottom: "fire8/concat"
+  top: "pool8"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "fire9/conv1x1_1"
+  type: "Convolution"
+  bottom: "pool8"
+  top: "fire9/conv1x1_1"
+  convolution_param {
+    num_output: 64
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire9/relu_conv1x1_1"
+  type: "ReLU"
+  bottom: "fire9/conv1x1_1"
+  top: "fire9/conv1x1_1"
+}
+layer {
+  name: "fire9/conv1x1_2"
+  type: "Convolution"
+  bottom: "fire9/conv1x1_1"
+  top: "fire9/conv1x1_2"
+  convolution_param {
+    num_output: 256
+    kernel_size: 1
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire9/relu_conv1x1_2"
+  type: "ReLU"
+  bottom: "fire9/conv1x1_2"
+  top: "fire9/conv1x1_2"
+}
+layer {
+  name: "fire9/conv3x3_2"
+  type: "Convolution"
+  bottom: "fire9/conv1x1_1"
+  top: "fire9/conv3x3_2"
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "xavier"
+    }
+  }
+}
+layer {
+  name: "fire9/relu_conv3x3_2"
+  type: "ReLU"
+  bottom: "fire9/conv3x3_2"
+  top: "fire9/conv3x3_2"
+}
+layer {
+  name: "fire9/concat"
+  type: "Concat"
+  bottom: "fire9/conv1x1_2"
+  bottom: "fire9/conv3x3_2"
+  top: "fire9/concat"
+}
+layer {
+  name: "drop9"
+  type: "Dropout"
+  bottom: "fire9/concat"
+  top: "fire9/concat"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  name: "conv_final"
+  type: "Convolution"
+  bottom: "fire9/concat"
+  top: "conv_final"
+  convolution_param {
+    num_output: 1000
+    pad: 1
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      mean: 0.0
+      std: 0.01
+    }
+  }
+}
+layer {
+  name: "relu_conv_final"
+  type: "ReLU"
+  bottom: "conv_final"
+  top: "conv_final"
+}
+layer {
+  name: "pool_final"
+  type: "Pooling"
+  bottom: "conv_final"
+  top: "pool_final"
+  pooling_param {
+    pool: AVE
+    global_pooling: true
+  }
+}
+
+
+# loss, top1, top5
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "pool_final"
+  bottom: "label"
+  top: "loss"
+  include {
+#    phase: TRAIN
+  }
+}
+layer {
+  name: "accuracy_top1"
+  type: "Accuracy"
+  bottom: "pool_final"
+  bottom: "label"
+  top: "accuracy_top1"
+  include {
+    # phase: TEST
+  }
+  accuracy_param {
+    top_k: 1
+  }
+}
+layer {
+  name: "accuracy_top5"
+  type: "Accuracy"
+  bottom: "pool_final"
+  bottom: "label"
+  top: "accuracy_top5"
+  include {
+    # phase: TEST
+  }
+  accuracy_param {
+    top_k: 5
+  }
+}
