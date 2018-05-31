@@ -5,6 +5,7 @@
 
 [CPD配准算法 源码的研究](https://blog.csdn.net/LilyNothing/article/details/73277139)
 
+[icp点云配准 算法原理](https://blog.csdn.net/lilynothing/article/details/80170521)
 
     在逆向工程，计算机视觉，文物数字化等领域中，由于点云的不完整，旋转错位，平移错位等，
     使得要得到的完整的点云就需要对局部点云进行配准，为了得到被测物体的完整数据模型，
