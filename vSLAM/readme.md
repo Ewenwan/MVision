@@ -20,7 +20,7 @@
     视觉惯性里程计Visual–Inertial Odometry(VIO)
     港科大的VIO VINS-Mono  A Robust and Versatile Monocular Visual-Inertial State Estimator
     ORB_SLAM2_IMU
-    OKVIS: Open Keyframe-based Visual-Inertial SLAM.
+    OKVIS: Open Keyframe-based Visual-Inertial SLAM.  OKVIS 属于 VIO（Visual Inertial Odometry），视觉融合 IMU 做 odometry。
     
     
 [视觉惯性里程计Visual–Inertial Odometry(VIO)概述](https://www.cnblogs.com/hitcm/p/6327442.html)
