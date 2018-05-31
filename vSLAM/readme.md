@@ -17,6 +17,19 @@
     dso_slam   
     lsd_slam   直接法
     ORB_SLAM2  基于ORB特征点的 slam
+    视觉惯性里程计Visual–Inertial Odometry(VIO)
+    港科大的VIO VINS-Mono  A Robust and Versatile Monocular Visual-Inertial State Estimator
+    ORB_SLAM2_IMU
+    OKVIS: Open Keyframe-based Visual-Inertial SLAM.
+    
+    
+[视觉惯性里程计Visual–Inertial Odometry(VIO)概述](https://www.cnblogs.com/hitcm/p/6327442.html)
+    
+[VINS-Mono代码](https://github.com/Ewenwan/VINS-Mono)
+
+[ORB_SLAM2_IMU](https://github.com/Ewenwan/LearnViORB_NOROS)
+
+[OKVIS: Open Keyframe-based Visual-Inertial SLAM.](https://github.com/Ewenwan/okvis)
 
 # Awesome SLAM [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
