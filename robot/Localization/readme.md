@@ -6,6 +6,12 @@
 # 2. 卡尔曼滤波定位                
     高斯分布   状态转移  测量  反馈补偿 协方差矩阵
     连续状态   单峰值数据（高斯分布）
+    
+[Kalman滤波的公式解析](https://wenku.baidu.com/view/187eecec856a561252d36f5b.html)
+
+[kalman滤波以及EKF 博文参考](https://blog.csdn.net/lilynothing/article/details/66967744)
+
+
 # 3. 粒子滤波定位
     连续状态   多峰值数据 
 
