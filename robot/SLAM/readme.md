@@ -17,12 +17,29 @@
         3D SLAM通常产生3D点云，或者Octree Map。
         基于视觉（单目、双目、鱼眼相机、深度相机）方法的SLAM，
         比如orbSLAM，lsdSLAM...
+# 0. GraphSLAM
 
 
+# 1  tiny-slam
+[tiny-slam-ros-cpp代码](https://github.com/Ewenwan/tiny-slam-ros-cpp)
 
-# 1. GraphSLAM
+        tinySLAM是openSLAM中实现最为简单的一个SLAM方法，相比于ORB-SLAM之类的，
+        这个代码的核心实现没有超过两百行，所以还是相对简单一些。
+        主要是基于particle-filter进行的。
+        
+[博客参考](https://blog.csdn.net/lilynothing/article/details/62043583)
+   
+   
+## 粒子滤波的基本思想是：
+        通过寻找一组在状态空间中传播的随机样本来近似的表示概率密度函数，
+        用样本均值代替积分运算，进而获得系统状态的最小方差估计的过程，
+        这些样本被形象的称为“粒子”，故而叫粒子滤波。
+        这篇文章是基于蒙特卡洛的这种粒子滤波的方法。具体的实现方法之后代码部分具体学习。 
+        主要想法是基于粒子滤波器，将 激光的信息整合到定位系统中去。
+        
+        
 
-# Gmapping 基于粒子滤波 的 激光雷达slam
+# 2 Gmapping 基于粒子滤波 的 激光雷达slam
 [Rao-Blackwellized Particle Filters 论文参考](https://people.eecs.berkeley.edu/~pabbeel/cs287-fa12/optreadings/GrisettiStachnissBurgard_gMapping_T-RO2006.pdf)
 
 [参考](https://blog.csdn.net/roadseek_zw/article/details/53316177)
@@ -54,6 +71,8 @@
                 从而对每个粒子进行评分，选择得分高的粒子作为该时间点的机器人位姿。
         （4）粒子群重采样
                 将评分低的粒子舍弃，将评分高且很接近的粒子都保留下来，并对评分高的粒子进行复制，保持粒子数量不变。
+
+
 
 
 # cartographer
