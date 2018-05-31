@@ -83,10 +83,15 @@
 [官方](https://google-cartographer-ros.readthedocs.io/en/latest/tuning.html)
 [代码](https://github.com/hitcm/cartographer)
 [cartographer_ros](https://github.com/Ewenwan/cartographer_ros)
+
     谷歌在 2016年 10 月 6 日开源的 SLAM 算法
     基本思路 和 orbslam 类似。
     2D激光SLAM，利用激光数据进行匹配的算法。
     
+[cartographer论文翻译](https://blog.csdn.net/lilynothing/article/details/60875825)
+
+[论文解读2](https://note.youdao.com/share/?id=d8d15963d4577236399aa52c2cd968a7&type=note#/)
+ 
 ## 框架：
     惯导追踪 ImuTracker、
     位姿估算 PoseExtrapolator、
