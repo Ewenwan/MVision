@@ -27,6 +27,8 @@
 
 [参考](https://blog.csdn.net/roadseek_zw/article/details/53316177)
 
+[百度文库代码解析](https://wenku.baidu.com/view/3a67461550e2524de4187e4d.html)
+
         ROS 提供的 gmaping 包是用来生成地图的，它是对著名的开源 OpenSlam 包在 ROS 框架下的一个实现。
         这个包提供了对激光设备的 Slam,根据激光设备的输入和姿态数据从而建立一个基于网格的的2D地图。
         它需要从 ROS 系统监听许多 Topic，并输出一个 Topic——map(nav_msgs/OccupancyGrid)，
