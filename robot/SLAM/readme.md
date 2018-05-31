@@ -22,12 +22,19 @@
 
 # 1. GraphSLAM
 
-# Gmapping
+# Gmapping 基于粒子滤波 的 激光雷达slam
+[参考](https://blog.csdn.net/roadseek_zw/article/details/53316177)
+
+        ROS 提供的 gmaping 包是用来生成地图的，它是对著名的开源 OpenSlam 包在 ROS 框架下的一个实现。
+        这个包提供了对激光设备的 Slam,根据激光设备的输入和姿态数据从而建立一个基于网格的的2D地图。
+        它需要从 ROS 系统监听许多 Topic，并输出一个 Topic——map(nav_msgs/OccupancyGrid)，
+        这也是 RViz 的输入 Topic。
+
 
 # cartographer
 [官方](https://google-cartographer-ros.readthedocs.io/en/latest/tuning.html)
 [代码](https://github.com/hitcm/cartographer)
-
+[cartographer_ros](https://github.com/Ewenwan/cartographer_ros)
     谷歌在 2016年 10 月 6 日开源的 SLAM 算法
     基本思路 和 orbslam 类似。
     2D激光SLAM，利用激光数据进行匹配的算法。
