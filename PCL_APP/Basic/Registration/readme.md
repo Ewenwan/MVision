@@ -7,6 +7,8 @@
 
 [icp点云配准 算法原理](https://blog.csdn.net/lilynothing/article/details/80170521)
 
+[CPD && ICP对比分析](https://blog.csdn.net/lilynothing/article/details/67631634)
+
     在逆向工程，计算机视觉，文物数字化等领域中，由于点云的不完整，旋转错位，平移错位等，
     使得要得到的完整的点云就需要对局部点云进行配准，为了得到被测物体的完整数据模型，
     需要确定一个合适的坐标系，将从各个视角得到的点集合并到统一的坐标系下形成一个完整的点云，
