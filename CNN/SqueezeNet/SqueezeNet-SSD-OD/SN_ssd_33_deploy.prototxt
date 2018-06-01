@@ -6,6 +6,7 @@ input_shape {
   dim: 300
   dim: 300
 }
+#===== NET Begin
 layer {
   name: "conv1"
   type: "Convolution"
