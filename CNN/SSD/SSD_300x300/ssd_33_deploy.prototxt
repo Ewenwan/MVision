@@ -1613,14 +1613,6 @@ layer {
       nms_threshold: 0.45
       top_k: 400
     }
-    save_output_param {
-      output_directory: "/root/data/VOCdevkit/results/VOC2007/SSD_300x300/Main"
-      output_name_prefix: "comp4_det_test_"
-      output_format: "VOC"
-      label_map_file: "labelmap_voc.prototxt"
-      name_size_file: "test_name_size.txt"
-      num_test_image: 4952
-    }
     code_type: CENTER_SIZE
     keep_top_k: 200
     confidence_threshold: 0.01
