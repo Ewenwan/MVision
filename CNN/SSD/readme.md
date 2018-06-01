@@ -385,6 +385,27 @@ VGG fc7 输出 19*19*1024           ----->  卷积边框回归 + 类别分类   
 38*38*4  + 19*19*6 + 10*10*6 + 5*5*6 + 3*3*4 + 1*1*4  = 8732个预测边框
 
 ```
+![](https://images2017.cnblogs.com/blog/1067530/201708/1067530-20170811174907023-1120784499.png)
 
-
-
+# 预设边框框Defalut box生成规则
+    以feature map上每个格子的中点为中心（offset=0.5），
+    生成一系列同心的Defalut box
+    （然后中心点的坐标会乘以step，相当于从feature map位置映射回原图位置）
+    使用m(SSD300中m=6)个不同大小的feature map 来做预测，
+    最底层的 feature map 的 scale 值为 Smin=0.2，最高层的为Smax=0.95，
+    其他层通过下面的公式计算得到.
+![](https://images2017.cnblogs.com/blog/1067530/201708/1067530-20170811175207554-1439280703.jpg)
+    
+    
+# 3. LOSS计算
+    与常见的 Object Detection模型的目标函数相同，
+    SSD算法的目标函数分为两部分：
+    计算相应的default box 与 目标类别的confidence loss 以及 相应的位置回归。
+    L(x,c,l,g) = sum(Lconf(x,c) + Lloc(x,l,g))/N
+    
+    位置回归：位置回归则是采用 Smooth L1 loss，
+    Lloc(x,l,g)
+    
+    类别误差 confidence loss是典型的softmax loss：
+    Lconf(x,c)
+![](https://images2017.cnblogs.com/blog/1067530/201708/1067530-20170811175226976-860447034.png)
