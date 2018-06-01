@@ -121,6 +121,13 @@ somtmax 指数映射回归分类
 
     1*1*256*128  1*1卷积 步长1 填充0 128输出         卷积+relu  conv8_1
     3*3*128*256  3*3卷积 步长1 填充1 256输出         卷积+relu  conv8_2
+    
+| 输出特征图大小 256*3*3
+
+    1*1*256*128  1*1卷积 步长1 填充0 128输出         卷积+relu  conv9_1
+    3*3*128*256  3*3卷积 步长1 填充1 256输出         卷积+relu  conv9_2
+    
+| 输出特征图大小 256*3*3
 
 ---------------正则化层
 1.
@@ -178,15 +185,160 @@ somtmax 指数映射回归分类
                         offset: 0.5                           
           
 3. 
-          输入 conv6_2      512*5*5
+          输入 conv6_2            512*5*5
           conv6_2_mbox_loc        Convolution   3*3*512*24  24通道输出   --->  24*5*5
           conv6_2_mbox_loc_perm   Permute       0  2  3  1
           conv6_2_mbox_loc_flat   Flatten       axis: 1   
           
           conv6_2_mbox_conf       Convolution   3*3*24*126  126通道输出   --->  126*5*5
           conv6_2_mbox_conf_perm  Permute       0  2  3  1
-          conv6_2_mbox_conf_flat   Flatten
+          conv6_2_mbox_conf_flat  Flatten      axis: 1
           
+          conv6_2_mbox_priorbox            输入  conv6_2      512*5*5
+                                           输入  data
+                        min_size: 111.0
+                        max_size: 162.0
+                        aspect_ratio: 2
+                        aspect_ratio: 3
+                        flip: true
+                        clip: false
+                        variance: 0.1
+                        variance: 0.1
+                        variance: 0.2
+                        variance: 0.2
+                        step: 32
+                        offset: 0.5              
+              
+ 4. 
+          输入 conv7_2           256*3*3
+          conv7_2_mbox_loc       Convolution  3*3*256*24  24通道输出   --->  24*3*3
+          conv7_2_mbox_loc_perm  Permute       0  2  3  1 
+          conv7_2_mbox_loc_flat  Flatten       axis: 1   
           
+          conv7_2_mbox_conf       Convolution   3*3*24*126  126通道输出   --->  126*3*3
+          conv7_2_mbox_conf_perm  Permute       0  2  3  1
+          conv7_2_mbox_conf_flat  Flatten      axis: 1
           
+          conv7_2_mbox_priorbox            输入  conv7_2       256*3*3
+                                           输入  data
+                        min_size: 162.0
+                        max_size: 213.0
+                        aspect_ratio: 2
+                        aspect_ratio: 3
+                        flip: true
+                        clip: false
+                        variance: 0.1
+                        variance: 0.1
+                        variance: 0.2
+                        variance: 0.2
+                        step: 64
+                        
+5.     
+          输入 conv8_2           256*3*3                             
+          conv8_2_mbox_loc       Convolution  3*3*256*16  16通道输出   --->  16*3*3
+          conv8_2_mbox_loc_perm  Permute       0  2  3  1 
+          conv8_2_mbox_loc_flat  Flatten       axis: 1   
+          
+          conv8_2_mbox_conf      Convolution   3*3*16*84  84通道输出   --->  84*3*3
+          conv8_2_mbox_conf_perm Permute       0  2  3  1
+          conv8_2_mbox_conf_flat Flatten       axis: 1
+          
+          conv8_2_mbox_priorbox            输入  conv8_2       256*3*3
+                                           输入  data
+          
+                        min_size: 213.0
+                        max_size: 264.0
+                        aspect_ratio: 2
+                        flip: true
+                        clip: false
+                        variance: 0.1
+                        variance: 0.1
+                        variance: 0.2
+                        variance: 0.2
+                        step: 100
+                        offset: 0.5
+                        
+6.       
+          输入 conv8_2           256*3*3          
+          conv9_2_mbox_loc       Convolution   3*3*256*16  16通道输出   --->  16*3*3
+          conv9_2_mbox_loc_perm  Permute       0  2  3  1 
+          conv9_2_mbox_loc_flat  Flatten       axis: 1  
+          
+          conv9_2_mbox_conf      Convolution   3*3*16*84  84通道输出   --->  84*3*3
+          conv9_2_mbox_conf_perm Permute  
+          conv9_2_mbox_conf_flat Flatten
+          
+          conv9_2_mbox_priorbox            输入  conv9_2       256*3*3
+                                           输入  data
+                        min_size: 264.0
+                        max_size: 315.0
+                        aspect_ratio: 2
+                        flip: true
+                        clip: false
+                        variance: 0.1
+                        variance: 0.1
+                        variance: 0.2
+                        variance: 0.2
+                        step: 300
+                        offset: 0.5
+                        
+7.  
+
+    mbox_loc        type:  Concat 
+    
+            bottom: "conv4_3_norm_mbox_loc_flat"
+            bottom: "fc7_mbox_loc_flat"
+            bottom: "conv6_2_mbox_loc_flat"
+            bottom: "conv7_2_mbox_loc_flat"
+            bottom: "conv8_2_mbox_loc_flat"
+            bottom: "conv9_2_mbox_loc_flat"
+            
+            top: "mbox_loc"
+    
+   mbox_conf        type: Concat
+            bottom: "conv4_3_norm_mbox_conf_flat"
+            bottom: "fc7_mbox_conf_flat"
+            bottom: "conv6_2_mbox_conf_flat"
+            bottom: "conv7_2_mbox_conf_flat"
+            bottom: "conv8_2_mbox_conf_flat"
+            bottom: "conv9_2_mbox_conf_flat"
+            
+            top: "mbox_conf"             
+          
+    mbox_priorbox     type: Concat
+            bottom: "conv4_3_norm_mbox_priorbox"
+            bottom: "fc7_mbox_priorbox"
+            bottom: "conv6_2_mbox_priorbox"
+            bottom: "conv7_2_mbox_priorbox"
+            bottom: "conv8_2_mbox_priorbox"
+            bottom: "conv9_2_mbox_priorbox"
+            
+            top: "mbox_priorbox"   
+
+    mbox_conf_reshape   type:  Reshape      输入 mbox_conf
+              dim: 0 
+              dim: -1
+              dim: 21
+    
+    mbox_conf_softmax   type: Softmax   axis: 2  输入  mbox_conf_reshape 
+    
+    mbox_conf_flatten   type: Flatten   axis: 1  输入  mbox_conf_softmax
+    
+    
+    detection_out 
+            type: "DetectionOutput"
+            bottom: "mbox_loc"
+            bottom: "mbox_conf_flatten"
+            bottom: "mbox_priorbox"
+            
+            num_classes: 21
+            share_location: true
+            background_label_id: 0
+            nms_param {
+              nms_threshold: 0.45
+              top_k: 400
+            }
+            code_type: CENTER_SIZE
+            keep_top_k: 200
+            confidence_threshold: 0.01   
 ```   
