@@ -287,7 +287,7 @@ somtmax 指数映射回归分类
                         step: 300
                         offset: 0.5
                         
-7.  
+7.  预测结果结合concat层
 
     mbox_loc        type:  Concat 
     
@@ -347,3 +347,5 @@ somtmax 指数映射回归分类
             keep_top_k: 200
             confidence_threshold: 0.01   
 ```   
+# 思想
+
