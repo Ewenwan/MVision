@@ -4,6 +4,8 @@
 
 [VGG16与训练权重](https://download.csdn.net/download/zhayushui/10132277)
 
+[博客解读 较好](https://blog.csdn.net/WZZ18191171661/article/details/79444217)
+
 # VGG16 结构图 13个卷积层+3个全链接层=16
 ```asm
 输入图像  3*300*300
