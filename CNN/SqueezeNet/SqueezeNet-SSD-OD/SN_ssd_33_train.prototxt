@@ -1,4 +1,4 @@
-name: "squeezenet-ssd"
+name: "SN_VOC0712_SSD_300x300_train"
 layer {
   name: "data"
   type: "AnnotatedData"
@@ -13,7 +13,7 @@ layer {
     mean_value: 117
     mean_value: 123
     resize_param {
-      prob: 1.0
+      prob: 1
       resize_mode: WARP
       height: 300
       width: 300
@@ -28,12 +28,12 @@ layer {
     }
     distort_param {
       brightness_prob: 0.5
-      brightness_delta: 32.0
+      brightness_delta: 32
       contrast_prob: 0.5
       contrast_lower: 0.5
       contrast_upper: 1.5
       hue_prob: 0.5
-      hue_delta: 18.0
+      hue_delta: 18
       saturation_prob: 0.5
       saturation_lower: 0.5
       saturation_upper: 1.5
@@ -45,8 +45,8 @@ layer {
     }
   }
   data_param {
-    source: "trainval_lmdb"
-    batch_size: 32
+    source: "/home/wanyouwen/ewenwan/software/darknet/data/voc/VOCdevkit/VOC0712/lmdb/VOC0712_trainval_lmdb"
+    batch_size: 16
     backend: LMDB
   }
   annotated_data_param {
@@ -132,9 +132,10 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    label_map_file: "labelmap.prototxt"
+    label_map_file: "./labelmap_voc.prototxt"
   }
 }
+#============ NET Begin
 layer {
   name: "conv1"
   type: "Convolution"
@@ -867,6 +868,7 @@ layer {
     }
   }
 }
+#======= add bn
 layer {
   name: "fire9/expand1x1/bn"
   type: "BatchNorm"
@@ -908,6 +910,7 @@ layer {
     }
   }
 }
+#======= 
 layer {
   name: "fire9/relu_expand1x1"
   type: "ReLU"
@@ -936,6 +939,7 @@ layer {
     }
   }
 }
+# ==== add bn
 layer {
   name: "fire9/expand3x3/bn"
   type: "BatchNorm"
@@ -977,6 +981,7 @@ layer {
     }
   }
 }
+#=========
 layer {
   name: "fire9/relu_expand3x3"
   type: "ReLU"
