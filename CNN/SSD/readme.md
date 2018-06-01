@@ -258,7 +258,7 @@ somtmax 指数映射回归分类
                         offset: 0.5
                         
 6.       
-          输入 conv8_2           256*3*3          
+          输入 conv9_2           256*3*3          
           conv9_2_mbox_loc       Convolution   3*3*256*16  16通道输出   --->  16*3*3
           conv9_2_mbox_loc_perm  Permute       0  2  3  1 
           conv9_2_mbox_loc_flat  Flatten       axis: 1  
