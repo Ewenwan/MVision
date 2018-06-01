@@ -1,4 +1,5 @@
 # opencv 学习
+[LearnOpenCV.com 项目](https://github.com/Ewenwan/learnopencv)
 
 ## window下安装
       1、系统环境变量设置
