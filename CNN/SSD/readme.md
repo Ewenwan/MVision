@@ -123,7 +123,7 @@ somtmax 指数映射回归分类
     3*3*128*256  3*3卷积 步长1 填充1 256输出         卷积+relu  conv8_2
 
 ---------------正则化层
-
+1.
          输入为 conv4_3层的输出： 256*38*38
          conv4_3_norm               Normalize    scale_filler  value: 20
          conv4_3_norm_mbox_loc      Convolution  3*3*256*16  16通道输出   --->  16*38*38
@@ -131,10 +131,10 @@ somtmax 指数映射回归分类
          conv4_3_norm_mbox_loc_flat Flatten      axis: 1 
          
          
-         conv4_3_norm_mbox_conf       Convolution  输入 conv4_3_norm 256*38*38
-                                                   3*3*256*84  84通道输出   --->  84*38*38
+         conv4_3_norm_mbox_conf       Convolution    输入 conv4_3_norm 256*38*38
+                                                     3*3*256*84  84通道输出   --->  84*38*38
          conv4_3_norm_mbox_conf_perm  Permute        0  2  3  1
-         conv4_3_norm_mbox_conf_flat  Flatten      axis: 1 
+         conv4_3_norm_mbox_conf_flat  Flatten        axis: 1 
          
          
          conv4_3_norm_mbox_priorbox   PriorBox      输入 conv4_3_norm 256*38*38
@@ -150,7 +150,43 @@ somtmax 指数映射回归分类
                         variance: 0.2
                         step: 8
                         offset: 0.5                     
-                        
-          输入为  fc7      
-          fc7_mbox_loc   
+              
+  2.             
+          输入为  fc7      输入  1024*10*10  
+          fc7_mbox_loc       Convolution   3*3*1024*24  24通道输出   --->  24*10*10
+          fc7_mbox_loc_perm  Permute       0  2  3  1
+          fc7_mbox_loc_flat  Flatten       axis: 1
+          
+          fc7_mbox_conf      Convolution   3*3*24*126  126通道输出   --->  126*10*10
+          fc7_mbox_conf_perm Permute       0  2  3  1
+          fc7_mbox_conf_flat Flatten       axis: 1
+          
+          fc7_mbox_priorbox  PriorBox      输入  fc7     1024*10*10 
+                                           输入 data
+             
+                        min_size: 60.0
+                        max_size: 111.0
+                        aspect_ratio: 2
+                        aspect_ratio: 3
+                        flip: true
+                        clip: false
+                        variance: 0.1
+                        variance: 0.1
+                        variance: 0.2
+                        variance: 0.2
+                        step: 16
+                        offset: 0.5                           
+          
+3. 
+          输入 conv6_2      512*5*5
+          conv6_2_mbox_loc        Convolution   3*3*512*24  24通道输出   --->  24*5*5
+          conv6_2_mbox_loc_perm   Permute       0  2  3  1
+          conv6_2_mbox_loc_flat   Flatten       axis: 1   
+          
+          conv6_2_mbox_conf       Convolution   3*3*24*126  126通道输出   --->  126*5*5
+          conv6_2_mbox_conf_perm  Permute       0  2  3  1
+          conv6_2_mbox_conf_flat   Flatten
+          
+          
+          
 ```   
