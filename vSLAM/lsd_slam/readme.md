@@ -703,6 +703,12 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
 [代码双目BA实例 ](https://github.com/gaoxiang12/g2o_ba_example)
 
+### BA集束优化算法：
+     将一个图像中的点投影到三维空间，在通过欧式变换关系[R t]变换到另一个图像的坐标系下，在通过相机内参数投影到其像素平面上
+     可以球的误差，使用优化算法，更新[R t]来使得误差最小
+
+
+####  g2o简介 
      g2o 全称 general graph optimization，是一个用来优化非线性误差函数的c++框架。
      稀疏优化 SparseOptimizer 是我们最终要维护的东东。
      它是一个Optimizable Graph，从而也是一个Hyper Graph。
@@ -733,6 +739,8 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 [G2O图优化demo和理论推导](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/g2o%E5%9B%BE%E4%BC%98%E5%8C%96.md)
 
 [卡尔曼滤波推到+应用](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/%E5%8D%A1%E5%B0%94%E6%9B%BC%E6%BB%A4%E6%B3%A2.md)
+
+
 
 # 数据结构
 ## Frame 帧类 详情
