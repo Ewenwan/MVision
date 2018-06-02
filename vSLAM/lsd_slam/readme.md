@@ -704,6 +704,8 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 [代码双目BA实例 ](https://github.com/gaoxiang12/g2o_ba_example)
 
 ### BA集束优化算法：
+[BA集束优化算法](http://www.cnblogs.com/gaoxiang12/p/5304272.html)
+
      将一个图像中的点投影到三维空间，在通过欧式变换关系[R t]变换到另一个图像的坐标系下，在通过相机内参数投影到其像素平面上
      可以球的误差，使用优化算法，更新[R t]来使得误差最小
 
