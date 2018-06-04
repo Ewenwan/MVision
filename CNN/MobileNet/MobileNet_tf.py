@@ -21,7 +21,7 @@
 
 #网络结构：
 """
-1. 普通3d卷积层 3*3*3*round(32 * width_multiplier) 3*3卷积核 3通道输入 输出通道数量 随机确定1~32个
+1. 普通3d卷积层 3*3*3*round(32 * width_multiplier) 3*3卷积核 步长2 3通道输入 输出通道数量 随机确定1~32个  卷积+NB+RELU
 2. 13个 depthwise_separable_conv2d 层 3*3*1*输入通道 -> BN -> RELU ->  1*1*输入通道*输出通道 -> BN -> RELU
 3. 均值池化层	 7*7核	+ squeeze 去掉维度为1的维
 4. 全连接层 输出  -> [N, 1000]
