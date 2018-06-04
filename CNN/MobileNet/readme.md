@@ -23,6 +23,8 @@
 
 [MobileNet-v2-tf](https://github.com/neuleaf/MobileNetV2)
 
+[MobileNet-SSD目标检测](https://github.com/chuanqi305/MobileNet-SSD)
+
       是Google针对手机等嵌入式设备(  移动和嵌入式视觉应用 mobile and embedded vision applications)
       提出的一种轻量级的深层神经网络，取名为MobileNets。
       个人感觉论文所做工作偏向于模型压缩方面，
