@@ -109,6 +109,7 @@
     D. 使用SVM进行分类
         对编码量化之后的特征向量使用SVM支持向量机进行分类。
 #### iDT（improved dense trajectories) 改进
+```asm
     1. 剔除相机运动引起的背景光流
         a. 使用SURF特征算法匹配前后两帧的 匹配点对，这里会使用人体检测，剔除人体区域的匹配点，运动量大，影响较大；
         b. 利用RANSAC 随机采样序列一致性算法估计 前后两帧的 单应投影变换矩阵 I(t+1) = H * I(t)；
@@ -177,10 +178,10 @@
         在实际的实验中，推荐使用liblinear，速度比较快。
     4. 其他改进思想 
        原先是沿着轨迹提取手工设计的特征，可以沿着轨迹利用CNN提取特征。
-       
+```    
 #### Fisher Vector 特征编码 主要思想是使用高斯分布来拟合单词 而不是简简单单的聚类产生中心点
 [VLFeat数学推导](http://www.vlfeat.org/api/fisher-fundamentals.html)
-
+```asm
     FV采用GMM构建视觉词典，为了可视化，这里采用二维的数据，
     然这里的数据可以是SIFT或其它局部特征，
     具体实现代码如下：
@@ -207,6 +208,7 @@
     dataToBeEncoded = rand(dimension,numDataToBeEncoded);    %2*1000维数据
     % 进行FV编码
     encoding = vl_fisher(datatoBeEncoded, means, covariances, priors);
+```
 ### 传统视频行为分析算法总结
 #### a.	特征提取方法
     1. 方向梯度直方图 HOG   
