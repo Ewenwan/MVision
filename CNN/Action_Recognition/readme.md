@@ -325,6 +325,8 @@
         3. 最后直接对两个网络的class score进行fusion（包括直接平均和svm两种方法），得到最终的分类结果。
     注意，对与两个分支使用了相同的2D CNN网络结构，其网络结构见下图。
     实验效果：UCF101-88.0%，HMDB51-59.4% 
+    
+![](https://img-blog.csdn.net/20171028174641361?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGl1eGlhbzIxNA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 #### 改进1 CNN网络进行了spatial以及temporal的融合
 [Convolutional Two-Stream Network Fusion for Video Action Recognition“（2016CVPR）](https://arxiv.org/pdf/1604.06573.pdf)
