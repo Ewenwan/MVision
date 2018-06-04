@@ -317,7 +317,11 @@
 
 [论文博客翻译](https://blog.csdn.net/liuxiao214/article/details/78377791)
 
-    Two Stream方法最初在这篇文章中被提出，
+    Two Stream方法最初在这篇文章中被提出：
+    在空间部分，以单个帧上的外观形式，携带了视频描绘的场景和目标信息。
+               其自身静态外表是一个很有用的线索，因为一些动作很明显地与特定的目标有联系。
+    在时间部分，以多帧上的运动形式，表达了观察者（摄像机）和目标者的运动。
+    
     基本原理为:
         1. 对视频序列中每两帧计算密集光流，得到密集光流的序列（即temporal信息）。
         2. 然后对于视频图像（spatial）和密集光流（temporal）分别训练CNN模型，
@@ -325,8 +329,12 @@
         3. 最后直接对两个网络的class score进行fusion（包括直接平均和svm两种方法），得到最终的分类结果。
     注意，对与两个分支使用了相同的2D CNN网络结构，其网络结构见下图。
     实验效果：UCF101-88.0%，HMDB51-59.4% 
-    
+
+    结构：
 ![](https://img-blog.csdn.net/20171028174641361?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGl1eGlhbzIxNA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+    光流 和 轨迹
+![](https://img-blog.csdn.net/20171028174823206?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGl1eGlhbzIxNA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 #### 改进1 CNN网络进行了spatial以及temporal的融合
 [Convolutional Two-Stream Network Fusion for Video Action Recognition“（2016CVPR）](https://arxiv.org/pdf/1604.06573.pdf)
