@@ -9,7 +9,7 @@ set( CMAKE_CXX_FLAGS "-std=c++11 -Wall -O3 -march=native" )
 
 #SET(CMAKE_BUILD_TYPE "Debug") 
 #SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
-
+# cmake  -DCMAKE_BUILD_TYPE=Debug ..   make
 # 添加cmake模块以使用g2o
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules )
 
