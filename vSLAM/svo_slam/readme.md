@@ -181,7 +181,32 @@
         关于如何纠正这个scale drift的问题很多单目slam里都提到了，所以这里不再深入。 
         
 [Visual SLAM Tutorial ](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/)
-        
+
+[Features特征, Tracking跟踪, Essential Matrix本质矩阵, and RANSAC随机采样序列一致性](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A11-VisualOdometry.pdf)
+
+[Stereo Visual Odometry 双目视觉里程计](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A12-StereoVO.pdf)
+
+[BundleAdjustmen 集束优化](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A13-BundleAdjustment.pdf)
+
+[DealingWithScale 尺度问题](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A21-DealingWithScale.pdf)
+
+[Incremental 滤波器优化 非线性最小二乘优化等](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A22-Incremental.pdf)
+
+[LoopClosing闭环检测](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A23-LoopClosing.pdf)
+
+[大尺度地图高效构建](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P11-LargeScaleEfficiency.pdf)
+
+[稠密VO](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P12-DenseVO.pdf)
+
+[ptam svo 光流 ](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P13-Hybrids.pdf)
+
+[Dense mapping: KinectFusion and DTAM](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P14-GreedyDenseSLAM.pdf)
+
+[Kintinuous: Reconstruction of an Apartment ICP+RGBD](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P21-Kintinuous.pdf)
+
+[SLAM++](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P22-SLAM%2B%2B.pdf)
+
+
 # 和常规的单目一样，SVO算法分成两部分: 位姿估计，深度估计
 ## 1. 位姿估计 motion estimation
         svo 方法中motion estimation的步骤可以简单概括如下:
@@ -418,6 +443,8 @@
         式中：x1 = k逆 × p1 ，x2 = k逆 × p2 ， T= [R, t] 已知
         可以求解D 
         D是3维齐次坐标，需要除以第四个尺度因子 归一化.
+[三角法求深度（triangulation）](https://blog.csdn.net/heyijia0327/article/details/50774104)
+        
         
         我们知道通过两帧图像的匹配点就可以计算出这一点的深度值，
         如果有多幅图像，那就能计算出这一点的多个深度值。
