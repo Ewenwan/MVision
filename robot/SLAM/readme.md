@@ -31,7 +31,7 @@
 
 [tinySLAM代码逻辑结构](https://blog.csdn.net/lilynothing/article/details/62881142)  
 
-
+[CoreSLAM（tinySLAM）主要思想就是基于粒子滤波器（particle filter）将激光数据整合到定位子系统中](https://blog.csdn.net/myarrow/article/details/80340548)
 
    
 ## 粒子滤波的基本思想是：
