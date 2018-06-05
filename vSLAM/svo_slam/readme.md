@@ -4,7 +4,10 @@
 
 [SVO 代码笔记](https://blog.csdn.net/heyijia0327/article/details/51649082)
 
+[项目主页](https://github.com/uzh-rpg/rpg_svo)
+
 [ssvo类似代码](https://github.com/kokerf/ssvo)
+
 
 # 半直接法解析 
         SVO 从名字来看，是半直接视觉里程计，
