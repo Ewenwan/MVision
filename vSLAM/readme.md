@@ -2,6 +2,35 @@
 
 [视觉SLAM基础知识总结](https://blog.csdn.net/myarrow/article/details/53704339)
 
+        
+[Visual SLAM Tutorial ](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/)
+
+[Features特征, Tracking跟踪, Essential Matrix本质矩阵, and RANSAC随机采样序列一致性](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A11-VisualOdometry.pdf)
+
+[Stereo Visual Odometry 双目视觉里程计](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A12-StereoVO.pdf)
+
+[BundleAdjustmen 集束优化](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A13-BundleAdjustment.pdf)
+
+[DealingWithScale 尺度问题](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A21-DealingWithScale.pdf)
+
+[Incremental 滤波器优化 非线性最小二乘优化等](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A22-Incremental.pdf)
+
+[LoopClosing闭环检测](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A23-LoopClosing.pdf)
+
+[大尺度地图高效构建](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P11-LargeScaleEfficiency.pdf)
+
+[稠密VO](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P12-DenseVO.pdf)
+
+[ptam svo 光流 ](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P13-Hybrids.pdf)
+
+[Dense mapping: KinectFusion and DTAM](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P14-GreedyDenseSLAM.pdf)
+
+[Kintinuous: Reconstruction of an Apartment ICP+RGBD](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P21-Kintinuous.pdf)
+
+[SLAM++](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P22-SLAM%2B%2B.pdf)
+
+
+
     ch1 Preface 
     ch2 Overview of SLAM & linux, cmake    概述，cmake基础
     ch3 Rigid body motion & Eigen          三维几何
