@@ -2,12 +2,17 @@
 
 [svo： semi-direct visual odometry 论文解析](https://blog.csdn.net/heyijia0327/article/details/51083398)
 
+[SVO原理解析](http://www.cnblogs.com/luyb/p/5773691.html)
+
 [SVO 代码笔记](https://blog.csdn.net/heyijia0327/article/details/51649082)
+
+[SVO 代码笔记](http://www.voidcn.com/article/p-psxnfcdp-ko.html)
 
 [项目主页](https://github.com/uzh-rpg/rpg_svo)
 
 [ssvo类似代码](https://github.com/kokerf/ssvo)
 
+[一步步完善视觉里程计1——项目框架搭建](http://fengbing.net/2015/08/02/%E4%B8%80%E6%AD%A5%E6%AD%A5%E5%AE%9E%E7%8E%B0%E5%8D%95%E7%9B%AE%E8%A7%86%E8%A7%89%E9%87%8C%E7%A8%8B%E8%AE%A11%E2%80%94%E2%80%94%E9%A1%B9%E7%9B%AE%E6%A1%86%E6%9E%B6%E6%90%AD%E5%BB%BA/)
 
 # 半直接法解析 
         SVO 从名字来看，是半直接视觉里程计，
@@ -351,4 +356,45 @@
         因此，可以用贝叶斯估计来对多个测量值进行融合，使得估计的不确定性缩小。
         如下图所示：
 ![](https://img-blog.csdn.net/20160407222351307)     
+
+        一开始深度估计的不确定性较大(浅绿色部分)，
+        通过三角化得到一个深度估计值以后，
+        能够极大的缩小这个不确定性(墨绿色部分)。 
+        
+### 极线搜索匹配点三角化计算深度
+        在这里，先简单介绍下svo中的三角化计算深度的过程，主要是极线搜索确定匹配点。
+        在参考帧Ir中，我们知道了一个特征的图像位置ui，假设它的深度值在[dmin,dmax]之间，
+        那么根据这两个端点深度值，我们能够计算出他们在当前帧Ik中的位置，
+        如上图中草绿色圆圈中的蓝色线段。
+        确定了特征出现的极线段位置，就可以进行特征搜索匹配了。
+        如果极线段很短，小于两个像素，
+        那直接使用上面求位姿时提到的Feature Alignment光流法就可以比较准确地预测特征位置。
+        如果极线段很长，那分两步走，第一步在极线段上间隔采样，
+        对采样的多个特征块一一和参考帧中的特征块匹配，
+        用Zero mean Sum of Squared Differences （零均值差平方和）方法对各采样特征块评分，
+        哪个得分最高，说明他和参考帧中的特征块最匹配。
+        第二步就是在这个得分最高点附近使用Feature Alignment得到次像素精度的特征点位置。
+        像素点位置确定了，就可以三角化计算深度了。 
+        
+        得到一个新的深度估计值以后，用贝叶斯概率模型对深度值更新。
+        在LSD slam中，假设深度估计值服从高斯分布，
+        用卡尔曼滤波(贝叶斯的一种)来更新深度值。
+        这种假设中，他认为深度估计值效果很棒，
+        很大的概率出现在真实值(高斯分布均值)附近。
+        而SVO的作者采用的是Vogiatzis的
+        论文《Video-based, real-time multi-view stereo》提到的概率模型：
+![](https://img-blog.csdn.net/20160407222956700)
+
+        这个概率模型是一个 高斯分布 加上一个设定
+        在最小深度dmin和最大深度dmax之间的 均匀分布。
+        这个均匀分布的意义是假设会有一定的概率出现错误的深度估计值。
+        有关这个概率模型来由更严谨的论证去看看Vogiatzis的论文。
+        
+        同时，有关这个概率模型递推更新的过程具体可以看Vogiatzis在论文中
+        提到的Supplementary material，论文中告知了下载地址。
+        知道了这个贝叶斯概率模型的递推过程，程序就可以实现深度值的融合了，
+        结合supplementary material去看svo代码中的updateSeeds(frame)这个程序就容易了，
+        整个程序里的那些参数的计算递归过程的推导，我简单截个图，
+        这部分我也没细看(公式19是错误的，svo作者指出了)，
+        现在有几篇博客对该部分进行了推导.
         
