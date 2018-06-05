@@ -2,6 +2,18 @@
 
 [机器人选修课](http://www.diag.uniroma1.it/%7Elanari/EIR/)
 
+[Andrew Davison的课程： Robotics Lecture Course (course code 333)](http://www.doc.ic.ac.uk/~ajd/Robotics/index.html)
+
+[Simultaneous Localization and Mapping: Part I ](http://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial1.pdf)
+
+[Simultaneous Localization and Mapping: Part II ](http://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/SLAMTutorial2.pdf)
+
+[瑞士苏黎世理工的学生练习](http://www.csc.kth.se/~kootstra/index.php?item=313&menu=300)
+
+[书籍 Robotics, Vision & Control 推荐！！！！](http://petercorke.com/wordpress/)
+
+[Robotics, Vision and Control csdn](https://download.csdn.net/download/u013834525/10169878)
+
 [优达学城 机器人人工智能课程](https://classroom.udacity.com/courses/cs373)
 
 [学习无人驾驶车，你所必须知道的](https://zhuanlan.zhihu.com/p/27686577)
