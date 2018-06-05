@@ -1,4 +1,7 @@
 # 目录 
+
+[视觉SLAM基础知识总结](https://blog.csdn.net/myarrow/article/details/53704339)
+
     ch1 Preface 
     ch2 Overview of SLAM & linux, cmake    概述，cmake基础
     ch3 Rigid body motion & Eigen          三维几何
@@ -26,6 +29,13 @@
  
 [视觉惯性里程计Visual–Inertial Odometry(VIO)概述](https://www.cnblogs.com/hitcm/p/6327442.html)
     
+[视觉惯性单目SLAM （一）算法描述](https://blog.csdn.net/MyArrow/article/details/54694472)
+[视觉惯性单目SLAM （二） 算法基础知识](https://blog.csdn.net/myarrow/article/details/55669033)
+[视觉惯性单目SLAM （三）优化方法](https://blog.csdn.net/myarrow/article/details/56279273)
+[视觉惯性单目SLAM （四）-泰勒展开式](https://blog.csdn.net/myarrow/article/details/56667168)
+[视觉惯性单目SLAM （五）矩阵微积分](https://blog.csdn.net/myarrow/article/details/56834795)
+[视觉惯性单目SLAM （五）-线性和二次型](https://blog.csdn.net/myarrow/article/details/58601497)
+
 [VINS-Mono代码](https://github.com/Ewenwan/VINS-Mono)
 
 [ORB_SLAM2_IMU](https://github.com/Ewenwan/LearnViORB_NOROS)
