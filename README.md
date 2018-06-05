@@ -48,6 +48,16 @@
 
 [路径规划A*算法及SLAM自主地图创建导航算法](http://www.voidcn.com/article/p-yfjpnwte-tz.html)
 
+[冯兵的blog slam](http://www.fengbing.net)
+
+[imu和单目的数据融合开源代码（EKF)](https://github.com/ethz-asl/rovio)
+
+[imu和单目的数据融合开源代码(非线性优化）](https://github.com/ethz-asl/okvis_ros)
+
+[双目立体匹配](https://wenku.baidu.com/view/08f86102e518964bcf847c6c.html)
+
+[计算机视觉的一些库文件](https://blog.csdn.net/garfielder007/article/details/50533052)
+
 # 无人驾驶的各个方面知识
 [参考](https://blog.csdn.net/qq_40027052/article/details/78485120)
 
