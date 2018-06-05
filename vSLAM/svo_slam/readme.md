@@ -8,6 +8,8 @@
 
 [SVO 代码笔记](http://www.voidcn.com/article/p-psxnfcdp-ko.html)
 
+[SVO 代码笔记](http://www.cnblogs.com/luyb/p/5773691.html)
+
 [项目主页](https://github.com/uzh-rpg/rpg_svo)
 
 [ssvo类似代码](https://github.com/kokerf/ssvo)
@@ -299,6 +301,7 @@
         基于光度不变性假设，特征块在以前参考帧中的亮度(灰度值)应该和new frame中的亮度差不多。
         所以可以重新构造一个残差，对特征预测位置进行优化。
 ![](https://img-blog.csdn.net/20160407172225347)
+
 ![](https://img-blog.csdn.net/20160820223132238?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
 
         注意这里的优化变量是像素位置，这过程就是 光流法跟踪,  
@@ -329,6 +332,7 @@
         这里由于优化后的特征位置 和 之前预测的特征位置存在差异，这个能用来构造新的优化目标函数。
 
 ![](https://img-blog.csdn.net/20160407175529081)
+
 ![](https://img-blog.csdn.net/20160820223159658?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
 
         注意上式中误差变成了像素重投影以后位置的差异（不是像素值的差异），
@@ -364,6 +368,10 @@
         能够极大的缩小这个不确定性(墨绿色部分)。 
         
 ### 极线搜索匹配点三角化计算深度
+[深度估计的思路论文 Video-based, Real-Time Multi View Stereo ](http://george-vogiatzis.org/publications/ivcj2010.pdf)
+
+[深度估计的思路 参考博客](http://www.cnblogs.com/luyb/p/5773691.html)
+
         在这里，先简单介绍下svo中的三角化计算深度的过程，主要是极线搜索确定匹配点。
         在参考帧Ir中，我们知道了一个特征的图像位置ui，假设它的深度值在[dmin,dmax]之间，
         那么根据这两个端点深度值，我们能够计算出他们在当前帧Ik中的位置，
@@ -390,6 +398,10 @@
         这个概率模型是一个 高斯分布 加上一个设定
         在最小深度dmin和最大深度dmax之间的 均匀分布。
         这个均匀分布的意义是假设会有一定的概率出现错误的深度估计值。
+        
+        其中pi π 表示x为有效测量(高斯分布)的概率,而(1-pi)为噪声出现错误的概率
+![](https://images2015.cnblogs.com/blog/879417/201608/879417-20160815172058250-1160761930.png)
+
         有关这个概率模型来由更严谨的论证去看看Vogiatzis的论文。
         
         同时，有关这个概率模型递推更新的过程具体可以看Vogiatzis在论文中
@@ -400,3 +412,5 @@
         这部分我也没细看(公式19是错误的，svo作者指出了)，
         现在有几篇博客对该部分进行了推导.
         
+[svo的Supplementary matterial 推导过程](https://blog.csdn.net/u013004597/article/details/52069741)
+
