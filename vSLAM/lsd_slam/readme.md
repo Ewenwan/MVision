@@ -10,10 +10,19 @@
  
 [tracking  optimizationThreadLoop线程 分析等](https://blog.csdn.net/u013004597)
 
+[lsd:tracking 较好](https://blog.csdn.net/u013004597/article/details/52303017)
+
+[lsd：constraintSearchThreadLoop线程](https://blog.csdn.net/u013004597/article/details/52295085)
+
+[lsd:optimizationThreadLoop线程](https://blog.csdn.net/u013004597/article/details/52301966)
+
+
+
 https://blog.csdn.net/tiandijun/article/details/62226163
 
 [官网:](http://vision.in.tum.de/research/vslam/lsdslam)
 [代码:](https://github.com/tum-vision/lsd_slam)
+
 
 # 运行lsd-slam
 [一个来自官方的范例，使用的dataset如下，400+M](http://vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip)
