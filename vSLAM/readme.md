@@ -22,7 +22,8 @@
     ORB_SLAM2_IMU
     OKVIS: Open Keyframe-based Visual-Inertial SLAM.  OKVIS 属于 VIO（Visual Inertial Odometry），视觉融合 IMU 做 odometry。
     
-    
+ [基于视觉的 SLAM/Visual Odometry (VO) 开源资料、博客和论文列表](http://www.voidcn.com/article/p-amraedch-nh.html)
+ 
 [视觉惯性里程计Visual–Inertial Odometry(VIO)概述](https://www.cnblogs.com/hitcm/p/6327442.html)
     
 [VINS-Mono代码](https://github.com/Ewenwan/VINS-Mono)
