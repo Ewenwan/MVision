@@ -1,6 +1,8 @@
 # opencv 学习
 [LearnOpenCV.com 项目](https://github.com/Ewenwan/learnopencv)
 
+[OpenCV学习笔记](https://blog.csdn.net/column/details/opencv-manual.html?&page=3)
+
 ## window下安装
       1、系统环境变量设置
       动态链接库配置
