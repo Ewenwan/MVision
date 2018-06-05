@@ -2,7 +2,9 @@
 # caffe code
 [caffeSSD ](https://github.com/weiliu89/caffe/tree/ssd)
 
-[VGG16与训练权重](https://download.csdn.net/download/zhayushui/10132277)
+[VGG16与训练权重 csdn上需要金币](https://download.csdn.net/download/zhayushui/10132277)
+
+[VGG16与训练权重 可能需要翻墙下载 ](http://cs.unc.edu/~wliu/projects/ParseNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel)
 
 # VGG16 结构图 13个卷积层+3个全链接层=16
 ```asm
