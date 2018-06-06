@@ -77,7 +77,7 @@
 ![](https://img-blog.csdn.net/20160228210635964)
 
         由于C0、C1、P三点共面，得到： 
-![](https://img-blog.csdn.net/201602282136150180)
+![](https://img-blog.csdn.net/20160228213615018)
 
          这时，由共面得到的向量方程可写成：  
          p0 *(t 叉乘 R * p1)
