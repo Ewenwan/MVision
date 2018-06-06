@@ -22,4 +22,23 @@
     make clean
     make all -j
     make pycaffe
-# 
+# 通道重排三部曲 
+
+| group 1  | group 2  |  group 3  |  
+| :------: | :------: | :-------: |  
+| 1     2  | 3     4  |  5     6  |   
+
+Each nubmer represents a channel of the feature map  
+    
+## step 1: Reshape  按分组变形成列矩阵
+1  2  
+3  4   
+5  6 
+## step 2: transpose  转置
+1 3 5  
+2 4 6　　
+## step 3: flatten    按分组数量 平滑成行向量
+
+| group 1  | group 2  |  group 3  |  
+| :-----:  | :------: | :-------: |  
+| 1     3  | 5     2  |  4     6  |  
