@@ -3,7 +3,7 @@
 
 [参考2](https://github.com/linchaozhang/shufflenet-ssd)
 
-# 新建通道层
+# 新建通道重排层
     添加三个文件 ：
     shuffle_channel_layer.cpp
     shuffle_channel_layer.cu
