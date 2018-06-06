@@ -235,6 +235,7 @@
 
 
 #### 以上的解法 在 orbslam2中有很好的代码解法
+[orbslam2 单目初始化 ](https://github.com/Ewenwan/MVision/blob/master/vSLAM/oRB_SLAM2/src/Initializer.cc)
 
 ### 尺度问题
 ![](https://img-blog.csdn.net/20160229104204048)
