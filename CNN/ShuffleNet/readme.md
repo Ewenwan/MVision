@@ -9,6 +9,8 @@
 
 [shufflenet-ssd](https://github.com/linchaozhang/shufflenet-ssd)
 
+[预训练的ShuffleNet-cafe模型参数文件](https://github.com/msnqqer/ShuffleNet)
+
 ## ResNet 残差网络  结合不同层特征
      ________________________________>
     |                                 ADD -->  f(x) + x
