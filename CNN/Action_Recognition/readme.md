@@ -339,11 +339,17 @@
 #### 改进1 CNN网络进行了spatial以及temporal的融合
 [Convolutional Two-Stream Network Fusion for Video Action Recognition“（2016CVPR）](https://arxiv.org/pdf/1604.06573.pdf)
 
+[代码 matlab github](https://github.com/feichtenhofer/twostreamfusion)
+
+![](http://ofltv9hb9.bkt.clouddn.com/image/action_recognition/cts.png)
+
     这篇论文的主要工作为:
         1. 在two stream network的基础上，
            利用CNN网络进行了spatial以及temporal的融合，从而进一步提高了效果。
         2. 此外，该文章还将基础的spatial和temporal网络都换成了VGG-16 network。
     实验效果：UCF101-92.5%，HMDB51-65.4% 
+
+
 
 #### TSN 结构 
 [Temporal Segment Networks: Towards Good Practices for Deep Action Recognition](https://arxiv.org/pdf/1608.00859.pdf)
