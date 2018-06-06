@@ -42,3 +42,13 @@ Each nubmer represents a channel of the feature map
 | group 1  | group 2  |  group 3  |  
 | :-----:  | :------: | :-------: |  
 | 1     3  | 5     2  |  4     6  |  
+
+
+## shuffleNet 模型框架
+
+    conv1：  3*3/2  24输出  + bn + scale + relu  +      3*3/2 MAXpooling
+
+    ----> resx1_match_conv（3*3/2 AVGpooling） 
+    ----> resx1_conv1 1*1*54  + bn + scale + relu  
+
+
