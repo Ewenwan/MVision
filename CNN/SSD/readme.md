@@ -6,6 +6,9 @@
 
 [VGG16与训练权重 可能需要翻墙下载 ](http://cs.unc.edu/~wliu/projects/ParseNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel)
 
+[VGG/MobileNet/ShuffleNet SSD detection network](https://github.com/FreeApe/VGG-or-MobileNet-SSD)
+
+
 # VGG16 结构图 13个卷积层+3个全链接层=16
 ```asm
 输入图像  3*300*300
