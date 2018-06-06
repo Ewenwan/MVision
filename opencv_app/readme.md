@@ -3,6 +3,10 @@
 
 [OpenCV学习笔记](https://blog.csdn.net/column/details/opencv-manual.html?&page=3)
 
+[opencv大师 项目](https://github.com/Ewenwan/code)
+
+
+
 ## window下安装
       1、系统环境变量设置
       动态链接库配置
