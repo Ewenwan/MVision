@@ -11,6 +11,10 @@
 
 [反向传播神经网络及应用](https://github.com/Ewenwan/neural_net)
 
+[MatConvNetConvolutional Neural Networks for MATLAB 工具箱手册](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf)
+
+[MatConvNetConvolutional Neural Networks for MATLAB 工具箱 主页](http://www.vlfeat.org/matconvnet/)
+
 # 损失函数 交叉熵CrossEntropy 以及 Focal Loss 
 [交叉熵损失 Focal Loss 博客介绍](http://www.cnblogs.com/xuanyuyt/p/7444468.html)
 
