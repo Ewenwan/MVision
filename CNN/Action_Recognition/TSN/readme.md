@@ -1,4 +1,4 @@
-#TSN 结构 
+# TSN 结构 
 [Temporal Segment Networks: Towards Good Practices for Deep Action Recognition](https://arxiv.org/pdf/1608.00859.pdf)
 
 [caffe code](https://github.com/yjxiong/temporal-segment-networks)
@@ -17,7 +17,7 @@
         2. 构：尝试了GoogLeNet,VGGNet-16及BN-Inception三种网络结构，其中BN-Inception的效果最好。
         3. 包括 跨模态预训练，正则化，数据增强等。
         4. 果：UCF101-94.2%，HMDB51-69.4% 
-#TSN改进版本之一  加权融合
+# TSN改进版本之一  加权融合
     改进的地方主要在于fusion部分，不同的片段的应该有不同的权重，而这部分由网络学习而得，最后由SVM分类得到结果。
 [Deep Local Video Feature for Action Recognition 【CVPR2017】](https://arxiv.org/pdf/1701.07368.pdf)
 
