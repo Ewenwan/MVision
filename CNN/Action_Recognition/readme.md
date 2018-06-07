@@ -407,6 +407,10 @@
 
     这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
 
+![](http://jeffdonahue.com/lrcn/images/lrcn_tasks.png)
+
+[相关研究主页](http://jeffdonahue.com/lrcn/)
+
 #### TSN 结构 
 [Temporal Segment Networks: Towards Good Practices for Deep Action Recognition](https://arxiv.org/pdf/1608.00859.pdf)
 
