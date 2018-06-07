@@ -133,6 +133,8 @@
     D. 使用SVM进行分类
         对编码量化之后的特征向量使用SVM支持向量机进行分类。
 #### iDT（improved dense trajectories) 改进
+[iDT论文](https://hal.inria.fr/hal-00873267v2/document)
+
 ```asm
     1. 剔除相机运动引起的背景光流
         a. 使用SURF特征算法匹配前后两帧的 匹配点对，这里会使用人体检测，剔除人体区域的匹配点，运动量大，影响较大；
