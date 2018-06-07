@@ -539,6 +539,18 @@
 
     改进ResNet内部连接中的卷积形式。然后，超深网络，一般人显然只能空有想法，望而却步。
 
+### 3D卷积方式的 改进 
+[Exploring Temporal Preservation Networks for Precise Temporal Action Localization TPC 时序保留卷积](https://arxiv.org/pdf/1708.03280.pdf)
+
+
+    思路：
+    这篇文章是在CDC网络的基础进行改进的，CDC最后是采用了时间上上采样，
+    空间下采样的方法做到了 per-frame action predictions，而且取得了可信的行为定位的结果。
+    但是在CDC filter之前时间上的下采样存在一定时序信息的丢失。
+    作者提出的TPC网络，采用时序保留卷积操作，
+    这样能够在不进行时序池化操作的情况下获得同样大小的感受野而不缩短时序长度。
+
+
 ### 其他方法 
 #### PP3D  Temporal Pyramid Pooling
 [End-to-end Video-level Representation Learning for Action Recognition](https://arxiv.org/pdf/1711.04161.pdf)
@@ -573,6 +585,10 @@
 [caffe examples/LRCN_activity_recognition" ](https://github.com/LisaAnne/lisa-caffe-public)
 
 [对LSTM研究很好的一个老师主页](http://jeffdonahue.com/lrcn/)
+
+
+[Multimodal Keyless Attention Fusion for Video Classification 多模态 LSTM](http://research.baidu.com/Public/uploads/5acc1f9026183.pdf)
+
 
 
 ### 数据数据的提纯
