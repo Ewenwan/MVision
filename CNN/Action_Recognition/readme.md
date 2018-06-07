@@ -362,6 +362,9 @@
         4) 使用维特比算法进行求解出一个最大概率的隐含状态链(即行为状态序列)
         
     4) 深度学习的方法分割动作 
+    
+    DTW/HMM/CRBM/高斯过程
+
 #### e. 分类器分类
         1.  SVM 支持向量机进行分类。
         2.  KNN 最近邻分类器进行分类。
@@ -616,6 +619,8 @@
 [对LSTM研究很好的一个老师主页](http://jeffdonahue.com/lrcn/)
 
 [LSTM 用于行为识别 图像描述 视频描述 博客详解](https://blog.csdn.net/mounty_fsc/article/details/53114698)
+
+![](https://img-blog.csdn.net/20161110141705935)
 
 [Multimodal Keyless Attention Fusion for Video Classification 多模态 LSTM](http://research.baidu.com/Public/uploads/5acc1f9026183.pdf)
 
