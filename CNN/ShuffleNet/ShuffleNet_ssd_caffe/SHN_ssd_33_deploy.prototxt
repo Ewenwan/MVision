@@ -4205,7 +4205,7 @@ layer {
     phase: TEST
   }
   detection_output_param {
-    num_classes: cls1x
+    num_classes: 21
     share_location: true
     background_label_id: 0
     nms_param {
