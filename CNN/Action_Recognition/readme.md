@@ -480,6 +480,11 @@
 
 [Spatial Temporal Graph Convolutional Networks for Skeleton-Based Action Recognition 骨骼时空网络兴趣点](https://arxiv.org/pdf/1801.07455.pdf)
 
+    思路： 
+    在视频上先对每一帧做姿态估计（Kinetics 数据集上文章用的是OpenPose），然后可以构建出一个空间上的骨架时序图。
+    然后应用ST-GCN网络提取高层特征
+    最后用softmax分类器进行分类
+
 [博客1](https://blog.csdn.net/heyc861221/article/details/80128180)
 
 [博客2](https://blog.csdn.net/yengjie2200/article/details/68063605)
