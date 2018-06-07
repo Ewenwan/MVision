@@ -356,6 +356,8 @@
 
 [caffe code](https://github.com/yjxiong/temporal-segment-networks)
 
+[TSN（Temporal Segment Networks）代码实验](https://blog.csdn.net/zhang_can/article/details/79704084)
+
     这篇文章是港中文Limin Wang大神的工作，他在这方面做了很多很棒的工作，
     可以followt他的主页：http://wanglimin.github.io/ 。
 
