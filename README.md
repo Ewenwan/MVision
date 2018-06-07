@@ -4,6 +4,8 @@
 
 [计算机视觉和算法 书籍](http://szeliski.org/Book/drafts/SzeliskiBook_20100903_draft.pdf)
 
+[Computer vision:models, learning and inference 书籍](http://web4.cs.ucl.ac.uk/staff/s.prince/book/book.pdf)
+
 [机器人选修课](http://www.diag.uniroma1.it/%7Elanari/EIR/)
 
 [Andrew Davison的课程： Robotics Lecture Course (course code 333)](http://www.doc.ic.ac.uk/~ajd/Robotics/index.html)
