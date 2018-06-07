@@ -539,9 +539,8 @@
 
     改进ResNet内部连接中的卷积形式。然后，超深网络，一般人显然只能空有想法，望而却步。
 
-### 3D卷积方式的 改进 
+### 3D卷积方式的 改进 TPC 时序保留卷积
 [Exploring Temporal Preservation Networks for Precise Temporal Action Localization TPC 时序保留卷积](https://arxiv.org/pdf/1708.03280.pdf)
-
 
     思路：
     这篇文章是在CDC网络的基础进行改进的，CDC最后是采用了时间上上采样，
@@ -549,6 +548,26 @@
     但是在CDC filter之前时间上的下采样存在一定时序信息的丢失。
     作者提出的TPC网络，采用时序保留卷积操作，
     这样能够在不进行时序池化操作的情况下获得同样大小的感受野而不缩短时序长度。
+    
+    
+### R-C3D C3D网络为基础。借鉴了Faster RCNN的思
+[R-C3D-Resgion Convolutional 3D Network for Temporal Activity Detection](https://arxiv.org/pdf/1703.07814.pdf)
+
+[博客解析](https://blog.csdn.net/neu_chenguangq/article/details/79177335)
+
+    以C3D网络为基础。借鉴了Faster RCNN的思路，对于任意的输入视频L，
+    先进行proposal，然后3D-pooling,最后后进行分类和回归操作。
+    文章主要贡献点有3个：
+        可以针对任意长度视频、任意长度行为进行端到端的检测
+        速度很快(是目前网络的5倍)，通过共享Progposal generation 和Classification网络的C3D参数
+        作者测试了3个不同的数据集，效果都很好，显示了通用性。
+
+#### 整个网络可以分为四个部分：
+
+    1、特征提取网络：对于输入任意长度的视频进行特征提取
+    2、Temporal Proposal Subnet: 用来提取可能存在行为的时序片段（Proposal Segments）
+    3、Activity Classification Subnet: 行为分类子网络
+    4、Loss Function
 
 
 ### 其他方法 
