@@ -466,7 +466,7 @@
 ### 行为识别 人体骨架检测+LSTM
     人体骨架怎么获得呢？
     主要有两个途径：
-    通过RGB图像进行关节点估计（Pose Estimation）获得[3][4]，
+    通过RGB图像进行关节点估计（Pose Estimation openpose工具箱）获得，
     或是通过深度摄像机直接获得（例如Kinect）。
     每一时刻（帧）骨架对应人体的K个关节点所在的坐标位置信息，一个时间序列由若干帧组成。
 [3 骨架获取 Stacked Hourglass Networks for Human Pose Estimation](https://arxiv.org/pdf/1603.06937.pdf)
@@ -478,6 +478,7 @@
 
 [基于部分亲和字段PAF(Part Affinity Field)的2D图像姿态估计 博客参考](https://blog.csdn.net/qq_14845119/article/details/72526737)
 
+[Spatial Temporal Graph Convolutional Networks for Skeleton-Based Action Recognition 骨骼时空网络兴趣点](https://arxiv.org/pdf/1801.07455.pdf)
 
 [博客1](https://blog.csdn.net/heyc861221/article/details/80128180)
 
