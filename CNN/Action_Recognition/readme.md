@@ -615,6 +615,7 @@
 
 [对LSTM研究很好的一个老师主页](http://jeffdonahue.com/lrcn/)
 
+[LSTM 用于行为识别 图像描述 视频描述 博客详解](https://blog.csdn.net/mounty_fsc/article/details/53114698)
 
 [Multimodal Keyless Attention Fusion for Video Classification 多模态 LSTM](http://research.baidu.com/Public/uploads/5acc1f9026183.pdf)
 
