@@ -349,7 +349,10 @@
         2. 此外，该文章还将基础的spatial和temporal网络都换成了VGG-16 network。
     实验效果：UCF101-92.5%，HMDB51-65.4% 
 
+#### 改进2  LSTM网络 融合双流 spatial以及temporal
+[双流 + LSTM](https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Ng_Beyond_Short_Snippets_2015_CVPR_paper.pdf)
 
+    这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
 
 #### TSN 结构 
 [Temporal Segment Networks: Towards Good Practices for Deep Action Recognition](https://arxiv.org/pdf/1608.00859.pdf)
