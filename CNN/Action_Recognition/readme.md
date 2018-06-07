@@ -6,6 +6,30 @@
     传统 DTW 动态时间规整 分割视频
     现在 利用RNN网络对未分割序列进行行为检测（行为动作的起止点的定位 和 行为动作类型的判定）
 
+    Action Detection
+
+    目的：不仅要知道一个动作在视频中是否发生，还需要知道动作发生在视频的哪段时间
+    
+    特点：需要处理较长的，未分割的视频。且视频通常有较多干扰，目标动作一般只占视频的一小部分。
+    
+    分类：根据待检测视频是一整段读入的还是逐次读入的，分为online和offline两种
+    
+    Offline action detection:
+    特点：一次读入一整段视频，然后在这一整段视频中定位动作发生的时间
+    
+    Online action detection:
+    特点：不断读入新的帧，在读入帧的过程中需要尽可能早的发现动作的发生（在动作尚未结束时就检测到）。
+         同时online action detection 还需要满足实时性要求，这点非常重要。
+         这导致online action detection不能采用计算复杂度过大的方法（在现有的计算能力下）
+         
+    现有方法：
+         逐帧检测法：
+                  即在视频序列的每帧上独立判断动作的类型，可以用CNN等方法，仅用上了spatial的信息
+         滑窗法：  即设置一个固定的滑窗大小，在视频序列上进行滑窗，然后对滑窗得到的视频小片断利用action recognition的方法进行分类。
+         
+    现状：由于此问题难度比action recognition高很多，所以现在还没有效果较好的方法
+
+
 [论文总结参考](https://blog.csdn.net/whfshuaisi/article/details/79116265)
 
 [博客参考2](https://blog.csdn.net/wzmsltw/article/details/70239000)
