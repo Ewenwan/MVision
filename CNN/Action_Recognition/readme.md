@@ -1,5 +1,9 @@
 # Video Analysis 相关领域 之Action Recognition(行为识别)  类似图像目标识别
     行为识别就是对时域预先分割好的序列判定其所属行为动作的类型，即“读懂行为”。   
+    
+[基于Deep Learning 的视频识别技术](https://yq.aliyun.com/articles/39134)
+
+    
 # 行为检测 Action Detection                            类似图像目标检测
     但在现实应用中更容易遇到的情况是序列尚未在时域分割（Untrimmed），
     因此需要同时对行为动作进行时域定位（分割）和类型判定，这类任务一般称为行为检测。
