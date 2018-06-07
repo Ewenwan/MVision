@@ -554,7 +554,15 @@
     实验效果：UCF101-93.1%，HMDB51-63.3%
 
 #### 使用LSTM，RNN循环神经网络来完成时间上的建模
-[CNN提取特征->LSTM建模](http://cs231n.stanford.edu/reports/2016/pdfs/221_Report.pdf)
+[CNN提取特征->LSTM建模 A Torch Library for Action Recognition and Detection Using CNNs and LSTMs ](http://cs231n.stanford.edu/reports/2016/pdfs/221_Report.pdf)
+
+[Long-term Recurrent Convolutional Networks for Visual Recognition and Description](https://arxiv.org/pdf/1411.4389.pdf)
+
+[代码主页](https://people.eecs.berkeley.edu/~lisa_anne/LRCN_video)
+
+[caffe examples/LRCN_activity_recognition" ](https://github.com/LisaAnne/lisa-caffe-public)
+
+[对LSTM研究很好的一个老师主页](http://jeffdonahue.com/lrcn/)
 
 
 ### 数据数据的提纯
