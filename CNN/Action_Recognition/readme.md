@@ -233,6 +233,25 @@
     % 进行FV编码
     encoding = vl_fisher(datatoBeEncoded, means, covariances, priors);
 ```
+### idt算法总结
+    1、密集采样:
+        多尺度(8个)
+        间隔采样（5）
+        无纹理区域点的剔除
+    2、光流法跟踪:
+        I(x, y, t) = I(x+dx, y+dy, t+dt) 
+        泰勒展开：
+        [Ix, Iy] * [u; v] = -It 
+        局部区域 运动相同：
+         A * U = b 
+         U = (A转置*A)逆 * A转置 * b  伪逆求解
+        光流中指滤波：
+         Pt+1=(xt+1,yt+1)=(xt,yt)+(M∗Ut)|xt,yt
+    3、特征计算：
+
+
+
+
 ### 传统视频行为分析算法总结
 #### a.	特征提取方法
     1. 方向梯度直方图 HOG   
