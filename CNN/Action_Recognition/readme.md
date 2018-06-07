@@ -568,6 +568,16 @@
     2、Temporal Proposal Subnet: 用来提取可能存在行为的时序片段（Proposal Segments）
     3、Activity Classification Subnet: 行为分类子网络
     4、Loss Function
+![](https://img-blog.csdn.net/20180124174713311)
+##### 时序候选框提取网络，类似于Faster R-CNN中的RPN
+![](https://img-blog.csdn.net/20180125083017808)
+
+##### 行为分类子网络有如下几个功能：
+
+    从TPS（Temporal Proposal subnet）中选择出Proposal segment
+    对于上述的proposal，用3D RoI 提取固定大小特征
+    以上述特征为基础，将选择的Proposal做类别判断和时序边框回归
+![](https://img-blog.csdn.net/20180125090021602)
 
 
 ### 其他方法 
