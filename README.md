@@ -16,6 +16,8 @@
 
 [书籍 Robotics, Vision & Control 推荐！！！！](http://petercorke.com/wordpress/)
 
+[Robotics, Vision & Control.PDF 百度网盘](https://pan.baidu.com/s/1c1TcEgo)
+
 [Robotics, Vision and Control csdn](https://download.csdn.net/download/u013834525/10169878)
 
 [优达学城 机器人人工智能课程](https://classroom.udacity.com/courses/cs373)
