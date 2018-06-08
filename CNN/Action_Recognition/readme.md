@@ -466,6 +466,8 @@
 
 [Understanding LSTM Networks](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
 
+[LSTM理解](https://blog.csdn.net/nxcxl88/article/details/52590500)
+
     这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
     实验效果：UCF101-88.6% 
 
