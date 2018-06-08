@@ -1,12 +1,11 @@
-name: "MobileNetV2-SSD"
-layer {
-  name: "data"
-  type: "AnnotatedData"
-  top: "data"
-  top: "label"
-  include {
-    phase: TEST
-  }
+name: "mobilenetv2-ssd"
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 300
+  dim: 300
+}
 #=================NET BEGINING ====
 
 layer {
@@ -5053,21 +5052,5 @@ layer {
     code_type: CENTER_SIZE
     keep_top_k: 100
     confidence_threshold: 0.25
-  }
-}
-layer {
-  name: "detection_eval"
-  type: "DetectionEvaluate"
-  bottom: "detection_out"
-  bottom: "label"
-  top: "detection_eval"
-  include {
-    phase: TEST
-  }
-  detection_evaluate_param {
-    num_classes: 21
-    background_label_id: 0
-    overlap_threshold: 0.5
-    evaluate_difficult_gt: false
   }
 }
