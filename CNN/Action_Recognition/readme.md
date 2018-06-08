@@ -464,15 +464,21 @@
 #### LSTM 结构融合双流特征
 [Beyond Short Snippets: Deep Networks for Video Classification Joe](https://arxiv.org/pdf/1503.08909.pdf)
 
+    这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
+    实验效果：UCF101-88.6%
+
+
 [Understanding LSTM Networks](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
 
 [LSTM理解](https://blog.csdn.net/nxcxl88/article/details/52590500)
 
-    这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
-    实验效果：UCF101-88.6% 
-    
+    RNN的展开结构
+![](https://img-blog.csdn.net/20160920225401298)
+
+    LSTM的展开结构
 ![](https://img-blog.csdn.net/20160920225528864)
 
+    LSTM 功能
 ![](https://img-blog.csdn.net/20160921212908527)
 
 [LSTM ResNet cnn TSN](https://github.com/woodfrog/ActionRecognition)
