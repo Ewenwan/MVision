@@ -823,6 +823,8 @@
 
 [代码](https://github.com/Ewenwan/video-nonlocal-net)
 
+[参考博客解析](https://blog.csdn.net/u010158659/article/details/78635219)
+
     非局部网络优势：
         在深层神经网络中，捕获长期依赖关系是至关重要的。
         对于连续的数据（例如演讲中语言），循环操作是时间域上长期依赖问题的主要解决方案。
