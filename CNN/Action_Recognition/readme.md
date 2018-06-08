@@ -727,6 +727,8 @@
 ## R-C3D(Region 3-Dimensional Convolution)网络
 [R-C3D-Resgion Convolutional 3D Network for Temporal Activity Detection](https://arxiv.org/pdf/1703.07814.pdf)
 
+[代码](https://github.com/Ewenwan/R-C3D)
+
 [博客解析](https://blog.csdn.net/neu_chenguangq/article/details/79177335)
 
     是基于Faster R-CNN和C3D网络思想。
