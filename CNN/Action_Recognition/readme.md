@@ -628,6 +628,10 @@
 [Multimodal Keyless Attention Fusion for Video Classification 多模态 LSTM](http://research.baidu.com/Public/uploads/5acc1f9026183.pdf)
 
 
+[行为识别]RPAN：An end-to-end recurrent pose-attention network for action recognition CNN+姿态注意力+lstm](https://blog.csdn.net/neu_chenguangq/article/details/79164830)
+
+[ CNN+姿态注意力+lstm 论文](http://openaccess.thecvf.com/content_ICCV_2017/papers/Du_RPAN_An_End-To-End_ICCV_2017_paper.pdf)
+
 
 ### 数据数据的提纯
     输入一方面指输入的数据类型和格式，也包括数据增强的相关操作。
