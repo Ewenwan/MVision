@@ -3530,7 +3530,7 @@ layer {
 layer {
   name: "conv13_mbox_loc"
   type: "Convolution"
-  bottom: "conv13"
+  bottom: "resx12_elewise"
   top: "conv13_mbox_loc"
   convolution_param {
     num_output: 12
@@ -3569,7 +3569,7 @@ layer {
 layer {
   name: "conv13_mbox_conf"
   type: "Convolution"
-  bottom: "conv13"
+  bottom: "resx12_elewise"
   top: "conv13_mbox_conf"
   convolution_param {
     num_output: 63# cls3x
@@ -3608,7 +3608,7 @@ layer {
 layer {
   name: "conv13_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv13"
+  bottom: "resx12_elewise"
   bottom: "data"
   top: "conv13_mbox_priorbox"
   prior_box_param {
@@ -3626,7 +3626,7 @@ layer {
 layer {
   name: "conv17_mbox_loc"
   type: "Convolution"
-  bottom: "conv17"
+  bottom: "resx16_elewise"
   top: "conv17_mbox_loc"
   param {
     lr_mult: 1.0
@@ -3673,7 +3673,7 @@ layer {
 layer {
   name: "conv17_mbox_conf"
   type: "Convolution"
-  bottom: "conv17"
+  bottom: "resx16_elewise"
   top: "conv17_mbox_conf"
   convolution_param {
     num_output: 126# cls6x
@@ -3712,7 +3712,7 @@ layer {
 layer {
   name: "conv17_mbox_priorbox"
   type: "PriorBox"
-  bottom: "conv17"
+  bottom: "resx16_elewise"
   bottom: "data"
   top: "conv17_mbox_priorbox"
   prior_box_param {
