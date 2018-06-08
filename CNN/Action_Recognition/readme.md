@@ -470,6 +470,10 @@
 
     这篇文章主要是用LSTM来做two-stream network的temporal融合。效果一般
     实验效果：UCF101-88.6% 
+    
+![](https://img-blog.csdn.net/20160920225528864)
+
+![](https://img-blog.csdn.net/20160921212908527)
 
 [LSTM ResNet cnn TSN](https://github.com/woodfrog/ActionRecognition)
 
