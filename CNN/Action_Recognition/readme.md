@@ -88,6 +88,9 @@
     比如MSR Action 3D，HDM05，SBU Kinect Interaction Dataset等。
     这些数据库已经提取了每帧视频中人的骨架信息，基于骨架信息判断运动类型。 
 
+    4. ACTIVITYNET Large Scale Activity Recognition Challenge
+
+
 # 3. 研究进展
     如今人体行为识别是计算机视觉研究的一个热点，
     人体行为识别的目标是从一个未知的视频或者是图像序列中自动分析其中正在进行的行为。
