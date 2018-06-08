@@ -66,6 +66,10 @@
 
 [计算机视觉的一些库文件](https://blog.csdn.net/garfielder007/article/details/50533052)
 
+[人脸检测总结](https://blog.csdn.net/neu_chenguangq/article/details/52983093)
+
+[行为识别总结](https://blog.csdn.net/neu_chenguangq/article/details/79504214)
+
 # 无人驾驶的各个方面知识
 [参考](https://blog.csdn.net/qq_40027052/article/details/78485120)
 
