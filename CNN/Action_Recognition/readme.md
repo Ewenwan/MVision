@@ -546,6 +546,8 @@
 #### P3D  [MSRA]
 [Learning Spatio-Temporal Representation with Pseudo-3D Residual Networks](https://www.microsoft.com/en-us/research/wp-content/uploads/2017/10/iccv_p3d_camera.pdf)
 
+[博客](https://blog.csdn.net/u014380165/article/details/78986416)
+
     改进ResNet内部连接中的卷积形式。然后，超深网络，一般人显然只能空有想法，望而却步。
 
 ### CDC 3D卷积方式的 改进 TPC 时序保留卷积  这里也是 行为检测
@@ -560,7 +562,7 @@
     
 
 ### 其他方法 
-#### PP3D  Temporal Pyramid Pooling
+#### TPP  Temporal Pyramid Pooling
 [End-to-end Video-level Representation Learning for Action Recognition](https://arxiv.org/pdf/1711.04161.pdf)
 
     Pooling。时空上都进行这种pooling操作，旨在捕捉不同长度的讯息。
