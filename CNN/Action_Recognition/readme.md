@@ -707,6 +707,18 @@
     该论文重点在于STCB模块，详情请参阅论文。
     交互方面，在保留空间、时序流的同时，对时空信息进行了一次融合，最后三路融合，得出最后结果
 
+#### SSN（structured segment network，结构化的段网络）
+    通过结构化的时间金字塔对每个行为实例的时间结构进行建模。
+    金字塔顶层有decomposed discriminative model（分解判别模型），
+    包含两个分类器：用于分类行为（针对recognition）和确定完整性（针对localization）。
+    集成到统一的网络中，可以以端到端的方式高效地进行训练。
+    为了提取高质量行为时间proposal，采用temporal actionness grouping (TAG)算法。
+
+[[代码开源](http://yjxiong.me/others/ssn)
+[论文](https://arxiv.org/pdf/1704.06228.pdf)
+[SSN博客解析](https://blog.csdn.net/zhang_can/article/details/79782387)
+
+
 #### 这两篇论文从pooling的层面提高了双流的交互能力
 
 [Attentional Pooling for Action Recognition](https://papers.nips.cc/paper/6609-attentional-pooling-for-action-recognition.pdf)
