@@ -851,7 +851,7 @@
     我们在Kinetics和Charades数据集上进行了详细的研究（分别进行了光流、多尺度测试）。
     我们的方法在所有数据集上都能获得比最新方法更好的结果。
 
-
+![](https://img-blog.csdn.net/20171126000354721?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMDE1ODY1OQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 
 # Non-local算法代码解析
