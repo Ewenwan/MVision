@@ -7,7 +7,7 @@
 
 [室内数据集 Middlebury 双目算法评估](http://vision.middlebury.edu/stereo/eval3/)
 
-[嵌入式 图像滤波卷积计算](http://vision.deis.unibo.it/~smatt/Seminars/Macloc_2017/Convolution_filters_HLS.pdf)
+[嵌入式 图像滤波卷积计算 卷积的简化计算](http://vision.deis.unibo.it/~smatt/Seminars/Macloc_2017/Convolution_filters_HLS.pdf)
 
 ## 0.基础知识 Basic Knowledge
 ### 相机内参数   Intrinsic parameters
