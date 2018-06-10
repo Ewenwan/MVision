@@ -1,5 +1,12 @@
 # 双目slam基础 Stereo camera slam
 [Stereo Vision:Algorithms and Applications 双目宝典](http://vision.deis.unibo.it/~smatt/Seminars/StereoVision.pdf)
+
+[Machine-learning-for-low-level-vision-problems 机器学习实现低层次视觉-深度估计等](http://vision.deis.unibo.it/~smatt/Seminars/Macloc_2017/Machine-learning_for_low_level_vision.pdf)
+
+[室外数据集 Kitti](http://www.cvlibs.net/datasets/kitti/)
+
+[室内数据集 Middlebury 双目算法评估](http://vision.middlebury.edu/stereo/eval3/)
+
 ## 0.基础知识 Basic Knowledge
 ### 相机内参数   Intrinsic parameters
 ```asm
@@ -163,6 +170,13 @@
 
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/8_sn3.PNG)
 
+**匹配误差cnn网络**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/MC-CNN.PNG)
+
+**端到端直接输出深度cnn网络**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/Disp-CNN-NET.PNG)
 
 ## 3. 双目特征匹配 Stereo Feature Matching
 
@@ -170,11 +184,20 @@
     可使用 均值滤波/双边滤波/Census transform/高斯滤波等
     
 ### a. 在极线范围内使用上面的特征计算方法计算 匹配代价Matching cost computation
-    
+**sad差绝对值和**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/sad.PNG)
+
+**censun领域相对关系**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/census.PNG)
+
 **双目匹配 极线范围内快匹配搜索**
+
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/5_stereo_match.PNG)
 
 **视差空间图像 Disparity Space Image (DSI) is a 3D matrix (WxHx(dmaxdmin)**
+
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/9_Disparity_Space_Image.PNG)
 
 ### b. 匹配代价聚合 Cost aggregation
