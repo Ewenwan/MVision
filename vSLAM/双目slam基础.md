@@ -110,6 +110,7 @@
 **校准之后的效果**
 
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/stereo1.PNG)
+
 ## 2. 特征提取 Feature Extraction 
 
 
@@ -118,10 +119,34 @@
 
 ## 4. 三角测量得到深度 Triangulation 
 
-[相似三角形 三角化](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/3_Triangulation.PNG)
+![相似三角形 三角化](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/3_Triangulation.PNG)
+```asm
+    上图中，三角形 P OR OT 相似于 三角形 P p p'
+    更加相似三角形的对应边成比例定理：
+    OR OT/ PX  = p p'/ PZ
+    换成长度：
+    B/Z  = (B+Xt-Xr) / (Z - f)
+        B为基线长度值
+        Z为点P的深度值
+        f为相机焦距值
+        Xr，Xt 为两幅图的匹配点坐标，Xr-Xt 为匹配点视差d
+    化简可以得到：
+    Z = B*f/(Xr-Xt) = B*f/d
 
-[视差与深度的关系](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/disparity_detp.PNG)
+    又有 三角形 OR cx p 相似于 三角形 P X OR
+    得到：
+    OR cx / p cx = P X / OR X
+    换成长度：
+    f/ (Xr - cx) = Z / X
+    得到 ：
+    X = Z/f * (Xr - cx)
+    同理：
+    Y = Z/f * (Yr - cy)
+```
+![视差 与深度的关系](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/disparity_detp.PNG)
 
+    由于 Z =  B*f/d，
+    视差与深度成反比
 
 ## 5. 相邻帧特征匹配 Temporal Feature Matching 
 
