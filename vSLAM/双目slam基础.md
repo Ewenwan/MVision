@@ -185,12 +185,20 @@
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/11_Segmentation.PNG)
 
 ### c. 视差计算&&优化 Disparity computation&&optimization
-**Scanline Optimization (SO)**
+**Scanline Optimization (SO) 线扫描优化**
 
-### d. 视差细化调整 Disparity refinement
-**亚像素调整Sub-pixel interpolation**
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/12_so.PNG)
+
+### d. 视差细化调整 Disparity refinement 剔除外点
+
+**亚像素调整Sub-pixel interpolation**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/Sub-pixel_interpolation.PNG)
+
 **视差滤波**
+
+        中值滤波
+        双边滤波
 
 ## 4. 三角测量得到深度 Triangulation 
 
