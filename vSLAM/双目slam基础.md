@@ -112,9 +112,16 @@
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/stereo1.PNG)
 ## 2. 特征提取 Feature Extraction 
 
+
+
 ## 3. 双目特征匹配 Stereo Feature Matching
 
 ## 4. 三角测量得到深度 Triangulation 
+
+[相似三角形 三角化](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/3_Triangulation.PNG)
+
+[视差与深度的关系](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/disparity_detp.PNG)
+
 
 ## 5. 相邻帧特征匹配 Temporal Feature Matching 
 
