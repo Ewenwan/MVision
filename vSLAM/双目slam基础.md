@@ -104,7 +104,10 @@
         
     其中d为左右两幅图像的视差. 
 ```
-![](1_Stereo_standard_form.PNG)
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/1_Stereo_standard_form.PNG)
+校准之后的效果
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/stereo1.PNG)
 ## 2. 特征提取 Feature Extraction 
 
 ## 3. 双目特征匹配 Stereo Feature Matching
