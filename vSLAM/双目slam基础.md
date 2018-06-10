@@ -348,10 +348,20 @@
 ## 6. 姿态恢复/跟踪/随机采样序列 Incremental Pose Recovery/RANSAC 
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/transformation.PNG)
 
-     计算变换矩阵的初始解：
+    计算变换矩阵的初始解：
+    1、(单应变换/本质矩阵）求初始解
 [2d-2d变换求解算法(单应变换/本质矩阵) 单目里面有说过](https://github.com/Ewenwan/MVision/blob/master/vSLAM/%E5%8D%95%E7%9B%AEslam%E5%9F%BA%E7%A1%80.md)
 
-     3d-2d 匹配点对，使用PnP求解算法得到初始解：
-     
+    2、3d-2d 匹配点对，使用PnP求解算法得到初始解：
+
+    3、3d-3d 匹配点对，使用ICP算法得到初始解：
+
+    鲁棒优化：
+    1、 使用RANSAC随机采样序列一致性算法
+        随机采样一些点对求解，计算剩余点对的误差，统计好的点的数量，选择内点数量多的变换关系
+
+
+    2、最小二乘优化算法优化位置矩阵，使用误差加权的列文伯格马尔夸克算法W-LM更新位姿
+
 [稠密相机跟踪 误差雅克比矩阵求解 最小二乘优化求解](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P12-DenseVO.pdf)
 
