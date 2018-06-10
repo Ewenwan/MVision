@@ -31,6 +31,8 @@
 
 [稠密相机跟踪 误差雅克比矩阵求解](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P12-DenseVO.pdf)
 
+[LSD_slam & 激光雷达slam](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/04_SLAM.pdf)
+
     ch1 Preface 
     ch2 Overview of SLAM & linux, cmake    概述，cmake基础
     ch3 Rigid body motion & Eigen          三维几何
