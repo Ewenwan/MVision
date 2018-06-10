@@ -223,6 +223,33 @@
     由于 Z =  B*f/d，
     视差与深度成反比
 
+### 深度估计总结
+#### 1. 主动方法
+    a. 结构光 Structured light  (Kinect1)  （iPhone X 齐刘海原理） Inter RealSenes
+       光已知空间方向的投影光线的集合称为结构光，结构光激光散斑
+       通过投射具有高度伪随机性的激光散斑，会随着不同距离变换不同的图案，
+       对三维空间直接标记，通过观察物体表面的散斑图案就可以判断其深度。
+    b. ToF - Time of Flight飞行时间法  (Kinect2) 
+       通过连续发射光脉冲（一般为不可见光）到被观测物体上，
+       然后接收从物体反射回去的光脉冲，
+       通过探测光脉冲的飞行（往返）时间来计算被测物体离相机的距离。
+    以上为RGBD传感器   
+    c. LIDAR 激光雷达    (Velodyne) 
+[结构光参考](https://blog.csdn.net/electech6/article/details/78707839)
+
+[飞行时间法](https://blog.csdn.net/electech6/article/details/78349107)
+
+
+#### 2.被动方法
+    a.  双目视觉
+         上面介绍的
+    b. 基于机器学习的单目 深度传感器 Monocular depth* sensors based on ML
+       需要先验知识
+       
+[双目视觉博客参考](https://blog.csdn.net/electech6/article/details/78526800)
+
+[]()
+
 ## 5. 相邻帧特征匹配 Temporal Feature Matching 
     常见的有如下两种方式： 
     1. 计算特征点，然后计算特征描述子，通过描述子来进行匹配，优点准确度高，缺点是描述子计算量大。 
