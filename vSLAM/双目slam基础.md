@@ -134,12 +134,31 @@
                 SURF 梯度的梯度信息 领域内使用赋值对方向加权统计。
 
        2.  卷积网络提取的特征(Learnable feature from Conv-Nets)：
+            输入 两张左右相机图像的图像块 到卷积网络(图片相似度判别网络Siamese network )内
+                 网络先对图像块进行特征提取，然后进行特征匹配，得到匹配代价图
+            输出  matching cost匹配代价图
+            更加匹配代价图，选出合适的匹配点，再计算视差，得到深度。
+            网络形式在后面以图片形式放出。
 
 [Census计算代码](https://github.com/Ewenwan/MVision/blob/master/stereo/stereo/ADCensusBM/src/adcensuscv.cpp)
 
 **census计算示意图**
 
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/4_census.PNG)
+
+
+**相似性卷积网络1 卷积+全连接**
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/6_sn1.PNG)
+
+**相似性卷积网络2 卷积+全连接**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/7_sn2.PNG)
+
+**相似性卷积网络3 卷积+点乘ElementWise+全内容**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/8_sn3.PNG)
+
+
 
 ## 3. 双目特征匹配 Stereo Feature Matching
 
