@@ -1,5 +1,7 @@
 # lsd是一个 大规模的 单目直接法 视觉半稠密 slam系统
 
+[LSD_slam & 激光雷达slam](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/04_SLAM.pdf)
+
 [lad源码解析 参考解析](https://blog.csdn.net/lancelot_vim)
 
 [LSD-SLAM笔记 优秀](https://blog.csdn.net/kokerf/article/details/78005934)
