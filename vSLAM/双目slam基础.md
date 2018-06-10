@@ -287,7 +287,6 @@
        
 [双目视觉博客参考](https://blog.csdn.net/electech6/article/details/78526800)
 
-
 ## 5. 相邻帧特征匹配 Temporal Feature Matching 
     使用双目 左右两幅图 立体匹配的到像素点对应的深度，进而得到3D点坐标
     使用当前帧 和参考帧 (都使用左图) 匹配，恢复相机移动矩阵：
@@ -354,5 +353,5 @@
 
      3d-2d 匹配点对，使用PnP求解算法得到初始解：
      
-
+[稠密相机跟踪 误差雅克比矩阵求解 最小二乘优化求解](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P12-DenseVO.pdf)
 
