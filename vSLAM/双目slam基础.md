@@ -118,7 +118,12 @@
     特征类型：
         1. 手工提取的特征(Hand-crafted feature )：
             a. 领域像素值信息：
-                直接使用领域块像素值  绝对值误差和SAD 误差平方和SSD  相关性NCC(与块均值相关)
+                直接使用领域块像素值  
+                    绝对值误差和SAD 
+                    误差平方和SSD  
+                    相关性NCC(Normalized Cross Correlation 与块均值相关)
+                    STAD truncated absolute differences (TAD) 带最小阈值的 绝对值误差和
+                    sum(min(asb(),thresh))
                 使用领域内像素相对信息 周围点相对于中心点像素值的大小关系 
                     ORB特征 基于 Faster角点与BRIEF描述子。
                     Faster角点特征：
@@ -159,12 +164,30 @@
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/8_sn3.PNG)
 
 
-
 ## 3. 双目特征匹配 Stereo Feature Matching
 
+### 0.计算代价之前一般会预处理 对图像滤波
+    可使用 均值滤波/双边滤波/Census transform/高斯滤波等
+    
+### a. 在极线范围内使用上面的特征计算方法计算 匹配代价Matching cost computation
+    
 **双目匹配 极线范围内快匹配搜索**
-
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/5_stereo_match.PNG)
+
+**视差空间图像 Disparity Space Image (DSI) is a 3D matrix (WxHx(dmaxdmin)**
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/9_Disparity_Space_Image.PNG)
+
+### b. 匹配代价聚合 Cost aggregation
+**场景内不同深度的代价不应该放在一起计算 可依据分割和像素值进行复权值**
+**多窗口
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/10Multiple_Windows.PNG)
+**图分割复权值
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/11_Segmentation.PNG)
+
+### c. 视差计算&&优化 Disparity computation&&optimization
+
+### d. 视差细化调整 Disparity refinement
+
 
 ## 4. 三角测量得到深度 Triangulation 
 
