@@ -70,6 +70,22 @@
 
 [行为识别总结](https://blog.csdn.net/neu_chenguangq/article/details/79504214)
 
+[Free-SpaceEstimation 无障碍物空间估计 稠密地图 栅格地图 动态规划 高度分割 路面信息提取](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/05_free_space.pdf)
+
+[2D Object Detection 2d目标检测 RCNN ](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/05_2D_detection.pdf)
+
+[3D Object Detection 3D目标检测 动机](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/06_3D_detection.pdf)
+
+[Semantic Segmentation 语义分割](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/07_segmentation.pdf)
+
+[Instance-level Segmentation 实例分割](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/08_instance.pdf)
+
+[Tracking 跟踪 ]()
+
+[]()
+
+[]()
+
 # 无人驾驶的各个方面知识
 [参考](https://blog.csdn.net/qq_40027052/article/details/78485120)
 
