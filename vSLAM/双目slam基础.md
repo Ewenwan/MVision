@@ -1,4 +1,73 @@
 # 双目slam基础 Stereo camera slam
+[Stereo Vision:Algorithms and Applications 双目宝典](http://vision.deis.unibo.it/~smatt/Seminars/StereoVision.pdf)
+## 0.基础知识 Basic Knowledge
+### 相机内参数   Intrinsic parameters
+```asm
+    u         x     fx  0  cx
+    v  =  K * y  =  0   fy cy   
+    1         z     0   0   1
+
+     * 相机感光元件CCD的尺寸是8mm X 6mm，
+       帧画面的分辨率设置为640X480，
+       那么毫米与像素点之间的转换关系就是80pixel/mm  80像素每毫米
+     * CCD传感器每个像素点的物理大小为dx*dy，相应地，就有 dx=dy=1/80
+     * 假设像素点的大小为k x l，其中 fx = f / k， fy = f / (l * sinA)， 
+                                   fx = 80*焦距  fy = 80*焦距
+                                   焦距为相机光心到感光平面中心的距离
+       A一般假设为 90°，是指摄像头坐标系的偏斜度（就是镜头坐标和CCD是否垂直）。
+     * 摄像头矩阵（内参）的目的是把图像的点从图像坐标转换成实际物理的三维坐标。
+        因此其中的fx, fy, cx, cy 都是使用类似上面的纲量。
+     * 同样，Q 中的变量 f，cx, cy 也应该是一样的。
+
+                                                 |Xw|
+     *   |u|    |fx  0   cx 0|     |  R   T |    |Yw|
+     *   |v| =  |0   fy  cy 0|  *  |        | *  |Zw| = M * W
+     *   |1|    |0   0   1  0|     | 0 0 0 1|    |1 |
+
+     *   像素坐标齐次表示(3*1)  =  内参数矩阵 齐次表示 3*4  ×  外参数矩阵齐次表示 4*4 ×  物体世界坐标 齐次表示  4*1
+     *   内参数齐次 × 外参数齐次 整合 得到 投影矩阵M  3*4    
+     *   对于左右两个相机 投影矩阵 P1=M1   P2=M2
+     *    世界坐标　W 　---->　左相机投影矩阵 P1 ------> 左相机像素点　(u1,v1,1)
+     *                 ----> 右相机投影矩阵 P２ ------> 右相机像素点　(u2,v2,1)
+
+     以下更加三角测量可以得到：
+     *   Q为 视差转深度矩阵 disparity-to-depth mapping matrix 
+
+     * Z = f*B/d        =   f    /(d/B)    B为相机基线长度  d为两匹配像素的视差
+     * X = Z*(x-cx)/fx = (x-c_x)/(d/B)     相似三角形
+     * Y = Z*(y-cy)/fy = (y-c_x)/(d/B) 
+
+     X        x
+     Y  = Q * y
+     Z        d
+     1        1
+
+     * Q= | 1   0    0         -c_x     |    Q03
+     *    | 0   1    0         -c_y     |    Q13
+     *    | 0   0    0          f       |    Q23
+     *    | 0   0   -1/B   (c_x-c_x')/B |  
+     *              Q32        Q33     
+
+     c_x和c_x'　为左右相机　平面坐标中心的差值（内参数）
+
+     *  以左相机光心为世界坐标系原点   左手坐标系Z  垂直向后指向 相机平面  
+     *        |x|   | x-cx         |     |X'|
+     *        |y|   | y-cy         |     |Y'|
+     *   Q  * |d| = | f            |  =  |Z'| ====>归一化==>  Z = Z/W =  -  f*B/(d-c_x+c_x')
+     *        |1|   |(-d+cx-cx')/B |     |W |
+```
+### 相机畸变参数  Extrinsic parameters
+
+     r^2 = x^2+y^2
+     * 径向畸变矫正 光学透镜特效  凸起                k1 k2 k3 三个参数确定
+     * Xp=Xd(1 + k1*r^2 + k2*r^4 + k3*r^6)
+     * Yp=Yd(1 + k1*r^2 + k2*r^4 + k3*r^6)
+     
+     * 切向畸变矫正 装配误差                         p1  p2  两个参数确定
+     * Xp=Xd + ( 2 * p1 * y   +  p2 * (r^2 +2 * x^2) )
+     * Yp=Yd + ( p1 * (r^2 + 2 * y^2) + 2 * p2 * x )
+
+### 双目外部参数   摆正两相机
 
 ## 1. 双目相机校正Stereo Rectification 
 
@@ -6,7 +75,10 @@
 
 ## 3. 双目特征匹配 Stereo Feature Matching
 
-## 4. 相邻帧特征匹配 Temporal Feature Matching 
+## 4. 三角测量得到深度 Triangulation 
 
-## 5. 姿态恢复/跟踪/随机采样序列 Incremental Pose Recovery/RANSAC 
+## 5. 相邻帧特征匹配 Temporal Feature Matching 
+
+## 6. 姿态恢复/跟踪/随机采样序列 Incremental Pose Recovery/RANSAC 
+
 
