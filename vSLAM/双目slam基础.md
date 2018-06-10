@@ -112,10 +112,40 @@
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/stereo1.PNG)
 
 ## 2. 特征提取 Feature Extraction 
+    一个像素点进行匹配奇异性太大，所以需要对像素点计算特征之后，用像素点的特征来进行匹配
+    匹配之后可以得到视差，进而得到像素点的深度。
 
+    特征类型：
+        1. 手工提取的特征(Hand-crafted feature )：
+            a. 领域像素值信息：
+                直接使用领域块像素值  绝对值误差和SAD 误差平方和SSD  相关性NCC(与块均值相关)
+                使用领域内像素相对信息 周围点相对于中心点像素值的大小关系 
+                    ORB特征 基于 Faster角点与BRIEF描述子。
+                    Faster角点特征：
+                       半径为R的圆周上的像素点的亮度值与中心点的大小关系，大了就为1，小了就为0。
+                    BRIEF描述子：
+                       邻域内随机选择n对像素点(p,q)，比较其灰度值大小，如果I(p)>I(q)，则令其对应的值为1，否则为0。
+                    Census变换特征：
+                       在指定窗口内比较周围亮度值与中心点的大小，大了就为1，小了就为0，
+                       然后每个像素都对应一个二值编码序列，然后通过海明距离来表示两个像素的相似程度。
 
+            b. 领域像素梯度值信息：
+                SIFT 尺度不变特征变换  对像素点领域内 像素梯度方向使用灰度梯度赋值加权统计。
+                SURF 梯度的梯度信息 领域内使用赋值对方向加权统计。
+
+       2.  卷积网络提取的特征(Learnable feature from Conv-Nets)：
+
+[Census计算代码](https://github.com/Ewenwan/MVision/blob/master/stereo/stereo/ADCensusBM/src/adcensuscv.cpp)
+
+**census计算示意图**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/4_census.PNG)
 
 ## 3. 双目特征匹配 Stereo Feature Matching
+
+**双目匹配 极线范围内快匹配搜索**
+
+![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/5_stereo_match.PNG)
 
 ## 4. 三角测量得到深度 Triangulation 
 
@@ -149,7 +179,15 @@
     视差与深度成反比
 
 ## 5. 相邻帧特征匹配 Temporal Feature Matching 
-
+    常见的有如下两种方式： 
+    1. 计算特征点，然后计算特征描述子，通过描述子来进行匹配，优点准确度高，缺点是描述子计算量大。 
+    2. 光流法：在第一幅图中检测特征点，使用光流法(Lucas Kanade method)对这些特征点进行跟踪，
+       得到这些特征点在第二幅图像中的位置，得到的位置可能和真实特征点所对应的位置有偏差。
+       所以通常的做法是对第二幅图也检测特征点，如果检测到的特征点位置和光流法预测的位置靠近，
+       那就认为这个特征点和第一幅图中的对应。
+       在相邻时刻光照条件几乎不变的条件下（特别是单目slam的情形），
+       光流法匹配是个不错的选择，它不需要计算特征描述子，计算量更小。
+       
 ## 6. 姿态恢复/跟踪/随机采样序列 Incremental Pose Recovery/RANSAC 
 
 
