@@ -309,7 +309,43 @@
            光流法匹配是个不错的选择，它不需要计算特征描述子，计算量更小。
          
 [光流计算](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/02_flow.pdf)
-         
+
+[光流场景流](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/03_scene_flow.pdf)  
+**光流计算**
+```asm
+假设1：光照亮度恒定：
+                  I(x, y, t) =  I(x+dx, y+dy, t+dt) 
+                 泰勒展开：
+                  I(x+dx, y+dy, t+dt) =  
+                                        I(x, y, t) + dI/dx * dx + dI/dy * dy + dI/dt * dt
+                                      =  I(x, y, t) + Ix * dx  + Iy * dy + It * dt
+                 得到：
+                      Ix * dx  + Iy * dy + It * dt = 0
+                 因为 像素水平方向的运动速度 u=dx/dt,  像素垂直方向的运动速度 v=dy/dt
+                 等式两边同时除以 dt ,得到：
+                      Ix * dx/dt  + Iy * dy/dt + It = 0
+                      Ix * u  + Iy * v + It = 0
+                 写成矩阵形式：
+                      [Ix, Iy] * [u; v] = -It,  式中Ix, Iy为图像空间像素差值(梯度), It 为时间维度，像素差值
+           假设2：局部区域 运动相同
+                 对于点[x,y]附近的点[x1,y1]  [x2,y2]  , ... , [xn,yn]  都具有相同的速度 [u; v]
+                 有：
+                  [Ix1, Iy1;                      [It1
+                   Ix2, Iy2;                       It2
+                   ...               *  [u; v] = - ...
+                   Ixn, Iyn;]                      Itn]
+                 写成矩阵形式：
+                  A * U = b
+                 由两边同时左乘 A逆 得到：
+                  U = A逆 * b
+                 由于A矩阵的逆矩阵可能不存在，可以曲线救国改求其伪逆矩阵
+                  U = (A转置*A)逆 * A转置 * b
+           得到像素的水平和垂直方向速度以后，可以得到:
+               速度幅值： 
+                        V = sqrt(u^2 + v^2)
+               速度方向：Cet = arctan(v/u)      
+```
+
 ## 6. 姿态恢复/跟踪/随机采样序列 Incremental Pose Recovery/RANSAC 
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/transformation.PNG)
 
