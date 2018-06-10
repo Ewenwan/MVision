@@ -240,6 +240,8 @@
 ### 尺度问题
 ![](https://img-blog.csdn.net/20160229104204048)
 
+[IMU+视觉消除尺度漂移问题](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A21-DealingWithScale.pdf)
+
         这个图简单明了的演示了这种平移缩放作用。
         从图中也可以看出，由于尺度scale的关系，
         不同尺度的F得到不同的t，决定了以后计算点P的深度也是不同的，
