@@ -9,6 +9,9 @@
 
 [嵌入式 图像滤波卷积计算 卷积的简化计算](http://vision.deis.unibo.it/~smatt/Seminars/Macloc_2017/Convolution_filters_HLS.pdf)
 
+[双目 匹配 CRF平滑 后处理](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/02_stereo.pdf)
+
+
 ## 0.基础知识 Basic Knowledge
 ### 相机内参数   Intrinsic parameters
 ```asm
