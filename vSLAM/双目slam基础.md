@@ -105,7 +105,9 @@
     其中d为左右两幅图像的视差. 
 ```
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/1_Stereo_standard_form.PNG)
-校准之后的效果
+
+
+**校准之后的效果**
 
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/stereo1.PNG)
 ## 2. 特征提取 Feature Extraction 
