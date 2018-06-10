@@ -27,7 +27,7 @@
 
 [Kintinuous: Reconstruction of an Apartment ICP+RGBD](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P21-Kintinuous.pdf)
 
-[SLAM++](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P22-SLAM%2B%2B.pdf)
+[SLAM++ 目标水平地图 3d目标位置检测](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P22-SLAM%2B%2B.pdf)
 
 [稠密相机跟踪 误差雅克比矩阵求解](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P12-DenseVO.pdf)
 
