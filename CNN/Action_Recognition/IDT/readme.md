@@ -82,5 +82,10 @@
 
 [Improved Dense Trajectory用法及源码分析](https://blog.csdn.net/zackzhaoyang/article/details/50881114)
 
+[iDT 算法 windows上编译](https://blog.csdn.net/u013913216/article/details/78646461)
 
+## windows上编译细节
+      论文中给出的代码是在Linux系统上编译的，
+      有几个与Linux系统相关的函数，
+      自己在windows vs2013上编译的时候将这些函数用其他的函数代替了。
 
