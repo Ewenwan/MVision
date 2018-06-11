@@ -147,6 +147,8 @@
 #### iDT（improved dense trajectories) 改进
 [iDT论文](https://hal.inria.fr/hal-00873267v2/document)
 
+[LEAR实验室 这个实验室个人感觉很不错，放出来的代码基本都能work，而且有不错的的效果。](http://lear.inrialpes.fr/software)
+
 ```asm
     1. 剔除相机运动引起的背景光流
         a. 使用SURF特征算法匹配前后两帧的 匹配点对，这里会使用人体检测，剔除人体区域的匹配点，运动量大，影响较大；
