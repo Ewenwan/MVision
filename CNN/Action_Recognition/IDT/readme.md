@@ -75,3 +75,12 @@
       p2 = K( RP + t) = KTP = H21 * KP 
       T = K 逆 * H21*K 
 
+## 代码
+[(iDT(improved Dense Trajectory)源代码](http://lear.inrialpes.fr/people/wang/dense_trajectories))
+
+[行为识别笔记：iDT算法用法与代码解析1](https://blog.csdn.net/wzmsltw/article/details/53221179)
+
+[Improved Dense Trajectory用法及源码分析](https://blog.csdn.net/zackzhaoyang/article/details/50881114)
+
+
+
