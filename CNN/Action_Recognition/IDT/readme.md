@@ -89,3 +89,6 @@
       有几个与Linux系统相关的函数，
       自己在windows vs2013上编译的时候将这些函数用其他的函数代替了。
 
+[ windows上编译细节参考ao](https://blog.csdn.net/u013913216/article/details/78646461)
+
+
