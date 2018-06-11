@@ -6,7 +6,9 @@
 [基于Deep Learning 的视频识别技术](https://yq.aliyun.com/articles/39134)
 
 [科研成果----中国科学院深圳先进技术研究院 面向人体姿态行为理解的深度学习方法 ](http://ice.dlut.edu.cn/valse2018/ppt/YuQiao_valse_2018-pose_and_behavior.pdf)
-    
+
+[CVPR 2014 Tutorial on Emerging Topics in Human Activity Recognition](http://michaelryoo.com/cvpr2014tutorial/)
+
 # 行为检测 Action Detection                            类似图像目标检测
     但在现实应用中更容易遇到的情况是序列尚未在时域分割（Untrimmed），
     因此需要同时对行为动作进行时域定位（分割）和类型判定，这类任务一般称为行为检测。
