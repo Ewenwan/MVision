@@ -1,5 +1,6 @@
 # Parallel Tracking And Mapping (PTAM)
-
+      ORB-SLAM就是继承并改进PTAM的
+      
 [项目主页](http://www.robots.ox.ac.uk/~gk/PTAM/)
 
 ## 主要原理是: 
