@@ -284,7 +284,7 @@
 
 [Incremental 滤波器优化 非线性最小二乘优化等](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A22-Incremental.pdf)
 
-[LoopClosing闭环检测](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A23-LoopClosing.pdf)
+[LoopClosing闭环检测 移动设备VSLAM](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A23-LoopClosing.pdf)
 
 [大尺度地图高效构建](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-P11-LargeScaleEfficiency.pdf)
 
