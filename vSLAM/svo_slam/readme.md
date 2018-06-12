@@ -529,12 +529,40 @@
         这是多视角几何的基础内容(可以参看圣经Hartly的《Multiple View Geometry in Computer Vision》
         中的第十二章structure computation.
         
-         相机归一化平面下的点  x1  x2
-        p1 = k × [R1 t1] × D       k逆 × p1 =  [R1 t1] × D     x1 = T1 × D    x1叉乘x1 =  x1叉乘T1 × D = 0
-        p2 = k × [ R2 t2]  × D     k逆 × p2 =  [R2 t2] × D     x2 = T2 × D    x2叉乘x2 =  x2叉乘T2 × D = 0      
-        式中：x1 = k逆 × p1 ，x2 = k逆 × p2 ， T= [R, t] 已知
-        可以求解D 
-        D是3维齐次坐标，需要除以第四个尺度因子 归一化.
+        用单应变换矩阵H或者本质矩阵E 求解得到相邻两帧的变换矩阵R,t后就可是使用类似双目的
+        三角测距原理来得到深度。
+![](https://img-blog.csdn.net/20160301171837557)
+
+        上图中的物理物理中的点    P =[X,Y,Z,1]
+        在两相机归一化平面下的点  x1  x2  [x,y,z]
+        在两相机像素平面上的点    p1, p2，匹配点对　[u,v,1]
+        p1 = k × [R1 t1] × P   
+        左乘　k逆 × p1 =  [R1 t1] × P   
+        得到　x1 = T1 × P   
+        计算　x1叉乘x1 =  x1叉乘T1 × P = 0
+        这里 T1 = [I, 0 0 0] 为单位矩阵。
+        p2 = k × [R2 t2]  × P    
+        左乘　k逆 × p2 =  [R2 t2] × P    
+        得到　x2 = T2 × P   
+        消去　x2叉乘x2 =  x2叉乘T2 × P = 0      
+        式中：
+         x1 = k逆 × p1 ，
+         x2 = k逆 × p2 ， 
+         T2= [R, t]为帧1变换到帧2的 已知
+        得到两个方程
+        x1叉乘T1 × P = 0
+         x2叉乘T2 × P = 0 
+         写成矩阵形式　A*P = 0
+         A = [x1叉乘T1; x2叉乘T2]
+        这又是一个要用最小二乘求解的线性方程方程组 ,和求本征矩阵一样，
+        计算矩阵A的SVD分解，然后奇异值最小的那个奇异向量就是三维坐标P的解。
+        P是3维齐次坐标，需要除以第四个尺度因子 归一化. 
+        [U,D,V] = svd(A);
+        P = V[:,4] 最后一列
+        P = P/P(4)；// 归一化
+        以上也是由本质矩阵E = t 叉乘 R 恢复变换矩阵R,t的时候，有四种情况，但是只有一种是正确的。
+        而判断正确的标准，就是按照这个R,t 计算出来的深度值都是正值，因为相机正前方为Z轴正方向。
+        
 [三角法求深度（triangulation）](https://blog.csdn.net/heyijia0327/article/details/50774104)
         
         
@@ -616,7 +644,8 @@
 
         一幅图像对应另外n幅图像，可以看作为n个深度传感器，
         把得到点的深度信息的问题看作是有噪声的多传感器数据融合的问题，
-        使用Gaussian Uniform mixture model（高斯均匀混合模型,GUMM,另外GMM高斯混合模型）来对这一问题进行建模，
+        使用Gaussian Uniform mixture model
+        （高斯均匀混合模型,GUMM,另外GMM高斯混合模型）来对这一问题进行建模，
         假设好的测量值符合正态分布，
         噪声符合均匀分布，
         好的测量值的比例为pi，
@@ -683,23 +712,54 @@
         后，祝大家好运，一起分享知识。 
         
 # SVO代码
-        SVO也是将一帧图像处理成多层图像金字塔形式，跟踪过程，也就是通过灰度残差最小来算相机位姿，这部分都在FrameHandlerMono类的addImage方法中，addImage方法完成初始化过程和相机位姿跟踪的部分，跟踪部分中存在四个系统状态：第一帧，第二帧，其他帧，relocalizing （这个状态要干什么还不是特别清楚），一二帧是初始化（算单应矩阵分解求位姿），其他帧就是有了初始地图之后的跟踪过程，具体函数为FrameHandlerMono类的processFrame函数，这个函数中的跟踪过程与论文中基本一样，也包括几个步骤：图像配准（alignment）求位姿，优化特征点的二维坐标，同时优化位姿和特征点坐标（BA）。
-        建图部分的主要函数在depthfilter类中，流程是首先在ros节点调用的时候会调用这个类的startThread函数，新开线程，线程里运行depthfiler类中的updateSeedsLoop方法，大致过程也就是等tracking部分向一个vector或者list中填充它选择的关键帧，如果有，就进行概率化建图，这个部分还没仔细看。
-        另外李群中的SE3在PTAM，SVO中都会出现，应该是表示T，相机位姿，但是感觉需要找点中文资料再看看SE3的具体含义。
+        SVO也是将一帧图像处理成多层图像金字塔形式，跟踪过程，也就是通过灰度残差最小来算相机位姿，
+        这部分都在FrameHandlerMono类的addImage方法中，addImage方法完成初始化过程和相机位姿跟踪的部分，
+        跟踪部分中存在四个系统状态：
+        第一帧，
+        第二帧，
+        其他帧，relocalizing （这个状态要干什么还不是特别清楚），
+        一二帧是初始化（算单应矩阵分解求位姿），
+        其他帧就是有了初始地图之后的跟踪过程，具体函数为FrameHandlerMono类的processFrame函数，
+        这个函数中的跟踪过程与论文中基本一样，也包括几个步骤：图像配准（alignment）求位姿，
+        优化特征点的二维坐标，同时优化位姿和特征点坐标（BA）。
+        建图部分的主要函数在depthfilter类中，流程是首先在ros节点调用的时候会调用这个类的startThread函数，
+        新开线程，线程里运行depthfiler类中的updateSeedsLoop方法，
+        大致过程也就是等tracking部分向一个vector或者list中填充它选择的关键帧，
+        如果有，就进行概率化建图，这个部分还没仔细看。
+        另外李群中的SE3在PTAM，SVO中都会出现，
+        应该是表示T，相机位姿，但是感觉需要找点中文资料再看看SE3的具体含义。
 
-        对应SVO论文中跟踪部分的三个过程，一是通过当前帧和上一帧的特征点对应的patch之间的灰度残差最小来求当前帧的位姿（即SE(3) T），一个函数完成，这是一个粗略估计，有了这个粗略估计就可以进行下一步：把地图中已有的在当前帧可见的特征点重投影到当前帧，一个重投影函数完成，这个重投影过程完成之后会分析重投影的质量，也就是匹配到的特征点对的个数，当点对太少的时候就会直接把当前帧的位姿设置为上一帧的位姿，并报错匹配特征点过少，这也是我常遇到的问题。最后是优化两个部分：一是之前粗略估计出的T，这一步叫做pose优化；二是投影到当前帧的点在世界坐标系下的坐标点，这一步叫做structure优化。最后是可选的BA算法同时对位姿和三维点坐标进行优化。
-
-
+        对应SVO论文中跟踪部分的三个过程，
+        一是通过当前帧和上一帧的特征点对应的patch之间的灰度残差最小来求当前帧的位姿（即SE(3) T），
+        一个函数完成，这是一个粗略估计，有了这个粗略估计就可以进行下一步：
+        把地图中已有的在当前帧可见的特征点重投影到当前帧，一个重投影函数完成，
+        这个重投影过程完成之后会分析重投影的质量，也就是匹配到的特征点对的个数，
+        当点对太少的时候就会直接把当前帧的位姿设置为上一帧的位姿，并报错匹配特征点过少，
+        这也是我常遇到的问题。
+        最后是优化两个部分：
+        一是之前粗略估计出的T，这一步叫做pose优化；
+        二是投影到当前帧的点在世界坐标系下的坐标点，
+        这一步叫做structure优化。
+        最后是可选的BA算法同时对位姿和三维点坐标进行优化。
+        
         以下分析均在rpg_svo文件夹下：
-        first：在svo_ros/src中vo_node文件中包含了了节点类vo_node的相关声明，并包含一个main函数
+        first：在svo_ros/src中vo_node文件中包含了了节点类vo_node的相关声明，
+        并包含一个main函数
         vo_node.cpp的main中:
-        1.包含一些ros节点的基本操作，在vo_node的构造函数中，实例化了一个FrameHandlerMono的对象vo_，并运行vo_->start
-        2.使用subscribe(cam_topic, 5, &svo::VoNode::imgCb, &vo_node)，每次获得图像时使用VoNode中的imgCb方法处理
-        3.在imgCb方法中，运行了FrameHandlerMono对象vo_的成员函数addImage，此方法中其他的部分是关于显示的，即Visualizer类的一些操作。
+        1.包含一些ros节点的基本操作，在vo_node的构造函数中，
+          实例化了一个FrameHandlerMono的对象vo_，并运行vo_->start
+        2.使用subscribe(cam_topic, 5, &svo::VoNode::imgCb, &vo_node)，
+          每次获得图像时使用VoNode中的imgCb方法处理
+        3.在imgCb方法中，运行了FrameHandlerMono对象vo_的成员函数addImage，
+          此方法中其他的部分是关于显示的，即Visualizer类的一些操作。
         3.当ros::ok()为真，且vo_node.quit_为假时，循环ros::spinOnce()
 
         ----------------------------------------------------------------------------------------------
         FrameHandlerMono类继承自FrameHandlerBase类：
         1.其构造函数中运行FrameHandlerMono.initialize()
-        2.initialize()函数中实例化DepthFilter类的一个对象，运行此对象的startThread()函数，此函数使用boost的thread方法新建了一个线程，并在此线程中运行DepthFilter.updateSeedsLoop函数。
-        3.在updateSeedsLoop函数中，会检查frame_queue_队列中是否有FramePtr存在，FramePtr在global.h中定义为boost::shared_ptr
+        2.initialize()函数中实例化DepthFilter类的一个对象，
+          运行此对象的startThread()函数，此函数使用boost的thread方法新建了一个线程，
+          并在此线程中运行DepthFilter.updateSeedsLoop函数。
+        3.在updateSeedsLoop函数中，
+          会检查frame_queue_队列中是否有FramePtr存在，
+          FramePtr在global.h中定义为boost::shared_ptr
