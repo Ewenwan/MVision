@@ -174,5 +174,9 @@
       块匹配：基于SSD的相似度计算，而没有用特征进行匹配，
              和SVO 一样，用的是 patch（8x8 方块）,计算相似度匹配时，需要先进行仿射变换，形状变化了。
           例如ORB-SLAM使用ORB特征进行特征匹配计算位姿，回环检测和重定位。
-          
+ 
+[PTAM之Mapping线程 对极几何　单应矩阵　主平面　PCA分解求法线　](https://blog.csdn.net/ilotuo/article/details/51831010)
+ 
+[PTAM之姿态估计 ](https://blog.csdn.net/ilotuo/article/details/51830928)
+   
 ## 9. 代码分析
