@@ -11,6 +11,8 @@
 
 [双目 匹配 CRF平滑 后处理](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/02_stereo.pdf)
 
+**针孔相机模型**
+![](http://ofr08plvj.bkt.clouddn.com/pinhole_camera_model.png)
 
 ## 0.基础知识 Basic Knowledge
 ### 相机内参数   Intrinsic parameters
