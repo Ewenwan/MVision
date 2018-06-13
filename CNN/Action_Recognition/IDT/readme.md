@@ -76,7 +76,13 @@
       T = K 逆 * H21*K 
 
 ## 代码
+      作者给出的代码只包括了密集采样+轨迹跟踪+特征提取三个部分，后续的特征编码部分未给出
+      
 [(iDT(improved Dense Trajectory)源代码](http://lear.inrialpes.fr/people/wang/dense_trajectories))
+
+[idt轨迹跟踪特征代码](http://lear.inrialpes.fr/people/wang/download/dense_trajectory_release_v1.2.tar.gz)
+
+[fv编码代码](https://github.com/chensun11/dtfv)
 
 [行为识别笔记：iDT算法用法与代码解析1](https://blog.csdn.net/wzmsltw/article/details/53221179)
 
