@@ -97,4 +97,32 @@
 
 [ windows上编译细节参考ao](https://blog.csdn.net/u013913216/article/details/78646461)
 
+## 批量化运行
+      在做自己的数据库时，不可能一个视频一个视频的去输入，
+      这时可以写一个vim脚本，来批量运行，可以参考如下代码：
+```asm   
+      #!/usr/bin/env bash
+
+      cmd="release/DenseTrackStab"
+      filePath="" #数据存放路径
+      fileType=".txt"
+      function readfile(){
+      for file in `ls $1`
+      do
+        if [ -d $1"/"$file ]
+        then
+            readfile $1"/"$file
+        else
+            echo $file
+            $cmd $1"/"$file
+        fi
+      done
+      }
+      readfile $filePath
+```
+
+## idt 特征提取
+
+## fv特征编码
+
 
