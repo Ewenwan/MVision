@@ -7,6 +7,7 @@
 
 [github源码](github.com/vlfeat/vlfeat)
 
+    linux下直接 make编译
     编译好vl_feat工具箱后，将vlfeats/bin/glnx64中的libvl.so文件
     拷贝到dtfv/src/vl文件夹中，
     如果拷贝glnx86中的libvl.so后编译时会报错
