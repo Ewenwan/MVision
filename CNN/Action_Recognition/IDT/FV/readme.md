@@ -13,3 +13,10 @@
     如果拷贝glnx86中的libvl.so后编译时会报错
     
 ## 编译 dtfv
+    cd defv/src
+    make 
+    
+## 运行dtfv
+    1. 修改配置文件
+       dtfv/script/extract_fv.py
+       
