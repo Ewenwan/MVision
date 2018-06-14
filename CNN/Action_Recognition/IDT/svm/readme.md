@@ -85,6 +85,46 @@
     -1 1:-0.375 2:1 3:-0.333333…. 10:-1 11:-1 12:-1 13:1
     -1 1:0.166667 2:1 3:1 …. 10:-0.870968 12:-1 13:0.5
    
+# svmtrain的用法
+
+    vmtrain我们在前面已经接触过，他主要实现对训练数据集的训练，并可以获得SVM模型。
+    用法： 
+    svmtrain [options] training_set_file [model_file]
+    其中，options为操作参数，可用的选项即表示的涵义如下所示:
+    -s设置svm类型：
+            0 – C-SVC
+            1 – v-SVC
+            2 – one-class-SVM
+            3 –ε-SVR
+            4 – n - SVR
+
+    -t设置核函数类型，默认值为2
+            0 --线性核：u'*v
+
+            1 --多项式核：(g*u'*v+coef0)degree
+
+            2 -- RBF核：exp(-γ*||u-v||2)
+
+            3 -- sigmoid核：tanh(γ*u'*v+coef0)
+    -d degree:设置多项式核中degree的值，默认为3
+    -gγ:设置核函数中γ的值，默认为1/k，k为特征（或者说是属性）数；
+    -r coef 0:设置核函数中的coef 0，默认值为0；
+    -c cost：设置C-SVC、ε-SVR、n - SVR中从惩罚系数C，默认值为1；
+    -n v：设置v-SVC、one-class-SVM与n - SVR中参数n，默认值0.5；
+    -pε：设置v-SVR的损失函数中的e，默认值为0.1；
+    -m cachesize：设置cache内存大小，以MB为单位，默认值为40；
+    -eε：设置终止准则中的可容忍偏差，默认值为0.001；
+    -h shrinking：是否使用启发式，可选值为0或1，默认值为1；
+    -b概率估计：是否计算SVC或SVR的概率估计，可选值0或1，默认0；
+    -wi weight：对各类样本的惩罚系数C加权，默认值为1；
+    -v n：n折交叉验证模式；
+    model_file：可选项，为要保存的结果文件，称为模型文件，以便在预测时使用。
+
+    默认情况下，只需要给函数提供一个样本文件名就可以了，
+    但为了能保存结果，还是要提供一个结果文件名，
+    比如:test.model,则命令为：
+        svmtrain test.txt test.model   
+
 # 5.2 svm-predict 预测
     svmpredict 的语法是 :
 
@@ -111,6 +151,26 @@
         Squared correlation coefficient = 0.532639(regression)
 
     =====================================
+    
+# svmpredict的用法
+
+    svmpredict是根据训练获得的模型，对数据集合进行预测。
+
+    用法：svmpredict [options] test_file model_file output_file
+
+    其中，options为操作参数，可用的选项即表示的涵义如下所示:
+
+         -b probability_estimates——
+                       是否需要进行概率估计预测，可选值为0或者1，默认值为0。
+
+         model_file —— 是由svmtrain产生的模型文件；
+
+         test_file —— 是要进行预测的数据文件，格式也要符合libsvm格式，
+                      即使不知道label的值，也要任意填一个，
+                      svmpredict会在output_file中给出正确的label结果，
+                      如果知道label的值，就会输出正确率；
+
+         output_file ——是svmpredict的输出文件，表示预测的结果值。
     
 # libSVM的数据格式
 
