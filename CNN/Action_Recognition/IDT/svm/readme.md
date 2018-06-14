@@ -39,7 +39,7 @@
 # 4.1 svm-train 寻训练
     svmtrain 的语法大致就是:
     svm-train [options] training_set_file [model_file]
-    
+
     training_set_file 就是之前的格式，而 model_file 
     假设不给就会叫[training_set_file].model.options 能够先不要给。
 
@@ -55,33 +55,42 @@
     obj = -100.877286, rho = 0.424632 
     nSV = 132, nBSV = 107 
     Total nSV = 132
-
     ======================
-    
+
+    其中，#iter为迭代次数，
+    nu是你选择的核函数类型的参数，
+    obj为SVM文件转换为的二次规划求解得到的最小值，
+    rho为判决函数的偏置项b，
+    nSV为标准支持向量个数(0<a[i]<c)，
+    nBSV为边界上的支持向量个数(a[i]=c)，
+    Total nSV为支持向量总个数
+    对于两类来说，因为只有一个分类模型Total 
+    nSV = nSV，但是对于多类，这个是各个分类模型的nSV之和）。
+   
 # 5.2 svm-predict 预测
-svmpredict 的语法是 :
+    svmpredict 的语法是 :
 
-svm-predict  test_file model_file  output_file
+    svm-predict  test_file model_file  output_file
 
-(1)test_file就是我们要预測的数据,它的格式svmtrain的输入，
-    也就是training_set_file是一样的,只是每行最前面的label能够省略(由于预測就是要预測那个label)。
-    但假设test_file有label的值的话，predict完会顺便拿predict出来的值跟test_file里面写的值去做比对，
-    这代表：test_file写的label是真正的分类结果拿来跟我们预測的结果比对就能够知道预測的效果。
-    所以我们能够拿原training set当做test_file再丟给svm-predict去预測(由于格式一样),看看正确率有多高，
-    方便后面调參数.其他參数就非常好理解了
+    (1)test_file就是我们要预測的数据,它的格式svmtrain的输入，
+        也就是training_set_file是一样的,只是每行最前面的label能够省略(由于预測就是要预測那个label)。
+        但假设test_file有label的值的话，predict完会顺便拿predict出来的值跟test_file里面写的值去做比对，
+        这代表：test_file写的label是真正的分类结果拿来跟我们预測的结果比对就能够知道预測的效果。
+        所以我们能够拿原training set当做test_file再丟给svm-predict去预測(由于格式一样),看看正确率有多高，
+        方便后面调參数.其他參数就非常好理解了
 
-(2)model_file就是svm-train出来的文件;
-    heart_scale.out： 
-    执行代码
+    (2)model_file就是svm-train出来的文件;
+        heart_scale.out： 
+        执行代码
 
-    ./svm-predict heart_scale heart_scale.model heart_scale.out
-    
-    得到输出：
+        ./svm-predict heart_scale heart_scale.model heart_scale.out
 
-    ===================================== 
-    Accuracy = 86.6667% (234/270) (classification) 
-    Mean squared error = 0.533333 (regression) 
-    Squared correlation coefficient = 0.532639(regression)
+        得到输出：
+
+        ===================================== 
+        Accuracy = 86.6667% (234/270) (classification) 
+        Mean squared error = 0.533333 (regression) 
+        Squared correlation coefficient = 0.532639(regression)
 
     =====================================
 # fv 编码后的特征分类实例
