@@ -258,15 +258,32 @@
     并提供了线性、多项式、径向基和S形函数四种常用的核函数供选择。
 
 ## fv编码分类 选项
-    svm_option='-s 0 -t 0 -q -w0 0.5 -w1 0.5 -c 100 -b 1'; 
+    # svm_option='-s 0 -t 0 -q -w0 0.5 -w1 0.5 -c 100 -b 1'; 
+    svm_option='-s 0 -t 0 -q -c 100 -b 1'; 
     -s 0 – C-SVC
     -t 0 --线性核：u'*v
     -wi weight：对各类样本的惩罚系数C加权，默认值为1；
     -c cost：设置C-SVC、ε-SVR、n-SVR中从惩罚系数C，默认值为1；
     -b概率估计：是否计算SVC或SVR的概率估计，可选值0或1，默认0；
     
+    train训练：
     
+        numLabels=max(trainLabel);//类别数量
+        model = cell(numLabels,1);// 一对多分类器的话，就应该有类别数量个二分类器
+        for i=1:numLabels
+            model{i} = svmtrain(double(trainLabel==i), trainData, '-q -c 100 -t 0 -b 1');//训练每一个 一对多二分类器并保存
+        end
     
-    
-    
+    测试预测阶段：
+        prob = zeros(size(testData,1),numLabels);// 每个视频有 类别个数个预测标签
+        for i=1:numLabels//每一个模型
+            [~,~,p] = svmpredict(double(testLabel==i), testData, model{i}, '-b 1');
+            prob(:,i) = p(:,model{i}.Label==1);    %# probability of class==k 每一列是一个模型的预测输出
+        end
+        
+        % predict the class with the highest probability
+        [~,pred] = max(prob,[],2);
+        acc = sum(pred == testLabel) ./ numel(testLabel);    %# accuracy
+
+
     
