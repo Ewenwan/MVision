@@ -246,6 +246,18 @@
     顾名思义，高斯混合模型是由很多个高斯分布组成的模型，每一个高斯分布都是一个component。
     每一个component Nk∼(μk,σk)，k=1,2,…K对应的是一个聚类中心，这个聚类中心的坐标可以看作(μk,σk)
     
+    一般解高斯混合模型都用的是EM算法(期望最大化算法)。 
+    EM算法分为两步： 
+    在E-step中，估计数据由每个component生成的概率。 
+        假设μ,Σ,ϕ已知，对于每个数据 xi 来说，它由第k个component 生成的概率为 
+    在M-step中，估计每个component的参数μk,Σk,πkk=1,…K。 
+        利用上一步得到的pik，它是对于每个数据 xi 来说，它由第k个component生成的概率，
+        也可以当做第k个component在生成这个数据上所做的贡献，或者说，
+        我们可以看作 xi这个值其中有pikxi 这部分是由 第k个component所生成的。
+        现在考虑所有的数据，可以看做第k个component生成了 p1kx1,…,pNkxN 这些点。
+        由于每个component 都是一个标准的 Gaussian 分布，可以很容易的根据期望、方差的定义求出它们： 
+    重复迭代前面两步，直到似然函数的值收敛为止。
+
 
 [VLFeat数学推导](http://www.vlfeat.org/api/fisher-fundamentals.html)
 
