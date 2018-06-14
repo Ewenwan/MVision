@@ -3,6 +3,8 @@
 
 [libsvm源码](https://github.com/Ewenwan/libsvm)
 
+[libSVM源码分析](https://blog.csdn.net/cyningsun/article/details/8705648)
+
 # 简介
     LibSVM是台湾林智仁(Chih-Jen Lin)教授2001年开发的一套支持向量机的库，
     这套库运算速度还是挺快的，可以很方便的对数据做分类或回归。由于libSVM程序小，
