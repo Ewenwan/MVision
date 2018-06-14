@@ -13,6 +13,8 @@
 
 [SVO 代码笔记](http://www.cnblogs.com/luyb/p/5773691.html)
 
+[SVO代码分析（一）结构](https://www.cnblogs.com/hxzkh/p/8607714.html)
+
 [项目主页](https://github.com/uzh-rpg/rpg_svo)
 
 [ssvo类似代码](https://github.com/kokerf/ssvo)
