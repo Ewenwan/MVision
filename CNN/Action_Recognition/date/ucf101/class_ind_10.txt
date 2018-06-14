@@ -1,0 +1,10 @@
+1 ApplyEyeMakeup
+2 ApplyLipstick
+3 Archery
+4 BabyCrawling
+5 BalanceBeam
+6 BandMarching
+7 BaseballPitch
+8 Basketball
+9 BasketballDunk
+10 BenchPress
