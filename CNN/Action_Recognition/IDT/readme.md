@@ -123,6 +123,51 @@
 
 ## idt 特征提取
 
+** 输出feature的结构：
+
+      特征是一个接一个计算的每一个都是单独一列，由下面的格式给出：
+
+      frameNum mean_x mean_y var_x var_y length scale x_pos y_pos t_pos Trajectory HOG HOF MBHx MBHy
+
+      前十个部分是关于轨迹的：
+
+      frameNum:     The trajectory ends on which frame
+
+      mean_x:       The mean value of the x coordinates of the trajectory
+
+      mean_y:       The mean value of the y coordinates of the trajectory
+
+      var_x:        The variance of the x coordinates of the trajectory
+
+      var_y:        The variance of the y coordinates of the trajectory
+
+      length:       The length of the trajectory
+
+      scale:        The trajectory is computed on which scale
+
+      x_pos:        The normalized x position w.r.t. the video (0~0.999), for spatio-temporal pyramid
+
+      y_pos:        The normalized y position w.r.t. the video (0~0.999), for spatio-temporal pyramid
+
+      t_pos:        The normalized t position w.r.t. the video (0~0.999), for spatio-temporal pyramid
+
+      下面的5个部分是一个接一个连起来的：
+
+      Trajectory:    2x[trajectory length] (default 30 dimension)
+
+      HOG:           8x[spatial cells]x[spatial cells]x[temporal cells] (default 96 dimension)
+
+      HOF:           9x[spatial cells]x[spatial cells]x[temporal cells] (default 108 dimension)
+
+      MBHx:          8x[spatial cells]x[spatial cells]x[temporal cells] (default 96 dimension)
+
+      MBHy:          8x[spatial cells]x[spatial cells]x[temporal cells] (default 96 dimension)
+
+
+
+每隔设定的帧长度会从零开始再计算。
+
+
 ## fv特征编码
 
 
