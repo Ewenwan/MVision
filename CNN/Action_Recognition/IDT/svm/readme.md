@@ -330,5 +330,19 @@
     10
     10
     10
-
     
+    % X为300*2 矩阵 2个特征 300个样本  
+    group=zeros(300,1);  
+    for i=1:300  
+        if i<=100       
+        group(i)=1;    % 第一类 
+        else if i<=200 
+        group(i)=2;    % 第二类 
+        else  
+        group(i)=3;    % 第三类  
+            end  
+        end  
+    end  
+    svmStruct=svmtrain(group,X,'-s 0 -t 2 -c 1.2 -g 2.8')%train  
+    [predict_label, accuracy, dec_values] =svmpredict(group, X, svmStruct) % test  
+
