@@ -266,6 +266,19 @@
     -c cost：设置C-SVC、ε-SVR、n-SVR中从惩罚系数C，默认值为1；
     -b概率估计：是否计算SVC或SVR的概率估计，可选值0或1，默认0；
     
+    
+    一对多svm 
+    double(trainLabel==i) 可以得到标签：
+    1   特征
+    1   特征
+    1   特征
+    0  
+    0
+    0
+    0
+    0
+    0
+    0
     train训练：
     
         numLabels=max(trainLabel);//类别数量
@@ -284,6 +297,38 @@
         % predict the class with the highest probability
         [~,pred] = max(prob,[],2);
         acc = sum(pred == testLabel) ./ numel(testLabel);    %# accuracy
-
+        
+    多对对svm libsvmv本身就支持
+    不过标签和上面的不一样
+    1
+    1
+    1
+    2
+    2
+    2
+    2
+    2
+    3
+    3
+    4
+    4
+    5
+    5
+    5
+    6
+    6
+    7
+    7
+    7
+    8
+    8
+    8
+    8
+    9
+    9
+    9
+    10
+    10
+    10
 
     
