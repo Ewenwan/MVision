@@ -115,10 +115,16 @@
 ### 特征综述
 
 ### 密集轨迹算法(DT算法) iDT（improved dense trajectories)特征
-     ”Action recognition with improved trajectories”
+     Action Recognition by Dense Trajectories
+     Action recognition with improved trajectories
+     
 [iDT算法](https://blog.csdn.net/wzmsltw/article/details/53023363) 
+
 [iDT算法用法与代码解析](https://blog.csdn.net/wzmsltw/article/details/53221179)
+
 [Stacked Fisher Vector 编码 基本原理 ](https://blog.csdn.net/wzmsltw/article/details/52050112)
+
+[DT论文](Action Recognition by Dense Trajectories)
 
     基本思路：
             DT算法的基本思路为利用光流场来获得视频序列中的一些轨迹，
