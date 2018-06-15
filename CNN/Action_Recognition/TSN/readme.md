@@ -7,6 +7,8 @@
 
 [(TSN)实验及错误日志](https://blog.csdn.net/cheese_pop/article/details/79958090)
 
+[tensorFlow PyTorch 版本](https://github.com/yjxiong/tsn-pytorch)
+
     这篇文章是港中文Limin Wang大神的工作，他在这方面做了很多很棒的工作，
     可以followt他的主页：http://wanglimin.github.io/ 。
 
