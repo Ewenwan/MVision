@@ -19,6 +19,50 @@
         2. 构：尝试了GoogLeNet,VGGNet-16及BN-Inception三种网络结构，其中BN-Inception的效果最好。
         3. 包括 跨模态预训练，正则化，数据增强等。
         4. 果：UCF101-94.2%，HMDB51-69.4% 
+# 安装 下载项目代码，并编译
+## 安装编译
+    git clone --recursive https://github.com/yjxiong/temporal-segment-networks
+    bash build_all.sh; 
+    或者多GPU并行：
+    MPI_PREFIX=<root path to openmpi installation> 
+    bash build_all.sh MPI_ON 
+    build_all.sh文件会下载opencv 2.4.13，
+    denseflow(用来截取视频帧和光流)，
+    并且编译caffe-action (双流网络结构)
+    这里有一点值得注意的是需要先clone代码，再编译。
+    如果是从网上download的代码直接编译的话，会因为缺少部分文件导致编译失败。 
+    
+## 获取视频帧和光流
+    论文中使用的数据库是HMDB-51和UCF-101，可以到他们的数据库官网中下载，并解压。 
+    获取视频帧和光流代码： 
+    bash scripts/extract_optical_flow.sh SRC_FOLDER OUT_FOLDER NUM_WORKER 
+    各参数含义如下： 
+    - SRC_FOLDER 数据集路径 
+    - OUT_FOLDER 提取的rgb帧和光流帧 
+    - NUM_WORKER 使用的gpu数量 >= 1
+
+## 下载预训练好的模型
+    bash scripts/get_reference_models.sh 
+    模型比较大，网络连接不通顺或者有精力的话，可以自己直接复制链接，从网页上download。      
+## 测试
+    UCF101 split1部分：
+
+    rgb流测试 部分
+    python tools/eval_net.py ucf101 1 rgb /data3/UCF-all-in-one/ucf_frame/ \ 
+    models/ucf101/tsn_bn_inception_rgb_deploy.prototxt \
+    models/ucf101_split_1_tsn_rgb_reference_bn_inception.caffemodel \
+    --num_worker 4 --save_scores rgb_score
+
+    flow流测试 部分
+    python tools/eval_net.py ucf101 1 flow /data3/UCF-all-in-one/ucf_transed/ \
+    models/ucf101/tsn_bn_inception_flow_deploy.prototxt \
+    models/ucf101_split_1_tsn_flow_reference_bn_inception.caffemodel \
+    --num_worker 4 --save_scores ucf101/flow_score
+
+    融合 fusion
+    python tools/eval_scores.py ucf101/rgb_score.npz ucf101/flow_score.npz --score_weights 1 1.5 
+
+
 # TSN改进版本之一  加权融合
     改进的地方主要在于fusion部分，不同的片段的应该有不同的权重，而这部分由网络学习而得，最后由SVM分类得到结果。
 [Deep Local Video Feature for Action Recognition 【CVPR2017】](https://arxiv.org/pdf/1701.07368.pdf)
