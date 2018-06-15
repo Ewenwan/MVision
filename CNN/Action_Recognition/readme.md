@@ -400,10 +400,7 @@
        2) 计算训练集和测试集特征相似度距离
        3) 使用动态规划算法为测试机样本在训练集中找出最匹配的一个
        4) 对训练集剩余部分采用3) 的方法依次找出最匹配的一个
-
-
     2) CDP
-    
     3) HMM
 [博客参考](https://www.cnblogs.com/skyme/p/4651331.html)
 
@@ -493,6 +490,54 @@
         2. 构：尝试了GoogLeNet,VGGNet-16及BN-Inception三种网络结构，其中BN-Inception的效果最好。
         3. 包括 跨模态预训练，正则化，数据增强等。
         4. 果：UCF101-94.2%，HMDB51-69.4% 
+        
+    two-stream 卷积网络对于长范围时间结构的建模无能为力，
+    主要因为它仅仅操作一帧（空间网络）或者操作短片段中的单堆帧（时间网络），
+    因此对时间上下文的访问是有限的。
+    视频级框架TSN可以从整段视频中建模动作。
+
+    和two-stream一样，TSN也是由空间流卷积网络和时间流卷积网络构成。
+    但不同于two-stream采用单帧或者单堆帧，TSN使用从整个视频中稀疏地采样一系列短片段，
+    每个片段都将给出其本身对于行为类别的初步预测，从这些片段的“共识”来得到视频级的预测结果。
+    在学习过程中，通过迭代更新模型参数来优化视频级预测的损失值（loss value）。
+
+    TSN网络示意图如下：
+
+![](https://img-blog.csdn.net/20180319152830700)
+
+    由上图所示，一个输入视频被分为 K 段（segment），一个片段（snippet）从它对应的段中随机采样得到。
+    不同片段的类别得分采用段共识函数（The segmental consensus function）
+    进行融合来产生段共识（segmental consensus），这是一个视频级的预测。
+    然后对所有模式的预测融合产生最终的预测结果。
+
+    具体来说，给定一段视频 V，把它按相等间隔分为 K 段 {S1,S2,⋯,SK}。
+    接着，TSN按如下方式对一系列片段进行建模：
+    TSN(T1,T2,⋯,TK)=H(G(F(T1;W),F(T2;W),⋯,F(TK;W)))
+    
+    其中：
+    (T1,T2,⋯,TK) 代表片段序列，每个片段 Tk 从它对应的段 Sk 中随机采样得到。
+    F(Tk;W) 函数代表采用 W 作为参数的卷积网络作用于短片段 Tk，函数返回 Tk 相对于所有类别的得分。
+    段共识函数 G（The segmental consensus function）结合多个短片段的类别得分输出以获得他们之间关于类别假设的共识。
+    基于这个共识，预测函数 H 预测整段视频属于每个行为类别的概率（本文 H 选择了Softmax函数）。
+    结合标准分类交叉熵损失（cross-entropy loss）；
+    网络结构
+    一些工作表明更深的结构可以提升物体识别的表现。
+    然而，two-stream网络采用了相对较浅的网络结构（ClarifaiNet）。
+    本文选择BN-Inception (Inception with Batch Normalization)构建模块，
+    由于它在准确率和效率之间有比较好的平衡。
+    作者将原始的BN-Inception架构适应于two-stream架构，和原始two-stream卷积网络相同，
+    空间流卷积网络操作单一RGB图像，时间流卷积网络将一堆连续的光流场作为输入。
+
+    网络输入
+    TSN通过探索更多的输入模式来提高辨别力。
+    除了像two-stream那样，
+    空间流卷积网络操作单一RGB图像，
+    时间流卷积网络将一堆连续的光流场作为输入，
+    作者提出了两种额外的输入模式：
+    RGB差异（RGB difference）和
+    扭曲的光流场（warped optical flow fields,idt中去除相机运动后的光流）。
+
+        
 #### TSN改进版本之一  加权融合
     改进的地方主要在于fusion部分，不同的片段的应该有不同的权重，而这部分由网络学习而得，最后由SVM分类得到结果。
 [Deep Local Video Feature for Action Recognition 【CVPR2017】](https://arxiv.org/pdf/1701.07368.pdf)
