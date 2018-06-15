@@ -52,3 +52,6 @@ do
 done
 pwd
 echo "Done!"
+# 生成libsvm的估计数据格式
+#printf 默认不带换行符 print默认带换行符
+#cat $outfile | awk '{for(i=1;i<=NF;i++){if(i==1) printf $i " "; else printf i-1 ":" $i " ";} print '\n'}' | tee $outfile
