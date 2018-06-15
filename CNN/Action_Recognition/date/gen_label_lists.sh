@@ -1,5 +1,4 @@
 #!/bin/sh
-
 # Command "realpath" is used in this tool. Please install it
 # first if you don't have it installed.
 
