@@ -1,4 +1,8 @@
 # TSN 结构 
+[使用的 特定caffe](https://github.com/yjxiong/caffe/tree/9831a2b4d67e3f99418b6f2f99b6dde716853672)
+
+[光流图像计算](https://github.com/yjxiong/dense_flow/tree/c9369a32ea491001db5298dfda1fa227a912d34f)
+
     two-stream 卷积网络对于长范围时间结构的建模无能为力，
     主要因为它仅仅操作一帧（空间网络）或者操作短片段中的单堆帧（时间网络），
     因此对时间上下文的访问是有限的。
