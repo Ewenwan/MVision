@@ -1,5 +1,7 @@
 # lsd是一个 大规模的 单目直接法 视觉半稠密 slam系统
 
+[本文github连接](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/readme.md)
+
 [LSD_slam & 激光雷达slam](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/04_SLAM.pdf)
 
 [lad源码解析 参考解析](https://blog.csdn.net/lancelot_vim)
@@ -18,9 +20,7 @@
 
 [lsd:optimizationThreadLoop线程](https://blog.csdn.net/u013004597/article/details/52301966)
 
-
-
-https://blog.csdn.net/tiandijun/article/details/62226163
+[路径规划A*算法及SLAM自主地图创建导航算法](https://blog.csdn.net/tiandijun/article/details/62226163)
 
 [官网:](http://vision.in.tum.de/research/vslam/lsdslam)
 [代码:](https://github.com/tum-vision/lsd_slam)
@@ -51,14 +51,17 @@ https://blog.csdn.net/tiandijun/article/details/62226163
     f) 误差函数对变量求偏导数得到雅克比矩阵，使用迭代边权重LM优化算法，计算线性方程参数： A * dse3 = b
     g) 使用　LDLT分解求取线性方程组的解 dse3 
     h）使用　dse3的指数映射后　对　初始位姿SE3进行更新
-    
-    
-    
+        
 ## 2. 深度图估计线程 Depth Estimation Thread,
     a. 根据极线匹配结果和运动矩阵求得深度(求极线＋线匹配搜索＋立体视觉三角测量得到深度)；
     b. 创建新的关键帧/优化当前关键帧，更新关键帧数据库；
-    c. 创建新的关键帧：传播深度信息到新的关键帧，正则化深度图；
-    d. 优化当前关键帧：近似为小基线长度双目，概率卡尔曼滤波优化更新，正则化深度图；
+    c. 创建新的关键帧：
+                     传播深度信息到新的关键帧，正则化深度图；
+    d. 优化当前关键帧：
+                     近似为小基线长度双目,使用对极几何来估计 深度均值；
+                     几何误差和光度误差 估计 深度方差；
+                     概率卡尔曼滤波优化更新(扩散卡尔曼滤波)，
+                     正则化深度图；
     
 ## 3. 全局地图优化 Map Optimization，      
     关键帧加入当地图，从地图中匹配最相似的关键帧，估计sim3位姿变换，LM优化最小化变换误差.
@@ -217,7 +220,7 @@ https://blog.csdn.net/tiandijun/article/details/62226163
           
 ### 深度估计主要有三个过程，分别是：
     1. 用立体视觉方法来从先前的帧得到新的深度估计
-    2. 深度图帧与帧之间的传播
+    2. 深度图帧与帧之间的传播(扩散卡尔曼滤波)
     3. 部分规范化已知深度
 #### 1. 用立体视觉方法来从先前的帧得到新的深度估计
       实际上就是搜索到最先看到这些像素的帧，一直到当前帧的前一帧作为参考帧，
@@ -286,6 +289,21 @@ https://blog.csdn.net/tiandijun/article/details/62226163
 
     由于SLAM领域经过长期实践发现取深度倒数在计算机中表示并对其进行估计有着更高的健壮性，
     所以如今的SLAM系统一般使用逆深度对三维世界进行表示。
+#### 2. 深度图帧与帧之间的传播(扩散卡尔曼滤波)
+##### 深度均值 和 方差的估计
+
+    a) 近似为小基线长度双目,使用对极几何来估计 深度均值；
+    
+    b) 几何误差和光度误差 估计 深度方差；
+
+##### 深度的传播和更新
+
+[参考](https://blog.csdn.net/lancelot_vim/article/details/51789318)
+
+
+#### 3. 部分规范化已知深度 
+
+    
 ===================================================
 # 【3】地图优化 Map Optimization  定义误差函数，最小化误差函数，优化位姿和地图点
     直接法的SLAM中一般采用迭代优化算法求出图像位姿变换，
