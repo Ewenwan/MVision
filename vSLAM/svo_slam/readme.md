@@ -803,22 +803,26 @@
         后，祝大家好运，一起分享知识。 
         
 # SVO代码
-        SVO也是将一帧图像处理成多层图像金字塔形式，跟踪过程，也就是通过灰度残差最小来算相机位姿，
+        SVO也是将一帧图像处理成多层图像金字塔形式，跟踪过程，也就是通过灰度残差最小来算相机位姿(直接法)，
         这部分都在FrameHandlerMono类的addImage方法中，addImage方法完成初始化过程和相机位姿跟踪的部分，
         跟踪部分中存在四个系统状态：
-        第一帧，
-        第二帧，
-        其他帧，relocalizing （这个状态要干什么还不是特别清楚），
+        第一帧关键帧 (处理第一帧到第一个关键帧之间的，fast角点特征匹配，单应变换求取位姿变换)，
+        第二帧关键帧 (光流法金字塔多尺度跟踪上一帧，单应性矩阵求取位姿变换，局部BA优化，深度值滤波器滤波)，
+        其他帧       (上帧位姿初始值，直接法最小化重投影误差优化变换矩阵，匹配点,3d点，深度值滤波器滤波)，
+        重定位模式（relocalizing 跟踪上一帧的参考帧 ），
+        
         一二帧是初始化（算单应矩阵分解求位姿），
         其他帧就是有了初始地图之后的跟踪过程，具体函数为FrameHandlerMono类的processFrame函数，
-        这个函数中的跟踪过程与论文中基本一样，也包括几个步骤：图像配准（alignment）求位姿，
-        优化特征点的二维坐标，同时优化位姿和特征点坐标（BA）。
+        这个函数中的跟踪过程与论文中基本一样，
+        也包括几个步骤：
+        图像配准（alignment）求位姿，
+        优化特征点的二维坐标，
+        同时优化位姿和特征点坐标（BA）。
+        
         建图部分的主要函数在depthfilter类中，流程是首先在ros节点调用的时候会调用这个类的startThread函数，
-        新开线程，线程里运行depthfiler类中的updateSeedsLoop方法，
+        新开线程，线程里运行depthfiler类中的 updateSeedsLoop方法，
         大致过程也就是等tracking部分向一个vector或者list中填充它选择的关键帧，
         如果有，就进行概率化建图，这个部分还没仔细看。
-        另外李群中的SE3在PTAM，SVO中都会出现，
-        应该是表示T，相机位姿，但是感觉需要找点中文资料再看看SE3的具体含义。
 
         对应SVO论文中跟踪部分的三个过程，
         一是通过当前帧和上一帧的特征点对应的patch之间的灰度残差最小来求当前帧的位姿（即SE(3) T），
@@ -827,12 +831,12 @@
         这个重投影过程完成之后会分析重投影的质量，也就是匹配到的特征点对的个数，
         当点对太少的时候就会直接把当前帧的位姿设置为上一帧的位姿，并报错匹配特征点过少，
         这也是我常遇到的问题。
-        最后是优化两个部分：
-        一是之前粗略估计出的T，这一步叫做pose优化；
-        二是投影到当前帧的点在世界坐标系下的坐标点，
-        这一步叫做structure优化。
-        最后是可选的BA算法同时对位姿和三维点坐标进行优化。
         
+        最后是优化两个部分：
+        一是之前粗略估计出的T，这一步叫做  pose优化；
+        二是投影到当前帧的点在世界坐标系下的坐标点，这一步叫做structure优化。
+        
+        最后是可选的BA算法同时对位姿和三维点坐标进行优化。
         以下分析均在rpg_svo文件夹下：
         first：在svo_ros/src中vo_node文件中包含了了节点类vo_node的相关声明，
         并包含一个main函数
@@ -854,3 +858,97 @@
         3.在updateSeedsLoop函数中，
           会检查frame_queue_队列中是否有FramePtr存在，
           FramePtr在global.h中定义为boost::shared_ptr
+
+# ==========frame_handler_mono.cpp ================
+    processFirstFrame(); // 作用是处理第1帧并将其设置为关键帧；
+    processSecondFrame();// 作用是处理第1帧后面所有帧，直至找到一个新的关键帧；
+    processFrame();      // 作用是处理两个关键帧之后的所有帧；
+    relocalizeFrame(=);  //作用是在相关位置重定位帧以提供关键帧
+
+    startFrameProcessingCommon(timestamp) 设置处理第一帧  stage_ = STAGE_FIRST_FRAME;
+
+    processFirstFrame(); 处理第一帧，直到找打第一个关键帧==============================================
+                    1. fast角点特征，单应变换求取位姿变换，特点点数超过100个点才设置第一帧为为关键帧，
+                    2. 计算单应性矩阵（根据前两个关键帧）来初始化位姿，3d点
+                    3. 且设置系统处理标志为第二帧 stage_ = STAGE_SECOND_FRAME
+
+    processSecondFrame(); 处理第一帧关键帧到第二帧关键帧之间的所有帧(跟踪上一帧) ========================
+                    1. 光流法 金字塔多尺度 跟踪关键点,根据跟踪的数量和阈值，做跟踪成功/失败的判断
+                    2. 前后两帧计算单应性矩阵，根据重投影误差记录内点数量，根据阈值，判断跟踪 成功/失败,计算3d点
+                    3. 集束调整优化, 非线性最小二乘优化, 
+                    4. 计算场景深度均值和最小值
+                    5. 深度滤波器对深度进行滤波，高斯均值混合模型进行更新深度值
+                    6. 设置系统状态 stage_= STAGE_DEFAULT_FRAME；
+
+    processFrame(); 处理前两个关键帧后的所有帧(跟踪上一帧) ============================================
+                    1. 设置初始位姿, 上帧的位姿初始化为当前帧的位姿
+                    2. 直接法 最小化 3d-2d 重投影 像素误差 求解位姿 LM算法优化位姿)
+                    3. 最小化 3d-2d 重投影像素误差 优化特征块的预测位置 更新3d-2d特征块匹配关系
+                    4. 使用优化后的 3d-2d特征块匹配关系， 类似直接法，最小化2d位置误差，来优化相机位姿(pose)
+                    5. 使用优化后的 3d-2d特征块匹配关系， 类似直接法，最小化2d位置误差，来优化3D点(structure)
+                    6. 深度值滤波
+
+    relocalizeFrame(); 重定位模式（跟踪参考帧）=======================================================
+                    1. 得到上一帧附近的关键帧作为参考帧 ref_keyframe
+                    2. 进行直接法 最小化 3d-2d 重投影 像素误差 求解当前帧的位姿
+                    3. 若跟踪质量较高(匹配特征点数大于30) 将参考帧设置为上一帧
+                    4. 直接法跟踪上一帧参考帧进行processFrame()处理( 其实就是跟踪参考帧模式 )
+                    5. 如果跟踪成功就设置为相应的跟踪后的位姿，否者设置为参考帧的位姿
+                    
+                    
+# 项目代码结构
+    rpg_svo
+    ├── rqt_svo       为与 显示界面 有关的功能插件
+    ├── svo           主程序文件，编译 svo_ros 时需要
+    │   ├── include
+    │   │   └── svo
+    │   │       ├── bundle_adjustment.h        光束法平差（图优化）
+    │   │       ├── config.h                   SVO的全局配置
+    │   │       ├── depth_filter.h             像素深度估计（基于概率） 高斯均值混合模型
+    │   │       ├── feature_alignment.h        特征匹配
+    │   │       ├── feature_detection.h        特征检测  faster角点
+    │   │       ├── feature.h（无对应cpp）      特征定义
+    │   │       ├── frame.h                    frame定义
+    │   │       ├── frame_handler_base.h       视觉前端基础类
+    │   │       ├── frame_handler_mono.h       单目视觉前端原理(较重要)==============================
+    │   │       ├── global.h（无对应cpp）       有关全局的一些配置
+    │   │       ├── initialization.h           单目初始化
+    │   │       ├── map.h                      地图的生成与管理
+    │   │       ├── matcher.h                  重投影匹配与极线搜索
+    │   │       ├── point.h                    3D点的定义
+    │   │       ├── pose_optimizer.h           图优化（光束法平差最优化重投影误差）
+    │   │       ├── reprojector.h              重投影
+    │   │       └── sparse_img_align.h         直接法优化位姿（最小化光度误差）
+    │   ├── src
+    │   │   ├── bundle_adjustment.cpp
+    │   │   ├── config.cpp
+    │   │   ├── depth_filter.cpp
+    │   │   ├── feature_alignment.cpp
+    │   │   ├── feature_detection.cpp
+    │   │   ├── frame.cpp
+    │   │   ├── frame_handler_base.cpp
+    │   │   ├── frame_handler_mono.cpp
+    │   │   ├── initialization.cpp
+    │   │   ├── map.cpp
+    │   │   ├── matcher.cpp
+    │   │   ├── point.cpp
+    │   │   ├── pose_optimizer.cpp
+    │   │   ├── reprojector.cpp
+    │   │   └── sparse_img_align.cpp
+    ├── svo_analysis           未知
+    ├── svo_msgs               一些配置文件，编译 svo_ros 时需要
+    └── svo_ros                为与ros有关的程序，包括 launch 文件
+         ├── CMakeLists.txt    定义ROS节点并指导rpg_svo的编译
+    ├── include
+    │   └── svo_ros
+    │    └── visualizer.h                
+    ├── launch
+    │   └── test_rig3.launch   ROS启动文件
+    ├── package.xml
+    ├── param                   摄像头等一些配置文件
+    ├── rviz_config.rviz        Rviz配置文件（启动Rviz时调用）
+    └── src
+             ├── benchmark_node.cpp
+             ├── visualizer.cpp        地图可视化
+             └── vo_node.cpp           VO主节点=======================================
+
