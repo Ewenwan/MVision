@@ -63,7 +63,7 @@
      其中
       a) ../../build/tools/extract_image_features.bin
           是提取特征的可执行文件，示例命令中使用了相对路径，如果在其他路径下调用注意进行对应的修改
-      b) prototxt/c3d_sport1m_feature_extractor_video.prototxt caffe网络配置文件
+      b) prototxt/c3d_sport1m_feature_extractor_video.prototxt caffe网络配置文件和数据集路径等
       c) conv3d_deepnetA_sport1m_iter_1900000 这是预训练模型文件，根据自己的需求做对应的修改
       d) 接下来的三项数字是：0 50 1，分别是gpu_id，mini_batch_size 和 number_of_mini_batches。
          gpu_id是在计算机具有多块GPU时指定使用哪一块GPU的，默认是0，如果将这一项的值置为-1则启动CPU模式。
@@ -75,11 +75,74 @@
 
      prototxt/c3d_sport1m_feature_extractor_video.prototxt是这个demo所使用的prototxt文档
 
-     第9行
-
+     第8行：
      source: "prototxt/input_list_frm.txt"
      这是记录输入文件路径的文档。在这个demo中，prototxt/input_list_frm.txt对应的是以图片作为输入时的文档，
      而prototxt/input_list_video.txt对应的是以视频作为输入时的文档。
-     以prototxt/input_list_frm.txt为例，该文档格式如下：
+     
+     以prototxt/input_list_frm.txt为例，
+     该文档格式如下：
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 1 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 17 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 33 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 49 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 65 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 81 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 97 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 113 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 129 0
+        input/frm/v_ApplyEyeMakeup_g01_c01/ 145 0
+        input/frm/v_BaseballPitch_g01_c01/ 1 0
+        input/frm/v_BaseballPitch_g01_c01/ 17 0
+        input/frm/v_BaseballPitch_g01_c01/ 33 0
+        input/frm/v_BaseballPitch_g01_c01/ 49 0
+        input/frm/v_BaseballPitch_g01_c01/ 65 0
+        input/frm/v_BaseballPitch_g01_c01/ 81 0
+        
+     其中input/frm/v_ApplyEyeMakeup_g01_c01/是保存图片的路径，
+     后面的第一个数字表示从哪一帧开始提取特征，
+     最后的数字表示该行对应的类别。
+     由于这是提取特征而非训练，类别填写什么都不要紧，只要有就行
 
+     多少帧提取一次特征，是由prototxt/input_list_frm.txt中第17行new_length一项参数决定的。
+     例如上面例子中的视频一共有165帧，那么最后一行对应的145帧开始提取特征，
+     取16帧，使用145帧-161帧的数据。在这里如果取用的帧的编号超过总帧数165，
+     则会报错，要注意这一点
 
+     如果输入时视频，则参考prototxt/input_list_video.txt。
+     需要注意的是，输入为视频时帧的序号是从0开始计算的。
+
+     第9行：
+     use_image: true
+     如果输入时图片，则为true，如果输入时视频，则为false。
+     
+     第10行
+     mean_file: "fb_train16_128_mean.binaryproto"
+     这里是使用的均值文件的路径，根据所使用的模型生成或选择均值文件即可
+     另外也可根据需求修改其他参数。 
+     
+## 1.3 输出前缀文件
+     参照prototxt/output_list_video_prefix.txt生成输出前缀文件，
+     可以根据需求进行自定义，只要注意该文件要和prototxt/input_list_frm.txt
+     输入文件清单的行数相对应即可
+
+## 1.4 其他注意事项
+
+     输出的特征文件所保存的路径必须自己生成，C3D不会创建文件夹
+
+     如果提示“out of memory” 可以尝试减小batch size
+
+     提取的特征是二进制文件，需要进行格式转换才能正常处理
+
+     其他的注意事项可以参考官方的用户指南
+
+# 2. C3D训练和fine-tune
+
+     训练和fine-tune的官方demo的路径分别是
+
+     ~/C3D-master/C3D-v1.0/examples/c3d_train_ucf101
+     ~/C3D-master/C3D-v1.0/examples/c3d_finetuning
+     所使用的prototxt和inputlist等文件参照特征提取和demo修改即可.
+     
+
+     
