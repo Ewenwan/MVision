@@ -36,3 +36,50 @@
 [博客](https://blog.csdn.net/u014380165/article/details/78986416)
 
     改进ResNet内部连接中的卷积形式。然后，超深网络，一般人显然只能空有想法，望而却步。
+
+
+# 1. C3D特征提取
+
+##  1.1 命令参数介绍
+
+     官方GitHub项目上同时提供了C3D-v1.0和C3D-v1.1两个版本，以下方法适用于v1.0
+
+     官方提供的特征提取demo路径为~/C3D-master/C3D-v1.0/examples/c3d_feature_extraction
+
+     在这个路径下，执行c3d_sport1m_feature_extraction_video.sh
+     或
+     c3d_sport1m_feature_extraction_frm.sh 可以分别从 视频提取特征 和从 图片提取特征的 demo
+
+     打开c3d_sport1m_feature_extraction_video.sh 文件，
+     除去一些用来生成文件夹的指令，
+     可以看到启动C3D的命令如下：
+     
+     GLOG_logtosterr=1 
+     ../../build/tools/extract_image_features.bin
+     prototxt/c3d_sport1m_feature_extractor_video.prototxt 
+     conv3d_deepnetA_sport1m_iter_1900000 0 50 1 
+     prototxt/output_list_video_prefix.txt fc7-1 fc6-1 prob
+     
+     其中
+      a) ../../build/tools/extract_image_features.bin
+          是提取特征的可执行文件，示例命令中使用了相对路径，如果在其他路径下调用注意进行对应的修改
+      b) prototxt/c3d_sport1m_feature_extractor_video.prototxt caffe网络配置文件
+      c) conv3d_deepnetA_sport1m_iter_1900000 这是预训练模型文件，根据自己的需求做对应的修改
+      d) 接下来的三项数字是：0 50 1，分别是gpu_id，mini_batch_size 和 number_of_mini_batches。
+         gpu_id是在计算机具有多块GPU时指定使用哪一块GPU的，默认是0，如果将这一项的值置为-1则启动CPU模式。
+         需要注意，如果需要调整batch size，在prototxt文档中也要进行相应的修改
+      e) prototxt/output_list_video_prefix.txt 是输出前缀文件，下面会详细介绍
+      f) fc7-1 fc6-1 prob 是卷积层特征输出名称 要提取哪一层的特征依序写在这里即可
+      
+## 1.2 prototxt文档
+
+     prototxt/c3d_sport1m_feature_extractor_video.prototxt是这个demo所使用的prototxt文档
+
+     第9行
+
+     source: "prototxt/input_list_frm.txt"
+     这是记录输入文件路径的文档。在这个demo中，prototxt/input_list_frm.txt对应的是以图片作为输入时的文档，
+     而prototxt/input_list_video.txt对应的是以视频作为输入时的文档。
+     以prototxt/input_list_frm.txt为例，该文档格式如下：
+
+
