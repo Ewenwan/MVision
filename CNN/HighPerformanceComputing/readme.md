@@ -10,4 +10,8 @@
       
 # 在深度神经网络中 特指提高卷积计算方式的方法
 
-      腾讯的
+     腾讯NCNN框架入门到应用
+     
+[代码](https://github.com/Ewenwan/ncnn)
+
+
