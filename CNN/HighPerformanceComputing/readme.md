@@ -101,10 +101,14 @@
       执行上面命令后就可以生成NCNN模型需要的param 与bin 文件.
       
 **e. 对模型参数加密**
-      
-      ./ncnn2mem alexnet.param alexnet.bin alexnet.id.h alexnet.mem.h
-      最后可以生成 alexnet.param.bin 这样的二进制加密文件.
-      
+
+      ./ncnn2mem alexnet.param alexnet.bin alexnet.id.h alexnet.mem.h  
+      注意 alexnet.id.h alexnet.mem.h 为定义的文件名 头文件名 后面后生成
+      最后 
+       alexnet.bi >>>  alexnet.param.bin     小
+                       alexnet.id.h          小
+                       alexnet.mem.h         较大
+
 **f. 模型载入**
 
       对于加密文件的读取也和原来不同,在源码中,
