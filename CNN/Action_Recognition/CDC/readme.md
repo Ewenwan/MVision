@@ -1,6 +1,7 @@
 # 基于3D卷积C3D提取特征再时序上上采样做 帧分类，然后预测存在行为的视频段并分类
 [原作者代码](https://bitbucket.org/columbiadvmm/cdc/src)
 
+[主页](http://www.ee.columbia.edu/ln/dvmm/researchProjects/cdc/cdc.html)
 
 ## CDC 用于未修剪视频中精确时间动作定位的卷积-反-卷积网络
 [基于3D卷积C3D做帧分类，然后预测存在行为的视频段并分类](http://www.columbia.edu/~zs2262/files/research/cvpr17_CDC_zheng_slides.pdf)
