@@ -588,7 +588,10 @@
 
 [LSTM理解](https://blog.csdn.net/nxcxl88/article/details/52590500)
 
-    RNN的展开结构
+    RNN的展开结构  ht = f(w1*xt + w2*ht-1 + b) 复合函数+递推数列
+    后一项的值由前一项的值ht-1 和 当前时刻的输入值xt  决定，有机会通过当前的输入值改变自己的命运。
+    ht-1提现了记忆功能，ht-1是由ht-2和xt-1所决定，所以ht的值实际上是由 x1, x2, x3,..., xt决定的，
+    它记住了之前完整的序列信息。
 ![](https://img-blog.csdn.net/20160920225401298)
 
     LSTM的展开结构
