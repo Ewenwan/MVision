@@ -1,3 +1,38 @@
+# 包含目录
+
+        1. 行为识别 Action_Recognition
+          IDT
+          TSN
+          C3D
+          CDC
+          R-C3D
+
+        2. 目标检测 大型网络
+          MaskRCNN
+          FCIS
+          DCNN
+          DenseNet
+          DetNet
+          ResNet
+          vgg16-SSD
+          Xception
+          前文还有：
+          yolov1 v2 v3 darknet / caffe
+
+
+        3. 目标检测 小型网络
+          MobileNet v1 v2 -ssd
+          ShuffleNet-ssd
+          SqueezeNet-ssd
+
+        4. 人体姿态识别 PoseEstimating 
+
+        5. 物体语义分割 Semantic_Segmentation 
+
+        6. 细粒度图像识别 (fine-grained image recognition)
+
+
+
 # 卷积神经网络
 [网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
 
