@@ -840,6 +840,8 @@
 ## CDC 用于未修剪视频中精确时间动作定位的卷积-反-卷积网络
 [基于3D卷积C3D做帧分类，然后预测存在行为的视频段并分类](http://www.columbia.edu/~zs2262/files/research/cvpr17_CDC_zheng_slides.pdf)
 
+[五篇Untrimmed(精细分割)相关论文论文汇总简介](https://blog.csdn.net/nclgsj1028/article/details/79643811)
+
 ![](https://img-blog.csdn.net/20180308102108902?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbmNsZ3NqMTAyOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 
