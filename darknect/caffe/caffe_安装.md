@@ -61,7 +61,8 @@
       sudo echo export PYTHONPATH="~/caffe-master/python" >> ~/.bashrc caffe实际安装路径下python文件夹
       sudo echo export PYTHONPATH="/home/wanyouwen/ewenwan/software/caffe-yolo/caffe/python" >> ~/.bashrc
       source ~/.bashrc
-
+      
+      export PYTHONPATH=$PYTHONPATH:/home/wanyouwen/ewenwan/software/caffe-yolo/caffe/python
 
     错误2：
       ImportError: No module named skimage.io1 
