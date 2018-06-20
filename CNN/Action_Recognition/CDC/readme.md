@@ -34,3 +34,23 @@
     CDC8：时间域上上采样到 L，而且全连接层用的是 4096xK+1, K是类别数
     softmax层
 [ CDC 论文](http://dvmmweb.cs.columbia.edu/files/CVPR17_Zheng_CDC.pdf)
+
+# 下载编译
+
+[代码模型下载](https://bitbucket.org/columbiadvmm/cdc/downloads/)
+
+    有训练好的模型参数，比较大
+    
+## 编译 
+    cd ./CDC/;
+    make all -j
+    make pycaffe
+    
+[Makefile.config 参考修改](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_src_change/Makefile.config)
+
+[由于cudnn版本较新，编译可能出错，参考cudnn.hpp修改](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_src_change/cudnn.hpp)
+
+
+
+
+
