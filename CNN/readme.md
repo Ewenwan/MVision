@@ -32,7 +32,8 @@
         6. 细粒度图像识别 (fine-grained image recognition)
         
         7. 深度神经网络压缩 Deep Compression
-
+        
+        8. 高性能计算 HighPerformanceComputing
 
 # 卷积神经网络
 [网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
