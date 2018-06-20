@@ -30,7 +30,8 @@
         5. 物体语义分割 Semantic_Segmentation 
 
         6. 细粒度图像识别 (fine-grained image recognition)
-
+        
+        7. 深度神经网络压缩 Deep Compression
 
 
 # 卷积神经网络
