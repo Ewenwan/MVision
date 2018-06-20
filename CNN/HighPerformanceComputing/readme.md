@@ -15,3 +15,26 @@
 [代码](https://github.com/Ewenwan/ncnn)
 
 
+## 在Ubuntu上安装NCNN
+### 1. 下载编译源码
+      git clone https://github.com/Tencent/ncnn.git
+      下载完成后，需要对源码进行编译
+            cd ncnn
+            mkdir build && cd build
+            cmake ..
+            make -j
+            make install
+
+      执行完毕后我们可以看到:
+            Install the project...
+            -- Install configuration: "release"
+            -- Installing: /home/ruyiwei/code/ncnn/build/install/lib/libncnn.a
+            -- Installing: /home/ruyiwei/code/ncnn/build/install/include/blob.h
+            -- Installing: /home/ruyiwei/code/ncnn/build/install/include/cpu.h
+            -- Installing: /home/ruyiwei/code/ncnn/build/install/include/layer.h
+            -- Installing: /home/ruyiwei/code/ncnn/build/install/include/mat.h
+            -- Installing: /home/ruyiwei/code/ncnn/build/install/include/net.h
+            -- Installing: /home/ruyiwei/code/ncnn/build/install/include/opencv.h
+            -- Installing: /home/ruyiwei/code/ncnn/build/install/include/platform.h
+
+
