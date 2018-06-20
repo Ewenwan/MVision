@@ -1,3 +1,8 @@
+# 性能提升方法
+    1. 小模型 mobilenet
+    2. 模型压缩：参数稀疏、量化、分解、去冗余。
+    3. 高性能计算。
+
 # 模型压缩
 
 [DeepCompression-caffe](https://github.com/Ewenwan/DeepCompression-caffe)
