@@ -42,7 +42,7 @@
     有训练好的模型参数，比较大
     
 ## 编译 
-    cd ./CDC/;
+    cd ./CDC/
     make all -j
     make pycaffe
     
@@ -50,7 +50,18 @@
 
 [由于cudnn版本较新，编译可能出错，参考cudnn.hpp修改](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_src_change/cudnn.hpp)
 
+# 运行demo
+    1. 输入数据： demo/data/window  列表文件： demo/data/test.lst
 
+    2. 每个数据样例都是 32帧长的视频片段. 
+       这里保持和 C3D-v1.0 格式一致, 
+       样例是以二进制文件形式(RGB值)，每一帧都有一个 4-th 长度的标签值;
+
+    3.运行 demo: 
+       cd demo
+       ./xfeat.sh
+
+    4. 输出特征文件夹 demo/feat
 
 
 
