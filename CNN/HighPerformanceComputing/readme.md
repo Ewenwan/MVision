@@ -59,12 +59,12 @@
       所以我们再将caffe模型转换为NCNN模型的时候，
       同样也需要 .caffemodel以及deploy.prototxt这两个文件，为了方便，我们使用AlexNet为例讲解。
       
-**下载 caffe 模型和参数**
+**a. 下载 caffe 模型和参数**
 
       alexnet 的 deploy.prototxt 可以在这里下载 https://github.com/BVLC/caffe/tree/master/models/bvlc_alexnet 
       alexnet 的 .caffemodel 可以在这里下载 http://dl.caffe.berkeleyvision.org/bvlc_alexnet.caffemodel
       
-**转换**
+**b. 转换**
 
       由于NCNN提供的转换工具只支持转换新版的caffe模型,
       所以我们需要利用caffe自带的工具将旧版的caffe模型转换为新版的caffe模型后,
@@ -72,7 +72,7 @@
 
       旧版本caffe模型->新版本caffe模型->NCNN模型。
       
-**旧版caffe模型转新版caffe模型**
+**c. 旧版caffe模型转新版caffe模型**
 
       模型框架转换：
       ~/code/ncnn/build/tools$ ~/caffe/build/tools/upgrade_net_proto_text deploy.prototxt new_deplpy.prototxt
@@ -91,7 +91,7 @@
                   input_param { shape: { dim: 1 dim: 3 dim: 227 dim: 227 } }
             }
             
-**新版caffe模型转ncnn模型**
+**d. 新版caffe模型转ncnn模型**
       
       ./caffe/caffe2ncnn new_deplpy.prototxt new_bvlc_alexnet.caffemodel alexnet.param alexnet.bin
       
@@ -100,12 +100,12 @@
             
       执行上面命令后就可以生成NCNN模型需要的param 与bin 文件.
       
-**对模型参数加密**
+**e. 对模型参数加密**
       
       ./ncnn2mem alexnet.param alexnet.bin alexnet.id.h alexnet.mem.h
       最后可以生成 alexnet.param.bin 这样的二进制加密文件.
       
-**模型载入**
+**f. 模型载入**
 
       对于加密文件的读取也和原来不同,在源码中,
       
