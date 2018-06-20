@@ -63,5 +63,32 @@
 
     4. 输出特征文件夹 demo/feat
 
+#  在 THUMOS 2014 数据集上处理
+
+## 1. 数据预处理
+    数据集地址：
+        inputdir = '/DATA_ROOT/THUMOS14/test/all_frames_pervideo/'
+    处理成二进制文件： 
+        cd THUMOS14/predata/test 
+        python gen_test_bin_and_list.py
+## 2. CDC 网络预测
+    cd THUMOS14/test
+    需要使用 网络输出的特征
+    提取特征：
+    /CDC_root/model/thumos_CDC/convdeconv-TH14_iter_24390
+## 3. 结构后 Post-process 
+    cd THUMOS14/test/postprocess
+    3步骤 matlab下
+    1. run matlab step1_gen_test_metadata.m and will generate metadata.mat
+      frmid: frame id in each video, starts with 1
+      videoid: belongs to which video
+      kept_frm_index: 
+    
+    2. run matlab step2_read_feat.m and will read all caffe outputs into two matlab matrixs:
+    3. run matlab step3_gen_CDC_det.m to produce action segment instances prediction for temporal localization.
+    
+    
+
+
 
 
