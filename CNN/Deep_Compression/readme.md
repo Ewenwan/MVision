@@ -379,6 +379,20 @@
     将衰减最少的参数认为是不重要的参数，可以剔除，这也是OBD的思路，但是OBD的方法需要求二阶导数，
     实现起来难度较大，而本文提出的Taylor expansion的方法可以很好的解决这个问题.
     
+**j. 一种基于Hessian矩阵的网络修剪算法**    
+[论文参考](https://papers.nips.cc/paper/647-second-order-derivatives-for-network-pruning-optimal-brain-surgeon.pdf)
+
+[参考博文](https://blog.csdn.net/qq_19645269/article/details/78791652)
+
+    OBS算法是一种基于Hessian矩阵的网络修剪算法，首先，构造误差曲面的一个局部模型，分析权值的扰动所造成的影响。 
+    通过对误差函数进行Taylor展开
+    可以得到 与二阶导数 海塞矩阵H相关的一个式子
+    
+![](https://img-blog.csdn.net/20171213154134181?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMTk2NDUyNjk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+    1.OBS算法的全称为optimal brain surgeon,翻译成中文就是最优外科手术，表面的意思就是该方法是和神经网络过程是分开的。 
+    2.该方法是一种框架，只要是模型能求出参数的梯度，那么都可用这个方法进行稀疏化。 
+
 
 ### 2. 量化(Quantization)
     为了进一步压缩网络，考虑让若干个权值共享同一个权值，
