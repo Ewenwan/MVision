@@ -217,9 +217,14 @@ int main(int argc, char** argv)
 
 }
 ```
-   
-   
-   
+
+      把模型和参数复制过来：
+      cp ../../examples/squeezen* .
+      以及类别列表文件：
+      cp ../../examples/synset_words.txt .
+      进行检测：
+      ./squeezenet cat.jpg
+
    
 ### 2. caffe网络模型转换为 ncnn模型 示例
 #### caffe下Alexnet网络模型转换为NCNN模型
