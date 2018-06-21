@@ -19,6 +19,17 @@
 ### 1. 下载编译源码
       git clone https://github.com/Tencent/ncnn.git
       下载完成后，需要对源码进行编译
+      修改CMakeLists.txt 文件 打开 一些文件的编译开关
+      
+            ##############################################
+            add_subdirectory(examples)
+            # add_subdirectory(benchmark)
+            add_subdirectory(src)
+            if(NOT ANDROID AND NOT IOS)
+            add_subdirectory(tools)
+            endif()
+            
+      开始编译:
             cd ncnn
             mkdir build && cd build
             cmake ..
@@ -53,6 +64,159 @@
             -rwxrwxr-x 1 wanyouwen wanyouwen 477538  6月 21 00:13 ncnn2mem*
             drwxrwxr-x 3 wanyouwen wanyouwen   4096  6月 21 00:13 onnx
             
+     而默认会生成 一个静态库build/src/libncnn.a 和一些可执行文件：
+     build/examples/squeezenet 分类模型
+     build/examples/fasterrcn  检测模型
+     build/examples/ssd/ssdsqueezenet 检测模型
+     build/examples/ssd/ssdmobilenet  检测模型
+     可以使用squeezenet进行测试，这里这是一个图像分类模型。
+     
+     把模型和参数复制过来：
+     cp ../../examples/squeezen* .
+     进行检测：
+     ./squeezenet cat.jpg
+     >>> 
+      283 = 0.377605
+      281 = 0.247314
+      282 = 0.100278
+     这里只是输出了类别的编码，没有输出类别的字符串
+     
+     需要修改examples/squeezenet.c文件
+```c     
+// Tencent is pleased to support the open source community by making ncnn available.
+// https://opensource.org/licenses/BSD-3-Clause
+
+#include <stdio.h>
+#include <algorithm>
+#include <vector>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>// putText()
+#include "net.h"
+
+static int detect_squeezenet(const cv::Mat& bgr, std::vector<float>& cls_scores)
+{
+    ncnn::Net squeezenet;// 前向模型
+    squeezenet.load_param("squeezenet_v1.1.param");// 模型框架
+    squeezenet.load_model("squeezenet_v1.1.bin");// 权重参数
+    // 图片变形
+    ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, bgr.cols, bgr.rows, 227, 227);
+    // 各个通道均值
+    const float mean_vals[3] = {104.f, 117.f, 123.f};
+    in.substract_mean_normalize(mean_vals, 0);// 图像减去均值归一化
+
+    ncnn::Extractor ex = squeezenet.create_extractor();
+    ex.set_light_mode(true);// 模型 提取器 
+
+    ex.input("data", in);
+
+    ncnn::Mat out;
+    ex.extract("prob", out);//提取 prob层的输出
+
+    cls_scores.resize(out.w);
+    for (int j=0; j<out.w; j++)
+    {
+        cls_scores[j] = out[j];//结果的每一个值 变成 vector 
+    }
+
+    return 0;
+}
+// 打印结果  有修改 保存类别结果和得分
+static int print_topk(const std::vector<float>& cls_scores, int topk, std::vector<int>& index_result, std::vector<float> score_result)
+{
+    // partial sort topk with index
+    int size = cls_scores.size();// 结果维度
+    std::vector< std::pair<float, int> > vec;
+    vec.resize(size);
+    for (int i=0; i<size; i++)
+    {// 成对 值:id 这里id对于类别
+        vec[i] = std::make_pair(cls_scores[i], i);
+    }
+    // 排序
+    std::partial_sort(vec.begin(), vec.begin() + topk, vec.end(),
+                      std::greater< std::pair<float, int> >());
+
+    // print topk and score
+    for (int i=0; i<topk; i++)
+    {
+        float score = vec[i].first;//得分值
+        int index = vec[i].second;// id
+        //fprintf(stderr, "%d = %f\n", index, score);
+       //  添加保存结果的 vector数组
+        score_result.push_back(score);
+        index_result.push_back(index);
+    }
+
+    return 0;
+}
+
+// 添加一个载入 类别目录的文件 的 函数
+static int load_labels(std::string path, std::vector<std::string>& labels)
+{
+    FILE* fp = fopen(path.c_str(), "r");//读取文件
+    
+    while(!feof(fp))
+    {
+      char str_b[1024];//先读取 1024个字符
+      fgets(str_b, 1024, fp);
+      std::string str_block(str_b);//转换成 string 方便操作
+      
+      if(str_block.length() > 0)
+      {
+        for (unsigned int i = 0; i <  str_block.length(); i++)
+        {
+           if(str_block[i] == ' ')
+           {
+              std:: string name = str_block.substr(i, str_block.length() - i - 1);
+              labels.push_back(name);
+              i = str_block.length();
+           }
+        }
+      }
+    }
+   return 0 ;
+}
+
+
+int main(int argc, char** argv)
+{
+   // 命令行传入的图片文件名
+    const char* imagepath = argv[1];
+   // opencv 读取图像
+    cv::Mat m = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
+    if (m.empty())
+    {
+        fprintf(stderr, "cv::imread %s failed\n", imagepath);
+        return -1;
+    }
+     
+    // 读取类别标签文件
+    std::vector<std::string> labels;
+    load_labels("synset_words.txt", labels);
+    
+    std::vector<float> cls_scores;
+    detect_squeezenet(m, cls_scores);
+    
+    std::vector<int> index;
+    std::vector<float> score;
+
+    print_topk(cls_scores, 3, index, score);
+
+   for(unsigned int i = 0; i < index.size(); i++)
+   {
+     cv::putText(m, labels[index[i]], cv::Point(50, 50+30*i), CV_FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 100, 200), 2, 8);
+   }
+   
+   cv::imshow("result", m);
+   cv::imwrite("test_result.jpg", m);
+   cv::waitKey(0);
+
+   return 0;
+
+
+}
+```
+      
 ### 2. caffe网络模型转换为 ncnn模型 示例
 #### caffe下Alexnet网络模型转换为NCNN模型
       我们在测试的过程中需要 .caffemodel文件(模型参数文件)  以及 deploy.prototxt文件(模型框架结构) ,
