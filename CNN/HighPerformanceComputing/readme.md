@@ -157,19 +157,20 @@ static int load_labels(std::string path, std::vector<std::string>& labels)
     
     while(!feof(fp))
     {
-      char str_b[1024];//先读取 1024个字符
+      char str_b[1024];//先读取 至多 1024个字符 一行数据 
       fgets(str_b, 1024, fp);
       std::string str_block(str_b);//转换成 string 方便操作
       
       if(str_block.length() > 0)
       {
-        for (unsigned int i = 0; i <  str_block.length(); i++)
+        for (unsigned int i = 0; i <  str_block.length(); i++)//变量每一个字符
         {
-           if(str_block[i] == ' ')
+           if(str_block[i] == ' ')// 第一个空格前面为编号 后面为类别字符串
+           // n01601694 water ouzel, dipper
            {
-              std:: string name = str_block.substr(i, str_block.length() - i - 1);
+              std:: string name = str_block.substr(i, str_block.length() - i - 1);//截取后面的类别字符串
               labels.push_back(name);
-              i = str_block.length();
+              i = str_block.length();//这一行处理完 读取下一行
            }
         }
       }
