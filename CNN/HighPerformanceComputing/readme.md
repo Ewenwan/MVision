@@ -311,7 +311,7 @@ int main(int argc, char** argv)
 
 ## 2. 模型转换 
 
-      ./../../tools/caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet-ssd.param mobilenet-ssd.bin 
+      ./../../tools/caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet_ssd_voc_ncnn.param mobilenet_ssd_voc_ncnn.bin 
       caffe2ncnn的 作用是将caffe模型生成ncnn 模型 
       .prototxt >>> .param  .caffemodel >>> .bin；
 
@@ -319,11 +319,129 @@ int main(int argc, char** argv)
 
       
 ## 3. 修改检测源文件
+```c
+// Tencent is pleased to support the open source community by making ncnn available.
+//
 
+#include <stdio.h>
+#include <algorithm>
+#include <vector>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
+
+#include "net.h"
+//定义一个结果 结构体
+struct Object{
+    cv::Rect rec;//边框
+    int class_id;//类别id
+    float prob;//概率
+};
+// voc
+const char* class_names[] = {"background",
+                            "aeroplane", "bicycle", "bird", "boat",
+                            "bottle", "bus", "car", "cat", "chair",
+                            "cow", "diningtable", "dog", "horse",
+                            "motorbike", "person", "pottedplant",
+                            "sheep", "sofa", "train", "tvmonitor"};
+
+static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
+{
+    ncnn::Net mobilenet;
+    /* 模型下载
+     * model is  converted from https://github.com/chuanqi305/MobileNet-SSD
+     * and can be downloaded from https://drive.google.com/open?id=0ByaKLD9QaPtucWk0Y0dha1VVY0U
+     */
+    // 原始图片尺寸 
+    int img_h = raw_img.size().height;
+    int img_w = raw_img.size().width;
+    mobilenet.load_param("mobilenet_ssd_voc_ncnn.param");
+    mobilenet.load_model("mobilenet_ssd_voc_ncnn.bin");
+    int input_size = 300;
+    // 改变图像尺寸 到网络的输入尺寸
+    ncnn::Mat in = ncnn::Mat::from_pixels_resize(raw_img.data, ncnn::Mat::PIXEL_BGR, raw_img.cols, raw_img.rows, input_size, input_size);
+    // 去均值, 再归一化
+    const float mean_vals[3] = {127.5f, 127.5f, 127.5f};
+    const float norm_vals[3] = {1.0/127.5,1.0/127.5,1.0/127.5};
+    in.substract_mean_normalize(mean_vals, norm_vals);
+
+    ncnn::Mat out;
+
+    ncnn::Extractor ex = mobilenet.create_extractor();
+    ex.set_light_mode(true);
+    //ex.set_num_threads(4);//线程数量
+    ex.input("data", in);
+    ex.extract("detection_out",out);//网络输出
+    // 打印总结果
+    printf("%d %d %d\n", out.w, out.h, out.c);
+    std::vector<Object> objects;
+    
+    // 获取结果
+    for (int iw=0;iw<out.h;iw++)
+    {
+        Object object;
+        const float *values = out.row(iw);//一行是一个结果
+        object.class_id = values[0];//类别id
+        object.prob = values[1];// 概率
+        object.rec.x = values[2] * img_w;//边框中心点
+        object.rec.y = values[3] * img_h;
+        object.rec.width = values[4] * img_w - object.rec.x;//半尺寸
+        object.rec.height = values[5] * img_h - object.rec.y;
+        objects.push_back(object);
+    }
+    // 打印结果
+    for(int i = 0;i<objects.size();++i)
+    {
+        Object object = objects.at(i);
+        if(object.prob > show_threshold)//按阈值显示
+        {
+            cv::rectangle(raw_img, object.rec, cv::Scalar(255, 0, 0));
+            std::ostringstream pro_str;
+            pro_str<<object.prob;//概率大小字符串
+            // 类别+概率字符串
+            std::string label = std::string(class_names[object.class_id]) + ": " + pro_str.str();
+            int baseLine = 0;
+            // 获取文字大小
+            cv::Size label_size = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+            // 画矩形边框
+            cv::rectangle(raw_img, cv::Rect(cv::Point(object.rec.x, object.rec.y- label_size.height),
+                                  cv::Size(label_size.width, label_size.height + baseLine)),
+                      cv::Scalar(255, 255, 255), CV_FILLED);
+            // 添加文字
+            cv::putText(raw_img, label, cv::Point(object.rec.x, object.rec.y),
+                    cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
+        }
+    }
+    // 显示带结果标签的 图像
+    cv::imshow("result",raw_img);
+    cv::waitKey();
+
+    return 0;
+}
+
+int main(int argc, char** argv)
+{   
+    // 图像地址
+    const char* imagepath = argv[1];
+    // 读取图像
+    cv::Mat m = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
+    if (m.empty())
+    {
+        fprintf(stderr, "cv::imread %s failed\n", imagepath);
+        return -1;
+    }
+    // 检测结果
+    detect_mobilenet(m,0.5);
+
+    return 0;
+}
+```
 
 ## 4. 编译
+make -j
 
 ## 5. 运行测试
 
-
+./ssdmobilenet person.jpg
 
