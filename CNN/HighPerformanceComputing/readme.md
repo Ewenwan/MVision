@@ -297,26 +297,32 @@ int main(int argc, char** argv)
       net.load_param_bin("alexnet.param.bin");
       net.load_model("alexnet.bin");
       
-## 3. 编译NCNN例程
-      前面介绍了如何将caffe模型转为NCNN模型并且加密,
-      最后我们来编译NCNN的例程,
-      这样可以更直观的运行或者理解NCNN. 
-      
-      首先我们需要进入ncnn/examples目录 
-      新建一个makefile,内容如下,最重要的是,NCNN例程序只支持opencv2,不支持opencv3.
-      
-            NCNN = /home/wanyouwen/ewenwan/software/ncnn
-            OPENCV = /home/ruyiwei/Downloads/opencv-2.4.13 #opencv路径
-            INCPATH =       -I${NCNN}/build/install/include \
-                            -I${OPENCV}/modules/objdetect/include \
-                            -I${OPENCV}/modules/highgui/include \
-                            -I${OPENCV}/modules/imgproc/include \
-                            -I${OPENCV}/modules/core/include
-            # 库
-            LIBS = -lopencv_core -lopencv_highgui -lopencv_imgproc  \
-                            -fopenmp -pthread
+## mobileNET-SSD 示例
+## 1. 训练
 
-            LIBPATH = -L${OPENCV}/build/lib
+      [使用caffe-ssd mobilenet-v1 训练网络 得到网络权重参数](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet/MobileNet_v1_ssd_caffe)
 
-            %:%.cpp
-                    $(CXX) $(INCPATH) $(LIBPATH) $^ ${NCNN}/build/install/lib/libncnn.a $(LIBS) -o $@
+      得到 caffe版本的模型和权重文件：
+            MN_ssd_33_deploy.prototxt
+            MN_ssd_33_iter_26000.caffemodel
+            
+            
+## 2. 模型转换 
+
+      ./caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet-ssd.param mobilenet-ssd.bin
+
+      caffe2ncnn的 作用是将caffe模型生成ncnn 模型 
+      .prototxt >>> .param  .caffemodel >>> .bin；
+
+      执行上面命令后就可以生成NCNN模型需要的param 与bin 文件.
+
+      
+## 3. 修改检测源文件
+
+
+## 4. 编译
+
+## 5. 运行测试
+
+
+
