@@ -1,5 +1,5 @@
 # 性能提升方法
-    1. 小模型 mobilenet , 更精细模型的设计
+    1. 小模型 mobilenet , 更精细模型的设计，紧致网络设计
        mobilenet squeezenet shufflenet 
        
     2. 模型压缩：参数稀疏、剪裁、量化、分解。
