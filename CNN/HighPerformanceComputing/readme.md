@@ -94,6 +94,18 @@
 #include <opencv2/imgproc/imgproc.hpp>// putText()
 #include "net.h"
 
+#include <sys/time.h>
+#include <unistd.h>
+
+// 计时
+long getTimeUsec()
+{
+    
+    struct timeval t;
+    gettimeofday(&t,0);
+    return (long)((long)t.tv_sec*1000*1000 + t.tv_usec);
+}
+
 static int detect_squeezenet(const cv::Mat& bgr, std::vector<float>& cls_scores)
 {
     ncnn::Net squeezenet;// 前向模型
@@ -128,7 +140,7 @@ static int print_topk(const std::vector<float>& cls_scores, int topk, std::vecto
     int size = cls_scores.size();// 结果维度
     std::vector< std::pair<float, int> > vec;
     vec.resize(size);
-    for (int i=0; i<size; i++)
+    for (unsigned int i=0; i<size; i++)
     {// 成对 值:id 这里id对于类别
         vec[i] = std::make_pair(cls_scores[i], i);
     }
@@ -157,20 +169,19 @@ static int load_labels(std::string path, std::vector<std::string>& labels)
     
     while(!feof(fp))
     {
-      char str_b[1024];//先读取 至多 1024个字符 一行数据 
+      char str_b[1024];//先读取 1024个字符
       fgets(str_b, 1024, fp);
       std::string str_block(str_b);//转换成 string 方便操作
       
       if(str_block.length() > 0)
       {
-        for (unsigned int i = 0; i <  str_block.length(); i++)//变量每一个字符
+        for (unsigned int i = 0; i <  str_block.length(); i++)
         {
-           if(str_block[i] == ' ')// 第一个空格前面为编号 后面为类别字符串
-           // n01601694 water ouzel, dipper
+           if(str_block[i] == ' ')
            {
-              std:: string name = str_block.substr(i, str_block.length() - i - 1);//截取后面的类别字符串
+              std:: string name = str_block.substr(i, str_block.length() - i - 1);
               labels.push_back(name);
-              i = str_block.length();//这一行处理完 读取下一行
+              i = str_block.length();
            }
         }
       }
@@ -196,14 +207,18 @@ int main(int argc, char** argv)
     load_labels("synset_words.txt", labels);
     
     std::vector<float> cls_scores;
+
+    long time = getTimeUsec();
     detect_squeezenet(m, cls_scores);
-    
+    time = getTimeUsec() - time;
+    printf("detection time: %ld ms\n",time/1000);
+
+
     std::vector<int> index;
     std::vector<float> score;
 
     print_topk(cls_scores, 3, index, score);
-    
-// 添加类别字符串
+
    for(unsigned int i = 0; i < index.size(); i++)
    {
      cv::putText(m, labels[index[i]], cv::Point(50, 50+30*i), CV_FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 100, 200), 2, 8);
@@ -214,8 +229,6 @@ int main(int argc, char** argv)
    cv::waitKey(0);
 
    return 0;
-
-
 }
 ```
 
@@ -455,6 +468,7 @@ int main(int argc, char** argv)
 
    return 0;
 }
+
 ```
 
 **修改ncnn/examples/CMakeLists.txt 添加编译选项**
@@ -462,9 +476,8 @@ int main(int argc, char** argv)
       add_executable(mobilenet mobilenet.cpp)
       target_link_libraries(mobilenet ncnn ${OpenCV_LIBS})
 
-
 ## 5. 编译&运行
-
+      ./mobilenet cat.jpg
 
     
     
