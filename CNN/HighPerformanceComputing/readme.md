@@ -309,8 +309,7 @@ int main(int argc, char** argv)
             
 ## 2. 模型转换 
 
-      ./caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet-ssd.param mobilenet-ssd.bin
-
+      ./../../tools/caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet-ssd.param mobilenet-ssd.bin 
       caffe2ncnn的 作用是将caffe模型生成ncnn 模型 
       .prototxt >>> .param  .caffemodel >>> .bin；
 
