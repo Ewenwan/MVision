@@ -201,7 +201,8 @@ int main(int argc, char** argv)
     std::vector<float> score;
 
     print_topk(cls_scores, 3, index, score);
-
+    
+// 添加类别字符串
    for(unsigned int i = 0; i < index.size(); i++)
    {
      cv::putText(m, labels[index[i]], cv::Point(50, 50+30*i), CV_FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(0, 100, 200), 2, 8);
@@ -216,7 +217,10 @@ int main(int argc, char** argv)
 
 }
 ```
-      
+   
+   
+   
+   
 ### 2. caffe网络模型转换为 ncnn模型 示例
 #### caffe下Alexnet网络模型转换为NCNN模型
       我们在测试的过程中需要 .caffemodel文件(模型参数文件)  以及 deploy.prototxt文件(模型框架结构) ,
