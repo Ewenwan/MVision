@@ -306,7 +306,9 @@ int main(int argc, char** argv)
             MN_ssd_33_deploy.prototxt
             MN_ssd_33_iter_26000.caffemodel
             
-            
+[也可以直接从这里下载](https://github.com/chuanqi305/MobileNet-SSD)         
+
+
 ## 2. 模型转换 
 
       ./../../tools/caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet-ssd.param mobilenet-ssd.bin 
