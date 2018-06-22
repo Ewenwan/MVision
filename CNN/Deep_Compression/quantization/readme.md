@@ -115,6 +115,11 @@
 
 ![](https://img-blog.csdn.net/20170214003827832?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
+    二值化神经网络，是指在浮点型神经网络的基础上，
+    将其权重矩阵中权重值(线段上) 和 各个激活函数值(圆圈内) 同时进行二值化得到的神经网络。
+        1. 一个是存储量减少，一个权重使用 1bit 就可以，而原来的浮点数需要32bits。
+        2. 运算量减少， 原先浮点数的乘法运算，可以变成 二进制位的异或运算。
+        
 [Binarized Neural Networks BNN](https://arxiv.org/pdf/1602.02830.pdf)
 
     BNN的激活量和参数都被二值化了, 反向传播时使用全精度梯度。 
@@ -132,6 +137,7 @@
 
 [论文笔记](https://blog.csdn.net/weixin_37904412/article/details/80618102)
 
+[BinaryConnect 代码]()
 
 
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
