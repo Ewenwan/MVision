@@ -1,5 +1,9 @@
 # pruning 剪枝
 
+[剪枝代码参考](https://github.com/Ewenwan/cut_weight_cnn)
+
+[博客](https://blog.csdn.net/jason19966/article/details/78922695)
+
 # 剪枝(pruning) 在训练结束后，可以将一些不重要的神经元连接
     结构化Pruning，Filter Pruning，梯度Pruning等方法
     
