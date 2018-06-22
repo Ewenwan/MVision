@@ -289,6 +289,12 @@ int main(int argc, char** argv)
       
 **c. 旧版caffe模型转新版caffe模型**
 
+      转换ncnn网络和模型
+      caffe 自带了工具可以把老版本的 caffe 网络和模型转换为新版（ncnn的工具只认识新版
+
+      upgrade_net_proto_text [老prototxt] [新prototxt]
+      upgrade_net_proto_binary [老caffemodel] [新caffemodel]
+      
       模型框架转换：
       ~/code/ncnn/build/tools$ ~/caffe/build/tools/upgrade_net_proto_text deploy.prototxt new_deplpy.prototxt
       模型权重文件转换：
