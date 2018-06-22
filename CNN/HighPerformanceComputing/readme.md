@@ -528,12 +528,24 @@ int main(int argc, char** argv)
 
 
 ## 2. 模型转换 
+     caffe_old -> caffe_new:
+           注意这里的caffe版本为 caffe-ssd的版本 否则有些层的类型不认识
+[caffe-ssd](https://github.com/weiliu89/caffe/tree/ssd)     
 
-      ./../../tools/caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet_ssd_voc_ncnn.param mobilenet_ssd_voc_ncnn.bin 
-      caffe2ncnn的 作用是将caffe模型生成ncnn 模型 
-      .prototxt >>> .param  .caffemodel >>> .bin；
+            upgrade_net_proto_text [老prototxt] [新prototxt]
+            upgrade_net_proto_binary [老caffemodel] [新caffemodel]
 
-      执行上面命令后就可以生成NCNN模型需要的param 与bin 文件.
+            模型框架转换：
+            ~/code/ncnn/build/tools$ ~/caffe/build/tools/upgrade_net_proto_text MN_ssd_33_deploy.prototxt ssdmobilenet.prototxt
+            模型权重文件转换：
+            ~/code/ncnn/build/tools$ ~/caffe/build/tools/upgrade_net_proto_binary MN_ssd_33_iter_26000.caffemodel ssdmobilenet.caffemodel
+
+     caffe -> ncnn
+            ./../../tools/caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet_ssd_voc_ncnn.param mobilenet_ssd_voc_ncnn.bin 
+            caffe2ncnn的 作用是将caffe模型生成ncnn 模型 
+            .prototxt >>> .param  .caffemodel >>> .bin；
+
+            执行上面命令后就可以生成NCNN模型需要的param 与bin 文件.
 
       
 ## 3. 修改检测源文件
@@ -664,4 +676,15 @@ make -j
 ## 5. 运行测试
 
 ./ssdmobilenet person.jpg
+
+      这里如果没使用 新版本caffe格式可能会有错误：
+            find_blob_index_by_name data_splitncnn_6 failed
+            find_blob_index_by_name data_splitncnn_5 failed
+            find_blob_index_by_name data_splitncnn_4 failed
+            find_blob_index_by_name data_splitncnn_3 failed
+            find_blob_index_by_name data_splitncnn_2 failed
+            find_blob_index_by_name data_splitncnn_1 failed
+            find_blob_index_by_name data_splitncnn_0 failed
+            Segmentation fault
+
 
