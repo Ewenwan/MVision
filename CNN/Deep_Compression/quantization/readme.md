@@ -148,15 +148,39 @@
 
 ![](https://img-blog.csdn.net/20170214010139607?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
+**在反传过程时**
 
-    使用sign函数时，sign函数不可导，使用直通估计（straight-through estimator）(即将误差直接传递到下一层): …. 
+    使用sign函数时，
+    对决定化方式中的Sign函数进行松弛化，即前传中是： 
+![](https://img-blog.csdn.net/20170214005740059?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+    sign函数不可导，
+    使用直通估计（straight-through estimator）(即将误差直接传递到下一层):
+    反传中在已知q的梯度，对r求梯度时，Sign函数松弛为：
     gr=gq1|r|≤1
+![](https://img-blog.csdn.net/20170214005816256?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+    
+    即当r的绝对值小于等于1时，r的梯度等于q的梯度，否则r的梯度为0。 
+    
+    最后求得各层浮点型权重值对应的梯度和浮点型激活函数值对应的残差，
+    然后用SGD方法或者其他梯度更新方法对浮点型的权重值进行更新，
+    以此不断的进行迭代，直到loss不再继续下降。
 
     BNN中同时介绍了基于移位（而非乘法）的BatchNormailze和AdaMax算法。 
     实验结果： 
     在MNIST，SVHN和CIFAR-10小数据集上几乎达到了顶尖的水平。 
     在ImageNet在使用AlexNet架构时有较大差距（在XNOR-Net中的实验Δ=29.8%） 
-    在GPU上有7倍加速
+    在GPU上有7倍加速.
+
+**求各层梯度方式如下：**
+
+![](https://img-blog.csdn.net/20170214005928789?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+    
+**梯度更新方式如下：**
+
+![](https://img-blog.csdn.net/20170214010005900?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+    
+    
 
 [BinaryConnect: Training Deep Neural Networks with binary weights](https://arxiv.org/pdf/1511.00363.pdf)
 
