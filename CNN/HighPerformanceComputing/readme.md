@@ -32,8 +32,12 @@
 
 [深度学习框架的并行优化方法小结](https://github.com/DragonFive/myblog/blob/master/source/_posts/mpi_parallel.md)
 
+# ncnn使用
+[ncnn_wiki 指南](https://github.com/Tencent/ncnn/wiki)
 
 ## 在Ubuntu上安装使用NCNN 
+
+
 ### 1. 下载编译源码
       git clone https://github.com/Tencent/ncnn.git
       下载完成后，需要对源码进行编译
@@ -132,6 +136,8 @@ static int detect_squeezenet(const cv::Mat& bgr, std::vector<float>& cls_scores)
     ncnn::Net squeezenet;// 前向模型
     squeezenet.load_param("squeezenet_v1.1.param");// 模型框架
     squeezenet.load_model("squeezenet_v1.1.bin");// 权重参数
+    
+// ncnn 用自己的数据结构 Mat 来存放输入和输出数据 输入图像的数据要转换为 Mat，依需要减去均值和乘系数
     // 图片变形
     ncnn::Mat in = ncnn::Mat::from_pixels_resize(bgr.data, ncnn::Mat::PIXEL_BGR, bgr.cols, bgr.rows, 227, 227);
     // 各个通道均值
@@ -142,7 +148,8 @@ static int detect_squeezenet(const cv::Mat& bgr, std::vector<float>& cls_scores)
     ex.set_light_mode(true);// 模型 提取器 
 
     ex.input("data", in);
-
+    
+// 执行前向网络，获得计算结果
     ncnn::Mat out;
     ex.extract("prob", out);//提取 prob层的输出
 
@@ -575,6 +582,8 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
 
     ncnn::Extractor ex = mobilenet.create_extractor();
     ex.set_light_mode(true);
+    
+// Extractor 有个多线程加速的开关，设置线程数能加快计算
     //ex.set_num_threads(4);//线程数量
     ex.input("data", in);
     ex.extract("detection_out",out);//网络输出
