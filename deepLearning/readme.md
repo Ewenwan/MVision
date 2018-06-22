@@ -10,6 +10,8 @@
 Note: the project aims at imitating the well-implemented algorithms in [Deep Learning Tutorials](http://www.deeplearning.net/tutorial/) (coded by [Theano](http://deeplearning.net/software/theano/index.html)).
 
 
+[参考博客](https://github.com/DragonFive/myblog/blob/master/source/_posts/DL-learningNote1.md)
+
 [吴恩达老师的深度学习课程笔记及资源](https://github.com/fengdu78/deeplearning_ai_books)
 
 ## 1. 神经网络的编程基础(Basics of Neural Network programming)
