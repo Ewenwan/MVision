@@ -111,6 +111,10 @@
         梯度更新过程为实数值。
 
 ## 2. 二值量化网络 
+[二值化神经网络介绍](https://blog.csdn.net/tangwei2014/article/details/55077172)
+
+![](https://img-blog.csdn.net/20170214003827832?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
 [Binarized Neural Networks BNN](https://arxiv.org/pdf/1602.02830.pdf)
 
     BNN的激活量和参数都被二值化了, 反向传播时使用全精度梯度。 
@@ -123,6 +127,12 @@
     在MNIST，SVHN和CIFAR-10小数据集上几乎达到了顶尖的水平。 
     在ImageNet在使用AlexNet架构时有较大差距（在XNOR-Net中的实验Δ=29.8%） 
     在GPU上有7倍加速
+
+[BinaryConnect: Training Deep Neural Networks with binary weights](https://arxiv.org/pdf/1511.00363.pdf)
+
+[论文笔记](https://blog.csdn.net/weixin_37904412/article/details/80618102)
+
+
 
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
