@@ -20,6 +20,15 @@
      Tengine 高性能神经网络推理引擎
 [代码](https://github.com/Ewenwan/Tengine)
 
+      百度MDL
+[代码](https://github.com/Ewenwan/paddle-mobile)
+
+      九言科技 绝影（Prestissimo）
+[代码](https://github.com/Ewenwan/In-Prestissimo)
+
+[代码]()
+
+[代码]()
 
 [深度学习框架的并行优化方法小结](https://github.com/DragonFive/myblog/blob/master/source/_posts/mpi_parallel.md)
 
