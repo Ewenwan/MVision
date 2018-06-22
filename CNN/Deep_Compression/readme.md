@@ -276,6 +276,9 @@
     IC是AA中每个元素对应的列号，长度为a。 
     所以将一个稀疏矩阵转为CSR表示，需要的空间为2*a+n+1个，同理CSC也是类似。 
 
+[caffe-python 剪枝 实例](https://github.com/Ewenwan/Caffe-Python-Tutorial/blob/master/prune.py)
+
+
 **b.基于量级的裁剪方式**
 [相关论文](https://arxiv.org/pdf/1608.08710.pdf)
 
