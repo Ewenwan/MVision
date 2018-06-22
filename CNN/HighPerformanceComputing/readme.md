@@ -536,12 +536,15 @@ int main(int argc, char** argv)
             upgrade_net_proto_binary [老caffemodel] [新caffemodel]
 
             模型框架转换：
-            ~/code/ncnn/build/tools$ ~/caffe/build/tools/upgrade_net_proto_text MN_ssd_33_deploy.prototxt ssdmobilenet.prototxt
+            ~/code/ncnn/build/tools$ ../../tools/caffe_tools/upgrade_net_proto_text MN_ssd_33_deploy.prototxt ssdmobilenet.prototxt
             模型权重文件转换：
-            ~/code/ncnn/build/tools$ ~/caffe/build/tools/upgrade_net_proto_binary MN_ssd_33_iter_26000.caffemodel ssdmobilenet.caffemodel
+            ~/code/ncnn/build/tools$ ../../tools/caffe_tools/upgrade_net_proto_binary MN_ssd_33_iter_26000.caffemodel ssdmobilenet.caffemodel 
+
+            上面 对casse-ssd/build/tools 工具做了 符号链接
+                  ln -s /home/wanyouwen/ewenwan/software/caffe-ssd/build/tools/ ./caffe_tools
 
      caffe -> ncnn
-            ./../../tools/caffe/caffe2ncnn MN_ssd_33_deploy.prototxt MN_ssd_33_iter_26000.caffemodel mobilenet_ssd_voc_ncnn.param mobilenet_ssd_voc_ncnn.bin 
+            ./../../tools/caffe/caffe2ncnn ssdmobilenet.prototxt ssdmobilenet.caffemodel mobilenet_ssd_voc_ncnn.param mobilenet_ssd_voc_ncnn.bin 
             caffe2ncnn的 作用是将caffe模型生成ncnn 模型 
             .prototxt >>> .param  .caffemodel >>> .bin；
 
