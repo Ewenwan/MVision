@@ -137,7 +137,7 @@
 
 [论文笔记](https://blog.csdn.net/weixin_37904412/article/details/80618102)
 
-[BinaryConnect 代码]()
+[BinaryConnect 代码](https://github.com/Ewenwan/BinaryConnect)
 
 
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
