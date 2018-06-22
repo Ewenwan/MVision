@@ -505,7 +505,7 @@ int main(int argc, char** argv)
 ## mobileNET-SSD 检测网络示例
 ## 1. 训练
 
-      [使用caffe-ssd mobilenet-v1 训练网络 得到网络权重参数](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet/MobileNet_v1_ssd_caffe)
+[使用caffe-ssd mobilenet-v1 训练网络 得到网络权重参数](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet/MobileNet_v1_ssd_caffe)
 
       得到 caffe版本的模型和权重文件：
             MN_ssd_33_deploy.prototxt
