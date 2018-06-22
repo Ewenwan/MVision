@@ -45,7 +45,7 @@
         当然，论文还提出需要对量化后的值进行重训练，挽回一点丢失的识别率 
         基本上所有压缩方法都有损，所以重训练还是比较必要的。
         
-# 深度神经网络压缩 Deep Compression
+# 1. 深度神经网络压缩 Deep Compression
     为了进一步压缩网络，考虑让若干个权值共享同一个权值，
     这一需要存储的数据量也大大减少。
     在论文中，采用kmeans算法来将权值进行聚类，
@@ -110,7 +110,7 @@
         通常做法是网络前馈过程为二值或三值，
         梯度更新过程为实数值。
 
-**1. 二值量化网络**
+## 2. 二值量化网络 
 [Binarized Neural Networks BNN](https://arxiv.org/pdf/1602.02830.pdf)
 
     BNN的激活量和参数都被二值化了, 反向传播时使用全精度梯度。 
@@ -149,7 +149,7 @@
         BNN约差于XNOR-NET（<3%），
         QNN-2bit activation 略优于DoReFaNet 2-bit activation
 
-**2. 三值化网络**
+## 3. 三值化网络 
 [Ternary Neural Networks TNN](https://arxiv.org/pdf/1609.00222.pdf)
 
     训练时激活量三值化，参数全精度 
@@ -175,7 +175,7 @@
 
 
 
-**3. 二进制位量化网络 哈希函数的味道啊**
+## 4. 二进制位量化网络 哈希函数的味道啊 
 [ShiftCNN](http://cn.arxiv.org/pdf/1706.02393v1)
 
 [博客](https://blog.csdn.net/shuzfan/article/details/77856900)
