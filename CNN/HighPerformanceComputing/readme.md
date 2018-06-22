@@ -520,10 +520,13 @@ int main(int argc, char** argv)
 
 [使用caffe-ssd mobilenet-v1 训练网络 得到网络权重参数](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet/MobileNet_v1_ssd_caffe)
 
-      得到 caffe版本的模型和权重文件：
+      这里训练的效果不太好，是基于mobilenet的权重进行训练的，得到 caffe版本的模型和权重文件：
             MN_ssd_33_deploy.prototxt
             MN_ssd_33_iter_26000.caffemodel
-            
+  
+ 
+      这里的是直接训练好的 mobilenet-ssd 检测效果还可以
+      其实可以基于这个权重进行训练：
 [也可以直接从这里下载](https://github.com/chuanqi305/MobileNet-SSD)         
 
 
@@ -565,6 +568,19 @@ int main(int argc, char** argv)
 #include <iostream>
 
 #include "net.h"
+
+#include <sys/time.h>
+#include <unistd.h>
+
+// 计时
+long getTimeUsec()
+{
+    
+    struct timeval t;
+    gettimeofday(&t,0);
+    return (long)((long)t.tv_sec*1000*1000 + t.tv_usec);
+}
+
 //定义一个结果 结构体
 struct Object{
     cv::Rect rec;//边框
@@ -581,33 +597,44 @@ const char* class_names[] = {"background",
 
 static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
 {
-    ncnn::Net mobilenet;
+    ncnn::Net ssdmobilenet;
     /* 模型下载
      * model is  converted from https://github.com/chuanqi305/MobileNet-SSD
      * and can be downloaded from https://drive.google.com/open?id=0ByaKLD9QaPtucWk0Y0dha1VVY0U
      */
+ 
+    printf("loading net... \r\n"); 
     // 原始图片尺寸 
     int img_h = raw_img.size().height;
     int img_w = raw_img.size().width;
-    mobilenet.load_param("mobilenet_ssd_voc_ncnn.param");
-    mobilenet.load_model("mobilenet_ssd_voc_ncnn.bin");
+    ssdmobilenet.load_param("mobilenet_ssd_voc_ncnn.param");
+    ssdmobilenet.load_model("mobilenet_ssd_voc_ncnn.bin");
     int input_size = 300;
     // 改变图像尺寸 到网络的输入尺寸
     ncnn::Mat in = ncnn::Mat::from_pixels_resize(raw_img.data, ncnn::Mat::PIXEL_BGR, raw_img.cols, raw_img.rows, input_size, input_size);
     // 去均值, 再归一化
     const float mean_vals[3] = {127.5f, 127.5f, 127.5f};
     const float norm_vals[3] = {1.0/127.5,1.0/127.5,1.0/127.5};
-    in.substract_mean_normalize(mean_vals, norm_vals);
-
-    ncnn::Mat out;
-
-    ncnn::Extractor ex = mobilenet.create_extractor();
-    ex.set_light_mode(true);
     
-// Extractor 有个多线程加速的开关，设置线程数能加快计算
+    //in.substract_mean_normalize(mean_vals, norm_vals);// 上面给的模型
+    
+    in.substract_mean_normalize(mean_vals, 0);// 我自己训练的 没有进行归一化
+
+    ncnn::Extractor ex = ssdmobilenet.create_extractor();
+    ex.set_light_mode(true);
     //ex.set_num_threads(4);//线程数量
     ex.input("data", in);
-    ex.extract("detection_out",out);//网络输出
+    
+    printf("begin detecting... \r\n");
+     
+    long time = getTimeUsec();
+     
+    ncnn::Mat out;
+    ex.extract("detection_out", out);//网络输出
+    
+    time = getTimeUsec() - time;
+    printf("detection time: %ld ms\n",time/1000);
+
     // 打印总结果
     printf("%d %d %d\n", out.w, out.h, out.c);
     std::vector<Object> objects;
@@ -626,12 +653,15 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
         objects.push_back(object);
     }
     // 打印结果
-    for(int i = 0;i<objects.size();++i)
+    for(unsigned int i = 0;i<objects.size();++i)
     {
         Object object = objects.at(i);
         if(object.prob > show_threshold)//按阈值显示
         {
-            cv::rectangle(raw_img, object.rec, cv::Scalar(255, 0, 0));
+            cv::RNG rng(cvGetTickCount()); 
+            //cv::rectangle(raw_img, object.rec, cv::Scalar(255, 0, 0));// 绿色 物体标注框
+            // 随机颜色框
+            cv::rectangle(raw_img, object.rec, cv::Scalar(rng.uniform(0,255),rng.uniform(0,255),rng.uniform(0,255)));
             std::ostringstream pro_str;
             pro_str<<object.prob;//概率大小字符串
             // 类别+概率字符串
@@ -639,13 +669,13 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
             int baseLine = 0;
             // 获取文字大小
             cv::Size label_size = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-            // 画矩形边框
+            // 画文本矩形边框
             cv::rectangle(raw_img, cv::Rect(cv::Point(object.rec.x, object.rec.y- label_size.height),
                                   cv::Size(label_size.width, label_size.height + baseLine)),
-                      cv::Scalar(255, 255, 255), CV_FILLED);
+                      cv::Scalar(255, 255, 255), CV_FILLED);//白色
             // 添加文字
             cv::putText(raw_img, label, cv::Point(object.rec.x, object.rec.y),
-                    cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
+                    cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));//黑色
         }
     }
     // 显示带结果标签的 图像
@@ -657,15 +687,25 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
 
 int main(int argc, char** argv)
 {   
+    if(argc != 2){
+       printf("usage: ./ssdmobilenet *.jpg\r\n"); 
+       return -1;
+    }
     // 图像地址
     const char* imagepath = argv[1];
     // 读取图像
     cv::Mat m = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
+    
+    printf("read img: %s successful\r\n", argv[1]);
+ 
     if (m.empty())
     {
         fprintf(stderr, "cv::imread %s failed\n", imagepath);
         return -1;
     }
+     
+    printf("detecting... \r\n");
+    
     // 检测结果
     detect_mobilenet(m,0.5);
 
