@@ -1,6 +1,7 @@
 # SSD 
-# caffe code
 [caffeSSD ](https://github.com/weiliu89/caffe/tree/ssd)
+
+[mxnet-ssd](https://github.com/Ewenwan/mxnet-ssd)
 
 [VGG16与训练权重 csdn上需要金币](https://download.csdn.net/download/zhayushui/10132277)
 
