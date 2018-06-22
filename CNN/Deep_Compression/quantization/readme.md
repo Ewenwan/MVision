@@ -286,3 +286,45 @@
     比如计算 y=wx, 而 w 通过量化已经被我们表示成了,
     类似于 2^−1 + 2^−2 + 2^−3 这种形式，
     于是 y = x>>1 + x>>2 + x>>3 
+
+
+## 5. 固定点多比特量化
+[Fixed Point Quantization of Deep Convolutional Networks ](https://arxiv.org/pdf/1511.06393.pdf)
+
+    r=S(q-Z) 其中q为定点结果，r为对应的浮点数据，S和Z分别为范围和偏移参数
+## 6. Quantized Convolutional Neural Networks for Mobile Devices  8bit
+[Quantized Convolutional Neural Networks for Mobile Devices](https://arxiv.org/pdf/1512.06473.pdf)
+
+
+## 7.
+
+[Ristretto: Hardware-Oriented Approximation of Convolutional Neural Networks](https://arxiv.org/pdf/1605.06402.pdf)
+
+
+[Fixed-point Factorized Networks](https://arxiv.org/pdf/1611.01972.pdf)
+
+[Deep Learning with Low Precision by Half-wave Gaussian Quantization](https://arxiv.org/pdf/1702.00953.pdf)
+
+[INCREMENTAL NETWORK QUANTIZATION: TOWARDS LOSSLESS CNNS WITH LOW-PRECISION WEIGHTS](https://arxiv.org/pdf/1702.03044.pdf)
+
+
+[Network Sketching: Exploiting Binary Structure in Deep CNNs ](https://arxiv.org/pdf/1706.02021.pdf)
+
+
+[Training Quantized Nets: A Deeper Understanding ](https://arxiv.org/pdf/1706.02379.pdf)
+
+
+[Balanced Quantization: An Effective and Efficient Approach to Quantized Neural Networks](https://arxiv.org/pdf/1706.07145.pdf)
+
+
+[Performance Guaranteed Network Acceleration viaHigh-Order Residual Quantization](https://arxiv.org/pdf/1708.08687.pdf)
+
+[Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference](https://arxiv.org/abs/1712.05877)
+
+
+[ALTERNATING MULTI-BIT QUANTIZATION FOR RECURRENT NEURAL NETWORKS](https://arxiv.org/pdf/1802.00150.pdf)
+
+
+[Deep Neural Network Compression with Single and Multiple Level Quantization](https://arxiv.org/pdf/1803.03289.pdf)
+
+[Expectation Backpropagation: Parameter-Free Training of Multilayer Neural Networks with Continuous or Discrete Weights](http://papers.nips.cc/paper/5269-expectation-backpropagation-parameter-free-training-of-multilayer-neural-networks-with-continuous-or-discrete-weights.pdf)
