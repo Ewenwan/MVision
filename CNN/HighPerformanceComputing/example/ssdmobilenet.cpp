@@ -103,7 +103,7 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
             cv::RNG rng(cvGetTickCount()); 
             //cv::rectangle(raw_img, object.rec, cv::Scalar(255, 0, 0));// 绿色 物体标注框
             // 随机颜色框
-            cv::rectangle(raw_img, object.rec, cv::Scalar(rng.uniform(0,255),rng.uniform(0,255),rng.uniform(0,255)));
+            cv::rectangle(raw_img, object.rec, cv::Scalar(rng.uniform(0,255),rng.uniform(0,255),rng.uniform(0,255)), 3);
             std::ostringstream pro_str;
             pro_str<<object.prob;//概率大小字符串
             // 类别+概率字符串
