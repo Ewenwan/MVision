@@ -13,9 +13,11 @@
      腾讯NCNN框架入门到应用
      
 [代码](https://github.com/Ewenwan/ncnn)
+     
+     FeatherCNN
+[代码](https://github.com/Ewenwan/FeatherCNN)
 
-
-## 在Ubuntu上安装NCNN
+## 在Ubuntu上安装使用NCNN 
 ### 1. 下载编译源码
       git clone https://github.com/Tencent/ncnn.git
       下载完成后，需要对源码进行编译
