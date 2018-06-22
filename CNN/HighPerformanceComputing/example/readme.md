@@ -1,12 +1,12 @@
 # 示例程序
 
-# 图像分类网络
+# 1. 图像分类网络
 
     mobilenet
 
     squeezenet
 
-# 目标检测网络
+# 2. 目标检测网络
 
     mobilenet-ssd
     squeezenet-ssd
