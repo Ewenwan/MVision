@@ -6,6 +6,8 @@
 
 [Computer vision:models, learning and inference 书籍](http://web4.cs.ucl.ac.uk/staff/s.prince/book/book.pdf)
 
+[TLD：tracking-learning-detection 跟踪算法](https://github.com/Ewenwan/opencv_TLD)
+
 [机器人选修课](http://www.diag.uniroma1.it/%7Elanari/EIR/)
 
 [Andrew Davison的课程： Robotics Lecture Course (course code 333)](http://www.doc.ic.ac.uk/~ajd/Robotics/index.html)
