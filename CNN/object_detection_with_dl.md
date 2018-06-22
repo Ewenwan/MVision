@@ -14,6 +14,8 @@ tags:
 
  去年总结了一篇关于目标检测的博客 [视频智能之——目标检测](https://dragonfive.github.io/object_detection/)，今年到现在有了新的体会，所以就更新一篇。
  
+[参考博文](https://github.com/DragonFive/myblog/blob/master/source/_posts/object_detection_with_dl.md)
+ 
  ![目标检测题图][1]
 <!--more-->
 
