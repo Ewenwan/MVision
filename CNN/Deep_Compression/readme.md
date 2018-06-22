@@ -446,6 +446,105 @@
             r = 32*n / (8*n + 256*32 )≈4 
             可以看出，如果采用8bit编码，则至少能达到4倍压缩率。
 
+[通过减少精度的方法来优化网络的方法总结](https://arxiv.org/pdf/1703.09039.pdf)
+
+
+**2. 二值量化网络**
+[Binarized Neural Networks BNN](https://arxiv.org/pdf/1602.02830.pdf)
+
+    BNN的激活量和参数都被二值化了, 反向传播时使用全精度梯度。 
+    有确定性(sign()函数）和随机（基于概率）两种二值化方式。
+    使用sign函数时，sign函数不可导，使用直通估计（straight-through estimator）(即将误差直接传递到下一层): …. 
+    gr=gq1|r|≤1
+
+    BNN中同时介绍了基于移位（而非乘法）的BatchNormailze和AdaMax算法。 
+    实验结果： 
+    在MNIST，SVHN和CIFAR-10小数据集上几乎达到了顶尖的水平。 
+    在ImageNet在使用AlexNet架构时有较大差距（在XNOR-Net中的实验Δ=29.8%） 
+    在GPU上有7倍加速
+
+[BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
+
+
+    BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。XNOR-Net是BinaryNet的升级版。 
+    主要思想： 
+        1. 二值化时增加了缩放因子，同时梯度函数也有相应改变：
+        W≈W^=αB=1n∑|W|ℓ1×sign(W)
+        ∂C∂W=∂C∂W^(1n+signWα)
+
+        2. XNOR-Net在激活量二值化前增加了BN层 
+        3. 第一层与最后一层不进行二值化 
+    实验结果： 
+        在ImageNet数据集AlexNet架构下，BWN的准确率有全精度几乎一样，XNOR-Net还有较大差距(Δ=11%) 
+        减少∼32×的参数大小，在CPU上inference阶段最高有∼58× 的加速。
+        
+[QNN](https://arxiv.org/pdf/1609.07061.pdf)
+
+        对BNN的简单扩展，
+        量化激活函数，
+        有线性量化与log量化两种，
+        其1-bit量化即为BinaryNet。
+        在正向传播过程中加入了均值为0的噪音。 
+        BNN约差于XNOR-NET（<3%），
+        QNN-2bit activation 略优于DoReFaNet 2-bit activation
+
+**3. 三值化网络**
+[Ternary Neural Networks TNN](https://arxiv.org/pdf/1609.00222.pdf)
+
+    训练时激活量三值化，参数全精度 
+    infernce时，激活量，参数都三值化（不使用任何乘法） 
+    用FPGA和ASIC设计了硬件
+
+[Ternary weight networks](https://arxiv.org/pdf/1605.04711.pdf)
+
+    主要思想就是三值化参数（激活量与梯度精度），参照BWN使用了缩放因子。
+    由于相同大小的filter，
+    三值化比二值化能蕴含更多的信息，
+    因此相比于BWN准确率有所提高。
+    
+    
+
+[Trained Ternary Quantization  TTQ](https://arxiv.org/pdf/1612.01064.pdf)
+
+    与TWN类似，
+    只用参数三值化，
+    但是正负缩放因子不同，
+    且可训练，由此提高了准确率。
+    ImageNet-18模型仅有3%的准确率下降。
+
+
+
+**4. 二进制位量化网络 哈希函数的味道啊**
+[ShiftCNN](http://cn.arxiv.org/pdf/1706.02393v1)
+
+[博客](https://blog.csdn.net/shuzfan/article/details/77856900)
+
+![](https://img-blog.csdn.net/20170905204744197?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2h1emZhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+
+    一个利用低精度和量化技术实现的神经网络压缩与加速方案。
+    
+>最优量化
+
+    量化可以看作用离散码本描述样本分布。 
+    优化目标(最大概率准则)和优化方法(L1和L2正则化)通常导致了神经网络参数呈现中心对称的非均匀分布。
+    因此，一个最佳的量化码本应当是一个非均匀分布的码本。 
+    这也是为什么BinaryNet(-1,+1)、ternary quantization(-1,0,+1)这种策略性能不足的一个重要原因。
+    
+    需要注意的是，
+    量化之前需要对参数进行范围归一化，
+    即除以最大值的绝对值，这样保证参数的绝对值都小于1。
+    该量化方法具有码本小、量化简单、量化误差小的优点。
+    
+    
+
+[]()
+[]()
+[]()
+[]()
+[]()
+
+
 ### 3. 编码(Huffman Encoding)
 
 ### 4. 迁移学习方法 基于教师——学生网络的方法
