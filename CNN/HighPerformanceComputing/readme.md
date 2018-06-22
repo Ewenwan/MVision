@@ -32,7 +32,7 @@
 
 [深度学习框架的并行优化方法小结](https://github.com/DragonFive/myblog/blob/master/source/_posts/mpi_parallel.md)
 
-# ncnn使用
+# 一 、 ncnn使用
 [ncnn_wiki 指南](https://github.com/Tencent/ncnn/wiki)
 
 ## 在Ubuntu上安装使用NCNN 
