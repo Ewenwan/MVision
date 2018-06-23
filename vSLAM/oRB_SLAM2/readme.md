@@ -1,3 +1,19 @@
+# ORB-SLAM2　ORB特征点法SLAM　支持单目、双目、rgbd相机
+[安装测试](https://github.com/Ewenwan/MVision/blob/master/vSLAM/oRB_SLAM2/install.md)
+
+[本文github链接]()
+
+# 相关论文：
+
+[ORB-SLAM 单目Monocular特征点法](http://webdiis.unizar.es/%7Eraulmur/MurMontielTardosTRO15.pdf)
+
+[ORB-SLAM2 单目双目rgbd](https://128.84.21.199/pdf/1610.06475.pdf)
+
+[词袋模型DBoW2 Place Recognizer](http://doriangalvez.com/papers/GalvezTRO12.pdf)
+
+
+
+
 # ORB-SLAM2
 **原作者:** [Raul Mur-Artal](http://webdiis.unizar.es/~raulmur/), [Juan D. Tardos](http://webdiis.unizar.es/~jdtardos/),
 [J. M. M. Montiel](http://webdiis.unizar.es/~josemari/) and [Dorian Galvez-Lopez](http://doriangalvez.com/)
