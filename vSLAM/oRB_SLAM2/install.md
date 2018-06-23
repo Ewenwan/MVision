@@ -1,6 +1,28 @@
 # ORB_slam2 安装 词带转换修改　运行测试
 [ORBSLAM2在Ubuntu14.04上详细配置流程](http://blog.csdn.net/zzlyw/article/details/54730830)
 
+# 要求
+
+操作系统 Ubuntu 12.04、14.04、16.04 
+
+C++11 or C++0x 编译环境 使用最新的线程 thread 和 计时chrono 函数功能
+
+[可视化 和人机接口 Pangolin](https://github.com/stevenlovegrove/Pangolin) 
+
+[Pangolin　安装方法]https://github.com/stevenlovegrove/Pangolin.
+
+OpenCV 计算机视觉库
+[OpenCV](http://opencv.org)　大于2.4.3　 　2.4.11 　3.2　
+
+[Eigen3 矩阵运算库](http://eigen.tuxfamily.org)  大于 3.1.0　
+
+[词带模型DBoW2](https://github.com/dorian3d/DBoW2)
+
+[图优化g2o](https://github.com/RainerKuemmerle/g2o) 
+
+[ROS (optional) 机器人系统](ros.org)
+
+
 ## 一、安装依赖工具
 ### 1 安装必要工具
 	首先，有两个工具是需要提前安装的。即cmake和git。
@@ -120,22 +142,80 @@
 
 # 五、单目测试
 
-[下载一个单目测试集，并解压](http://vision.in.tum.de/data/datasets/rgbd-dataset/download)
+[TUM Dataset数据集 下载一个单目测试集，并解压](http://vision.in.tum.de/data/datasets/rgbd-dataset/download)
 	
 	转到ORBSLAM2文件夹下，执行下面的命令。
 	根据下载的视频序列freiburg1， freiburg2 和 freiburg3将
 	TUMX.yaml分别转换为对应的 TUM1.yaml 或 TUM2.yaml 或 TUM3.yaml（相机参数文件）。
 	将PATH_TO_SEQUENCE_FOLDER 更改为解压的视频序列文件夹。
 　　　　 可执行文件 地图特征字典 数据集使用得相机参数　数据集地址
-	./Examples/Monocular/mono_tum Vocabulary/ORBvoc.txt Examples/Monocular/TUMX.yaml PATH_TO_SEQUENCE_FOLDER 
+```sh
+./Examples/Monocular/mono_tum Vocabulary/ORBvoc.txt Examples/Monocular/TUMX.yaml PATH_TO_SEQUENCE_FOLDER 
+```
+
+[KITTI Dataset 数据集](http://www.cvlibs.net/datasets/kitti/eval_odometry.php)
+	不同的数据集序列对应不同得相机参数 
+	sequence 0 to 2, 3, and 4 to 12 对应 KITTI00-02.yaml, KITTI03.yaml or KITTI04-12.yaml
+	对有参数修改为 KITTIX.yaml　
+	数据集路径 `PATH_TO_DATASET_FOLDER`
+	时间序列 `SEQUENCE_NUMBER` to 00, 01, 02,.., 11. 
+```sh
+./Examples/Monocular/mono_kitti Vocabulary/ORBvoc.txt Examples/Monocular/KITTIX.yaml PATH_TO_DATASET_FOLDER/dataset/sequences/SEQUENCE_NUMBER
+```
+
+[EuRoC Dataset数据集 ](http://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets)
+
+```
+./Examples/Monocular/mono_euroc Vocabulary/ORBvoc.txt Examples/Monocular/EuRoC.yaml PATH_TO_SEQUENCE_FOLDER/mav0/cam0/data Examples/Monocular/EuRoC_TimeStamps/SEQUENCE.txt 
+```
+```
+./Examples/Monocular/mono_euroc Vocabulary/ORBvoc.txt Examples/Monocular/EuRoC.yaml PATH_TO_SEQUENCE/cam0/data Examples/Monocular/EuRoC_TimeStamps/SEQUENCE.txt 
+```
+
 
 # 六、双目测试
-[下载一个序列 Vicon Room 1 02  大小1.2GB](http://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets)
+[EuRoC Dataset 数据集 下载一个序列 Vicon Room 1 02  大小1.2GB](http://projects.asl.ethz.ch/datasets/doku.php?id=kmavvisualinertialdatasets)
+```sh
+./Examples/Stereo/stereo_euroc Vocabulary/ORBvoc.txt Examples/Stereo/EuRoC.yaml PATH_TO_SEQUENCE/cam0/data 
+ Examples/Stereo/EuRoC_TimeStamps/SEQUENCE.txt
+```
+```
+./Examples/Stereo/stereo_euroc Vocabulary/ORBvoc.txt Examples/Stereo/EuRoC.yaml PATH_TO_SEQUENCE/cam0/data PATH_TO_SEQUENCE/cam1/data Examples/Stereo/EuRoC_TimeStamps/SEQUENCE.txt
+```
 
-	./Examples/Stereo/stereo_euroc Vocabulary/ORBvoc.txt Examples/Stereo/EuRoC.yaml PATH_TO_SEQUENCE/cam0/data 
-	 Examples/Stereo/EuRoC_TimeStamps/SEQUENCE.txt
+[KITTI Dataset数据集](http://www.cvlibs.net/datasets/kitti/eval_odometry.php) 
 
-# 七、词带格式转换
+	不同的数据集序列对应不同得相机参数 
+	sequence 0 to 2, 3, and 4 to 12 对应 KITTI00-02.yaml, KITTI03.yaml or KITTI04-12.yaml
+	对有参数修改为 KITTIX.yaml　
+	数据集路径 `PATH_TO_DATASET_FOLDER`
+	时间序列 `SEQUENCE_NUMBER` to 00, 01, 02,.., 11. 
+```
+./Examples/Stereo/stereo_kitti Vocabulary/ORBvoc.txt Examples/Stereo/KITTIX.yaml PATH_TO_DATASET_FOLDER/dataset/sequences/SEQUENCE_NUMBER
+```
+
+# 七. RGB-D 深度相机示例　
+
+[TUM Dataset数据集](http://vision.in.tum.de/data/datasets/rgbd-dataset/download)
+
+>**匹配RGB图像和深度图像
+
+[associate.py](http://vision.in.tum.de/data/datasets/rgbd-dataset/tools)
+
+  ```
+  python associate.py PATH_TO_SEQUENCE/rgb.txt PATH_TO_SEQUENCE/depth.txt > associations.txt
+  ```
+  
+        根据下载的视频序列freiburg1， freiburg2 和 freiburg3将
+	TUMX.yaml分别转换为对应的 TUM1.yaml 或 TUM2.yaml 或 TUM3.yaml（相机参数文件）。
+	将PATH_TO_SEQUENCE_FOLDER 更改为解压的视频序列文件夹。
+	ASSOCIATIONS_FILE 匹配文件
+　　　 可执行文件 地图特征字典 数据集使用得相机参数　数据集地址 匹配文件
+```
+./Examples/RGB-D/rgbd_tum Vocabulary/ORBvoc.txt Examples/RGB-D/TUMX.yaml PATH_TO_SEQUENCE_FOLDER ASSOCIATIONS_FILE
+```
+
+# 八、词带格式转换
 	 orb词带txt载入太慢，
 	 看到有人转换为binary，
 	 速度超快，试了下，确实快.
@@ -357,13 +437,70 @@ int main(int argc, char **argv) {
 	./Examples/Stereo/stereo_euroc Vocabulary/ORBvoc.bin Examples/Stereo/EuRoC.yaml /home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch9project/date/ /cam0/data /home/ewenwan/ewenwan/learn/vSLAM/test/vSLAM/ch9project/date/ /cam1/data Examples/Stereo/EuRoC_TimeStamps/V102.txt
 
 
-# 八、ros下的工程:
+# 九、ros下的工程:
 
 [添加稠密地图](http://blog.csdn.net/sinat_31802439/article/details/52331465)
+
 [修改后的工程](https://pan.baidu.com/s/1miDA952)
 
+> **添加环境变量
+```
+export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:PATH/ORB_SLAM2/Examples/ROS
+```
+> **执行编译脚本
 
-## 1. manifest.xml >>>> package.xml
+  ```
+  chmod +x build_ros.sh
+  ./build_ros.sh
+  ```
+  
+>**单目相机节点
+
+	单目相机话题　`/camera/image_raw` 
+	节点
+	rosrun ORB_SLAM2 Mono PATH_TO_VOCABULARY PATH_TO_SETTINGS_FILE
+
+> **单目AR 增强现实 Augmented Reality Demo
+　　　　
+	单目相机话题　`/camera/image_raw` 
+	节点
+	  rosrun ORB_SLAM2 MonoAR PATH_TO_VOCABULARY PATH_TO_SETTINGS_FILE
+
+> **双目相机节点
+
+	双目相机话题
+	`/camera/image_raw` 
+	`/camera/left/image_raw` 
+	`/camera/right/image_raw`
+	节点
+	```
+	rosrun ORB_SLAM2 Stereo PATH_TO_VOCABULARY PATH_TO_SETTINGS_FILE ONLINE_RECTIFICATION
+	```
+  
+	```
+	roscore
+	```
+
+	```
+	rosrun ORB_SLAM2 Stereo Vocabulary/ORBvoc.txt Examples/Stereo/EuRoC.yaml true
+	```
+
+	```
+	rosbag play --pause V1_01_easy.bag /cam0/image_raw:=/camera/left/image_raw /cam1/image_raw:=/camera/right/image_raw
+	```
+  
+
+> **RGB_D相机
+
+	相机话题
+	`/camera/rgb/image_raw` 
+	`/camera/depth_registered/image_raw`
+	节点
+	  ```
+	  rosrun ORB_SLAM2 RGBD PATH_TO_VOCABULARY PATH_TO_SETTINGS_FILE
+	  ```
+## 可能要修改的地方
+### 1. manifest.xml >>>> package.xml
 
 	<package>
 
@@ -396,7 +533,7 @@ int main(int argc, char **argv) {
 	</package>
 
 
-## 2. 编译信息文件 CMakeLists.txt
+### 2. 编译信息文件 CMakeLists.txt
 
 	cmake_minimum_required(VERSION 2.8.3) ### cmake版本限制
 
@@ -497,7 +634,7 @@ int main(int argc, char **argv) {
 	${LIBS}
 	)
 	
-## 3. 编译并运行
+### 3. 编译并运行
 	cd catkin_ws
 	catkin_make
 
