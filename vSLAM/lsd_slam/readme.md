@@ -2,6 +2,8 @@
 
 [本文github连接](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/readme.md)
 
+[lsd安装测试记录](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/install.md)
+
 [LSD_slam & 激光雷达slam](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/04_SLAM.pdf)
 
 [lad源码解析 参考解析](https://blog.csdn.net/lancelot_vim)
@@ -24,21 +26,6 @@
 
 [官网:](http://vision.in.tum.de/research/vslam/lsdslam)
 [代码:](https://github.com/tum-vision/lsd_slam)
-
-
-# 运行lsd-slam
-[一个来自官方的范例，使用的dataset如下，400+M](http://vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip)
-
-    解压之
-    然后运行下面的3个命令，即可看到效果
-    rosrun lsd_slam_viewer viewer
-    rosrun lsd_slam_core live_slam image:=/image_raw camera_info:=/camera_info
-    rosbag play ./LSD_room.bag
-    平移，旋转，相似以及投影变换，在lsd-slam中，
-    有个三方开源库叫做Sophus/sophus，封装好了前三个变换。
-    
-[库分析  Sophus/sophus ](https://blog.csdn.net/lancelot_vim/article/details/51706832)
-
 
 # 算法整体框架
 [算法原理](https://blog.csdn.net/lancelot_vim/article/details/51730676)
