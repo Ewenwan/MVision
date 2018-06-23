@@ -1,4 +1,9 @@
 # ORB-SLAM2 ORB特征点法SLAM 支持单目、双目、rgbd相机
+
+[安装测试](https://github.com/Ewenwan/MVision/blob/master/vSLAM/oRB_SLAM2/install.md)
+
+[本文github链接]()
+
     ORB-SLAM是一个基于特征点的实时单目SLAM系统，在大规模的、小规模的、室内室外的环境都可以运行。
     该系统对剧烈运动也很鲁棒，支持宽基线的闭环检测和重定位，包括全自动初始化。
     该系统包含了所有SLAM系统共有的模块：
@@ -8,19 +13,12 @@
  
 **系统框架**
 
-![](https://img-blog.csdn.net/20161114115058814)
-
-![](https://img-blog.csdn.net/20161114115114018)    
+![](https://img-blog.csdn.net/20161114115058814)  
 
 **贡献**
 
 ![](https://img-blog.csdn.net/20161114115026626)
 
-
-
-[安装测试](https://github.com/Ewenwan/MVision/blob/master/vSLAM/oRB_SLAM2/install.md)
-
-[本文github链接]()
 
 # 1. 相关论文：
 
