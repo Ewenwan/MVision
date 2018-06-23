@@ -1,47 +1,52 @@
-# lad_slam 直接法 视觉里程计
+# lad_slam 直接法稠密点云slam  视觉里程计 安装
+
+ Large Scale Direct Monocular
+ 
+[ubuntu-install-lsd-slam](http://www.luohanjie.com/2017-03-17/ubuntu-install-lsd-slam.html)
+
+[项目主页](https://vision.in.tum.de/research/vslam/lsdslam)
+
+[github 代码](https://github.com/tum-vision/lsd_slam)
 
 
+# 官方编译方法 rosmake 编译
 
-#################
-########################
-lsd-slam  直接法稠密点云slam    Large Scale Direct Monocular
-########################################
-####################
-
-	http://www.luohanjie.com/2017-03-17/ubuntu-install-lsd-slam.html
-	https://vision.in.tum.de/research/vslam/lsdslam
-	https://www.cnblogs.com/hitcm/p/4907536.html
-	https://github.com/tum-vision/lsd_slam
-
-
-官方编译方法[1]
-
-	rosmake 编译
+        依赖项：
 	sudo apt-get install python-rosinstall
-	sudo apt-get install ros-indigo-libg2o ros-indigo-cv-bridge liblapack-dev libblas-dev freeglut3-dev libqglviewer-dev libsuitesparse-dev libx11-dev
+	sudo apt-get install ros-indigo-libg2o ros-indigo-cv-bridge liblapack-dev 
+	sudo apt-get install libblas-dev freeglut3-dev libqglviewer-dev libsuitesparse-dev libx11-dev
+	
+	rosbuild_ws：
 	mkdir ~/SLAM/Code/rosbuild_ws
 	cd ~/SLAM/Code/rosbuild_ws
 	roses init . /opt/ros/indigo
+	
 	mkdir package_dir
 	roses set ~/SLAM/Code/rosbuild_ws/package_dir -t .
 	echo "source ~/SLAM/Code/rosbuild_ws/setup.bash" >> ~/.bashrc
 	bash
+	
+	下载编译:
 	cd package_dir
 	git clone https://github.com/tum-vision/lsd_slam.git lsd_slam
 	rosmake lsd_slam
 
 
-使用catkin对LSD-SLAM进行编译
-
+# 使用catkin对LSD-SLAM进行编译
+        上面的依赖项还需要安装
+	
+        下载:
 	mkdir -p ~/catkin_ws/src
 	git clone https://github.com/tum-vision/lsd_slam.git
 	cd lsd_slam
 	git checkout catkin
-
+	
+　　　  修改 package.xml:
 	对lsd_slam/lsd_slam_viewer和lsd_slam/lsd_slam_core文件夹下的package.xml中添加：
 	<build_depend>cmake_modules</build_depend>
 	<run_depend>cmake_modules</run_depend>
-
+	
+        修改 CMakeFiles.txt
 	对lsd_slam/lsd_slam_viewer和lsd_slam/lsd_slam_core文件夹下的CMakeFiles.txt中添加：
 	find_package(cmake_modules REQUIRED)
 	find_package(OpenCV 3.0 QUIET) #support opencv3
@@ -52,7 +57,6 @@ lsd-slam  直接法稠密点云slam    Large Scale Direct Monocular
 	   endif()
 	endif()
 
-
 	并且在所有的target_link_libraries中添加X11 ${OpenCV_LIBS}，如：
 	target_link_libraries(lsdslam 
 	${FABMAP_LIB} 
@@ -61,16 +65,15 @@ lsd-slam  直接法稠密点云slam    Large Scale Direct Monocular
 	${OpenCV_LIBS} 
 	sparse cxsparse X11
 	)
-
-然后开始编译：
-
+	
+	然后开始编译：
 	cd ~/catkin_ws/
 	catkin_make
 
+# 数据 测试
+[下载测试数据474MB日志回放](vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip)
 
-下载测试数据   474MB  日志回放
-vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip
-解压
+> 解压并运行
 
 	打开一个终端:
 	roscoe
@@ -87,10 +90,10 @@ vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip
 
 	打开另外一个终端：
 	cd ~/catkin_ws/
-	rosbag play ~/LSD_room.bag     ###回放日志   即将之前的数据按话题发布
+	rosbag play ~/LSD_room.bag  回放日志   即将之前的数据按话题发布
 
 
-使用摄像头运行LSD_SLAM
+# 使用摄像头运行LSD_SLAM
 安装驱动[4]：
 	cd ~/catkin_ws/
 	source devel/setup.sh
