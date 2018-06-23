@@ -27,6 +27,12 @@
 [官网:](http://vision.in.tum.de/research/vslam/lsdslam)
 [代码:](https://github.com/tum-vision/lsd_slam)
 
+ 　　 平移，旋转，相似以及投影变换，在lsd-slam中，
+   　 有个三方开源库叫做Sophus/sophus，封装好了前三个变换。
+[库分析  Sophus/sophus ](https://blog.csdn.net/lancelot_vim/article/details/51706832)
+
+
+
 # 算法整体框架
 [算法原理](https://blog.csdn.net/lancelot_vim/article/details/51730676)
 ## 1. 跟踪线程 Tracking Thread
