@@ -1,5 +1,144 @@
 # lad_slam 直接法 视觉里程计
 
+
+
+#################
+########################
+lsd-slam  直接法稠密点云slam    Large Scale Direct Monocular
+########################################
+####################
+
+	http://www.luohanjie.com/2017-03-17/ubuntu-install-lsd-slam.html
+	https://vision.in.tum.de/research/vslam/lsdslam
+	https://www.cnblogs.com/hitcm/p/4907536.html
+	https://github.com/tum-vision/lsd_slam
+
+
+官方编译方法[1]
+
+	rosmake 编译
+	sudo apt-get install python-rosinstall
+	sudo apt-get install ros-indigo-libg2o ros-indigo-cv-bridge liblapack-dev libblas-dev freeglut3-dev libqglviewer-dev libsuitesparse-dev libx11-dev
+	mkdir ~/SLAM/Code/rosbuild_ws
+	cd ~/SLAM/Code/rosbuild_ws
+	roses init . /opt/ros/indigo
+	mkdir package_dir
+	roses set ~/SLAM/Code/rosbuild_ws/package_dir -t .
+	echo "source ~/SLAM/Code/rosbuild_ws/setup.bash" >> ~/.bashrc
+	bash
+	cd package_dir
+	git clone https://github.com/tum-vision/lsd_slam.git lsd_slam
+	rosmake lsd_slam
+
+
+使用catkin对LSD-SLAM进行编译
+
+	mkdir -p ~/catkin_ws/src
+	git clone https://github.com/tum-vision/lsd_slam.git
+	cd lsd_slam
+	git checkout catkin
+
+	对lsd_slam/lsd_slam_viewer和lsd_slam/lsd_slam_core文件夹下的package.xml中添加：
+	<build_depend>cmake_modules</build_depend>
+	<run_depend>cmake_modules</run_depend>
+
+	对lsd_slam/lsd_slam_viewer和lsd_slam/lsd_slam_core文件夹下的CMakeFiles.txt中添加：
+	find_package(cmake_modules REQUIRED)
+	find_package(OpenCV 3.0 QUIET) #support opencv3
+	if(NOT OpenCV_FOUND)
+	   find_package(OpenCV 2.4.3 QUIET)
+	   if(NOT OpenCV_FOUND)
+	      message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
+	   endif()
+	endif()
+
+
+	并且在所有的target_link_libraries中添加X11 ${OpenCV_LIBS}，如：
+	target_link_libraries(lsdslam 
+	${FABMAP_LIB} 
+	${G2O_LIBRARIES} 
+	${catkin_LIBRARIES} 
+	${OpenCV_LIBS} 
+	sparse cxsparse X11
+	)
+
+然后开始编译：
+
+	cd ~/catkin_ws/
+	catkin_make
+
+
+下载测试数据   474MB  日志回放
+vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip
+解压
+
+	打开一个终端:
+	roscoe
+
+	打开另外一个终端：
+	cd ~/catkin_ws/
+	source devel/setup.sh
+	rosrun lsd_slam_viewer viewer
+
+	打开另外一个终端：
+	cd ~/catkin_ws/
+	source devel/setup.sh
+	rosrun lsd_slam_core live_slam image:=/image_raw camera_info:=/camera_info
+
+	打开另外一个终端：
+	cd ~/catkin_ws/
+	rosbag play ~/LSD_room.bag     ###回放日志   即将之前的数据按话题发布
+
+
+使用摄像头运行LSD_SLAM
+安装驱动[4]：
+	cd ~/catkin_ws/
+	source devel/setup.sh
+	cd ~/catkin_ws/src
+	git clone https://github.com/ktossell/camera_umd.git
+	cd ..
+	catkin_make
+	roscd uvc_camera/launch/
+	roslaunch ./camera_node.launch
+
+	camera_node.launch文件[5]，如：
+
+	<launch>
+	  <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen">
+	    <param name="width" type="int" value="640" />
+	    <param name="height" type="int" value="480" />
+	    <param name="fps" type="int" value="30" />
+	    <param name="frame" type="string" value="wide_stereo" />
+
+	    <param name="auto_focus" type="bool" value="False" />
+	    <param name="focus_absolute" type="int" value="0" />
+	    <!-- other supported params: auto_exposure, exposure_absolute, brightness, power_line_frequency -->
+
+	    <param name="device" type="string" value="/dev/video1" />
+	    <param name="camera_info_url" type="string" value="file://$(find uvc_camera)/example.yaml" />
+	  </node>
+	</launch>
+
+注意官方程序默认分辨率为640*480。
+
+	打开一个窗口
+	运行roscore；
+
+	打开另外一个窗口：
+	cd ~/catkin_ws/
+	source devel/setup.sh
+	rosrun lsd_slam_viewer viewer
+
+	再打开另外一个窗口：
+	cd ~/catkin_ws/
+	source devel/setup.sh
+	roslaunch uvc_camera camera_node.launch
+
+	再打开另外一个窗口：
+	rosrun lsd_slam_core live_slam /image:=image_raw _calib:=<calibration_file>
+	校正文件calibration_file可参考lsd_catkin_ws/src/lsd_slam/lsd_slam_core/calib中的cfg文件。
+
+
 # ros下安装
 ## 使用 老版本编译系统 rosmake
     sudo apt-get install python-rosinstall  
