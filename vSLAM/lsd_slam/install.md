@@ -9,30 +9,49 @@
 [github 代码](https://github.com/tum-vision/lsd_slam)
 
 
-# 官方编译方法 rosmake 编译
+# 1. 官方编译方法 rosmake 编译
 
-        依赖项：
+	1. 依赖项：
 	sudo apt-get install python-rosinstall
 	sudo apt-get install ros-indigo-libg2o ros-indigo-cv-bridge liblapack-dev 
 	sudo apt-get install libblas-dev freeglut3-dev libqglviewer-dev libsuitesparse-dev libx11-dev
-	
-	rosbuild_ws：
-	mkdir ~/SLAM/Code/rosbuild_ws
-	cd ~/SLAM/Code/rosbuild_ws
-	roses init . /opt/ros/indigo
-	
+
+	2. rosbuild_ws：
+	mkdir ~/SLAM/Code/rosbuild_ws　　　#创建 编译空间
+	cd ~/SLAM/Code/rosbuild_ws 
+	roses init . /opt/ros/indigo       #编译空间初始化
+
 	mkdir package_dir
-	roses set ~/SLAM/Code/rosbuild_ws/package_dir -t .
+	roses set ~/SLAM/Code/rosbuild_ws/package_dir -t .      #设置
 	echo "source ~/SLAM/Code/rosbuild_ws/setup.bash" >> ~/.bashrc
 	bash
-	
-	下载编译:
+
+	3. 下载编译:
 	cd package_dir
 	git clone https://github.com/tum-vision/lsd_slam.git lsd_slam
+	
 	rosmake lsd_slam
 
+	4. 如果你需要openFabMap去闭环检测的话（可选） 需要opencv 非免费的包
+	在 lsd_slam_core/CMakeLists.txt  
+	中去掉下列四行注释即可
+	#add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/openFabMap)  
+	#include_directories(${PROJECT_SOURCE_DIR}/thirdparty/openFabMap/include)  
+	#add_definitions("-DHAVE_FABMAP")  
+	#set(FABMAP_LIB openFABMAP )  
 
-# 使用catkin对LSD-SLAM进行编译
+	需要注意openFabMap需要OpenCv nonfree模块支持，OpenCV3.0以上已经不包含，作者推荐2.4.8版本
+	其中nonfree模块可以由以下方式安装
+	$ sudo add-apt-repository --yes ppa:xqms/opencv-nonfree  
+	$ sudo apt-get update  
+	$ sudo apt-get install libopencv-nonfree-dev  
+    
+
+# 2. 使用catkin对LSD-SLAM进行编译
+[catkin_make编译 参考](https://blog.csdn.net/zhuquan945/article/details/72980831)
+
+**后面有详细的记录**
+
         上面的依赖项还需要安装
 	
         下载:
@@ -70,7 +89,9 @@
 	cd ~/catkin_ws/
 	catkin_make
 
-# 数据 测试
+
+
+# 3. 数据 测试
 [下载测试数据474MB日志回放](vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip)
 
 > 解压并运行
@@ -93,8 +114,10 @@
 	rosbag play ~/LSD_room.bag  回放日志   即将之前的数据按话题发布
 
 
-# 使用摄像头运行LSD_SLAM
-安装驱动[4]：
+# 4. 使用摄像头运行LSD_SLAM
+
+> **安装相机驱动**
+
 	cd ~/catkin_ws/
 	source devel/setup.sh
 	cd ~/catkin_ws/src
@@ -104,7 +127,7 @@
 	roscd uvc_camera/launch/
 	roslaunch ./camera_node.launch
 
-	camera_node.launch文件[5]，如：
+> **添加 camera_node.launch**
 
 	<launch>
 	  <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen">
@@ -122,82 +145,43 @@
 	  </node>
 	</launch>
 
-注意官方程序默认分辨率为640*480。
+> **运行测试　注意官方程序默认分辨率为640*480**
 
-	打开一个窗口
-	运行roscore；
+	1. 启动ROS服务  
+	   打开一个窗口 运行
+	   roscore；
 
-	打开另外一个窗口：
-	cd ~/catkin_ws/
-	source devel/setup.sh
-	rosrun lsd_slam_viewer viewer
-
-	再打开另外一个窗口：
-	cd ~/catkin_ws/
-	source devel/setup.sh
-	roslaunch uvc_camera camera_node.launch
-
-	再打开另外一个窗口：
-	rosrun lsd_slam_core live_slam /image:=image_raw _calib:=<calibration_file>
-	校正文件calibration_file可参考lsd_catkin_ws/src/lsd_slam/lsd_slam_core/calib中的cfg文件。
+	2. 启动摄像服务（USB摄像模式）
+	   打开另外一个窗口：
+	   cd ~/catkin_ws/
+	   source devel/setup.sh
+	   roslaunch uvc_camera camera_node.launch device:=/dev/video0  
+	   
+	3. 启动LSD-viewer查看点云 
+	   cd ~/catkin_ws/
+	   source devel/setup.sh
+	   rosrun lsd_slam_viewer viewer
 
 
-# ros下安装
-## 使用 老版本编译系统 rosmake
-    sudo apt-get install python-rosinstall  
-    mkdir ~/rosbuild_ws   #创建 编译空间
-    cd ~/rosbuild_ws  
-    rosws init . /opt/ros/indigo   #编译空间初始化
-    mkdir package_dir  
-    rosws set ~/rosbuild_ws/package_dir -t .  #设置
-    echo "source ~/rosbuild_ws/setup.bash" >> ~/.bashrc  
-    bash  
-    cd package_dir 
-## 2. 安装依赖包 
-    sudo apt-get install ros-indigo-libg2o ros-indigo-cv-bridge liblapack-dev libblas-dev freeglut3-dev libqglviewer-dev libsuitesparse-dev libx11-dev  
-## 3.下载包
-    git clone https://github.com/tum-vision/lsd_slam.git lsd_slam  
-## 4. 如果你需要openFabMap去闭环检测的话（可选） 需要opencv 非免费的包
-    在 lsd_slam_core/CMakeLists.txt  
-    中去掉下列四行注释即可
-    #add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/openFabMap)  
-    #include_directories(${PROJECT_SOURCE_DIR}/thirdparty/openFabMap/include)  
-    #add_definitions("-DHAVE_FABMAP")  
-    #set(FABMAP_LIB openFABMAP )  
-    
-    需要注意openFabMap需要OpenCv nonfree模块支持，OpenCV3.0以上已经不包含，作者推荐2.4.8版本
-    其中nonfree模块可以由以下方式安装
-    $ sudo add-apt-repository --yes ppa:xqms/opencv-nonfree  
-    $ sudo apt-get update  
-    $ sudo apt-get install libopencv-nonfree-dev  
-    
-## 5. 编译LSD-SLAM
-    rosmake lsd_slam  
-## 6. 运行LSD-SLAM
-    1. 启动ROS服务               roscore  
-    2. 启动摄像服务（USB摄像模式）  rosrun uvc_camera uvc_camera_node device:=/dev/video0  
-    3. 启动LSD-viewer查看点云     rosrun lsd_slam_viewer viewer  
     4. 启动LSD-core  
-       1）数据集模式
+       1. 数据集模式
        rosrun lsd_slam_core dataset_slam _files:=<files> _hz:=<hz> _calib:=<calibration_file>  
        _files填数据集png包的路径，_hz表示帧率，填0代表默认值，_calib填标定文件地址 
        如：
        rosrun lsd_slam_core data
        set_slam _files:=<your path>/LSD_room/images _hz:=0 _calib:=<your path>/LSD_room/cameraCalibration.cfg  
 
-       2）USB摄像模式
+       2. USB摄像模式
        rosrun lsd_slam_core live_slam /image:=<yourstreamtopic> _calib:=<calibration_file>  
        _calib同上，/image选择视频流 
        如：
        rosrun lsd_slam_core live_slam /image:=image_raw _calib:=<your path>/LSD_room/cameraCalibration.cfg 
 
-## catkin_make编译
-[catkin_make编译 参考](https://blog.csdn.net/zhuquan945/article/details/72980831)
-  
 
-### 编译错误记录 
 
-#### opencv 
+# 5. 编译错误记录 
+
+## 1. opencv 
     KeyFrameDisplay.h
     
     //#include <opencv2/core/types_c.h>
@@ -206,7 +190,7 @@
     
     
     
-###  sophus 错误
+## 2. sophus 错误
     opt/ros/indigo/include/sophus/sim3.hpp:339:5: error: passing ‘const RxSO3Type {aka const Sophus::RxSO3Group}’ as ‘this’ argument of ‘void Sophus::RxSO3GroupBase::setScale(const Scalar&) [with Derived = Sophus::RxSO3Group; Sophus::RxSO3GroupBase::Scalar = double]’ discards qualifiers [-fpermissive]
     rxso3().setScale(scale);
     ^
@@ -214,11 +198,11 @@
     make[3]: *** [CMakeFiles/lsdslam.dir/src/SlamSystem.cpp.o] Error 1
 
 
-## 换用 catkin_make 编译
-    1. 目录下有两个包 core 和 view 所以 在 lsd_slam目录下新建一个文件夹 lad_slam  
+# 6. catkin_make 编译 详细记录
+## 1. 目录下有两个包 core 和 view 所以 在 lsd_slam目录下新建一个文件夹 lad_slam  
     把 CMakeLists.txt 和 package.xml 放入
 
-    包信息  package.xml
+### 包信息  package.xml
            =========================
             <?xml version="1.0"?>
             <package>
@@ -243,15 +227,15 @@
               </export>
             </package>
             ====================
-    CMakeLists.txt    
+###  CMakeLists.txt    
             ====================
             cmake_minimum_required(VERSION 2.8.3)
             project(lsd_slam)
             find_package(catkin REQUIRED)
             catkin_metapackage()
             ====================
-### lsd_slam_viewer 
-    包信息  package.xml
+## 2. lsd_slam_viewer 
+## 包信息  package.xml
         ==============================
         <package>
         <name>lsd_slam_viewer</name>
@@ -287,7 +271,7 @@
         </package>
 
        ======================================
-     CMakeLists.txt 
+## CMakeLists.txt 
        ======================================
         cmake_minimum_required(VERSION 2.4.6)
         project(lsd_slam_viewer)
@@ -399,8 +383,8 @@
 
       =============================
       
- ### lsd_slam_core
- 包信息  package.xml
+ ## 3. lsd_slam_core
+ ### 包信息  package.xml
          ========================
         <?xml version="1.0"?>
         <package>
@@ -441,7 +425,7 @@
         </package> 
         ===============
         
-  CMakeLists.txt 
+ ### CMakeLists.txt 
   
         ===============
         cmake_minimum_required(VERSION 2.8.7)
