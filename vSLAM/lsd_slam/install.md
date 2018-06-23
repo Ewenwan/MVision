@@ -92,6 +92,7 @@
 
 
 # 3. 数据 测试
+
 [下载测试数据474MB日志回放](vmcremers8.informatik.tu-muenchen.de/lsd/LSD_room.bag.zip)
 
 > 解压并运行
@@ -112,7 +113,6 @@
 	打开另外一个终端：
 	cd ~/catkin_ws/
 	rosbag play ~/LSD_room.bag  回放日志   即将之前的数据按话题发布
-
 
 # 4. 使用摄像头运行LSD_SLAM
 
