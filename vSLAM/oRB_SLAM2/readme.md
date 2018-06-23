@@ -113,7 +113,8 @@
     使用bag-of-words加速匹配帧的筛选，并使用EPnP算法完成重定位中的位姿估计。
          
          
-         
+# 4. 代码分析
+[ORB-SLAM2详解（二）代码逻辑](https://blog.csdn.net/u010128736/article/details/53169832)
          
          
     
