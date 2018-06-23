@@ -7,6 +7,7 @@
     ORB-SLAM2在ORB-SLAM的基础上，还支持标定后的双目相机和RGB-D相机。
  
 **系统框架**
+
 ![](https://img-blog.csdn.net/20161114115058814)
 
 ![](https://img-blog.csdn.net/20161114115114018)    
