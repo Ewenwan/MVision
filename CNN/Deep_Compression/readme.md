@@ -8,8 +8,11 @@
        腾讯 ncnn
 
 # 模型压缩
+[中科院自动化研究所](http://www.360doc.com/content/18/0518/19/22587800_755030434.shtml)
 
 [DeepCompression-caffe](https://github.com/Ewenwan/DeepCompression-caffe)
+
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_KANJYBAABsNrDZ4CQ598.png)
 
 
 ## 为什么要压缩网络？
@@ -69,6 +72,16 @@
              核的稀疏化可能需要一些稀疏计算库的支持，其加速的效果可能受到带宽、稀疏度等很多因素的制约；
 
 ### 1、低秩近似 （低秩分解 Low Rank Expansion）
+
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_KANDR5AAB8IPx88Z8849.png)
+
+    上图展示了低秩分解的基本思想:
+        将原来大的权重矩阵分解成多个小的矩阵，
+        右边的小矩阵的计算量都比原来大矩阵的计算量要小，
+        这是低秩分解的基本出发点。
+
+     奇异值分解SVD、CP分解、Tucker分解、Tensor Train分解和Block Term分解
+     
      用低秩矩阵近似原有权重矩阵。
      例如，可以用SVD得到原矩阵的最优低秩近似，
      或用Toeplitz矩阵配合Krylov分解近似原矩阵。
@@ -107,10 +120,45 @@
     
     另外现在越来越多网络中采用1×1的卷积，
     而这种小的卷积使用矩阵分解的方法很难实现网络加速和压缩。
+#### a、奇异值分解svd
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_KAP5FyAACbCThbuEU775.png)
     
+    上图是微软在2016年的工作，将卷积核矩阵先做成一个二维的矩阵，再做SVD分解。
+    上图右侧相当于用一个R的卷积核做卷积，再对R的特征映射做深入的操作。
+    从上面可以看到，虽然这个R的秩非常小，但是输入的通道S还是非常大的。
+    
+#### b、Tucker分解 解决SVD分解中输入的通道S大的问题
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_OAdLnzAACRe9h9Itk051.png)
+
+    为了解决SVD分解过程中通道S比较大的问题，
+    我们从另一个角度出发，沿着输入的方向对S做降维操作，这就是上图展示的Tucker分解的思想。
+    具体操作过程是：
+       原来的卷积，首先在S维度上做一个低维的表达，
+       再做一个正常的3×3的卷积，
+       最后再做一个升维的操作。
+#### c、CP分解加速神经网络的方法
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_OAJO8jAADBzGEWYzg944.png)
+
+    在SVD分解和Tucker分解之后的一些工作主要是做了更进一步的分解。
+    上图展示了使用微调的CP分解加速神经网络的方法。
+    在原来的四维张量上，在每个维度上都做类似1×1的卷积，转
+    化为第二行的形式，在每一个维度上都用很小的卷积核去做卷积。
+    在空间维度上，大部分都是3×3的卷积，所以空间的维度很小，可以转化成第三行的形式，
+    在输入和输出通道上做低维分解，但是在空间维度上不做分解，类似于MobileNet。
+    
+#### d、块分解
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_OAEQH9AACCdazvw-s720.png)
+
+    结合了上述两种分解方法各自的优势。首先把输入参数做降维，
+    然后在第二个卷积的时候，做分组操作，这样可以降低第二个3×3卷积的计算量，最后再做升维操作。
+    另一方面由于分组是分块卷积，它是有结构的稀疏，所以在实际中可以达到非常高的加速，
+    我们使用VGG网络在手机上的实验可以达到5-6倍的实际加速效果。
+
     
 ### 2、剪枝(pruning) 在训练结束后，可以将一些不重要的神经元连接
-    结构化Pruning，Filter Pruning，梯度Pruning等方法
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_OAAWMcAACXwnFDhd8125.png)
+
+    非结构化剪枝Pruning，结构化剪枝Filter Pruning，梯度Pruning等方法
     
     (可用权重数值大小衡量配合损失函数中的稀疏约束)或整个滤波器去除，
     之后进行若干轮微调。实际运行中，神经元连接级别的剪枝会
@@ -135,8 +183,27 @@
            而mask位为0的部分因为输出始终为0则不对后续部分产生影响。
         4. 输出模型参数储存的时候，因为有大量的稀疏，所以需要重新定义储存的数据结构，
            仅储存非零值以及其矩阵位置。重新读取模型参数的时候，就可以还原矩阵。
+#### a、非结构化剪枝 
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_OAf_svAAC3oM-0yKQ970.png)
+    
+    上图展示了在NIP2015上提出的非常经典的三阶段剪枝的方法。
+    
+    首先训练一个全精度网络，
+    随后删除一些不重要的节点，
+    后面再去训练权重。
+    
+    这种非结构化的剪枝的方法，虽然它的理论计算量可以压缩到很低，
+    但是收益是非常低的，比如在现在的CPU或者GPU框架下很难达到非常高的加速效果。
+    所以下面这种结构化的剪枝技术越来越多。
+#### b、结构化剪枝 
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAKeuGAACfqnIbbFY030.png)
 
-
+    从去年的ICCV就有大量基于channel sparsity的工作。
+    上面是其中的一个示意图，相当于对每一个feature map定义其重要性，
+    把不重要的给删除掉，这样产生的稀疏就是有规则的，
+    我们可以达到非常高的实际加速效果。
+    
+    
 ### 3、量化(quantization)。对权重数值进行聚类，
     量化的思想非常简单。
     CNN参数中数值分布在参数空间，
@@ -184,14 +251,16 @@
     Huffman编码笔者已经不太记得了，好像就是高频值用更少的字符储存，低频则用更多。
 
 ### 4、降低数据数值范围。 其实也可以算作量化
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAPOcSAACWBTome1c039.png)
+
     默认情况下数据是单精度浮点数，占32位。
-    有研究发现，改用半精度浮点数(16位)
-    几乎不会影响性能。谷歌TPU使用8位整型来
-    表示数据。极端情况是数值范围为二值
-    或三值(0/1或-1/0/1)，
+    有研究发现，
+    改用半精度浮点数(16位)几乎不会影响性能。
+    谷歌TPU使用8位整型来表示数据。
+    极端情况是数值范围为 二值(0/1) 或 三值 (-1/0/1)，
     这样仅用位运算即可快速完成所有计算，
     但如何对二值或三值网络进行训练是一个关键。
-    通常做法是网络前馈过程为二值或三值，
+    通常做法是网络前馈过程为二值 或 三值，
     梯度更新过程为实数值。
 
 ### 5、迁移学习 Knowledge Distillation
@@ -450,6 +519,18 @@
 
 
 **2. 二值量化网络**
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAdU6BAACcvDwG5pU677.png)
+
+    上图是在定点表示里面最基本的方法：BNN和BWN。
+    在网络进行计算的过程中，可以使用定点的数据进行计算，
+    由于是定点计算，实际上是不可导的，
+    于是提出使用straight-through方法将输出的估计值直接传给输入层做梯度估计。
+    在网络训练过程中会保存两份权值，用定点的权值做网络前向后向的计算，
+    整个梯度累积到浮点的权值上，整个网络就可以很好地训练，
+    后面几乎所有的量化方法都会沿用这种训练的策略。
+    前面包括BNN这种网络在小数据集上可以达到跟全精度网络持平的精度，
+    但是在ImageNet这种大数据集上还是表现比较差。
+
 [Binarized Neural Networks BNN](https://arxiv.org/pdf/1602.02830.pdf)
 
     BNN的激活量和参数都被二值化了, 反向传播时使用全精度梯度。 
@@ -465,6 +546,13 @@
 
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAaYgnAACz9cXw6vE854.png)
+
+    上图展示了ECCV2016上一篇名为XNOR-Net的工作，
+    其思想相当于在做量化的基础上，乘了一个尺度因子，这样大大降低了量化误差。
+    他们提出的BWN，在ImageNet上可以达到接近全精度的一个性能，
+    这也是首次在ImageNet数据集上达到这么高精度的网络。
+    
 
     BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。XNOR-Net是BinaryNet的升级版。 
     主要思想： 
@@ -488,6 +576,29 @@
         BNN约差于XNOR-NET（<3%），
         QNN-2bit activation 略优于DoReFaNet 2-bit activation
 
+#### 二值约束低比特量化
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAdFmiAACFxVTKLmQ760.png)
+
+    上图展示了阿里巴巴冷聪等人做的通过ADMM算法求解binary约束的低比特量化工作。
+    从凸优化的角度，在第一个优化公式中，f(w)是网络的损失函数，
+    后面会加入一项W在集合C上的loss来转化为一个优化问题。
+    这个集合C取值只有正负1，如果W在满足约束C的时候，它的loss就是0；
+    W在不满足约束C的时候它的loss就是正无穷。
+    为了方便求解还引进了一个增广变量，保证W是等于G的，
+    这样的话就可以用ADMM的方法去求解。
+    
+#### 哈希函数两比特缩放量化 BWNH
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAE7dRAACHJnpcRMk945.png)
+
+    通过Hashing方法做的网络权值二值化工作。
+    第一个公式是我们最常用的哈希算法的公式，其中S表示相似性，
+    后面是两个哈希函数之间的内积。
+    我们在神经网络做权值量化的时候采用第二个公式，
+    第一项表示输出的feature map，其中X代表输入的feature map，W表示量化前的权值，
+    第二项表示量化后输出的feature map，其中B相当于量化后的权值，
+    通过第二个公式就将网络的量化转化成类似第一个公式的Hashing方式。
+    通过最后一行的定义，就可以用Hashing的方法来求解Binary约束。
+    
 **3. 三值化网络**
 [Ternary Neural Networks TNN](https://arxiv.org/pdf/1609.00222.pdf)
 
@@ -512,6 +623,15 @@
     且可训练，由此提高了准确率。
     ImageNet-18模型仅有3%的准确率下降。
 
+#### 三值 矩阵分解和定点变换
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_aAHHAsAACFv5V6ARc330.png)
+
+    借助了矩阵分解和定点变换的优势，
+    对原始权值矩阵直接做一个定点分解，限制分解后的权值只有+1、-1、0三个值。
+    将网络变成三层的网络，首先是正常的3×3的卷积，对feature map做一个尺度的缩放，
+    最后是1×1的卷积，所有的卷积的操作都有+1、-1、0。
+    
+    
 
 
 **4. 二进制位量化网络 哈希函数的味道啊**
