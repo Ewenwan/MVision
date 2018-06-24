@@ -115,21 +115,60 @@
 [ORB-SLAM2详解（二）代码逻辑](https://blog.csdn.net/u010128736/article/details/53169832)
 
 ## 4.1 应用程序框架
->**单目相机：**
+>**单目相机app框架：**
 
-    app框架，
         1. 创建 单目ORB_SLAM2::System SLAM 对象
         2. 载入图片 或者 相机捕获图片 im = cv::imread();
         3. 记录时间戳 tframe ，并计时，std::chrono::steady_clock::now(); / std::chrono::monotonic_clock::now();
-        4. 把图像传给 SLAM系统, SLAM.TrackMonocular(im,tframe); 
+        4. 把图像和时间戳 传给 SLAM系统, SLAM.TrackMonocular(im,tframe); 
         5. 计时结束，计算时间差，处理时间。
         6. 循环2-5步。
         7. 结束，关闭slam系统，关闭所有线程 SLAM.Shutdown();
         8. 保存相机轨迹, SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");  
-    
 ![](https://img-blog.csdn.net/20161115115034740)
 
-    单目ORB_SLAM2::System SLAM 对象框架:
+>**双目相机app程序框架：**
+
+	1. 读取相机配置文件(内参数 畸变矫正参数 双目对齐变换矩阵) =======================
+	   cv::FileStorage fsSettings(setting_filename, cv::FileStorage::READ);
+	   fsSettings["LEFT.K"] >> K_l;//内参数
+	   fsSettings["LEFT.D"] >> D_l;// 畸变矫正
+	   fsSettings["LEFT.P"] >> P_l;// P_l,P_r --左右相机在校准后坐标系中的投影矩阵 3×4
+	   fsSettings["LEFT.R"] >> R_l;// R_l,R_r --左右相机校准变换（旋转）矩阵  3×3
+	2. 计算双目矫正映射矩阵========================================================
+	   cv::Mat M1l,M2l,M1r,M2r;
+           cv::initUndistortRectifyMap(K_l,D_l,R_l,P_l.rowRange(0,3).colRange(0,3),cv::Size(cols_l,rows_l),CV_32F,M1l,M2l);
+           cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,M1r,M2r);
+	3. 创建双目系统=============================================================== 
+	   ORB_SLAM2::System SLAM(vocabulary_filepath, setting_filename, ORB_SLAM2::System::STEREO, true);
+	4. 从双目设备捕获图像,设置分辨率捕获图像========================================
+	   cv::VideoCapture CapAll(deviceid); //打开相机设备 
+	   //设置分辨率   1280*480  分成两张 640*480  × 2 左右相机
+           CapAll.set(CV_CAP_PROP_FRAME_WIDTH,1280);  
+           CapAll.set(CV_CAP_PROP_FRAME_HEIGHT, 480); 
+        5. 获取左右相机图像===========================================================
+	   CapAll.read(src_img);
+	   imLeft  = src_img(cv::Range(0, 480), cv::Range(0, 640));   
+           imRight = src_img(cv::Range(0, 480), cv::Range(640, 1280));   
+	6. 使用2步获取的双目矫正映射矩阵 矫正 左右相机图像==============================
+	   cv::remap(imLeft,imLeftRect,M1l,M2l,cv::INTER_LINEAR);
+           cv::remap(imRight,imRightRect,M1r,M2r,cv::INTER_LINEAR);
+	7. 记录时间戳 time ，并计时===================================================
+		#ifdef COMPILEDWITHC11
+		   std::chrono::steady_clock::time_point    t1 = std::chrono::steady_clock::now();
+		#else
+		   std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+		#endif
+        8. 把左右图像和时间戳 传给 SLAM系统===========================================
+	    SLAM.TrackStereo(imLeftRect, imRightRect, time);
+	9. 计时结束，计算时间差，处理时间============================================= 
+	10.循环执行 5-9步===========================================================
+	11.结束，关闭slam系统，关闭所有线程===========================================   
+	12.保存相机轨迹============================================================== 
+	   
+
+>**ORB_SLAM2::System SLAM 对象框架:**
+
         在主函数中，我们创建了一个ORB_SLAM2::System的对象SLAM，这个时候就会进入到SLAM系统的主接口System.cc。
         这个代码是所有调用SLAM系统的主入口，
         在这里，我们将看到前面博客所说的ORB_SLAM的三大模块：
