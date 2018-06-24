@@ -1,7 +1,6 @@
 /**
 * This file is part of ORB-SLAM2.
 * 
-* 
 * mpMap就是我们整个位姿与地图（可以想象成ORB-SLAM运行时的那个界面世界），
 * MapPoint和KeyFrame都被包含在这个mpMap中。
 * 因此创建这三者对象（地图，地图点，关键帧）时，
@@ -20,8 +19,6 @@
 * 第二个是更新该地图点平均观测方向与观测距离的范围，这些都是为了后面做描述子融合做准备。
 pNewMP->UpdateNormalAndDepth();
 
-
-* 
 * 
 * 跟踪
 * 每一帧图像 Frame ---> 提取ORB关键点特征 -----> 根据上一帧进行位置估计计算R t (或者通过全局重定位初始化位置)
@@ -63,8 +60,8 @@ c 通过全局重定位来初始化位姿估计 Relocalization()
     
  * 3】局部地图跟踪
 *       更新局部地图 UpdateLocalMap() 更新关键帧和 更新地图点  UpdateLocalKeyFrames()   UpdateLocalPoints
-*       搜索地图点     获得局部地图与当前帧的匹配
-*       优化位姿         最小化重投影误差  3D点-2D点对  si * pi = K * T * Pi = K * exp(f) * Pi 
+*       搜索地图点  获得局部地图与当前帧的匹配
+*       优化位姿    最小化重投影误差  3D点-2D点对  si * pi = K * T * Pi = K * exp(f) * Pi 
 * 
 * 4】是否生成关键帧
 *       加入的条件：
@@ -130,9 +127,9 @@ namespace ORB_SLAM2
 	    cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);//读取配置文件
 	    
 //【1】------------------ 相机内参数矩阵 K------------------------
-	    //       |fx  0   cx|
+	    //     |fx  0   cx|
 	    // K = |0   fy  cy|
-	    //        |0   0   1 |
+	    //     |0   0   1 |
 	    float fx = fSettings["Camera.fx"];
 	    float fy = fSettings["Camera.fy"];
 	    float cx = fSettings["Camera.cx"];
@@ -302,7 +299,7 @@ namespace ORB_SLAM2
 	    mCurrentFrame = Frame(mImGray,imGrayRight,timestamp,mpORBextractorLeft,mpORBextractorRight,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
 // 步骤3：跟踪
-	    // ------// 跟踪后 就能够得到 位姿 
+	    // 跟踪后 就能够得到 位姿 
 	    // 初始化-------------------------------
 	    // 当前帧 特征点个数 大于500 进行初始化
 	    // 设置第一帧为关键帧  位姿为 [I 0] 
@@ -485,75 +482,74 @@ LocalMap包含：
  */
 	void Tracking::Track()
 	{
-	  // track包含两部分：估计运动、跟踪局部地图
-
-       // mState为tracking的状态机
-           // SYSTME_NOT_READY, NO_IMAGE_YET, NOT_INITIALIZED, OK, LOST
-           // 如果图像复位过、或者第一次运行，则为NO_IMAGE_YET状态
-	    if(mState==NO_IMAGES_YET)
+// track包含两部分：估计运动(前后两帧的运动变换矩阵)、 跟踪局部地图(在地图中定位)
+     // mState 为 tracking的状态机
+           // SYSTME_NOT_READY , NO_IMAGE_YET, NOT_INITIALIZED, OK, LOST
+           // 如果图像复位过、或者第一次运行，则为 NO_IMAGE_YET 状态
+	    if(mState == NO_IMAGES_YET)
 	    {
 		mState = NOT_INITIALIZED;// 未初始化
 	    }
 	    
-            // mLastProcessedState存储了Tracking最新的状态，用于FrameDrawer中的绘制
+            // mLastProcessedState 存储了 Tracking最新的状态，用于 FrameDrawer中的绘制
 	    mLastProcessedState = mState;
 
-	    // Get Map Mutex -> Map cannot be changed
-
+	    // 对地图上锁 Get Map Mutex -> Map cannot be changed
 	    unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
-// ------【1】得到初始化位姿 系统未初始化 进行初始化------------------------
-// 步骤1：初始化
-	    if(mState==NOT_INITIALIZED)
+// 步骤1：前一帧的跟踪, 系统未初始化 进行初始化 得到初始化位姿(跟踪估计运动) ==============================
+	    if(mState == NOT_INITIALIZED)
 	    {
-	 // 得到初始化位姿
+            // 1. 单目/双目/RGBD初始化 得到第一帧下看到的3d点
 		if(mSensor==System::STEREO || mSensor==System::RGBD)
-	    // 当前帧 特征点个数 大于500 进行初始化
-	    // 设置第一帧为关键帧  位姿为 [I 0] 
-	    // 根据第一帧视差求得的深度 计算3D点
-	    // 生成地图 添加地图点 地图点观测帧 地图点最好的描述子 更新地图点的方向和距离 
-	    //                 关键帧的地图点 当前帧添加地图点  地图添加地图点
-	    // 显示地图  
+		    // 当前帧 特征点个数 大于500 进行初始化
+		    // 设置第一帧为关键帧  位姿为 [I 0] 
+		    // 根据第一帧视差求得的深度 计算3D点
+		    // 生成地图 添加地图点 地图点观测帧 地图点最好的描述子 更新地图点的方向和距离 
+		    // 关键帧的地图点 当前帧添加地图点  地图添加地图点
+		    // 显示地图  
 		    StereoInitialization();// 双目 / 深度初始化
 		else
-	      // 连续两帧特征点个数大于100个 且两帧 关键点匹配点对数 大于100个  
-	      // 初始帧 [I  0] 第二帧 基础矩阵/单应恢复 [R t] 全局优化  同时得到对应的 3D点
-	      // 创建地图 使用 最小化重投影误差BA 进行 地图优化 优化位姿 和地图点
-	      // 深度距离中值 倒数 归一化第二帧位姿的 平移向量 和 地图点的 三轴坐标
-	      // 显示更新  
+		      // 连续两帧特征点个数大于100个 且两帧 关键点orb特征匹配点对数 大于100个  
+		      // 初始帧 [I  0] 第二帧 基础矩阵/单应恢复 [R t] 全局优化  同时得到对应的 3D点
+		      // 创建地图 使用 最小化重投影误差BA 进行 地图优化 优化位姿 和地图点
+		      // 深度距离中值 倒数 归一化第二帧位姿的 平移向量 和 地图点的 三轴坐标
+		      // 显示更新  
 		    MonocularInitialization();// 单目初始化
-	 // 显示帧位姿
-		mpFrameDrawer->Update(this);// 显示帧
+
+            // 2. 可视化显示当前帧位姿
+	    	mpFrameDrawer->Update(this);// 显示帧
 		if(mState!=OK)
 		    return;
 	    }  
 	    
-// ----------系统已经初始化  跟踪帧 特征点对 计算相机移动 位姿--------------------------	 
-// 步骤2：跟踪
+// 步骤2：后面帧的跟踪 ==========================================================================================================
+      // 1. 跟踪上一帧得到一个对位姿的初始估计.
+	 // 系统已经初始化(地图中已经有3d点) 跟踪上一帧 特征点对 计算相机移动 位姿----
+     // 2. 跟踪局部地图, 图优化对位姿进行精细化调整
+     // 3. 跟踪失败后的处理（两两跟踪失败 or 局部地图跟踪失败）
 	    else
 	    {
-		// System is initialized. Track Frame.
 		bool bOK; // bOK为临时变量，用于表示每个函数是否执行成功
 		// Initial camera pose estimation using motion model or relocalization (if tracking is lost)
-	// 在viewer中有个开关 menuLocalizationMode ，有它控制是否 ActivateLocalizationMode ，并最终管控mbOnlyTracking
-        // mbOnlyTracking等于false表示正常VO模式（有地图更新），mbOnlyTracking等于true表示用户手动选择定位模式
-//【2】 跟踪 + 建图 + 重定位		
+		// 在viewer中有个开关 menuLocalizationMode ，有它控制是否 ActivateLocalizationMode ，并最终管控mbOnlyTracking
+		// mbOnlyTracking等于false表示正常VO模式（有地图更新），mbOnlyTracking等于true表示用户手动选择定位模式
+     // 1.跟踪上一帧=============================================================================================================
+           // 1. 跟踪 + 建图 + 重定位==================================================================================		
 		if(!mbOnlyTracking)// 跟踪 + 建图 + 重定位（跟踪丢失后进行重定位）
 		{
 		    // Local Mapping is activated. This is the normal behaviour, unless
 		    // you explicitly activate the "only tracking" mode.
-                   // 正常初始化成功
+                // A. 正常初始化成功==============================================================================
 		    if(mState==OK)//状态ok 未跟丢
 		    {
-		      
 			// 检查并更新上一帧被替换的MapPoints
 			// 更新Fuse函数和 SearchAndFuse 函数替换的 MapPoints	      
-			// Local Mapping might have changed some MapPoints tracked in last frame
-			CheckReplacedInLastFrame();// // 最后一帧 地图点 是否有替换点 有替换点的则进行替换
-                         // 没有移动 跟踪参考关键帧
-			 // 运动模型是空的或刚完成重定位
-                         // mCurrentFrame.mnId<mnLastRelocFrameId+2这个判断不应该有
+			CheckReplacedInLastFrame();// 最后一帧 地图点 是否有替换点 有替换点的则进行替换
+                     // a. 跟踪参考帧模式 移动速度小========================================
+                         // 没有移动 跟踪参考关键帧(运动模型是空的)  或 刚完成重定位
+                         // mCurrentFrame.mnId < mnLastRelocFrameId+2这个判断不应该有
                          // 应该只要mVelocity不为空，就优先选择TrackWithMotionModel
-                         // mnLastRelocFrameId上一次重定位的那一帧
+                         // mnLastRelocFrameId 上一次重定位的那一帧
 			if(mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2)// 最新重定位的id
 			{
 			        // 将上一帧的位姿作为当前帧的初始位姿
@@ -561,85 +557,79 @@ LocalMap包含：
                                 // 优化每个特征点都对应3D点重投影误差即可得到位姿
 			    bOK = TrackReferenceKeyFrame();// 跟踪参考关键帧 中的 地图点 大于10个 返回真
 			}
-			// 有移动 先进行移动 跟踪 模式
+		     // b. 有移动 先进行移动 跟踪 模式=======================================
 			else
 			{
-			    // 根据恒速模型设定当前帧的初始位姿
-                            // 通过投影的方式在 上一帧参考帧 中找当前帧特征点的匹配点
-                            // 优化每个特征点所对应3D点的投影误差即可得到位姿
-			    bOK = TrackWithMotionModel();// 移动 跟踪 模式
-			    if(!bOK)//没成功 进行 跟踪参考帧 模式
-				// TrackReferenceKeyFrame是跟踪参考帧，不能根据固定运动速度模型预测当前帧的位姿态，通过bow加速匹配（SearchByBow）
+			    // 根据 恒速模型 设定 当前帧的初始位姿
+                            // 通过投影的方式在 上一帧参考帧 中找 当前帧特征点 的 匹配点
+                            // 优化每个 特征点所 对应3D点的投影误差 即可得到位姿
+			    bOK = TrackWithMotionModel();// 移动跟踪模式, 跟踪上一帧
+			    if(!bOK)//没成功 则尝试 进行 跟踪参考帧 模式
+				// 不能根据固定运动速度模型预测当前帧的位姿态，通过bow加速匹配（SearchByBow）
 				// 最后通过优化得到优化后的位姿			      
 				bOK = TrackReferenceKeyFrame();// 跟踪参考帧 模式 大于10个 返回真
 			}
 		    }
-		    else// 跟丢了 进行重定位
-		    {// BOW搜索，PnP求解位姿
-			bOK = Relocalization();//重定位
+                // B. 更丢了，重定位模式===========================================================================
+		    else
+		    {
+			bOK = Relocalization();//重定位  BOW搜索，PnP 3d-2d匹配 求解位姿
 		    }
 		}
-// 【3】跟踪 +   重定位（跟踪丢失后进行重定位）		
-		else //跟踪 +   重定位（跟踪丢失后进行重定位）
+            // 2. 已经有地图的情况下，则进行 跟踪 + 重定位（跟踪丢失后进行重定位）================================================		
+		else
 		{
-		    // Localization Mode: Local Mapping is deactivated
-		  // 跟踪丢失
+	        // A.跟踪丢失 ======================================================================================
 		    if(mState==LOST)
 		    {
-			bOK = Relocalization();//重定位 模式
+			bOK = Relocalization();//重定位  BOW搜索，PnP 3d-2d匹配 求解位姿
 		    }
+                // B. 正常跟踪
 		    else
 		    {
 		        // mbVO 是 mbOnlyTracking 为true时的才有的一个变量
-                        // mbVO 为false表示此帧匹配了很多的MapPoints，跟踪很正常，
-                        // mbVO 为true表明此帧匹配了很少的MapPoints，少于10个，要跪的节奏
-		      
-	       // mbVO为0则表明此帧匹配了很多的3D map点，非常好      
+                        // mbVO 为0表示此帧匹配了很多的MapPoints，跟踪很正常，
+                        // mbVO 为1表明此帧匹配了很少的MapPoints，少于10个，要跪的节奏      
 			if(!mbVO)
 			{
-		     // 上一帧跟踪的点足够多 In last frame we tracked enough MapPoints in the map
+		   // a. 上一帧跟踪的点足够多=============================================
+                           // 1. 移动跟踪模式, 如果失败，尝试使用跟踪参考帧模式====
 			    if(!mVelocity.empty())// 在移动
 			    {
-				bOK = TrackWithMotionModel();// 移动跟踪 模型
-				 // 这个地方是不是应该加上：
-				 if(!bOK)
+				bOK = TrackWithMotionModel();// 恒速跟踪上一帧 模型
+				 if(!bOK)// 新添加，如果移动跟踪模式失败，尝试使用 跟踪参考帧模式 进行跟踪
 				    bOK = TrackReferenceKeyFrame();
 			    }
+                           // 2. 使用跟踪参考帧模式===============================
 			    else//未移动
 			    {
-				bOK = TrackReferenceKeyFrame();// 跟踪之前的 参考帧
+				bOK = TrackReferenceKeyFrame();// 跟踪 参考帧
 			    }
 			}
-	         // mbVO为1，则表明此帧匹配了很少的3D map点，少于10个，要跪的节奏，既做跟踪又做定位		
-			else
+	         // b. 上一帧跟踪的点比较少(到了无纹理区域等)，要跪的节奏，既做跟踪又做定位========   	
+			else// mbVO为1，则表明此帧匹配了很少的3D map点，少于10个，要跪的节奏，既做 运动跟踪 又做 定位	
 			{
-		  // 上一帧跟踪的点不够多  In last frame we tracked mainly "visual odometry" points.
-                         // 运动跟踪模式
-			 // 重定位模式
-			    // We compute two camera poses, one from motion model and one doing relocalization.
-			    // If relocalization is sucessfull we choose that solution, otherwise we retain
-			    // the "visual odometry" solution.
-
+                            // 使用 运动跟踪 和 重定位模式 计算两个位姿，如果重定位成功，使用重定位得到的位姿
 			    bool bOKMM = false;
 			    bool bOKReloc = false;
 			    vector<MapPoint*> vpMPsMM;
 			    vector<bool> vbOutMM;
-			    cv::Mat TcwMM;
+			    cv::Mat TcwMM;// 视觉里程计跟踪得到的 位姿 结果
 			    if(!mVelocity.empty())// 有速度 运动跟踪模式
 			    {
-				bOKMM = TrackWithMotionModel();// 运动跟踪模式 结果
-				vpMPsMM = mCurrentFrame.mvpMapPoints;
-				vbOutMM = mCurrentFrame.mvbOutlier;
-				TcwMM = mCurrentFrame.mTcw.clone(); // 保持视觉里程计 位姿 结果
+				bOKMM = TrackWithMotionModel();// 运动跟踪模式跟踪上一帧 结果
+				vpMPsMM = mCurrentFrame.mvpMapPoints;// 地图点
+				vbOutMM = mCurrentFrame.mvbOutlier;  // 外点
+				TcwMM = mCurrentFrame.mTcw.clone();  // 保存视觉里程计 位姿 结果
 			    }
 			    
 			    bOKReloc = Relocalization();// 重定位模式
-                     // 重定位没有成功，但是如果跟踪成功
-			    if(bOKMM && !bOKReloc)// 运动跟踪模式 成功 重定位模式 失败
+                         // 1.重定位没有成功，但运动跟踪 成功,使用跟踪的结果===================================
+			    if(bOKMM && !bOKReloc)
 			    {
-				mCurrentFrame.SetPose(TcwMM);//
-				mCurrentFrame.mvpMapPoints = vpMPsMM;
-				mCurrentFrame.mvbOutlier = vbOutMM;
+				mCurrentFrame.SetPose(TcwMM);// 把帧的位置设置为 视觉里程计 位姿 结果
+				mCurrentFrame.mvpMapPoints = vpMPsMM;// 帧看到的地图点
+				mCurrentFrame.mvbOutlier = vbOutMM;// 外点
 
 				if(mbVO)
 				{
@@ -654,10 +644,10 @@ LocalMap包含：
 				    }
 				}
 			    }
-		   // 重定位模式 失败
+		         // 2. 重定位模式 成功=================================================
 			    else if(bOKReloc)// 只要重定位成功整个跟踪过程正常进行（定位与跟踪，更相信重定位）
 			    {
-				mbVO = false;
+				mbVO = false;//重定位成功 
 			    }
 
 			    bOK = bOKReloc || bOKMM;// 运动 跟踪 / 重定位 成功标志
@@ -665,27 +655,28 @@ LocalMap包含：
 		    }
 		}
 
-// 局部地图跟踪-----------------------		
+      // 步骤2. 局部地图跟踪=======================================================================================================	
 	      // 通过之前的计算，已经得到一个对位姿的初始估计，我们就能透过投影，
-	      // 从已经生成的地图点中找到更多的对应关系，来精确结果
+	      // 从已经生成的地图点 中找到更多的对应关系，来精确结果
 	      // 三种模式的初始跟踪之后  进行  局部地图的跟踪
 	      // 局部地图点的描述子 和 当前帧 特征点(还没有匹配到地图点的关键点) 进行描述子匹配
 	      // 图优化进行优化  利用当前帧的特征点的像素坐标和 与其匹配的3D地图点  在其原位姿上进行优化
 	      // 匹配优化后 成功的点对数 一般情况下 大于30 认为成功
 	      // 在刚进行过重定位的情况下 需要大于50 认为成功
 
-		mCurrentFrame.mpReferenceKF = mpReferenceKF;
-		// If we have an initial estimation of the camera pose and matching. Track the local map.
-		
-   // 步骤2.2：在帧间匹配得到初始的姿态后，现在对local map进行跟踪得到更多的匹配，并优化当前位姿
-        // local map:当前帧、当前帧的MapPoints、当前关键帧与其它关键帧共视关系
-        // 在步骤2.1中主要是两两跟踪（恒速模型跟踪上一帧、跟踪参考帧），这里搜索局部关键帧后搜集所有局部MapPoints，
-        // 然后将局部MapPoints和当前帧进行投影匹配，得到更多匹配的MapPoints后进行Pose优化
+		mCurrentFrame.mpReferenceKF = mpReferenceKF;// 参考关键帧
+	 // 步骤2.1：在帧间匹配得到初始的姿态后，现在对local map进行跟踪得到更多的匹配，并优化当前位姿
+		// local map:当前帧、当前帧的MapPoints、当前关键帧与其它关键帧共视关系
+		// 在上面两两帧跟踪（恒速模型跟踪上一帧、跟踪参考帧），
+                // 这里搜索局部关键帧 后 搜集所有局部MapPoints，
+		// 然后将局部MapPoints和当前帧进行投影匹配，得到更多匹配的MapPoints后进行Pose优化
+             // 有建图线程
 		if(!mbOnlyTracking)// 跟踪 + 建图 + 重定位
 		{
 		    if(bOK)
-			bOK = TrackLocalMap(); // 局部地图跟踪------------------
+			bOK = TrackLocalMap(); // 局部地图跟踪 g20优化 ------------------
 		}
+             // 无建图线程
 		else// 跟踪  + 重定位
 		{
 		    // mbVO true means that there are few matches to MapPoints in the map. We cannot retrieve
@@ -698,47 +689,45 @@ LocalMap包含：
 		if(bOK)
 		    mState = OK;
 		else
-		    mState=LOST;
+		    mState=LOST;// 丢失
 
 		// Update drawer
 		//  更新显示
 		mpFrameDrawer->Update(this);
 
-		// If tracking were good, check if we insert a keyframe
-  // --------局部地图跟踪成功 -----------------------------------
+
+       // 步骤2.2 局部地图跟踪成功, 根系运动模型，清除外点等，检查是否需要创建新的关键帧
 		if(bOK)
 		{
-	 // 【a】更新运动模型 Update motion model 运动速度为前后两针的 变换矩阵
+	       // a. 有运动，则更新运动模型 Update motion model 运动速度为前后两针的 变换矩阵
 		    if(!mLastFrame.mTcw.empty())
-		    {
-       // 步骤2.3：更新恒速运动模型 TrackWithMotionModel 中的 mVelocity	      
+		    {      
 			cv::Mat LastTwc = cv::Mat::eye(4,4,CV_32F);
 			mLastFrame.GetRotationInverse().copyTo(LastTwc.rowRange(0,3).colRange(0,3));
 			mLastFrame.GetCameraCenter().copyTo(LastTwc.rowRange(0,3).col(3));
 			mVelocity = mCurrentFrame.mTcw*LastTwc;//运动速度 为前后两针的 变换矩阵
 		    }
 		    else
-			mVelocity = cv::Mat();
+			mVelocity = cv::Mat();// 无速度
                     // 显示 当前相机位姿 
 		    mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.mTcw);
 
-            // 【b】Clean VO matches
-       // 步骤2.4：清除UpdateLastFrame中为当前帧临时添加的MapPoints	    
-                 // 当前帧 的地图点的 观测帧数量小于1 的化 清掉 相应的 地图点
-		    for(int i=0; i<mCurrentFrame.N; i++)
+               // b. 清除 UpdateLastFrame 中为当前帧 临时添加的 MapPoints	    
+                    // 当前帧 的地图点的 观测帧数量小于1 的化 清掉 相应的 地图点
+		    for(int i=0; i< mCurrentFrame.N; i++)
 		    {
 			MapPoint* pMP = mCurrentFrame.mvpMapPoints[i];//当前帧 匹配到的地图点
-			if(pMP)
+			if(pMP)//指针存在
 			    if(pMP->Observations()<1)// 其观测帧 小于 1
 			    {// 排除UpdateLastFrame函数中为了跟踪增加的MapPoints
 				mCurrentFrame.mvbOutlier[i] = false;// 外点标志 0 
 				mCurrentFrame.mvpMapPoints[i]=static_cast<MapPoint*>(NULL);// 清掉 相应的 地图点
 			    }
 		    }
-       // 步骤2.5：清除临时的MapPoints，这些MapPoints在TrackWithMotionModel的UpdateLastFrame函数里生成（仅双目和rgbd）
-		  // 步骤2.4中只是在当前帧中将这些MapPoints剔除，这里从MapPoints数据库中删除
+               // c. 清除临时的MapPoints,删除临时的地图点
+                  // 这些MapPoints在TrackWithMotionModel的UpdateLastFrame函数里生成（仅双目和rgbd）
+		  // b 中只是在 当前帧 中将这些MapPoints剔除，这里从MapPoints数据库中删除
 		  // 这里生成的仅仅是为了提高双目或rgbd摄像头的帧间跟踪效果，用完以后就扔了，没有添加到地图中
-	          // 【c】删除临时的地图点 Delete temporal MapPoints
 		    //  list<MapPoint*>::iterator 
 		    for(auto lit = mlpTemporalPoints.begin(), lend =  mlpTemporalPoints.end(); lit != lend; lit++)
 		    {
@@ -747,18 +736,13 @@ LocalMap包含：
 		    }
 		    mlpTemporalPoints.clear();
 
-	   // 【d】需要插入关键帧吗Check if we need to insert a new keyframe
-		// 最后一步是确定是否将当前帧定为关键帧，由于在Local Mapping中，
-		// 会剔除冗余关键帧，所以我们要尽快插入新的关键帧，这样才能更鲁棒。
+	      // d. 判断是否需要新建关键帧
+		   // 最后一步是确定是否将当前帧定为关键帧，由于在Local Mapping中，
+		   // 会剔除冗余关键帧，所以我们要尽快插入新的关键帧，这样才能更鲁棒。
 		    if(NeedNewKeyFrame())
 			CreateNewKeyFrame();
 
-		    // We allow points with high innovation (considererd outliers by the Huber Function)
-		    // pass to the new keyframe, so that bundle adjustment will finally decide
-		    // if they are outliers or not. We don't want next frame to estimate its position
-		    // with those points so we discard them in the frame.
-		    // 检查外点 标记(不符合 变换矩阵的 点 优化时更新)
-	// 【e】外点清除    
+	      // e. 外点清除 检查外点 标记(不符合 变换矩阵的 点 优化时更新)   
 		    for(int i=0; i<mCurrentFrame.N;i++)
 		    {
 			if(mCurrentFrame.mvpMapPoints[i] && mCurrentFrame.mvbOutlier[i])
@@ -766,12 +750,11 @@ LocalMap包含：
 		    }
 		}
 		
-   //-----局部地图跟踪失败-----------------------------------
-// 步骤3：记录位姿信息，用于轨迹复现   
-	// Reset if the camera get lost soon after initialization
-		if(mState==LOST)
+      // 3. 跟踪失败后的处理（两两跟踪失败 or 局部地图跟踪失败）======================================================
+
+		if(mState == LOST)
 		{
-		    if(mpMap->KeyFramesInMap()<=5)
+		    if(mpMap->KeyFramesInMap()<=5)// 关键帧数量过少（刚开始建图） 直接退出
 		    {
 			cout << "跟踪丢失， 正在重置 Track lost soon after initialisation, reseting..." << endl;
 			mpSystem->Reset();
@@ -782,14 +765,15 @@ LocalMap包含：
 		if(!mCurrentFrame.mpReferenceKF)
 		    mCurrentFrame.mpReferenceKF = mpReferenceKF;
 
-		mLastFrame = Frame(mCurrentFrame);
+		mLastFrame = Frame(mCurrentFrame);//新建关键帧
 	    }
-	    
-//------------【3】计算参考帧到当前帧 的变换 Tcr = mTcw  * mTwr --------------------
-	    // Store frame pose information to retrieve the complete camera trajectory afterwards.
+
+   
+// 步骤3: 返回跟踪得到的位姿 信息=======================================================================
+            // 计算参考帧到当前帧 的变换 Tcr = mTcw  * mTwr 
 	    if(!mCurrentFrame.mTcw.empty())
 	    {
-	      // mTcw  * mTwr  = mTcr
+	        // mTcw  * mTwr  = mTcr
 		cv::Mat Tcr = mCurrentFrame.mTcw * mCurrentFrame.mpReferenceKF->GetPoseInverse();
 		mlRelativeFramePoses.push_back(Tcr);
 		mlpReferences.push_back(mpReferenceKF);
@@ -805,7 +789,7 @@ LocalMap包含：
 		mlbLost.push_back(mState==LOST);
 	    }
 
-	}
+  }
 // 以上为 Tracking部分
 	
 
@@ -813,7 +797,7 @@ LocalMap包含：
 // 设置第一帧为关键帧  位姿为 [I 0] 
 // 根据第一帧视差求得的深度 计算3D点
 // 生成地图 添加地图点 地图点观测帧 地图点最好的描述子 更新地图点的方向和距离 
-//                 关键帧的地图点 当前帧添加地图点  地图添加地图点
+// 关键帧的地图点 当前帧添加地图点  地图添加地图点
 // 显示地图
 
 /**
