@@ -1,6 +1,24 @@
 # 量化策略
 
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAPOcSAACWBTome1c039.png)
+
+
 # 量化(quantization)。
+    对象：对权重量化，对特征图量化(神经元输出)，对梯度量化(训练过程中)
+    过程：在inference网络前传，在训练过程(反传)
+    一步量化(仅对权重量化)，
+    两步量化(对神经元与特征图量化，第一步先对feature map进行量化，第二步再对权重量化)
+    
+    32位浮点和16位浮点存储的时候，
+    第一位是符号位，中间是指数位，后面是尾数。
+    英特尔在NIPS2017上提出了把前面的指数项共享的方法，
+    这样可以把浮点运算转化为尾数的整数定点运算，从而加速网络训练。
+![](http://image109.360doc.com/DownloadImg/2018/05/1819/133371604_20_20180518070453675)
+
+    分布式训练梯度量化：
+![](http://image109.360doc.com/DownloadImg/2018/05/1819/133371604_21_20180518070453753)
+    
+
     对权重数值进行聚类，
     量化的思想非常简单。
     CNN参数中数值分布在参数空间，
@@ -113,6 +131,19 @@
 ## 2. 二值量化网络 
 [二值化神经网络介绍](https://blog.csdn.net/tangwei2014/article/details/55077172)
 
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAdU6BAACcvDwG5pU677.png)
+
+    上图是在定点表示里面最基本的方法：BNN和BWN。
+    在网络进行计算的过程中，可以使用定点的数据进行计算，
+    由于是定点计算，实际上是不可导的，
+    于是提出使用straight-through方法将输出的估计值直接传给输入层做梯度估计。
+    在网络训练过程中会保存两份权值，用定点的权值做网络前向后向的计算，
+    整个梯度累积到浮点的权值上，整个网络就可以很好地训练，
+    后面几乎所有的量化方法都会沿用这种训练的策略。
+    前面包括BNN这种网络在小数据集上可以达到跟全精度网络持平的精度，
+    但是在ImageNet这种大数据集上还是表现比较差。
+
+
 ![](https://img-blog.csdn.net/20170214003827832?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
     二值化神经网络，是指在浮点型神经网络的基础上，
@@ -191,6 +222,13 @@
 
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAaYgnAACz9cXw6vE854.png)
+
+    上图展示了ECCV2016上一篇名为XNOR-Net的工作，
+    其思想相当于在做量化的基础上，乘了一个尺度因子，这样大大降低了量化误差。
+    他们提出的BWN，在ImageNet上可以达到接近全精度的一个性能，
+    这也是首次在ImageNet数据集上达到这么高精度的网络。
+    
 
     BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。XNOR-Net是BinaryNet的升级版。 
     主要思想： 
@@ -213,6 +251,31 @@
         在正向传播过程中加入了均值为0的噪音。 
         BNN约差于XNOR-NET（<3%），
         QNN-2bit activation 略优于DoReFaNet 2-bit activation
+
+
+#### 二值约束低比特量化
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAdFmiAACFxVTKLmQ760.png)
+
+    上图展示了阿里巴巴冷聪等人做的通过ADMM算法求解binary约束的低比特量化工作。
+    从凸优化的角度，在第一个优化公式中，f(w)是网络的损失函数，
+    后面会加入一项W在集合C上的loss来转化为一个优化问题。
+    这个集合C取值只有正负1，如果W在满足约束C的时候，它的loss就是0；
+    W在不满足约束C的时候它的loss就是正无穷。
+    为了方便求解还引进了一个增广变量，保证W是等于G的，
+    这样的话就可以用ADMM的方法去求解。
+    
+#### 哈希函数两比特缩放量化 BWNH
+![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAE7dRAACHJnpcRMk945.png)
+
+    通过Hashing方法做的网络权值二值化工作。
+    第一个公式是我们最常用的哈希算法的公式，其中S表示相似性，
+    后面是两个哈希函数之间的内积。
+    我们在神经网络做权值量化的时候采用第二个公式，
+    第一项表示输出的feature map，其中X代表输入的feature map，W表示量化前的权值，
+    第二项表示量化后输出的feature map，其中B相当于量化后的权值，
+    通过第二个公式就将网络的量化转化成类似第一个公式的Hashing方式。
+    通过最后一行的定义，就可以用Hashing的方法来求解Binary约束。
+
 
 ## 3. 三值化网络 
 [Ternary Neural Networks TNN](https://arxiv.org/pdf/1609.00222.pdf)
