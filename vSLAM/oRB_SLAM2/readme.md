@@ -261,17 +261,26 @@
 
 
 ## 4.2 单目/双目/RGBD初始化, 单应变换/本质矩阵恢复3d点
+[参考](https://blog.csdn.net/u010128736/article/details/53218140)
+
 ### 1. 单目初始化      Tracking::MonocularInitialization()
 
 ### 2. 双目/RGBD初始化 Tracking::StereoInitialization()
 
 
 ## 4.3 跟踪线程 Tracking 两帧跟踪/局部地图跟踪
+[参考](https://blog.csdn.net/u010128736/article/details/53339311)
+
 
 ## 4.4 局部跟踪线程 LocalMapping
+[参考](https://blog.csdn.net/u010128736/article/details/53395936)
+
 
 ## 4.5 闭环检测线程 LoopClosing
+[参考](https://blog.csdn.net/u010128736/article/details/53409199)
 
  
 # 5. 数学理论总结
+[参考]()
+
 
