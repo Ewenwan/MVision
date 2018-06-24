@@ -113,6 +113,34 @@
          
 # 4. 代码分析
 [ORB-SLAM2详解（二）代码逻辑](https://blog.csdn.net/u010128736/article/details/53169832)
+
+## 4.1 应用程序框架
+>**单目相机：**
+
+    app框架，
+        1. 创建 单目ORB_SLAM2::System SLAM 对象
+        2. 载入图片 或者 相机捕获图片 im = cv::imread();
+        3. 记录时间戳 tframe ，并计时，std::chrono::steady_clock::now(); / std::chrono::monotonic_clock::now();
+        4. 把图像传给 SLAM系统, SLAM.TrackMonocular(im,tframe); 
+        5. 计时结束，计算时间差，处理时间。
+        6. 循环2-5步。
+        7. 结束，关闭slam系统，关闭所有线程 SLAM.Shutdown();
+        8. 保存相机轨迹, SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");  
+    
+![](https://img-blog.csdn.net/20161115115034740)
+
+    单目ORB_SLAM2::System SLAM 对象框架:
+    
+     在主函数中，我们创建了一个ORB_SLAM2::System的对象SLAM，这个时候就会进入到SLAM系统的主接口System.cc。
+      这个代码是所有调用SLAM系统的主入口，
+      在这里，我们将看到前面博客所说的ORB_SLAM的三大模块：
+      Tracking、LocalMapping 和 LoopClosing。
+      如下图所示： 
+![](https://img-blog.csdn.net/20161115115045032)
+    
+    System类的初始化函数：
+    1. 
+         
          
          
     
