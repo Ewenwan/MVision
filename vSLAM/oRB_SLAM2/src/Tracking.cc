@@ -1,5 +1,5 @@
-/**
-* This file is part of ORB-SLAM2.
+/* 跟踪线程 深度 双目初始化位姿 运动模型 关键帧模式 重定位 局部地图跟踪 关键帧
+*This file is part of ORB-SLAM2.
 * 
 * mpMap就是我们整个位姿与地图（可以想象成ORB-SLAM运行时的那个界面世界），
 * MapPoint和KeyFrame都被包含在这个mpMap中。
@@ -294,8 +294,8 @@ namespace ORB_SLAM2
 		}
 	    }
 // 步骤2：构造Frame	    
-           //---创建 帧  灰度图左图  灰度图右图   时间戳   左右图像的 ORB特征提取器 ORB字典 相机内参数mk 畸变校正参数mDistCoef  远近点阈值  深度尺度
-           // 帧对象 关键点 关键点匹配对应深度值 匹配点坐标值 对关键点分块
+       //---创建 帧  灰度图左图  灰度图右图   时间戳   左右图像的 ORB特征提取器 ORB字典 相机内参数mk 畸变校正参数mDistCoef  远近点阈值  深度尺度
+       // 帧对象 关键点 关键点匹配对应深度值 匹配点坐标值 对关键点分块
 	    mCurrentFrame = Frame(mImGray,imGrayRight,timestamp,mpORBextractorLeft,mpORBextractorRight,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
 // 步骤3：跟踪
@@ -356,7 +356,7 @@ namespace ORB_SLAM2
 	}
 	
 /**
-  * @brief   单目相机  获取相机位姿
+  * @brief 单目相机  获取相机位姿
   * 输入左目RGB或RGBA图像
   * 1、将图像转为mImGray并初始化mCurrentFrame
   * 2、进行tracking过程
