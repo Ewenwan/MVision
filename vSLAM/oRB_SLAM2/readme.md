@@ -171,7 +171,7 @@
 ```
 
 >**ORB_SLAM2::System SLAM 对象框架:**
-```ams
+```asm
         在主函数中，我们创建了一个ORB_SLAM2::System的对象SLAM，这个时候就会进入到SLAM系统的主接口System.cc。
         这个代码是所有调用SLAM系统的主入口，
         在这里，我们将看到前面博客所说的ORB_SLAM的三大模块：
