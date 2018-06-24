@@ -1,7 +1,47 @@
 /*
-stereo_on_line
-auther:EwenWan
-date:2018.3.25
+auther: wanyouwen
+date: 2018.6.24
+
+双目示例:
+双目相机app程序框架：
+
+1. 读取相机配置文件(内参数 畸变矫正参数 双目对齐变换矩阵) =======================
+   cv::FileStorage fsSettings(setting_filename, cv::FileStorage::READ);
+   fsSettings["LEFT.K"] >> K_l;//内参数
+   fsSettings["LEFT.D"] >> D_l;// 畸变矫正
+   fsSettings["LEFT.P"] >> P_l;// P_l,P_r --左右相机在校准后坐标系中的投影矩阵 3×4
+   fsSettings["LEFT.R"] >> R_l;// R_l,R_r --左右相机校准变换（旋转）矩阵  3×3
+2. 计算双目矫正映射矩阵========================================================
+   cv::Mat M1l,M2l,M1r,M2r;
+       cv::initUndistortRectifyMap(K_l,D_l,R_l,P_l.rowRange(0,3).colRange(0,3),cv::Size(cols_l,rows_l),CV_32F,M1l,M2l);
+       cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,M1r,M2r);
+3. 创建双目系统=============================================================== 
+   ORB_SLAM2::System SLAM(vocabulary_filepath, setting_filename, ORB_SLAM2::System::STEREO, true);
+4. 从双目设备捕获图像,设置分辨率捕获图像========================================
+   cv::VideoCapture CapAll(deviceid); //打开相机设备 
+   //设置分辨率   1280*480  分成两张 640*480  × 2 左右相机
+       CapAll.set(CV_CAP_PROP_FRAME_WIDTH,1280);  
+       CapAll.set(CV_CAP_PROP_FRAME_HEIGHT, 480); 
+    5. 获取左右相机图像===========================================================
+   CapAll.read(src_img);
+   imLeft  = src_img(cv::Range(0, 480), cv::Range(0, 640));   
+       imRight = src_img(cv::Range(0, 480), cv::Range(640, 1280));   
+6. 使用2步获取的双目矫正映射矩阵 矫正 左右相机图像==============================
+   cv::remap(imLeft,imLeftRect,M1l,M2l,cv::INTER_LINEAR);
+       cv::remap(imRight,imRightRect,M1r,M2r,cv::INTER_LINEAR);
+7. 记录时间戳 time ，并计时===================================================
+	#ifdef COMPILEDWITHC11
+	   std::chrono::steady_clock::time_point    t1 = std::chrono::steady_clock::now();
+	#else
+	   std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+	#endif
+    8. 把左右图像和时间戳 传给 SLAM系统===========================================
+    SLAM.TrackStereo(imLeftRect, imRightRect, time);
+9. 计时结束，计算时间差，处理时间============================================= 
+10.循环执行 5-9步===========================================================
+11.结束，关闭slam系统，关闭所有线程===========================================   
+12.保存相机轨迹============================================================== 
+
 */
 #include<iostream>
 #include<algorithm>
@@ -55,7 +95,7 @@ int main(int argc, char **argv)
     }
 //if(setting_filename.empty())//{
 
- // Read rectification parameters
+ //1.  读取相机配置文件(内参数 畸变矫正参数 双目对齐变换矩阵 ) ====================
     cv::FileStorage fsSettings(setting_filename, cv::FileStorage::READ);
     if(!fsSettings.isOpened())
     {
@@ -102,19 +142,18 @@ int main(int argc, char **argv)
 //图像矫正摆正 映射计算  
 //stereoRectify( K_l, D_l, K_r, D_r, cv::Size(cols_l,rows_l), R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY, -1, cv::Size(cols_l,rows_l), &roi1, &roi2 );
 
-// 获取矫正映射矩阵
+// 2. 计算双目矫正映射矩阵================================================
     cv::Mat M1l,M2l,M1r,M2r;
-
     cv::initUndistortRectifyMap(K_l,D_l,R_l,P_l.rowRange(0,3).colRange(0,3),cv::Size(cols_l,rows_l),CV_32F,M1l,M2l);
     cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,M1r,M2r);
 
-    // Create SLAM system. It initializes all system threads and gets ready to process frames.
+// 3. 创建双目系统 ORB_SLAM2::System======================================
     ORB_SLAM2::System SLAM(vocabulary_filepath, setting_filename, ORB_SLAM2::System::STEREO, true);
 
 
     cout << endl << "-------" << endl;
     cout << "Start processing sequence ..." << endl;
-
+// 4. 从双目设备捕获图像设置分辨率捕获图像 ===================================================
     cv::VideoCapture CapAll(deviceid); //打开相机设备 
     if( !CapAll.isOpened() ) 
     { 
@@ -138,22 +177,29 @@ int main(int argc, char **argv)
     CapAll.set(CV_CAP_PROP_FRAME_HEIGHT, 480);  
 
     cv::Mat src_img, imLeft, imRight, imLeftRect, imRightRect;
+
     while(CapAll.read(src_img)) 
      {
+// 5. 获取左右相机图像====================================================
         imLeft  = src_img(cv::Range(0, 480), cv::Range(0, 640));   
         imRight = src_img(cv::Range(0, 480), cv::Range(640, 1280)); 
+
+// 6. 矫正左右相机图像====================================================
         cv::remap(imLeft,imLeftRect,M1l,M2l,cv::INTER_LINEAR);
         cv::remap(imRight,imRightRect,M1r,M2r,cv::INTER_LINEAR);
+
+// 7. 记录时间戳 tframe ，并计时==========================================
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point        t1 = std::chrono::steady_clock::now();
 #else
         std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
-	
+#endif	
         time += ttrack ;
 
+// 8. 把左右图像和时间戳 传给 SLAM系统====================================
         SLAM.TrackStereo(imLeftRect, imRightRect, time);
-	
+
+// 9. 计时结束，计算时间差，处理时间======================================	
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point        t2 = std::chrono::steady_clock::now();
 #else
@@ -166,7 +212,10 @@ int main(int argc, char **argv)
 //   usleep((T-ttrack)*1e6); //sleep
 	
     }
+
+// 10. 结束，关闭slam系统，关闭所有线程===================================
     SLAM.Shutdown();
+// 11. 保存相机轨迹======================================================
     SLAM.SaveTrajectoryKITTI("myCameraTrajectory.txt");
 
     CapAll.release();
