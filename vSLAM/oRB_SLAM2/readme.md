@@ -230,6 +230,7 @@
 	   mpTracker->GrabImageMonocular(im,timestamp);// Tracking.cc中
 	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取等)
 	   // 使用Track()进行跟踪: 
+	                 0. 单目初始化(最开始执行) MonocularInitialization();// 单目初始化
 	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
 	                 b. 跟踪局部地图，多帧局部地图G2O优化位姿
 ```
@@ -241,6 +242,7 @@
 	   mpTracker->GrabImageStereo(imLeft,imRight,timestamp); // Tracking.cc中
 	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取器,分块特征匹配，视差计算深度)
 	   // 使用Track()进行跟踪:
+	                 0. 双目初始化(最开始执行) StereoInitialization();// 双目 / 深度初始化
 	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
 		         b. 跟踪局部地图，多帧局部地图G2O优化位姿
 ```
@@ -252,6 +254,24 @@
 	   mpTracker->GrabImageRGBD(im,depthmap,timestamp); // Tracking.cc中
 	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取器,深度图初始化特征点深度)
 	   // 使用Track()进行跟踪: 
+	                 0. RGBD初始化(最开始执行) StereoInitialization();// 双目 / 深度初始化
 	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
 		         b. 跟踪局部地图，多帧局部地图G2O优化位姿
 ```
+
+
+## 4.2 单目/双目/RGBD初始化, 单应变换/本质矩阵恢复3d点
+### 1. 单目初始化      Tracking::MonocularInitialization()
+
+### 2. 双目/RGBD初始化 Tracking::StereoInitialization()
+
+
+## 4.3 跟踪线程 Tracking 两帧跟踪/局部地图跟踪
+
+## 4.4 局部跟踪线程 LocalMapping
+
+## 4.5 闭环检测线程 LoopClosing
+
+
+
+
