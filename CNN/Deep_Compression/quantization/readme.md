@@ -13,10 +13,10 @@
     第一位是符号位，中间是指数位，后面是尾数。
     英特尔在NIPS2017上提出了把前面的指数项共享的方法，
     这样可以把浮点运算转化为尾数的整数定点运算，从而加速网络训练。
-![](http://image109.360doc.com/DownloadImg/2018/05/1819/133371604_20_20180518070453675)
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/img/flexpoint.jpg)
 
     分布式训练梯度量化：
-![](http://image109.360doc.com/DownloadImg/2018/05/1819/133371604_21_20180518070453753)
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/img/gradient_quant.jpg)
     
 
     对权重数值进行聚类，
