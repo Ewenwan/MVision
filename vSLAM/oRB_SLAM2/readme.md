@@ -218,6 +218,32 @@
         
         如下图所示： 
 ![](https://img-blog.csdn.net/20161115115045032)
-           
-         
-    
+
+>**单目跟踪SLAM.TrackMonocular()框架**
+
+	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
+	2. 检查跟踪tracking线程重启
+	3. 单目跟踪
+	   mpTracker->GrabImageMonocular(im,timestamp);// Tracking.cc中
+	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取等)
+	   // 使用Track()进行跟踪: a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
+				  b. 跟踪局部地图，多帧局部地图G2O优化位姿
+
+>**双目跟踪System::TrackStereo()框架**
+
+	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
+	2. 检查跟踪tracking线程重启
+	3. 双目跟踪
+	   mpTracker->GrabImageStereo(imLeft,imRight,timestamp); // Tracking.cc中
+	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取器,分块特征匹配，视差计算深度)
+	   // 使用Track()进行跟踪: a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
+				  b. 跟踪局部地图，多帧局部地图G2O优化位姿
+>**深度相机跟踪System::TrackRGBD()框架**
+
+	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
+	2. 检查跟踪tracking线程重启
+	3. 双目跟踪
+	   mpTracker->GrabImageRGBD(im,depthmap,timestamp); // Tracking.cc中
+	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取器,深度图初始化特征点深度)
+	   // 使用Track()进行跟踪: a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
+				  b. 跟踪局部地图，多帧局部地图G2O优化位姿
