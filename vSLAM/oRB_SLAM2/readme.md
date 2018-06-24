@@ -130,17 +130,55 @@
 ![](https://img-blog.csdn.net/20161115115034740)
 
     单目ORB_SLAM2::System SLAM 对象框架:
-    
-     在主函数中，我们创建了一个ORB_SLAM2::System的对象SLAM，这个时候就会进入到SLAM系统的主接口System.cc。
-      这个代码是所有调用SLAM系统的主入口，
-      在这里，我们将看到前面博客所说的ORB_SLAM的三大模块：
-      Tracking、LocalMapping 和 LoopClosing。
-      如下图所示： 
-![](https://img-blog.csdn.net/20161115115045032)
-    
+        在主函数中，我们创建了一个ORB_SLAM2::System的对象SLAM，这个时候就会进入到SLAM系统的主接口System.cc。
+        这个代码是所有调用SLAM系统的主入口，
+        在这里，我们将看到前面博客所说的ORB_SLAM的三大模块：
+        Tracking、LocalMapping 和 LoopClosing。
+
     System类的初始化函数：
-    1. 
-         
-         
+        1. 创建字典 mpVocabulary = new ORBVocabulary()；并从文件中载入字典 
+           mpVocabulary = new ORBVocabulary();           // 创建关键帧字典数据库
+           // 读取 txt格式或者bin格式的 orb特征字典, 
+           mpVocabulary->loadFromTextFile(strVocFile);   // txt格式
+           mpVocabulary->loadFromBinaryFile(strVocFile); // bin格式
+           
+        2. 使用特征字典mpVocabulary 创建关键帧数据库 
+           mpKeyFrameDatabase = new KeyFrameDatabase(*mpVocabulary);
+           
+        3. 创建地图对象 mpMap 
+           mpMap = new Map();
+           
+        4. 创建地图显示(mpMapDrawer) 帧显示(mpFrameDrawer) 两个显示窗口   
+           mpMapDrawer = new MapDrawer(mpMap, strSettingsFile);//地图显示
+           mpFrameDrawer = new FrameDrawer(mpMap);//关键帧显示
+           
+        5. 初始化 跟踪线程(mpTracker) 对象 未启动
+	       mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
+				      mpMap, mpKeyFrameDatabase, strSettingsFile, mSensor); 
+                      
+        6. 初始化 局部地图构建线程(mptLocalMapping) 并启动线程
+	       mpLocalMapper = new LocalMapping(mpMap, mSensor==MONOCULAR);
+	       mptLocalMapping = new thread(&ORB_SLAM2::LocalMapping::Run,mpLocalMapper);
+          
+        7. 初始化 闭环检测线程(mptLoopClosing) 并启动线程
+	       mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR);
+	       mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
+          
+        8. 初始化 跟踪线程可视化 并启动
+           mpViewer = new Viewer(this, mpFrameDrawer,mpMapDrawer,mpTracker,strSettingsFile);
+		   mptViewer = new thread(&Viewer::Run, mpViewer);
+		   mpTracker->SetViewer(mpViewer);
+           
+        9. 线程之间传递指针 Set pointers between threads
+	       mpTracker->SetLocalMapper(mpLocalMapper);   // 跟踪线程 关联 局部建图和闭环检测线程
+	       mpTracker->SetLoopClosing(mpLoopCloser);
+	       mpLocalMapper->SetTracker(mpTracker);       // 局部建图线程 关联 跟踪和闭环检测线程
+	       mpLocalMapper->SetLoopCloser(mpLoopCloser);
+	       mpLoopCloser->SetTracker(mpTracker);        // 闭环检测线程 关联 跟踪和局部建图线程
+	       mpLoopCloser->SetLocalMapper(mpLocalMapper);
+        
+        如下图所示： 
+![](https://img-blog.csdn.net/20161115115045032)
+           
          
     
