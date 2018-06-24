@@ -116,6 +116,7 @@ namespace ORB_SLAM2
 	  /////// ////////////////////////////////////
 	  //// wyw 修改 2017.11.4
 	      clock_t tStart = clock();//时间开始
+// 1. 创建字典 mpVocabulary = new ORBVocabulary()；并从文件中载入字典===================================
 	      mpVocabulary = new ORBVocabulary();//关键帧字典数据库
 	      //bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
 	      bool bVocLoad = false; //  bool量  打开字典flag
@@ -132,39 +133,39 @@ namespace ORB_SLAM2
 	      }
 	      printf("数据库载入时间 Vocabulary loaded in %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);//显示文件载入时间 秒
 	  ///////////////////////////////////////////
-
-	      //创建关键帧数据库 Create KeyFrame Database
+				      
+// 2. 使用特征字典mpVocabulary 创建关键帧数据库 KeyFrameDatabase=========================================
 	      mpKeyFrameDatabase = new KeyFrameDatabase(*mpVocabulary);
-	      //创建地图对象  Create the Map
+				      
+// 3. 创建地图对象  mpMap ==============================================================================
 	      mpMap = new Map();
-
-	      //创建地图显示 帧显示 两个显示窗口  Create Drawers. These are used by the Viewer
+				      
+// 4. 创建地图显示 帧显示 两个显示窗口 Create Drawers. These are used by the Viewer======================
 	      mpFrameDrawer = new FrameDrawer(mpMap);//关键帧显示
 	      mpMapDrawer = new MapDrawer(mpMap, strSettingsFile);//地图显示
 
 	      
 	          // Initialize pointcloud mapping
-		
 	      //mpPointCloudMapping = make_shared<PointCloudMapping>( resolution );
 
 	      //Initialize the Tracking thread
 	      //(it will live in the main thread of execution, the one that called this constructor)
-	      // 初始化 跟踪线程 对象 未启动
+// 5. 初始化 跟踪线程 对象 未启动=======================================================================
 	      mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
 				      mpMap, mpKeyFrameDatabase, strSettingsFile, mSensor);
 
 	      //Initialize the Local Mapping thread and launch
-	      // 初始化 局部地图构建 线程 并启动
+// 6. 初始化 局部地图构建 线程 并启动线程===============================================================
 	      mpLocalMapper = new LocalMapping(mpMap, mSensor==MONOCULAR);
 	      mptLocalMapping = new thread(&ORB_SLAM2::LocalMapping::Run,mpLocalMapper);
 
 	      //Initialize the Loop Closing thread and launch
-	      // 初始化闭环检测线程 并启动
+// 7. 初始化闭环检测线程 并启动线程====================================================================
 	      mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR);
 	      mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
 
 	      //Initialize the Viewer thread and launch
-	      // 初始化 用户显示 线程 并启动
+// 8. 初始化 跟踪线程可视化 并启动=====================================================================
 	      if(bUseViewer)
 	      {
 		  mpViewer = new Viewer(this, mpFrameDrawer,mpMapDrawer,mpTracker,strSettingsFile);
@@ -172,14 +173,14 @@ namespace ORB_SLAM2
 		  mpTracker->SetViewer(mpViewer);
 	      }
 
-	      // 线程之间传递指针 Set pointers between threads
-	      mpTracker->SetLocalMapper(mpLocalMapper);// 跟踪 关联 建图和闭环检测
+// 9. 线程之间传递指针 Set pointers between threads===================================================
+	      mpTracker->SetLocalMapper(mpLocalMapper);   // 跟踪线程 关联 局部建图和闭环检测线程
 	      mpTracker->SetLoopClosing(mpLoopCloser);
 
-	      mpLocalMapper->SetTracker(mpTracker);         // 建图 关联 跟踪和闭环检测
+	      mpLocalMapper->SetTracker(mpTracker);       // 局部建图线程 关联 跟踪和闭环检测线程
 	      mpLocalMapper->SetLoopCloser(mpLoopCloser);
 
-	      mpLoopCloser->SetTracker(mpTracker);	    // 闭环检测 关联 跟踪和建图
+	      mpLoopCloser->SetTracker(mpTracker);        // 闭环检测线程 关联 跟踪和局部建图线程
 	      mpLoopCloser->SetLocalMapper(mpLocalMapper);
 	  }
 
