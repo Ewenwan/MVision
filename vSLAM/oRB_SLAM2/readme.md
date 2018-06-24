@@ -116,19 +116,22 @@
 
 ## 4.1 应用程序框架
 >**单目相机app框架：**
-
+```asm
         1. 创建 单目ORB_SLAM2::System SLAM 对象
         2. 载入图片 或者 相机捕获图片 im = cv::imread();
-        3. 记录时间戳 tframe ，并计时，std::chrono::steady_clock::now(); / std::chrono::monotonic_clock::now();
+        3. 记录时间戳 tframe ，并计时，
+	   std::chrono::steady_clock::now();    // c++11
+	   std::chrono::monotonic_clock::now();
         4. 把图像和时间戳 传给 SLAM系统, SLAM.TrackMonocular(im,tframe); 
         5. 计时结束，计算时间差，处理时间。
         6. 循环2-5步。
         7. 结束，关闭slam系统，关闭所有线程 SLAM.Shutdown();
-        8. 保存相机轨迹, SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");  
+        8. 保存相机轨迹, SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+```	
 ![](https://img-blog.csdn.net/20161115115034740)
 
 >**双目相机app程序框架：**
-
+```asm
 	1. 读取相机配置文件(内参数 畸变矫正参数 双目对齐变换矩阵) =======================
 	   cv::FileStorage fsSettings(setting_filename, cv::FileStorage::READ);
 	   fsSettings["LEFT.K"] >> K_l;//内参数
@@ -160,15 +163,15 @@
 		   std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 		#endif
         8. 把左右图像和时间戳 传给 SLAM系统===========================================
-	    SLAM.TrackStereo(imLeftRect, imRightRect, time);
+	   SLAM.TrackStereo(imLeftRect, imRightRect, time);
 	9. 计时结束，计算时间差，处理时间============================================= 
-	10.循环执行 5-9步===========================================================
+	10.循环执行 5-9步              =============================================
 	11.结束，关闭slam系统，关闭所有线程===========================================   
-	12.保存相机轨迹============================================================== 
-	   
+	12.保存相机轨迹                   ========================================== 
+```
 
 >**ORB_SLAM2::System SLAM 对象框架:**
-
+```ams
         在主函数中，我们创建了一个ORB_SLAM2::System的对象SLAM，这个时候就会进入到SLAM系统的主接口System.cc。
         这个代码是所有调用SLAM系统的主入口，
         在这里，我们将看到前面博客所说的ORB_SLAM的三大模块：
@@ -215,35 +218,40 @@
 	       mpLocalMapper->SetLoopCloser(mpLoopCloser);
 	       mpLoopCloser->SetTracker(mpTracker);        // 闭环检测线程 关联 跟踪和局部建图线程
 	       mpLoopCloser->SetLocalMapper(mpLocalMapper);
-        
+```     
         如下图所示： 
 ![](https://img-blog.csdn.net/20161115115045032)
 
 >**单目跟踪SLAM.TrackMonocular()框架**
-
+```asm
 	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
 	2. 检查跟踪tracking线程重启
 	3. 单目跟踪
 	   mpTracker->GrabImageMonocular(im,timestamp);// Tracking.cc中
 	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取等)
-	   // 使用Track()进行跟踪: a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
-				  b. 跟踪局部地图，多帧局部地图G2O优化位姿
-
+	   // 使用Track()进行跟踪: 
+	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
+	                 b. 跟踪局部地图，多帧局部地图G2O优化位姿
+```
 >**双目跟踪System::TrackStereo()框架**
-
+```asm
 	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
 	2. 检查跟踪tracking线程重启
 	3. 双目跟踪
 	   mpTracker->GrabImageStereo(imLeft,imRight,timestamp); // Tracking.cc中
 	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取器,分块特征匹配，视差计算深度)
-	   // 使用Track()进行跟踪: a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
-				  b. 跟踪局部地图，多帧局部地图G2O优化位姿
+	   // 使用Track()进行跟踪:
+	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
+		         b. 跟踪局部地图，多帧局部地图G2O优化位姿
+```
 >**深度相机跟踪System::TrackRGBD()框架**
-
+```asm
 	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
 	2. 检查跟踪tracking线程重启
 	3. 双目跟踪
 	   mpTracker->GrabImageRGBD(im,depthmap,timestamp); // Tracking.cc中
 	   // 图像转换成灰度图，创建帧Frame对象(orb特征提取器,深度图初始化特征点深度)
-	   // 使用Track()进行跟踪: a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
-				  b. 跟踪局部地图，多帧局部地图G2O优化位姿
+	   // 使用Track()进行跟踪: 
+	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
+		         b. 跟踪局部地图，多帧局部地图G2O优化位姿
+```
