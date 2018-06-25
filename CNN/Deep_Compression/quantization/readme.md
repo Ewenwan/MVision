@@ -162,10 +162,16 @@
 ![](https://img-blog.csdn.net/20170214005016493?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)    
              
     2. 概率二值化随机（基于概率）两种二值化方式。
-       x = +1,  p = sigmod(x)   对浮点数使用 sigmod函数(1/(1-exp(-x)))转化成概率
+       x = +1,  p = sigmod(x) ,  
            -1,  1-p
 ![](https://img-blog.csdn.net/20170214005110619?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
-           
+
+![](https://raw.githubusercontent.com/stdcoutzyx/Blogs/master/blogs2016/imgs_binarized/3.png)
+
+    第二种方法虽然看起来比第一种更合理，但是在实现时却有一个问题，
+    那就是每次生成随机数会非常耗时，所以一般使用第一种方法.
+    
+    
            
 **训练二值化网络**
 
