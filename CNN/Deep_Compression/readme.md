@@ -636,7 +636,7 @@
         AP2(x) = sign(x) × 2^round(log2|x|)
          平方近似
 
-**5. 约束低比特(3比特)量化
+**5. 约束低比特(3比特)量化 Extremely Low Bit Neural Networks
 [论文 Extremely Low Bit Neural Network: Squeeze the Last Bit Out with ADMM](https://arxiv.org/pdf/1707.09870.pdf)
 
 [翻译](https://www.jiqizhixin.com/articles/2018-01-22-6)
@@ -662,6 +662,13 @@
     同时，原始的浮点数乘法操作可以被定点数的移位操作所替代。
     在现代处理器中，定点移位操作的速度和能耗是远远优于浮点数乘法操作的。
     
+    {-1，0，1 }, 三值网络，存储只需要2bit，极大地压缩存储空间，
+    同时也可以避免乘法运算，只是符号位的变化和加减操作，从而提升计算速度。
+![](https://upload-images.jianshu.io/upload_images/2509688-eab1154e07f49554.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/533)
+    
+    {-2，-1，0，1，2}, 五值网络 和 {-4，-2，-1，0，1，2，4} 七值网络，
+    需要3bit存储
+    
     首先，我们将离散值权重的神经网络训练定义成一个离散约束优化问题。
     以三值网络为例，其目标函数可以表示为：
 ![](https://image.jiqizhixin.com/uploads/editor/e02461c9-1369-4f22-ab30-c12dfec03db5/3718302.png)
@@ -682,6 +689,8 @@
     为了求解上述约束优化问题，我们引入 ADMM 算法。
     在此之前，我们需要对目标函数的形式做一个等价变换(对偶变换)。
 ![](https://image.jiqizhixin.com/uploads/editor/620d2e54-5d9b-49ef-8d11-f3b29ca39794/6118804.png)
+
+![](https://upload-images.jianshu.io/upload_images/2509688-09b68d52c24fac35.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
 
     其中 Ic 为指示函数，
     如果 G 符合约束条件，则 Ic(G)=0，
