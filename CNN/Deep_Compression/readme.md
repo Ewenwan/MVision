@@ -493,6 +493,8 @@
 
 **聚类量化，降低内存消耗，但不能降低计算消耗**
 
+[代码参考](https://github.com/Ewenwan/Caffe-Python-Tutorial/blob/master/quantize.py)
+
     为了进一步压缩网络，考虑让若干个权值共享同一个权值，
     这一需要存储的数据量也大大减少。
     在论文中，采用kmeans算法来将权值进行聚类，
