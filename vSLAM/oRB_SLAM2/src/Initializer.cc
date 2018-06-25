@@ -1,4 +1,4 @@
-/*
+/* 单目初始化 单应矩阵 本质矩阵 恢复R t 三角变换求 3D点
 * This file is part of ORB-SLAM2
 * 
 * 单目相机初始化
@@ -240,7 +240,7 @@ namespace ORB_SLAM2
              // 这个变量后面没有用到，后面只关心匹配上的特征点    
 	    mvbMatched1.resize(mvKeys1.size());// 匹配参考帧(1)关键点的匹配信息
 	    
-// 步骤1： 组织特征点对
+// 步骤1：根据 matcher.SearchForInitialization 得到的初始匹配点对，筛选后得到好的特征匹配点对
 	    for(size_t i=0, iend=vMatches12.size();i<iend; i++)
 	    {
 		if(vMatches12[i]>=0)// 帧2特征点 有匹配
@@ -266,7 +266,7 @@ namespace ORB_SLAM2
 	    }
 
 	    // Generate sets of 8 points for each RANSAC iteration
-// 步骤2： 在所有匹配特征点对中随机选择8对匹配特征点为一组，共选择mMaxIterations组
+// 步骤2： 在所有匹配特征点对中随机选择8对特征匹配点对为一组，共选择mMaxIterations组
 	    // 用于FindHomography和FindFundamental求解
 	    // mMaxIterations:200	    
 	    // 随机采样序列 最大迭代次数 随机序列 8点法 
@@ -314,7 +314,7 @@ namespace ORB_SLAM2
 	    // Compute ratio of scores
 	    float RH = SH/(SH+SF);// 计算 选着标志
 	    
-// 步骤5：从单应矩阵H 或 基础矩阵F中恢复R,t
+// 步骤5：根据评价得分，从单应矩阵H 或 基础矩阵F中恢复R,t
 	    // Try to reconstruct from homography or fundamental depending on the ratio (0.40-0.45)
 	    if(RH>0.40)// 更偏向于 平面  使用  单应矩阵恢复
 		return ReconstructH(vbMatchesInliersH,H,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
