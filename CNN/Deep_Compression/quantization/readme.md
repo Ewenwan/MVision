@@ -128,7 +128,7 @@
         通常做法是网络前馈过程为二值或三值，
         梯度更新过程为实数值。
 
-## 2. 二值量化网络 
+# 2. 二值量化网络 
 [二值化神经网络介绍](https://blog.csdn.net/tangwei2014/article/details/55077172)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAdU6BAACcvDwG5pU677.png)
@@ -152,7 +152,7 @@
         2. 运算量减少， 原先浮点数的乘法运算，可以变成 二进制位的异或运算。
         
 
-### 1. BNN
+## 1. BNN全二值网络
 
     BNN的 激活函数值 和 权重参数 都被二值化了, 前向传播是使用二值，反向传播时使用全精度梯度。 
     
@@ -272,7 +272,7 @@
 ![](https://img-blog.csdn.net/20170214010005900?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
     
     
-**2. BCN 混有单精度与二值的神经网络BinaryConnect 与BNN合并**
+## 2. BCN 混有单精度与二值的神经网络BinaryConnect 与BNN合并**
 
 [BinaryConnect: Training Deep Neural Networks with binary weights](https://arxiv.org/pdf/1511.00363.pdf)
 
@@ -303,7 +303,7 @@
     由于达成了中间结果的二值化，BinaryNet的一个样例实现无需额外硬件，
     在现有的GPU上即达成了7倍加速。
   
-**3. 二值系数网络 BWN  异或网络XNOR-Net **
+## 3. 二值系数网络 BWN  异或网络XNOR-Net  
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAaYgnAACz9cXw6vE854.png)
@@ -391,7 +391,7 @@
       主框架:
 ![](https://img-blog.csdn.net/20160715114256287)
  
-**4. 量化网络 量化激活函数
+## 4. QNN 量化网络 量化激活函数
 [QNN Quantized Neural Networks ](https://arxiv.org/pdf/1609.07061.pdf)
 
         对BNN的简单扩展，
@@ -436,7 +436,8 @@
         其次，利用ILSVRC-12训练集对量化网络的全连接层进行微调，恢复分类精度。
         最后，纠错量化微调的层网络的全连接。
 
-####  约束低比特(3比特)量化 Extremely Low Bit Neural Networks
+## 5. 约束低比特(3比特)量化 Extremely Low Bit Neural Networks 
+
 [论文 Extremely Low Bit Neural Network: Squeeze the Last Bit Out with ADMM](https://arxiv.org/pdf/1707.09870.pdf)
 
 [翻译](https://www.jiqizhixin.com/articles/2018-01-22-6)
@@ -523,11 +524,15 @@
 
     参数空间中加入2、4、8等值后，仍然不需要乘法运算，只需进行移位操作。
     因此，通过这种方法将神经网络中的乘法操作全部替换为移位和加操作。
-    
+     
+## 6. 哈希函数两比特缩放量化 BWNH 
+[论文](https://arxiv.org/pdf/1802.02733.pdf)
 
+[博客解析](https://blog.csdn.net/ajj15120321/article/details/80571748)
 
-#### 哈希函数两比特缩放量化 BWNH
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAE7dRAACHJnpcRMk945.png)
+
+[保留内积哈希方法是沈老师团队在15年ICCV上提出的 Learning Binary Codes for Maximum Inner Product Search ](https://webpages.uncc.edu/~szhang16/paper/ICCV15_binary.pdf)
 
     通过Hashing方法做的网络权值二值化工作。
     第一个公式是我们最常用的哈希算法的公式，其中S表示相似性，
@@ -537,9 +542,19 @@
     第二项表示量化后输出的feature map，其中B相当于量化后的权值，
     通过第二个公式就将网络的量化转化成类似第一个公式的Hashing方式。
     通过最后一行的定义，就可以用Hashing的方法来求解Binary约束。
+    
+    本文在二值化权重(BWN)方面做出了创新，发表在AAAI2018上，作者是自动化所程建团队。
+    本文的主要贡献是提出了一个新的训练BWN的方法，
+    揭示了哈希与BW(Binary Weights)之间的关联，表明训练BWN的方法在本质上可以当做一个哈希问题。
+    基于这个方法，本文还提出了一种交替更新的方法来有效的学习hash codes而不是直接学习Weights。
+    在小数据和大数据集上表现的比之前的方法要好。
+    
+    为了减轻用哈希方法所带来的loss，
+    本文将binary codes乘以了一个scaling factor并用交替优化的策略来更新binary codes以及factor.
+    
+    
 
-
-## 3. 三值化网络 
+# 3. 三值化网络 
 [Ternary Neural Networks TNN](https://arxiv.org/pdf/1609.00222.pdf)
 
     训练时激活量三值化，参数全精度 
@@ -563,7 +578,7 @@
     且可训练，由此提高了准确率。
     ImageNet-18模型仅有3%的准确率下降。
 
-#### 三值 矩阵分解和定点变换
+## 三值 矩阵分解和定点变换
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_aAHHAsAACFv5V6ARc330.png)
 
     借助了矩阵分解和定点变换的优势，
@@ -628,7 +643,7 @@
 [Quantized Convolutional Neural Networks for Mobile Devices](https://arxiv.org/pdf/1512.06473.pdf)
 
 
-## 7.
+## 7.其他
 
 [Ristretto: Hardware-Oriented Approximation of Convolutional Neural Networks](https://arxiv.org/pdf/1605.06402.pdf)
 
