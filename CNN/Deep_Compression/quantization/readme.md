@@ -559,8 +559,6 @@
     
     为了减轻用哈希方法所带来的loss，
     本文将binary codes乘以了一个scaling factor并用交替优化的策略来更新binary codes以及factor.
-    
-    
 
 # 3. 三值化网络 
 
