@@ -2,13 +2,14 @@
     1. 小模型 mobilenet , 更精细模型的设计，紧致网络设计
        mobilenet squeezenet shufflenet 
        
-    2. 模型压缩：参数稀疏、剪裁、量化、分解。
+    2. 模型压缩：参数稀疏、剪裁、量化、分解
     
-    3. 高性能计算。
+    3. 软件优化-高性能计算 
        腾讯 ncnn
        
-    4. AI芯片
-
+    4. 硬件优化-AI芯片
+       TPU
+       FPGA上的应用
 
 
 [Binarized Neural Network TF training code + C matrix / eval library 量化网络框架](https://github.com/Ewenwan/tinier-nn)
@@ -893,28 +894,101 @@
     
     
 **3. 三值化网络**
+## TNN 全三值网络
 [Ternary Neural Networks TNN](https://arxiv.org/pdf/1609.00222.pdf)
+
+[代码](https://github.com/Ewenwan/tnn-train)
 
     训练时激活量三值化，参数全精度 
     infernce时，激活量，参数都三值化（不使用任何乘法） 
     用FPGA和ASIC设计了硬件
+## TWN 三值系数网络
+    权值三值化的核心：
+        首先，认为多权值相对比于二值化具有更好的网络泛化能力。
+        其次，认为权值的分布接近于一个正态分布和一个均匀分布的组合。
+        最后，使用一个 scale 参数去最小化三值化前的权值和三值化之后的权值的 L2 距离。   
 
 [Ternary weight networks](https://arxiv.org/pdf/1605.04711.pdf)
 
+[论文翻译参考](https://blog.csdn.net/xjtu_noc_wei/article/details/52862282)
+
+[参考2](https://blog.csdn.net/weixin_37904412/article/details/80590746)
+
+    算法
+![](https://img-blog.csdn.net/20161019215508291?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+    这个算法的核心是只在前向和后向过程中使用使用权值简化，但是在update是仍然是使用连续的权值。
+
+    简单的说就是先利用公式计算出三值网络中的阈值：
+![](https://img-blog.csdn.net/20161019215559323?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+    也就是说，将每一层的权值绝对值求平均值乘以0.7算出一个deta作为三值网络离散权值的阈值，
+    具体的离散过程如下：
+![](https://img-blog.csdn.net/20161019215719426?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+    其实就是简单的选取一个阈值（Δ），
+    大于这个阈值的权值变成 1，小于-阈值的权值变成 -1，其他变成 0。
+    当然这个阈值其实是根据权值的分布的先验知识算出来的。
+    本文最核心的部分其实就是阈值和 scale 参数 alpha 的推导过程。
+
+    在参数三值化之后，作者使用了一个 scale 参数去让三值化之后的参数更接近于三值化之前的参数。
+    根据一个误差函数 推导出 alpha 再推导出 阈值（Δ）
+
+    这样，我们就可以把连续的权值变成离散的（1,0，-1），
+
+    那么，接下来我们还需要一个alpha参数，具体干什么用后面会说（增强表达能力）
+    这个参数的计算方式如下：
+![](https://img-blog.csdn.net/20161019215844543?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+    |I(deta)|这个参数指的是权值的绝对值大于deta的权值个数，计算出这个参数我们就可以简化前向计算了，
+    具体简化过程如下：
+![](https://img-blog.csdn.net/20161019215951715?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+    可以看到，在把alpha乘到前面以后，我们把复杂的乘法运算变成了简单的加法运算，从而加快了整个的训练速度。
+    
     主要思想就是三值化参数（激活量与梯度精度），参照BWN使用了缩放因子。
     由于相同大小的filter，
     三值化比二值化能蕴含更多的信息，
     因此相比于BWN准确率有所提高。
+   
     
     
-
+## 训练三值量化 TTQ  训练浮点数量化
 [Trained Ternary Quantization  TTQ](https://arxiv.org/pdf/1612.01064.pdf)
 
+[博客参考](https://blog.csdn.net/yingpeng_zhong/article/details/80382704)
+
+    提供一个三值网络的训练方法。
+    对AlexNet在ImageNet的表现，相比32全精度的提升0.3%。
     与TWN类似，
-    只用参数三值化，
+    只用参数三值化(训练得到的浮点数)，
     但是正负缩放因子不同，
     且可训练，由此提高了准确率。
     ImageNet-18模型仅有3%的准确率下降。
+
+    对于每一层网络，三个值是32bit浮点的{−Wnl,0,Wpl}，
+    Wnl、Wpl是可训练的参数。
+    另外32bit浮点的模型也是训练的对象，但是阈值Δl是不可训练的。 
+    由公式(6)从32bit浮点的到量化的三值： 
+![](https://img-blog.csdn.net/20180520154233906?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpbmdwZW5nX3pob25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+    由(7)算出Wnl、Wpl的梯度:
+![](https://img-blog.csdn.net/20180520154430336?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpbmdwZW5nX3pob25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+    
+    其中:
+![](https://img-blog.csdn.net/20180520154553848?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpbmdwZW5nX3pob25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+    由(8)算出32bit浮点模型的梯度
+![](https://img-blog.csdn.net/20180520154744861?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpbmdwZW5nX3pob25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+    由(9)给出阈值，这种方法在CIFAR-10的实验中使用阈值t=0.05。
+    而在ImageNet的实验中，并不是由通过钦定阈值的方式进行量化的划分，
+    而是钦定0值的比率r，即稀疏度。 
+![](https://img-blog.csdn.net/20180520155802296?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpbmdwZW5nX3pob25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+    
+    整个流程:
+![](https://img-blog.csdn.net/20180520154900829?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpbmdwZW5nX3pob25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
 
 #### 三值 矩阵分解和定点变换
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_aAHHAsAACFv5V6ARc330.png)
