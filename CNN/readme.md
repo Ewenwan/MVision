@@ -58,6 +58,8 @@
 
 [新新神经网络的 Keras 实现](https://github.com/Ewenwan/nn_playground)
 
+[pytorch学习 各种实现](https://github.com/Ewenwan/pytorch_workplace)
+
 # 损失函数 交叉熵CrossEntropy 以及 Focal Loss 
 [交叉熵损失 Focal Loss 博客介绍](http://www.cnblogs.com/xuanyuyt/p/7444468.html)
 
