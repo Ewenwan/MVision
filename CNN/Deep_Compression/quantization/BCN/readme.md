@@ -1,5 +1,12 @@
 # 混有单精度与二值的神经网络BinaryConnect
 
+[BinaryConnect: Training Deep Neural Networks with binary weights](https://arxiv.org/pdf/1511.00363.pdf)
+
+[论文笔记](https://blog.csdn.net/weixin_37904412/article/details/80618102)
+
+[BinaryConnect 代码](https://github.com/Ewenwan/BinaryConnect)
+
+
       首先点燃战火的是Matthieu Courbariaux，
       他来自深度学习巨头之一的Yoshua Bengio领导的蒙特利尔大学的研究组。
       他们的文章于2015年11月出现在arxiv.org上。
