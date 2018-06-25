@@ -10,11 +10,16 @@
 
 # BNN的 激活函数值 和 权重参数 都被二值化了, 前向传播是使用二值，反向传播时使用全精度梯度。 
     
-[代码](https://github.com/MatthieuCourbariaux/BinaryNet)
+[ Keras 的实现 实现了梯度的 straight-through estimator](https://github.com/Ewenwan/nn_playground/tree/master/binarynet)
 
-[代码注解](https://github.com/Ewenwan/BinaryNet)
+[代码注解 theano 版本 采用确定性（deterministic）的二值化方式](https://github.com/Ewenwan/BinaryNet)
+
+[torch版本 基于概率随机随机化（stochastic）的二值化, 对BN也离散化](https://github.com/Ewenwan/BinaryNet-1)
 
 [论文 Binarized Neural Networks BNN](https://arxiv.org/pdf/1602.02830.pdf)
+   
+
+
    
 ## **二值化方法**
 
