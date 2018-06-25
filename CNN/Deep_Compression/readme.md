@@ -481,16 +481,17 @@
     第一位是符号位，中间是指数位，后面是尾数。
     英特尔在NIPS2017上提出了把前面的指数项共享的方法，
     这样可以把浮点运算转化为尾数的整数定点运算，从而加速网络训练。
-![](http://image109.360doc.com/DownloadImg/2018/05/1819/133371604_20_20180518070453675)
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/img/flexpoint.jpg)
 
     分布式训练梯度量化：
-![](http://image109.360doc.com/DownloadImg/2018/05/1819/133371604_21_20180518070453753)
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/img/gradient_quant.jpg)
     
     在很多深度学习训练过程中，为了让训练更快往往会用到分布式计算。
     在分布式计算过程中有一个很大问题，
     每一个分布式服务器都和中心服务器节点有大量的梯度信息传输过程，从而造成带宽限制。
     这篇文章采取把要传输的梯度信息量化为三值的方法来有效加速分布式计算。
 
+**聚类量化，降低内存消耗，但不能降低计算消耗**
 
     为了进一步压缩网络，考虑让若干个权值共享同一个权值，
     这一需要存储的数据量也大大减少。
@@ -555,7 +556,7 @@
     后面几乎所有的量化方法都会沿用这种训练的策略。
     前面包括BNN这种网络在小数据集上可以达到跟全精度网络持平的精度，
     但是在ImageNet这种大数据集上还是表现比较差。
-
+**1. BCN & BNN 全二值网络**
 [Binarized Neural Networks BNN](https://arxiv.org/pdf/1602.02830.pdf)
 
     BNN的激活量和参数都被二值化了, 反向传播时使用全精度梯度。 
@@ -568,7 +569,7 @@
     在MNIST，SVHN和CIFAR-10小数据集上几乎达到了顶尖的水平。 
     在ImageNet在使用AlexNet架构时有较大差距（在XNOR-Net中的实验Δ=29.8%） 
     在GPU上有7倍加速
-
+**2. 
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAaYgnAACz9cXw6vE854.png)
@@ -578,7 +579,7 @@
     他们提出的BWN，在ImageNet上可以达到接近全精度的一个性能，
     这也是首次在ImageNet数据集上达到这么高精度的网络。
     
-
+**3. 
     BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。XNOR-Net是BinaryNet的升级版。 
     主要思想： 
         1. 二值化时增加了缩放因子，同时梯度函数也有相应改变：
@@ -591,6 +592,7 @@
         在ImageNet数据集AlexNet架构下，BWN的准确率有全精度几乎一样，XNOR-Net还有较大差距(Δ=11%) 
         减少∼32×的参数大小，在CPU上inference阶段最高有∼58× 的加速。
         
+**4. 量化网络**      
 [QNN](https://arxiv.org/pdf/1609.07061.pdf)
 
         对BNN的简单扩展，
@@ -601,7 +603,7 @@
         BNN约差于XNOR-NET（<3%），
         QNN-2bit activation 略优于DoReFaNet 2-bit activation
 
-#### 二值约束低比特量化
+**5.二值约束低比特量化
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAdFmiAACFxVTKLmQ760.png)
 
     上图展示了阿里巴巴冷聪等人做的通过ADMM算法求解binary约束的低比特量化工作。
@@ -612,7 +614,7 @@
     为了方便求解还引进了一个增广变量，保证W是等于G的，
     这样的话就可以用ADMM的方法去求解。
     
-#### 哈希函数两比特缩放量化 BWNH
+**6. 哈希函数两比特缩放量化 BWNH
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAE7dRAACHJnpcRMk945.png)
 
     通过Hashing方法做的网络权值二值化工作。
