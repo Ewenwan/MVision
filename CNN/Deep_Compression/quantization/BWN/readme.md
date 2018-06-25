@@ -72,8 +72,8 @@
       得到的矩阵 A，再和一个 w x h 的卷积核 k 进行卷积得到比例因子矩阵 K，
       
       其中：
+      Kij = 1 / (w x h)
       
-![](https://yqfile.alicdn.com/a4ff8005584616e0c98954c14b9aaf31a8366ada.png)
 
 
 
