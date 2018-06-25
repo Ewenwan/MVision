@@ -32,6 +32,10 @@
         6. 细粒度图像识别 (fine-grained image recognition)
         
         7. 深度神经网络压缩 Deep Compression
+           BNN
+           BCN
+           BWN
+           QNN
         
         8. 高性能计算 HighPerformanceComputing
 
@@ -51,6 +55,8 @@
 [MatConvNetConvolutional Neural Networks for MATLAB 工具箱手册](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf)
 
 [MatConvNetConvolutional Neural Networks for MATLAB 工具箱 主页](http://www.vlfeat.org/matconvnet/)
+
+[新新神经网络的 Keras 实现](https://github.com/Ewenwan/nn_playground)
 
 # 损失函数 交叉熵CrossEntropy 以及 Focal Loss 
 [交叉熵损失 Focal Loss 博客介绍](http://www.cnblogs.com/xuanyuyt/p/7444468.html)
