@@ -246,7 +246,7 @@
 ![](https://img-blog.csdn.net/20170214010005900?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
     
     
-**2. BCN 混有单精度与二值的神经网络BinaryConnect **
+**2. BCN 混有单精度与二值的神经网络BinaryConnect 与BNN合并**
 
 [BinaryConnect: Training Deep Neural Networks with binary weights](https://arxiv.org/pdf/1511.00363.pdf)
 
@@ -266,11 +266,48 @@
     同时超越了人类水平，打破了此前对二值网络的一般印象，并奠定了之后一系列工作的基础。
     然而由于只有系数被二值化，Matthieu的BinaryConnect只能消减乘法运算，
     在CPU和GPU上一般只有2倍的理论加速比，但在FPGA甚至ASIC这样的专用硬件上则有更大潜力。
+
+    一石激起千层浪。Matthieu组很快发现自己的工作引起的兴趣超乎想像。
+    事实上，3个月后，Itay Hubara在以色列理工的研究组甚至比Matthieu组，
+    早了一天在arxiv.org上发表了同时实现系数和中间结果二值化，
+    并在SVHN上达到了可观预测准确率的二值网络。
+    由于双方的工作太过相似，三个星期后，也就是2016年2月29日，
+    双方的论文被合并后以Matthieu与Itay并列一作的方式再次发表到arxiv.org上。
+    这个同时实现系数和中间结果二值化的网络被命名为BinaryNet。
+    由于达成了中间结果的二值化，BinaryNet的一个样例实现无需额外硬件，
+    在现有的GPU上即达成了7倍加速。
   
-**3. BWN**
+**3. 二值系数网络 BWN  异或网络XNOR-Net **
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAaYgnAACz9cXw6vE854.png)
+
+    每年的年初是机器学习相关会议扎堆的时段，Matthieu与Itay于3月17日更新了他们的合作论文，
+    进行了一些细节的调整，看起来是投稿前的最后准备。
+    但就在一天前的3月16日，来自西雅图的Allen institute for AI和
+    华盛顿大学的Mohammad Rastegari等人用新方法改进了二值系数网络BinaryConnect和全二值网络BinaryNet
+    ，在大规模数据集ImageNet上分别提高预测准确率十几个百分点。
+    其中，改进后的 二值系数网络BWN已达到被普遍接受的神经网络质量标准：
+    只差单精度AlexNet3个百分点。
+    
+    而Mohammad改进BinaryNet的产物XNOR-Net，离单精度的AlexNet也只差13个百分点了
+    。考虑到XNOR-Net相比AlexNet的惊人的实测58倍运行时加速，
+    达到二值神经网络的理论上限的光明未来已近在眼前了。 
+    
+    Mohammad的方法的关键是达成了计算量与量化噪声间的一个巧妙平衡：
+       用二值来进行AlexNet中最昂贵的卷积操作，而用一部分单精度值计算来降低量化噪声。
+    也就是说，XNOR-Net不是一个纯粹的二值网络，却保留了二值网络绝大部分的好处。
+    从数学的角度，Mohammad提出了一种用二值矩阵与单精度值对角阵之积近似一个单精度值矩阵的算法。
+    
+    这在数学里中可归为矩阵近似的一种。
+    
+    矩阵近似包含一大类方法，比如笔者所在的研究组此前提出的Kronecker Fully-Connect方法，
+    即用一系列小矩阵对的Kronecker积的和来近似一个大矩阵。
+    类似的以减少存储大小和计算量为目的的工作还有利用随机投影的“Deep Fried Network”，
+    利用循环矩阵的”Circulant Network”等等。
+    由于Mohammad的二值化方法也是一种近似，因此不可避免地会造成预测准确率的降低。
+    寻找能快速计算的更好的矩阵近似方法，可能是下一步的主要目标。
+
 
     上图展示了ECCV2016上一篇名为XNOR-Net的工作，
     其思想相当于在做量化的基础上，乘了一个尺度因子，这样大大降低了量化误差。
