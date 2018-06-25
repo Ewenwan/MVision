@@ -641,6 +641,8 @@
 
 [翻译](https://www.jiqizhixin.com/articles/2018-01-22-6)
 
+[解析2](https://www.jianshu.com/p/c34ec77dae9e)
+
 [ADMM 算法理解 对原函数不好求解，转而求解它的对偶函数，基于对对偶函数的优化，从来解出原问题](https://blog.csdn.net/danyhgc/article/details/76014478)
 
 [ADMM 算法实现](http://web.stanford.edu/~boyd/admm.html)
@@ -716,9 +718,14 @@
 
     该问题可以通过迭代优化的方法进行求解。当 a 或 Q 固定时，很容易就可以获得 Q 和 a 的解析解。
     
+    除上述三值网络外，还有以下几种常用的参数空间：
+![](https://upload-images.jianshu.io/upload_images/2509688-d3699da636ddfe3b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/399)
 
-![]()
-
+    参数空间中加入2、4、8等值后，仍然不需要乘法运算，只需进行移位操作。
+    因此，通过这种方法将神经网络中的乘法操作全部替换为移位和加操作。
+    
+    
+    
     
 **6. 哈希函数两比特缩放量化 BWNH
 
