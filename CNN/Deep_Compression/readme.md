@@ -9,6 +9,7 @@
 
 [Binarized Neural Network TF training code + C matrix / eval library 量化网络框架](https://github.com/Ewenwan/tinier-nn)
 
+[Model Compression and Model Acceleration in TensorLayer ](https://github.com/tensorlayer/tensorlayer/issues/416)
 
 # 模型压缩
 [中科院自动化研究所](http://www.360doc.com/content/18/0518/19/22587800_755030434.shtml)
@@ -18,6 +19,13 @@
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_KANJYBAABsNrDZ4CQ598.png)
 
 [超全总结：神经网络加速之量化模型 | 附带代码](https://yq.aliyun.com/articles/598953)
+
+    量化模型（Quantized Model）是一种模型加速（Model Acceleration）方法的总称，
+    包括二值化网络（Binary Network）、
+    三值化网络（Ternary Network）、
+    深度压缩（Deep Compression）、
+    多比例量化等
+
 
 ## 为什么要压缩网络？
     做过深度学习的应该都知道，NN大法确实效果很赞，
@@ -627,7 +635,7 @@
         在ImageNet数据集AlexNet架构下，BWN的准确率有全精度几乎一样，XNOR-Net还有较大差距(Δ=11%) 
         减少∼32×的参数大小，在CPU上inference阶段最高有∼58× 的加速。
         
-**4. 量化网络**      
+**4. 量化网络 nbit量化 **      
 
 [QNN](https://arxiv.org/pdf/1609.07061.pdf)
 
