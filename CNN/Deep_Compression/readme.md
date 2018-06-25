@@ -158,6 +158,17 @@
     我们使用VGG网络在手机上的实验可以达到5-6倍的实际加速效果。
 
     
+#### LBCNN 局部二值卷积 卷积稀疏滤波器 
+[LBCNN 参考](https://blog.csdn.net/omnispace/article/details/78081682)
+
+[代码](https://github.com/Ewenwan/lbcnn.torch)
+
+![](https://camo.githubusercontent.com/98d4d6c95262bf6c87cdf2239260d38fb93a1ad4/687474703a2f2f78756a75656665692e636f6d2f6c62636e6e5f696d6167652f30315f4c42505f335f352e706e67)
+
+![](https://camo.githubusercontent.com/a360c72570b26d33b52a459add59ad49f2eb3edb/687474703a2f2f78756a75656665692e636f6d2f6c62636e6e5f696d6167652f30335f4c42434e4e5f434e4e2e706e67)
+
+![](https://camo.githubusercontent.com/2eac80bf7c1bf2e660aa052ca14999523f54bfc1/687474703a2f2f78756a75656665692e636f6d2f6c62636e6e5f696d6167652f30345f73706172736974795f322e706e67)
+
 ### 2、剪枝(pruning) 在训练结束后，可以将一些不重要的神经元连接
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_OAAWMcAACXwnFDhd8125.png)
 
