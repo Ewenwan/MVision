@@ -597,6 +597,8 @@
 **4. 量化网络**      
 [QNN](https://arxiv.org/pdf/1609.07061.pdf)
 
+[代码](https://github.com/Ewenwan/quantized-cnn)
+
         对BNN的简单扩展，
         量化激活函数，
         有线性量化与log量化两种，
