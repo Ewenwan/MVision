@@ -562,7 +562,7 @@
 
 # 3. 三值化网络 
 
-## TNN 全三值网络
+## a. TNN 全三值网络
 [Ternary Neural Networks TNN](https://arxiv.org/pdf/1609.00222.pdf)
 
 [代码](https://github.com/Ewenwan/tnn-train)
@@ -570,7 +570,7 @@
     训练时激活量三值化，参数全精度 
     infernce时，激活量，参数都三值化（不使用任何乘法） 
     用FPGA和ASIC设计了硬件
-## TWN 三值系数网络
+## b. TWN 三值系数网络
     权值三值化的核心：
         首先，认为多权值相对比于二值化具有更好的网络泛化能力。
         其次，认为权值的分布接近于一个正态分布和一个均匀分布的组合。
@@ -621,7 +621,7 @@
    
     
     
-## 训练三值量化 TTQ  训练浮点数量化
+## c. 训练三值量化 TTQ  训练浮点数量化
 [Trained Ternary Quantization  TTQ](https://arxiv.org/pdf/1612.01064.pdf)
 
 [博客参考](https://blog.csdn.net/yingpeng_zhong/article/details/80382704)
@@ -658,14 +658,25 @@
 ![](https://img-blog.csdn.net/20180520154900829?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpbmdwZW5nX3pob25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 
-## 三值 矩阵分解和定点变换
+## d. 三值定点变换量化 + 矩阵分解 
+[Fixed-point Factorized Networks 论文](https://arxiv.org/pdf/1611.01972.pdf)
+
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_aAHHAsAACFv5V6ARc330.png)
+
 
     借助了矩阵分解和定点变换的优势，
     对原始权值矩阵直接做一个定点分解，限制分解后的权值只有+1、-1、0三个值。
     将网络变成三层的网络，首先是正常的3×3的卷积，对feature map做一个尺度的缩放，
     最后是1×1的卷积，所有的卷积的操作都有+1、-1、0。
     
+    原矩阵 W = 三值矩阵*D矩阵*三值矩阵
+![](https://upload-images.jianshu.io/upload_images/1770756-24fc80630c954833.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/354)
+    
+    SSD矩阵分解算法：
+![](https://upload-images.jianshu.io/upload_images/1770756-8e0634a2f48d91d1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/663)
+    
+    全精度恢复： Full-precision Weights Recovery
+![](https://upload-images.jianshu.io/upload_images/1770756-3c6160b5ec67fc1b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/353)
 
 ## 4. 二进制位量化网络 哈希函数的味道啊 
 [ShiftCNN](http://cn.arxiv.org/pdf/1706.02393v1)
