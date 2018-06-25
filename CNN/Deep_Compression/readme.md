@@ -7,6 +7,9 @@
     3. 高性能计算。
        腾讯 ncnn
 
+[Binarized Neural Network TF training code + C matrix / eval library 量化网络框架](https://github.com/Ewenwan/tinier-nn)
+
+
 # 模型压缩
 [中科院自动化研究所](http://www.360doc.com/content/18/0518/19/22587800_755030434.shtml)
 
