@@ -17,6 +17,7 @@
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_KANJYBAABsNrDZ4CQ598.png)
 
+[超全总结：神经网络加速之量化模型 | 附带代码](https://yq.aliyun.com/articles/598953)
 
 ## 为什么要压缩网络？
     做过深度学习的应该都知道，NN大法确实效果很赞，
