@@ -653,7 +653,8 @@
         AP2(x) = sign(x) × 2^round(log2|x|)
          平方近似
 
-**5. 约束低比特(3比特)量化 Extremely Low Bit Neural Networks
+**5. 约束低比特(3比特)量化 Extremely Low Bit Neural Networks**
+
 [论文 Extremely Low Bit Neural Network: Squeeze the Last Bit Out with ADMM](https://arxiv.org/pdf/1707.09870.pdf)
 
 [翻译](https://www.jiqizhixin.com/articles/2018-01-22-6)
