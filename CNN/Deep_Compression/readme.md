@@ -584,8 +584,7 @@
     他们提出的BWN，在ImageNet上可以达到接近全精度的一个性能，
     这也是首次在ImageNet数据集上达到这么高精度的网络。
     
-**3. 
-    BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。XNOR-Net是BinaryNet的升级版。 
+**3.  BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。XNOR-Net是BinaryNet的升级版。 
     主要思想： 
         1. 二值化时增加了缩放因子，同时梯度函数也有相应改变：
         W≈W^=αB=1n∑|W|ℓ1×sign(W)
@@ -609,6 +608,22 @@
         在正向传播过程中加入了均值为0的噪音。 
         BNN约差于XNOR-NET（<3%），
         QNN-2bit activation 略优于DoReFaNet 2-bit activation
+
+    激活函数量 线性量化：
+
+        LinearQuant(x, bitwidth)= Clip(round(x/bitwidth)*bitwidth,  minV, maxV )
+
+        激活函数为 整数阶梯函数  
+        最小值 minV
+        最大值 maxV
+        中间   线性阶梯整数
+
+    log量化：
+
+        LogQuant(x, bitwidth)、 = Clip (AP2(x), minV, maxV )
+
+        AP2(x) = sign(x) × 2^round(log2|x|)
+         平方近似
 
 **5.二值约束低比特量化
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAdFmiAACFxVTKLmQ760.png)
