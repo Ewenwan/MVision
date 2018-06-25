@@ -264,58 +264,73 @@
 [参考](https://blog.csdn.net/u010128736/article/details/53218140)
 
 ### 1. 单目初始化      Tracking::MonocularInitialization()
-	系统的第一步是初始化，ORB_SLAM使用的是一种自动初始化方法。
-	这里同时计算两个模型：
-		1. 用于 平面场景的单应性矩阵H( 4对 3d-2d点对，线性方程组，奇异值分解) 
-		2. 用于 非平面场景的基础矩阵F(8对 3d-2d点对，线性方程组，奇异值分解)，
-	
+    系统的第一步是初始化，ORB_SLAM使用的是一种自动初始化方法。
+    这里同时计算两个模型：
+	1. 用于 平面场景的单应性矩阵H( 4对 3d-2d点对，线性方程组，奇异值分解) 
+	2. 用于 非平面场景的基础矩阵F(8对 3d-2d点对，线性方程组，奇异值分解)，
+
 [推到 参考 单目slam基础](https://github.com/Ewenwan/MVision/blob/master/vSLAM/%E5%8D%95%E7%9B%AEslam%E5%9F%BA%E7%A1%80.md)
 
-	然后通过一个评分规则来选择合适的模型，恢复相机的旋转矩阵R和平移向量t。
+    然后通过一个评分规则来选择合适的模型，恢复相机的旋转矩阵R和平移向量t。
+    函数调用关系：
+	Tracking::GrabImageMonocular() 创建帧对象(第一帧提取orb特征点数量较多,为后面帧的两倍) -> 
+	Tracking::Track() ->  初始化 MonocularInitialization();// 单目初始化
+		  |  1. 第一帧关键点个数超过 100个，进行初始化  mpInitializer = new Initializer(mCurrentFrame,1.0,200)；
+		  |  2. 第二帧关键点个数 小于100个，删除初始化器,跳到第一步重新初始化。
+		  |  3. 第二帧关键点个数 也大于100个(只有连续的两帧特征点 均>100 个才能够成功构建初始化器)
+		  |     构建 两两帧 特征匹配器    ORBmatcher::ORBmatcher matcher(0.9,true)
+		  |     金字塔分层块匹配搜索匹配点对  100为搜索窗口大小尺寸尺度 
+		  |     int nmatches=matcher.SearchForInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
+		  |  4. 如果两帧匹配点对过少(nmatches<100)，跳到第一步，重新初始化。
+		  |  5. 匹配点数量足够多(nmatches >= 100),进行单目初始化：
+		  |     第一帧位置设置为：单位阵 Tcw = cv::Mat::eye(4,4,CV_32F);
+		  |     使用 单应性矩阵H 和 基础矩阵F 同时计算两个模型，通过一个评分规则来选择合适的模型，
+		  |     恢复第二帧相机的旋转矩阵Rcw 和 平移向量 tcw，同时 三角变换得到 部分三维点 mvIniP3D
+		  |     mpInitializer->Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated))
+		  |  6. 设置初始参考帧的世界坐标位姿态:
+		  |     mInitialFrame.SetPose(cv::Mat::eye(4,4,CV_32F));
+		  |  7. 设置第二帧(当前帧)的位姿
+		  |     cv::Mat Tcw = cv::Mat::eye(4,4,CV_32F);
+		  |     Rcw.copyTo(Tcw.rowRange(0,3).colRange(0,3));
+		  |     tcw.copyTo(Tcw.rowRange(0,3).col(3)); 
+		  |     mCurrentFrame.SetPose(Tcw);
+		  |  8. 创建初始地图 使用 最小化重投影误差BA 进行 地图优化 优化位姿 和地图点
+		  |     CreateInitialMapMonocular();
+		  |
+		  |-> 后面帧的跟踪 -> 两两帧的跟踪得到初始位姿
+			  |  1. 有运动速度，使用恒速运动模式跟踪上一帧   Tracking::TrackWithMotionModel()
+			  |  2. 运动量小或者 1.跟踪失败，跟踪参考帧模式  Tracking::TrackReferenceKeyFrame()
+			  |  3. 1 和 2都跟踪失败的话，使用重定位跟踪，跟踪可视参考帧群 Tracking::Relocalization()
+			  | 
+		         之后 -> 跟踪局部地图(一级二级相连关键帧), 使用图优化对位姿进行精细化调整 Tracking::TrackLocalMap()
+			     |
+			     -> 判断是否需要新建关键帧   Tracking::NeedNewKeyFrame();  Tracking::CreateNewKeyFrame();
+			         |
+				 |-> 跟踪失败后的处理
 
-	函数调用关系：
-		Tracking::GrabImageMonocular() 创建帧对象(第一帧提取orb特征点数量较多,为后面帧的两倍) -> 
-		Tracking::Track() ->  初始化 MonocularInitialization();// 单目初始化
-				  |  1. 第一帧关键点个数超过 100个，进行初始化  mpInitializer = new Initializer(mCurrentFrame,1.0,200)；
-				  |  2. 第二帧关键点个数 小于100个，删除初始化器,跳到第一步重新初始化。
-				  |  3. 第二帧关键点个数 也大于100个(只有连续的两帧特征点 均>100 个才能够成功构建初始化器)
-				  |       构建 两两帧 特征匹配器    ORBmatcher::ORBmatcher matcher(0.9,true)
-				  |       金字塔分层块匹配搜索匹配点对  100为搜索窗口大小尺寸尺度 
-				  | int nmatches=matcher.SearchForInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
-				  |  4. 如果两帧匹配点对过少(nmatches<100)，跳到第一步，重新初始化。
-				  |  5. 匹配点数量足够多(nmatches >= 100),进行单目初始化：
-				  |     第一帧位置设置为：单位阵 Tcw = cv::Mat::eye(4,4,CV_32F);
-				  |     使用 单应性矩阵H 和 基础矩阵F 同时计算两个模型，通过一个评分规则来选择合适的模型，
-				  |     恢复第二帧相机的旋转矩阵Rcw 和 平移向量 tcw，同时 三角变换得到 部分三维点 mvIniP3D
-				  |     mpInitializer->Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated))
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |
-				  |-> 后面帧的跟踪 -> 两两帧的跟踪得到初始位姿
-						  |  1. 有运动速度，使用恒速运动模式跟踪上一帧   Tracking::TrackWithMotionModel()
-						  |  2. 运动量小或者 1.跟踪失败，跟踪参考帧模式  Tracking::TrackReferenceKeyFrame()
-						  |  3. 1 和 2都跟踪失败的话，使用重定位跟踪，跟踪可视参考帧群 Tracking::Relocalization()
-						  | 
+#### 单目位姿恢复分析 Initializer::Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated)) 
+
+    步骤1：根据 matcher.SearchForInitialization 得到的初始匹配点对，筛选后得到好的特征匹配点对
+    步骤2：在所有匹配特征点对中随机选择8对特征匹配点对为一组，共选择mMaxIterations组
+    步骤3：调用多线程分别用于计算fundamental matrix(基础矩阵F) 和 homography(单应性矩阵)
+           Initializer::FindHomography();   得分为SH
+	   Initializer::FindFundamental();  得分为SF
+    步骤4：计算评价得分 RH，用来选取某个模型
+           float RH = SH / (SH + SF);// 计算 选着标志
+    步骤5：根据评价得分，从单应矩阵H 或 基础矩阵F中恢复R,t
+	   if(RH>0.40)// 更偏向于 平面  使用  单应矩阵恢复
+	       return ReconstructH(vbMatchesInliersH,H,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
+	   else //if(pF_HF>0.6) // 偏向于非平面  使用 基础矩阵 恢复
+	       return ReconstructF(vbMatchesInliersF,F,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
+
+#####  fundamental matrix(基础矩阵F) Initializer::FindHomography()
+
+#####  homography(单应性矩阵)  Initializer::FindFundamental()
 
 
-				       之后 -> 跟踪局部地图(一级二级相连关键帧), 使用图优化对位姿进行精细化调整 Tracking::TrackLocalMap()
-					     |
-					     |-> 判断是否需要新建关键帧   Tracking::NeedNewKeyFrame();  Tracking::CreateNewKeyFrame();
-						 |
-						 |-> 跟踪失败后的处理
+##### 基础矩阵F恢复R,t  Initializer::ReconstructF()
 
-
+##### 单应矩阵H恢复R,t  Initializer::ReconstructH()
 	
 
 
