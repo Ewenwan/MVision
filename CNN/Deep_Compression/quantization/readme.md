@@ -164,6 +164,9 @@
 
 [pytorch版本](https://github.com/Ewenwan/pytorch_workplace/tree/master/binary)
 
+[inference 前向  基于 CUDA 的 GPU](https://github.com/MatthieuCourbariaux/BinaryNet/blob/master/Run-time/binary_kernels.cu)
+
+[inference 前向  基于 CPU 的实现（其基于 tensorflow 的训练代码有些小问题）](https://github.com/codekansas/tinier-nn/tree/master/eval)
 
 **二值化方法**
 
