@@ -162,6 +162,9 @@
 
 [torch版本 基于概率随机随机化（stochastic）的二值化, 对BN也离散化](https://github.com/Ewenwan/BinaryNet-1)
 
+[pytorch版本](https://github.com/Ewenwan/pytorch_workplace/tree/master/binary)
+
+
 **二值化方法**
 
     1. 阈值二值化，确定性(sign()函数）
