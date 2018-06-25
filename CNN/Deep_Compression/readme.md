@@ -585,7 +585,8 @@
     在MNIST，SVHN和CIFAR-10小数据集上几乎达到了顶尖的水平。 
     在ImageNet在使用AlexNet架构时有较大差距（在XNOR-Net中的实验Δ=29.8%） 
     在GPU上有7倍加速
-**2.  BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。
+**2.  BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度**
+
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAaYgnAACz9cXw6vE854.png)
@@ -612,7 +613,8 @@
       缩放比例a的求解，由全精度权重W求解得到
 ![](https://img-blog.csdn.net/20160715113609159)
     
-**3. XNOR-Net是BinaryNet的升级版。 
+**3. XNOR-Net是BinaryNet的升级版**
+
     主要思想： 
         1. 二值化时增加了缩放因子，同时梯度函数也有相应改变：
         W≈W^=αB=1n∑|W|ℓ1×sign(W)
@@ -625,6 +627,7 @@
         减少∼32×的参数大小，在CPU上inference阶段最高有∼58× 的加速。
         
 **4. 量化网络**      
+
 [QNN](https://arxiv.org/pdf/1609.07061.pdf)
 
 [代码](https://github.com/Ewenwan/quantized-cnn)
@@ -745,7 +748,8 @@
     
     
     
-**6. 哈希函数两比特缩放量化 BWNH
+**6. 哈希函数两比特缩放量化 BWNH**
+[论文](https://arxiv.org/pdf/1802.02733.pdf)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAE7dRAACHJnpcRMk945.png)
 
@@ -757,6 +761,18 @@
     第二项表示量化后输出的feature map，其中B相当于量化后的权值，
     通过第二个公式就将网络的量化转化成类似第一个公式的Hashing方式。
     通过最后一行的定义，就可以用Hashing的方法来求解Binary约束。
+    
+    本文在二值化权重(BWN)方面做出了创新，发表在AAAI2018上，作者是自动化所程建团队。
+    本文的主要贡献是提出了一个新的训练BWN的方法，
+    揭示了哈希与BW(Binary Weights)之间的关联，表明训练BWN的方法在本质上可以当做一个哈希问题。
+    基于这个方法，本文还提出了一种交替更新的方法来有效的学习hash codes而不是直接学习Weights。
+    在小数据和大数据集上表现的比之前的方法要好。
+    
+    为了减轻用哈希方法所带来的loss，
+    本文将binary codes乘以了一个scaling factor并用交替优化的策略来更新binary codes以及factor.
+    
+    
+    
     
 **3. 三值化网络**
 [Ternary Neural Networks TNN](https://arxiv.org/pdf/1609.00222.pdf)
