@@ -585,7 +585,7 @@
     在MNIST，SVHN和CIFAR-10小数据集上几乎达到了顶尖的水平。 
     在ImageNet在使用AlexNet架构时有较大差距（在XNOR-Net中的实验Δ=29.8%） 
     在GPU上有7倍加速
-**2. 
+**2.  BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAaYgnAACz9cXw6vE854.png)
@@ -595,7 +595,7 @@
     他们提出的BWN，在ImageNet上可以达到接近全精度的一个性能，
     这也是首次在ImageNet数据集上达到这么高精度的网络。
     
-**3.  BWN(Binary-Weights-Networks) 仅有参数二值化了，激活量和梯度任然使用全精度。XNOR-Net是BinaryNet的升级版。 
+**3. XNOR-Net是BinaryNet的升级版。 
     主要思想： 
         1. 二值化时增加了缩放因子，同时梯度函数也有相应改变：
         W≈W^=αB=1n∑|W|ℓ1×sign(W)
@@ -637,6 +637,7 @@
          平方近似
 
 **5.二值约束低比特量化
+
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAdFmiAACFxVTKLmQ760.png)
 
     上图展示了阿里巴巴冷聪等人做的通过ADMM算法求解binary约束的低比特量化工作。
@@ -648,6 +649,7 @@
     这样的话就可以用ADMM的方法去求解。
     
 **6. 哈希函数两比特缩放量化 BWNH
+
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAE7dRAACHJnpcRMk945.png)
 
     通过Hashing方法做的网络权值二值化工作。
