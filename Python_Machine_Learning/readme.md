@@ -7,6 +7,8 @@
 
 [周志华机器学习 西瓜书（PDF） 斯坦福大学机器学习视频 机器学习基石+技法 邹博机器学习 七月在线机器学习 资源下载](https://blog.csdn.net/qq_34731703/article/details/78790752)
 
+[K-Means GMM  CRF  CTC GPR ](https://github.com/DingKe/ml-tutorial)
+
 ## 1 最大释然估计  Maximum Likelihood Estimation (MLE)  最大后验概率Maximum A Posterior (MAP) 
 ## 2 朴素贝叶斯 Naive Bayes
 ## 3 线性回归 逻辑回归 多项式回归 Linear Regression Logistic regression  Polynomial Regression 
