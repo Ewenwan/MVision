@@ -390,8 +390,16 @@
 
       主框架:
 ![](https://img-blog.csdn.net/20160715114256287)
+
+
+    由于在一般网络下，一层卷积的 kernel 规格是固定的，kernel 和 input 在进行卷积的时候，
+    input 会有重叠的地方，所以在进行量化因子的运算时，先对 input 全部在 channel 维求平均，
+    得到的矩阵 A，再和一个 w x h 的卷积核 k 进行卷积得到比例因子矩阵 K，
+
+    其中：
+    Kij = 1 / (w x h)
  
-## 4. QNN 量化网络 量化激活函数
+## 4. QNN 量化网络 量化激活函数 nbit量化
 [QNN Quantized Neural Networks ](https://arxiv.org/pdf/1609.07061.pdf)
 
         对BNN的简单扩展，
