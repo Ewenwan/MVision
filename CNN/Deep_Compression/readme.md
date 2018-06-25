@@ -751,7 +751,11 @@
 **6. 哈希函数两比特缩放量化 BWNH**
 [论文](https://arxiv.org/pdf/1802.02733.pdf)
 
+[博客解析](https://blog.csdn.net/ajj15120321/article/details/80571748)
+
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_WAE7dRAACHJnpcRMk945.png)
+
+[保留内积哈希方法是沈老师团队在15年ICCV上提出的 Learning Binary Codes for Maximum Inner Product Search ](https://webpages.uncc.edu/~szhang16/paper/ICCV15_binary.pdf)
 
     通过Hashing方法做的网络权值二值化工作。
     第一个公式是我们最常用的哈希算法的公式，其中S表示相似性，
