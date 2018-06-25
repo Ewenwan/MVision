@@ -1,4 +1,4 @@
-/**
+/*特征匹配 特征点与特征点 地图点与特征点 词袋模型 Sim3位姿匹配
 * This file is part of ORB-SLAM2.
 * ORB_ 匹配点
 * * 该类负责
@@ -56,8 +56,8 @@ namespace ORB_SLAM2
   * 以及最终的方向投票机制进行剔除
   * @param  F           当前帧
   * @param  vpMapPoints Local MapPoints 局部地图点  和当前帧有关连的帧对应的 地图点集合
-  * @param  th          阈值
-  * @return                成功匹配的数量
+  * @param  th          搜索窗口大小尺寸尺度  
+  * @return             成功匹配的数量
   * @see SearchLocalPoints() isInFrustum()
   */
 	int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoints, const float th)
