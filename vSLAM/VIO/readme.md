@@ -102,13 +102,17 @@
       他的ssf和msf都是这方面比较优秀的开源算法，有兴趣的读者可以参考他的博士论文。
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120212016937-685009538.png)
 
-## 松耦合举例-ssf
+## 基于滤波器的松耦合举例-ssf
 [代码](https://github.com/Ewenwan/ethzasl_sensor_fusion)
       
       滤波器的状态向量 x 是24维，如下，相较于紧耦合的方法会精简很多。
       Ssf_core主要处理state的数据，里面有预测和更新两个过程。
       Ssf_update则处理另外一个传感器的数据，主要完成测量的过程
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120212030437-1010714101.png)
+
+## 基于滤波器的松耦合举例-msf
+[代码](https://github.com/Ewenwan/ethzasl_msf)
+
 
 # 基于优化的松耦合
       随着研究的不断进步和计算平台性能的不断提升，
