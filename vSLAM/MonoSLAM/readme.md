@@ -14,3 +14,12 @@
     综合以上，我们设计了非常有效和鲁棒的算法，
     在普通PC和摄像头可以运行到30HZ。 这些工作扩展了robotic系统的范围，也开辟了SLAM在其中应用的大门。
     最后我们把MonoSLAM应用于高性能全自由度的仿人机器人和人手持摄像头的增强现实中。
+
+# 扩展卡尔曼滤波
+![](http://vision.ia.ac.cn/Students/gzp/ekf.jpg)
+
+
+# 基于相机状态 特征状态 的扩展卡尔曼系统
+
+
+# 惯性传感器的校正 IMU-Camera Calibration
