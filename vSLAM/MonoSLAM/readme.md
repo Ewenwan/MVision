@@ -1,4 +1,7 @@
-# MonoSLAM   Extended Kalman Filter based Monocular SLAM
+# MonoSLAM  扩展卡尔曼滤波 更新 相机特征点法得到的位姿 
+    Extended Kalman Filter based Monocular SLAM
+![](http://vision.ia.ac.cn/Students/gzp/ekfslamflow.jpg)
+
 [参考 EKF+ Monocular SLAM ](http://vision.ia.ac.cn/Students/gzp/monocularslam.html)
 
     Real-Time Single Camera SLAM  单目摄像头的3D运动轨迹的算法
