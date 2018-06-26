@@ -1,9 +1,6 @@
 
-###########################
-#################################
-#####################################
-DSO: Direct Sparse Odometry   直接法稀疏点云  SLAM  
-https://github.com/JakobEngel/dso
+# DSO: Direct Sparse Odometry   直接法稀疏点云  SLAM
+[代码](https://github.com/Ewenwan/dso)
 
 
 	１.下载DSO源代码到相应文件路径，比如我的文件路径为/home/hyj/DSO
@@ -33,9 +30,7 @@ https://github.com/JakobEngel/dso
 	    make -j
 	至此，不出意外的话，我们就可以很顺利的完成了DOS的安装。
 
-##############################
-###################################
-Pangolin  可视化库的使用
+# Pangolin  可视化库的使用
 
 	参考地址：
 	【1】Pangolin：https://github.com/stevenlovegrove/Pangolin
