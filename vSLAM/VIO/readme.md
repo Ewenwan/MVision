@@ -1,5 +1,8 @@
 # 视觉惯性里程计 VIO - Visual Inertial Odometry 视觉−惯性导航融合SLAM方案
 
+![](https://pic2.zhimg.com/v2-18cb9f97ac7f759a128b789b681c534f_1200x500.jpg)
+
+
       IO和之前的几种SLAM最大的不同在于两点：
         首先，VIO在硬件上需要传感器的融合，包括相机和六轴陀螺仪，
              相机产生图片，
