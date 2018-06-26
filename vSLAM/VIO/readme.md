@@ -142,10 +142,19 @@
       我们需要建立一个统一的损失函数进行联合优化.
 ![](https://pic4.zhimg.com/v2-c00d0a55d9ff7bf23a4ed5249fb1090b_r.png)
       
-# 基于优化的 紧耦合 orbslam2 + imu 紧耦合、ORB稀疏前端、图优化后端、带闭环检测和重定位
+## 基于优化的 紧耦合 orbslam2 + imu 紧耦合、ORB稀疏前端、图优化后端、带闭环检测和重定位
 [代码](https://github.com/Ewenwan/LearnVIORB)
 
-# VINS-Mono
-[代码](https://github.com/Ewenwan/VINS-Mono)
+[orb-slam1 + imu](https://github.com/Ewenwan/orb_slam_imu)
+
+## 基于优化的紧耦合  VINS-Mono   港科大的VIO
+
+      前端基于KLT跟踪算法， 后端基于滑动窗口的优化(采用ceres库)， 基于DBoW的回环检测
+      
+[VINS-Mono  Linux](https://github.com/Ewenwan/VINS-Mono)
+
+[VINS-Mobile MacOS](https://github.com/Ewenwan/VINS-Mobile)
+
+![](https://pic3.zhimg.com/80/v2-145f576a58d1123a9faa1d265af40522_hd.png)
 
 
