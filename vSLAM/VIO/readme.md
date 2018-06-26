@@ -113,6 +113,7 @@
 ## 基于滤波器的松耦合举例-msf
 [代码](https://github.com/Ewenwan/ethzasl_msf)
 
+![](http://www.liuxiao.org/wp-content/uploads/2016/07/framesetup-300x144.png)
 
 # 基于优化的松耦合
       随着研究的不断进步和计算平台性能的不断提升，
@@ -124,7 +125,7 @@
       
 # 基于优化的 紧耦合 
       
-## 基于优化的紧耦合举例-okvis
+## 基于优化的紧耦合举例-okvis   多目+IMU 
 [代码](https://github.com/Ewenwan/okvis)
 
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120212125265-76552078.png)
