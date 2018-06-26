@@ -4,7 +4,11 @@
     而 LSD SLAM里 只对 “有纹理”(梯度大的地方) 的区域进行估计，不估计令每一个做SLAM的人都害怕的终极大魔头——“大白墙”部分
     估计深度的部分在原理上也是direct method，和DTAM类似.
 ![](https://img-blog.csdn.net/20160706173859609)
-
+    
+    先从图片中提取特征点并进行匹配，然后进行优化求解，这类方法称为特征法或间接法。
+    由于提取、匹配的过程中耗时很大，因此有人提出是否能不计算关键点或描述子，
+    直接根据图像的像素信息来计算相机运动，这类方法称为直接法。
+       
 [本文github连接](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/readme.md)
 
 [lsd安装测试记录](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/install.md)
@@ -18,6 +22,8 @@
 [lad算法分析 代码分析 安装 非ros改造](http://www.cnblogs.com/hitcm/category/763753.html)
 
 [算法数学基础](https://blog.csdn.net/xdEddy/article/details/78009748)
+ 
+[SLAM笔记（六）直接法介绍](https://blog.csdn.net/kevin_cc98/article/details/70920700)
  
 [tracking  optimizationThreadLoop线程 分析等](https://blog.csdn.net/u013004597)
 
@@ -36,7 +42,34 @@
    　 有个三方开源库叫做Sophus/sophus，封装好了前三个变换。
 [库分析  Sophus/sophus ](https://blog.csdn.net/lancelot_vim/article/details/51706832)
 
+    Dense+Indirect: 
+    基本方法：光流场的平滑度 + 几何误差（光流求导） 
+    DTAM(直接法跟踪全部像素点，稠密方法)
+    LSD（选取整幅图像中有梯度的部分来采用直接法，这种方法称为半稠密方法（simi-dense）），
+    SVO（选取关键点来采用直接法，这类方法称为稀疏方法（sparse））
+    
+    Sparse+Indirect:非直接法（即特征点法）SLAM，
+    基本套路是：特征点+匹配+优化方法求解最小化重投影误差。 
+    典型代表： 
+    Mono-SLAM,PTAM(FAST角点),ORB-SLAM(ORB特征点),以及现在大部分SLAM 
+    
+    间接法与直接法的区别:
+![](https://img-blog.csdn.net/20170428164809095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvS2V2aW5fY2M5OA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
+    除了提取和匹配耗时，在使用特征点时，也忽略了除特征点以外的所有信息，因此丢弃了很多可能有用的图像信息. 
+    间接法通过最小化几何误差geometric error）（因为预先得到的点或光流向量都是几何度量，
+    常用的有重投影误差（projection error）等）来进行优化从而得到相机运动；
+    直接法通过最小化测量误差（photometirc error，即像素之间的误差）.
+    直接法的好处：
+       直接法让单独一个点不具备识别意义，而是将大量的点组织起来，因此它的表达是一种细粒度的几何表示。
+    
+    直接法原理：
+![](https://img-blog.csdn.net/20170428171532599)
+    
+    目标函数对变量的一阶导数，颜可比矩阵：
+![](https://img-blog.csdn.net/20170428174358562?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvS2V2aW5fY2M5OA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+![](https://img-blog.csdn.net/20170428201111448)
 
 # 算法整体框架
 [算法原理](https://blog.csdn.net/lancelot_vim/article/details/51730676)
