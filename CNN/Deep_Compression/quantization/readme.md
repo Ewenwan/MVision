@@ -701,11 +701,14 @@
     全精度恢复： Full-precision Weights Recovery
 ![](https://upload-images.jianshu.io/upload_images/1770756-3c6160b5ec67fc1b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/353)
 
-## 4. 二进制位量化网络 哈希函数的味道啊 
+## 4. 二进制位量化网络 哈希函数的味道啊  仅权重量化
 [ShiftCNN](http://cn.arxiv.org/pdf/1706.02393v1)
+
+[代码 caffe-quant-shiftcnn ](https://github.com/Ewenwan/caffe-quant-shiftcnn)
 
 [博客](https://blog.csdn.net/shuzfan/article/details/77856900)
 
+    整个对参数进行量化的流程如下：
 ![](https://img-blog.csdn.net/20170905204744197?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2h1emZhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 
@@ -748,6 +751,15 @@
     类似于 2^−1 + 2^−2 + 2^−3 这种形式，
     于是 y = x>>1 + x>>2 + x>>3 
 
+![](https://img-blog.csdn.net/20170905211321692?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2h1emZhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+    其中累加单元如下：(主要是逻辑控制与求和):
+![](https://img-blog.csdn.net/20170905211836994?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2h1emZhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+    实验
+    ShiftCNN量化后无需再训练。 
+    个人觉得再训练应该会更好一点。
+    再训练-再量化-再训练-再量化
 
 ## 5. 固定点多比特量化
 [Fixed Point Quantization of Deep Convolutional Networks ](https://arxiv.org/pdf/1511.06393.pdf)
