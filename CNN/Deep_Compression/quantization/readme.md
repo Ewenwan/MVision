@@ -675,17 +675,23 @@
 ![](https://img-blog.csdn.net/20180520154900829?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpbmdwZW5nX3pob25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 
-## d. 三值定点变换量化 + 矩阵分解 
+## d. 三值定点变换量化 + 矩阵分解  定点分解神经网络
 [Fixed-point Factorized Networks 论文](https://arxiv.org/pdf/1611.01972.pdf)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_aAHHAsAACFv5V6ARc330.png)
 
+    一般的方法都是先做矩阵（张量）分解然后做定点运算（fixed point）； 
+    而这种方法是
+    1、先进行不动点分解，
+    2、然后进行伪全精度权重复原（pseudo full precision weight recovery），
+    3、接下来做权重均衡（weight balancing），
+    4、最后再进行微调（fine-tuning）。
 
     借助了矩阵分解和定点变换的优势，
     对原始权值矩阵直接做一个定点分解，限制分解后的权值只有+1、-1、0三个值。
     将网络变成三层的网络，首先是正常的3×3的卷积，对feature map做一个尺度的缩放，
     最后是1×1的卷积，所有的卷积的操作都有+1、-1、0。
-    
+
     原矩阵 W = 三值矩阵*D矩阵*三值矩阵
 ![](https://upload-images.jianshu.io/upload_images/1770756-24fc80630c954833.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/354)
     
