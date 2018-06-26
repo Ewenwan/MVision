@@ -1,4 +1,6 @@
-# MonoSLAM   Real-Time Single Camera SLAM  单目摄像头的3D运动轨迹的算法
+# MonoSLAM   Extended Kalman Filter based Monocular SLAM
+
+    Real-Time Single Camera SLAM  单目摄像头的3D运动轨迹的算法
     本文设计了一种可以实时复现在未知场景里随机运动的单目摄像头的3D运动轨迹的算法。
     我们叫这个系统为MonoSLAM,它是第一个成功地利用一个移动端的不可控制的摄像头获得“纯粹的视觉”的系统
     ，在用移动的方法无法预知接口的情况下可以达到实时且无漂亮的表现。
