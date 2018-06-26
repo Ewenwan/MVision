@@ -52,7 +52,7 @@
     ch12 Loop closure & DBoW3                     词袋方法 
     ch13 Dense reconstruction & REMODE, Octomap   稠密地图构建
     
-    svo_slam
+    svo_slam   关键点直接法稀疏方法
     dso_slam   
     lsd_slam   直接法
     ORB_SLAM2  基于ORB特征点的 slam
@@ -60,7 +60,25 @@
     港科大的VIO VINS-Mono  A Robust and Versatile Monocular Visual-Inertial State Estimator
     ORB_SLAM2_IMU
     OKVIS: Open Keyframe-based Visual-Inertial SLAM.  OKVIS 属于 VIO（Visual Inertial Odometry），视觉融合 IMU 做 odometry。
-   
+    
+    Dense+Indirect: 
+    基本方法：光流场的平滑度 + 几何误差（光流求导） 
+    DTAM(直接法跟踪全部像素点，稠密方法)
+    LSD（选取整幅图像中有梯度的部分来采用直接法，这种方法称为半稠密方法（simi-dense）），
+    DSO ( )
+    
+    SVO（选取关键点来采用直接法，这类方法称为稀疏方法（sparse））
+    
+    
+    
+    Sparse+Indirect:非直接法（即特征点法）SLAM，
+    基本套路是：特征点+匹配+优化方法求解最小化重投影误差。 
+    典型代表： 
+    Mono-SLAM,PTAM(FAST角点),ORB-SLAM(ORB特征点),以及现在大部分SLAM 
+    
+    间接法与直接法的区别:
+![](https://img-blog.csdn.net/20170428164809095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvS2V2aW5fY2M5OA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
 #　基础资料
 [基于视觉的 SLAM/Visual Odometry (VO) 开源资料、博客和论文列表](http://www.voidcn.com/article/p-amraedch-nh.html)
  
