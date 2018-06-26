@@ -9,6 +9,8 @@
 
 [VGG/MobileNet/ShuffleNet SSD detection network](https://github.com/FreeApe/VGG-or-MobileNet-SSD)
 
+[基于TensorFlow的SSD车辆检测](https://blog.csdn.net/shuzfan/article/details/79034555)
+
 
 # VGG16 结构图 13个卷积层+3个全链接层=16
 ```asm
