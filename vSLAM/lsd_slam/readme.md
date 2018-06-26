@@ -2,7 +2,8 @@
 
     DTAM里面对每个像素都进行直接法的跟踪，
     而 LSD SLAM里 只对 “有纹理”(梯度大的地方) 的区域进行估计，不估计令每一个做SLAM的人都害怕的终极大魔头——“大白墙”部分
-
+    估计深度的部分在原理上也是direct method，和DTAM类似.
+![](https://pic.36krcnd.com/avatar/201607/07074455/i3x2f9uhrotrg0kg.png)
 
 [本文github连接](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/readme.md)
 
