@@ -334,17 +334,17 @@
 > 单目位姿恢复分析 Initializer::Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated)) 
 
     步骤1：根据 matcher.SearchForInitialization 得到的初始匹配点对，筛选后得到好的特征匹配点对
-    步骤2：在所有匹配特征点对中随机选择8对特征匹配点对为一组，共选择mMaxIterations组
+    步骤2：在所有匹配特征点对中随机选择8对特征匹配点对为一组，共选择 mMaxIterations 组
     步骤3：调用多线程分别用于计算fundamental matrix(基础矩阵F) 和 homography(单应性矩阵)
-           Initializer::FindHomography();   得分为SH
+	   Initializer::FindHomography();   得分为SH
 	   Initializer::FindFundamental();  得分为SF
     步骤4：计算评价得分 RH，用来选取某个模型
            float RH = SH / (SH + SF);// 计算 选着标志
     步骤5：根据评价得分，从单应矩阵H 或 基础矩阵F中恢复R,t
 	   if(RH>0.40)// 更偏向于 平面  使用  单应矩阵恢复
-	       return ReconstructH(vbMatchesInliersH,H,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
+	     return ReconstructH(vbMatchesInliersH,H,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
 	   else //if(pF_HF>0.6) // 偏向于非平面  使用 基础矩阵 恢复
-	       return ReconstructF(vbMatchesInliersF,F,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
+	     return ReconstructF(vbMatchesInliersF,F,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
 
 ### 0. 2D-2D配点对求变换矩阵前先进行标准化处理去 均值后再除以绝对矩 Initializer::Normalize()
 	步骤1：计算两坐标的均值
@@ -376,8 +376,44 @@
 			     0   0        1 
 		而由标准化坐标 还原 回 原坐标(左乘T 逆)：
 			原坐标 = 标准化矩阵T 逆矩阵 * 标准化后的的坐标
-
+			
+                再者用于还原 单应矩阵 下面需要用到
+		  p1'  ------> Hn -------> p2'   , p2'   = Hn*p1'
+		  T1*p1 -----> Hn -------> T2*p2 , T2*p2 = Hn*(T1*p1)
+		  左乘 T2逆 ，得到   p2 = T2逆 * Hn*(T1*p1)= H21i*p1
+		  H21i = T2逆 * Hn * T1
 ### a. fundamental matrix(基础矩阵F) Initializer::FindHomography()
+	思想：
+		计算单应矩阵,随机采样序列8点法,采用归一化的直接线性变换（normalized DLT）求解，
+		假设场景为平面情况下通过前两帧求取Homography矩阵(current frame 2 到 reference frame 1)，
+		在最大迭代次数内调用 ComputeH21计算H,
+		使用 CheckHomography 计算此单应变换得分，
+		在最大迭代次数内保留最高得分的单应矩阵H。
+
+	步骤：
+		步骤1：将两帧上对应的2d-2d匹配点对进行归一化
+			Initializer::Normalize(mvKeys1,vPn1, T1);//  mvKeys1原坐标 vPn1归一化坐标，T1标准化矩阵
+			Initializer::Normalize(mvKeys2,vPn2, T2);// 
+			cv::Mat T2inv = T2.inv();// 标准化矩阵 逆矩阵
+		步骤2：在最大迭代次数mMaxIterations内，从标准化后的点中随机选取8对点对
+			int idx = mvSets[it][j];//随机数集合 总匹配点数范围内
+			vPn1i[j] = vPn1[mvMatches12[idx].first];
+			vPn2i[j] = vPn2[mvMatches12[idx].second]; 
+		步骤3：通过标准化逆矩阵和标准化点对的单应变换计算原点对的单应变换矩阵 Initializer::ComputeH21()
+			cv::Mat Hn = ComputeH21(vPn1i,vPn2i);// 计算 标准化后的点对 对应的 单应矩阵Hn
+			// H21i = T2逆 * Hn * T1  见上面  0步骤的推导
+			H21i = T2inv * Hn * T1;// 原始点    p1 -----------> p2 的单应
+			H12i = H21i.inv();     // 原始点    p2 -----------> p1 的单应
+		步骤4：通过计算重投影误差来计算单应矩阵的好坏，得分 currentScore =Initializer::CheckHomography()
+
+		步骤5：保留迭代中，得分最高的单应矩阵和对应的得分
+			if(currentScore > score)//此次迭代 计算的单应H的得分较高
+			{
+			    H21 = H21i.clone();//保留较高得分的单应
+			    vbMatchesInliers = vbCurrentInliers;//对应的匹配点对   
+			    score = currentScore;// 最高的得分
+			}
+			
 
 ### b. homography(单应性矩阵)  Initializer::FindFundamental()
 
