@@ -1,4 +1,8 @@
-# lsd是一个 大规模的 单目直接法 视觉半稠密 slam系统
+# lsd是一个 大规模的 单目直接法 视觉半稠密 slam系统   Semi-Dense Large Scale Direct SLAM
+
+    DTAM里面对每个像素都进行直接法的跟踪，
+    而 LSD SLAM里 只对 “有纹理”(梯度大的地方) 的区域进行估计，不估计令每一个做SLAM的人都害怕的终极大魔头——“大白墙”部分
+
 
 [本文github连接](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/readme.md)
 
