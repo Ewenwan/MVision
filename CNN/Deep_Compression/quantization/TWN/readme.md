@@ -3,8 +3,10 @@
         首先，认为多权值相对比于二值化具有更好的网络泛化能力。
         其次，认为权值的分布接近于一个正态分布和一个均匀分布的组合。
         最后，使用一个 scale 参数去最小化三值化前的权值和三值化之后的权值的 L2 距离。   
+        
+[caffe-代码](https://github.com/Ewenwan/caffe-twns)
 
-[Ternary weight networks](https://arxiv.org/pdf/1605.04711.pdf)
+[论文 Ternary weight networks](https://arxiv.org/pdf/1605.04711.pdf)
 
 [论文翻译参考](https://blog.csdn.net/xjtu_noc_wei/article/details/52862282)
 
