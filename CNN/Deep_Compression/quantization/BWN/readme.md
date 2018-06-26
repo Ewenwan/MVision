@@ -1,6 +1,12 @@
 # 二值系数网络 BWN
 
-[代码](https://github.com/Ewenwan/XNOR-Net)
+[代码 lua 版本](https://github.com/Ewenwan/XNOR-Net)
+
+[XNOR-Net-caffe](https://github.com/Ewenwan/XNOR-Net-1)
+
+[theano-xnor-net](https://github.com/Ewenwan/theano-xnor-net)
+
+[fast-xnor-net 纯C实现](https://github.com/Ewenwan/fast-xnor-net)
 
 ![](https://img-blog.csdn.net/20160715112109483)
 
