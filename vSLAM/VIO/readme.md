@@ -95,6 +95,10 @@
       一个特征点在滑动窗口的几个位姿都被观察到的话，
       就会在这几个位姿间建立约束，从而进行KF的更新。
 
+## ROVIO，紧耦合，图像patch的稀疏前端(?)，EKF后端
+[代码](https://github.com/Ewenwan/rovio)
+
+
 # 基于滤波器的松耦合 Filter-based Tightly Coupled
       松耦合的方法则简单的多，避免把图像的feature加入状态向量，
       而是把图像当成一个black box,计算vo处理之后才和imu数据进行融合。
@@ -125,7 +129,7 @@
       
 # 基于优化的 紧耦合 
       
-## 基于优化的紧耦合举例-okvis   多目+IMU 
+## 基于优化的紧耦合举例-okvis   多目+IMU   使用了ceres solver的优化库。
 [代码](https://github.com/Ewenwan/okvis)
 
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120212125265-76552078.png)
@@ -138,5 +142,10 @@
       我们需要建立一个统一的损失函数进行联合优化.
 ![](https://pic4.zhimg.com/v2-c00d0a55d9ff7bf23a4ed5249fb1090b_r.png)
       
-         
-      
+# 基于优化的 紧耦合 orbslam2 + imu 紧耦合、ORB稀疏前端、图优化后端、带闭环检测和重定位
+[代码](https://github.com/Ewenwan/LearnVIORB)
+
+# VINS-Mono
+[代码](https://github.com/Ewenwan/VINS-Mono)
+
+
