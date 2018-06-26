@@ -380,7 +380,10 @@
 ![](https://img-blog.csdn.net/20160715113831914)
 
 
-**异或网络 XNOR-Networks  对 I(神经元激活输出，下一层的输入) 及 W(权重参数) 都二值化
+**同或网络 XNOR-Networks  对 I(神经元激活输出，下一层的输入) 及 W(权重参数) 都二值化
+
+    XNOR又叫同或门，假设输入是0或1，那么当两个输入相同时输出为1，当两个输入不同时输出为0。
+
 [代码](https://github.com/Ewenwan/XNOR-Net)
 
      最开始的输入X，权重W, 使用b*H代替X, 使用a*B代替W , a,b为缩放比例，H,B为 二值矩阵。
@@ -392,6 +395,11 @@
       主框架:
 ![](https://img-blog.csdn.net/20160715114256287)
 
+    这里第四行有个符号是圆圈里面有个*，
+    表示的是convolutional opration using XNOR and bitcount operation。
+    也就是说正常两个矩阵之间的点乘如果用在两个二值矩阵之间，
+    那么就可以将点乘换成XNOR-Bitcounting operation，
+    从32位浮点数之间的操作直接变成1位的XNOR门操作，这就是加速的核心。
 
     由于在一般网络下，一层卷积的 kernel 规格是固定的，kernel 和 input 在进行卷积的时候，
     input 会有重叠的地方，所以在进行量化因子的运算时，先对 input 全部在 channel 维求平均，
@@ -399,6 +407,11 @@
 
     其中：
     Kij = 1 / (w x h)
+    
+    实际添加了XNOR的网络:
+![](https://img-blog.csdn.net/20170831082647603?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDM4MDE2NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+
  
 ## 4. QNN 量化网络 量化激活函数 nbit量化
 [QNN Quantized Neural Networks ](https://arxiv.org/pdf/1609.07061.pdf)
