@@ -1,4 +1,5 @@
 # MonoSLAM   Extended Kalman Filter based Monocular SLAM
+[参考 EKF+ Monocular SLAM ](http://vision.ia.ac.cn/Students/gzp/monocularslam.html)
 
     Real-Time Single Camera SLAM  单目摄像头的3D运动轨迹的算法
     本文设计了一种可以实时复现在未知场景里随机运动的单目摄像头的3D运动轨迹的算法。
