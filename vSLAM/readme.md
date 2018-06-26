@@ -52,13 +52,13 @@
     ch12 Loop closure & DBoW3                     词袋方法 
     ch13 Dense reconstruction & REMODE, Octomap   稠密地图构建
     
-    DTAM       像素点直接法稠密
-    svo_slam   关键点直接法稀疏方法-半直接法
-    lsd_slam   纹理点直接法
-    dso_slam   直接法 
+    DTAM       像素点直接法稠密             2011年，Direct SLAM方法的鼻祖; 
+    svo_slam   关键点直接法稀疏方法-半直接法 
+    lsd_slam   纹理点直接法                 2014年一个半稠密SLAM系统           
+    dso_slam   直接法   
     
-    ORB_SLAM2  基于ORB特征点的 slam
-    PTAM       FAST角点 
+    ORB_SLAM2  基于ORB特征点的 slam         2015年一个比较完整的基于特征点的SLAM系统
+    PTAM       FAST角点                    2013 
     
     视觉惯性里程计Visual–Inertial Odometry(VIO)
     港科大的VIO VINS-Mono  A Robust and Versatile Monocular Visual-Inertial State Estimator
@@ -74,7 +74,7 @@
     Sparse + Indirect:非直接法（即特征点法）SLAM，
     基本套路是：特征点+匹配+优化方法求解最小化重投影误差。 
     典型代表： 
-    Mono-SLAM,
+    Mono-SLAM（MonoSLAM: Real-Time Single Camera SLAM）
     PTAM(FAST角点),
     ORB-SLAM(ORB特征点),
     以及现在大部分SLAM 
