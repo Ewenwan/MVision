@@ -114,7 +114,7 @@
 # 4. 代码分析
 [ORB-SLAM2详解（二）代码逻辑](https://blog.csdn.net/u010128736/article/details/53169832)
 
-## 4.1 应用程序框架
+# 4.1 应用程序框架
 >**单目相机app框架：**
 ```asm
         1. 创建 单目ORB_SLAM2::System SLAM 对象
@@ -127,7 +127,7 @@
         6. 循环2-5步。
         7. 结束，关闭slam系统，关闭所有线程 SLAM.Shutdown();
         8. 保存相机轨迹, SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
-```	
+```
 ![](https://img-blog.csdn.net/20161115115034740)
 
 >**双目相机app程序框架：**
@@ -169,7 +169,6 @@
 	11.结束，关闭slam系统，关闭所有线程===========================================   
 	12.保存相机轨迹                   ========================================== 
 ```
-
 >**ORB_SLAM2::System SLAM 对象框架:**
 ```asm
         在主函数中，我们创建了一个ORB_SLAM2::System的对象SLAM，这个时候就会进入到SLAM系统的主接口System.cc。
@@ -232,7 +231,7 @@
 	   // 使用Track()进行跟踪: 
 	                 0. 单目初始化(最开始执行) MonocularInitialization();// 单目初始化
 	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
-	                 b. 跟踪局部地图，多帧局部地图G2O优化位姿
+	                 b. 跟踪局部地图，多帧局部地图G2O优化位姿, 新建关键帧
 ```
 >**双目跟踪System::TrackStereo()框架**
 ```asm
@@ -244,7 +243,7 @@
 	   // 使用Track()进行跟踪:
 	                 0. 双目初始化(最开始执行) StereoInitialization();// 双目 / 深度初始化
 	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
-		         b. 跟踪局部地图，多帧局部地图G2O优化位姿
+		         b. 跟踪局部地图，多帧局部地图G2O优化位姿, 新建关键帧
 ```
 >**深度相机跟踪System::TrackRGBD()框架**
 ```asm
@@ -256,14 +255,14 @@
 	   // 使用Track()进行跟踪: 
 	                 0. RGBD初始化(最开始执行) StereoInitialization();// 双目 / 深度初始化
 	                 a. 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
-		         b. 跟踪局部地图，多帧局部地图G2O优化位姿
+		         b. 跟踪局部地图，多帧局部地图G2O优化位姿, 新建关键帧
 ```
 
 
-## 4.2 单目/双目/RGBD初始化, 单应变换/本质矩阵恢复3d点
+# 4.2 单目/双目/RGBD初始化, 单应变换/本质矩阵恢复3d点
 [参考](https://blog.csdn.net/u010128736/article/details/53218140)
 
-### 1. 单目初始化      Tracking::MonocularInitialization()
+## 1. 单目初始化      Tracking::MonocularInitialization()
     系统的第一步是初始化，ORB_SLAM使用的是一种自动初始化方法。
     这里同时计算两个模型：
 	1. 用于 平面场景的单应性矩阵H( 4对 3d-2d点对，线性方程组，奇异值分解) 
@@ -308,7 +307,7 @@
 			         |
 				 |-> 跟踪失败后的处理
 
-#### 单目位姿恢复分析 Initializer::Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated)) 
+> 单目位姿恢复分析 Initializer::Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated)) 
 
     步骤1：根据 matcher.SearchForInitialization 得到的初始匹配点对，筛选后得到好的特征匹配点对
     步骤2：在所有匹配特征点对中随机选择8对特征匹配点对为一组，共选择mMaxIterations组
@@ -323,29 +322,29 @@
 	   else //if(pF_HF>0.6) // 偏向于非平面  使用 基础矩阵 恢复
 	       return ReconstructF(vbMatchesInliersF,F,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
 
-#####  fundamental matrix(基础矩阵F) Initializer::FindHomography()
+### a. fundamental matrix(基础矩阵F) Initializer::FindHomography()
 
-#####  homography(单应性矩阵)  Initializer::FindFundamental()
+### b. homography(单应性矩阵)  Initializer::FindFundamental()
 
 
-##### 基础矩阵F恢复R,t  Initializer::ReconstructF()
+### c. 基础矩阵F恢复R,t  Initializer::ReconstructF()
 
-##### 单应矩阵H恢复R,t  Initializer::ReconstructH()
+### d. 单应矩阵H恢复R,t  Initializer::ReconstructH()
 	
+### e. 创建初始地图      CreateInitialMapMonocular();
+
+## 2. 双目/RGBD初始化 Tracking::StereoInitialization()
 
 
-### 2. 双目/RGBD初始化 Tracking::StereoInitialization()
-
-
-## 4.3 跟踪线程 Tracking 两帧跟踪/局部地图跟踪
+# 4.3 跟踪线程 Tracking 两帧跟踪/局部地图跟踪
 [参考](https://blog.csdn.net/u010128736/article/details/53339311)
 
 
-## 4.4 局部跟踪线程 LocalMapping
+# 4.4 局部跟踪线程 LocalMapping
 [参考](https://blog.csdn.net/u010128736/article/details/53395936)
 
 
-## 4.5 闭环检测线程 LoopClosing
+# 4.5 闭环检测线程 LoopClosing
 [参考](https://blog.csdn.net/u010128736/article/details/53409199)
 
  
