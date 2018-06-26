@@ -278,8 +278,10 @@
 		  |  2. 第二帧关键点个数 小于100个，删除初始化器,跳到第一步重新初始化。
 		  |  3. 第二帧关键点个数 也大于100个(只有连续的两帧特征点 均>100 个才能够成功构建初始化器)
 		  |     构建 两两帧 特征匹配器    ORBmatcher::ORBmatcher matcher(0.9,true)
+		  
 		  |     金字塔分层块匹配搜索匹配点对  100为搜索窗口大小尺寸尺度 
 		  |     int nmatches=matcher.SearchForInitialization(mInitialFrame,mCurrentFrame,mvbPrevMatched,mvIniMatches,100);
+		  
 		  |  4. 如果两帧匹配点对过少(nmatches<100)，跳到第一步，重新初始化。
 		  |  5. 匹配点数量足够多(nmatches >= 100),进行单目初始化：
 		  |     第一帧位置设置为：单位阵 Tcw = cv::Mat::eye(4,4,CV_32F);
@@ -306,7 +308,29 @@
 			     -> 判断是否需要新建关键帧   Tracking::NeedNewKeyFrame();  Tracking::CreateNewKeyFrame();
 			         |
 				 |-> 跟踪失败后的处理
+				 
+				 
+> 初始化时，orb匹配点的搜索 ORBmatcher::SearchForInitialization()
 
+	金字塔分层分块orb特征匹配，然后通过三个限制，滤除不好的匹配点对:
+		1. 最小值阈值限制；
+		2. 最近匹配距离一定比例小于次近匹配距离；
+		3. 特征方向误差一致性判断(方向差直方图统计，保留3个最高的方向差一致性最多的点，一致性较大)
+		   ORBmatcher::ComputeThreeMaxima(); // 统计数组中最大 的几个数算法，参考性较大
+		   ORBmatcher.cc 1912行 优秀的算法值得参考
+	步骤:
+		步骤1：为帧1的每一个关键点在帧2中寻找匹配点(同一金字塔层级，对应位置方块内的点，多个匹配点)
+		       Frame::GetFeaturesInArea()
+		步骤2：计算 1对多 匹配点对描述子之间的距离(二进制变量差异)
+		       ORBmatcher::DescriptorDistance(d1,d2); // 只计算了前八个 二进制位 的差异
+		       ORBmatcher.cc 1968行 优秀的算法值得参考
+		步骤3：保留最小和次小距离对应的匹配点
+		       ORBmatcher.cc 570行  优秀的算法值得参考
+		步骤4：确保最小距离小于阈值 50
+		步骤5：确保最佳匹配比次佳匹配明显要好，那么最佳匹配才真正靠谱，并统计方向差值直方图
+		步骤6：特征方向误差一致性判断(方向差直方图统计，保留3个最高的方向差一致性最多的点，一致性较大)
+		步骤7：更新匹配信息，用最新的匹配更新之前记录的匹配
+	
 > 单目位姿恢复分析 Initializer::Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated)) 
 
     步骤1：根据 matcher.SearchForInitialization 得到的初始匹配点对，筛选后得到好的特征匹配点对
@@ -322,16 +346,49 @@
 	   else //if(pF_HF>0.6) // 偏向于非平面  使用 基础矩阵 恢复
 	       return ReconstructF(vbMatchesInliersF,F,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
 
+### 0. 2D-2D配点对求变换矩阵前先进行标准化处理去 均值后再除以绝对矩 Initializer::Normalize()
+	步骤1：计算两坐标的均值
+	       mean_x  =  sum(ui) / N ；
+	       mean_y  =  sum(vi) / N；
+	步骤2：计算绝对局倒数
+	      绝对矩：
+		 mean_x_dev = sum（abs(ui - mean_x)）/ N ；
+		 mean_y_dev = sum（abs(vi - mean_y)）/ N ； 
+	      绝对矩倒数：
+		 sX = 1/mean_x_dev 
+		 sY = 1/mean_y_dev
+	步骤3：计算标准化后的点坐标
+		ui' = (ui - mean_x) * sX
+		vi' = (vi - mean_y) * sY 
+	步骤4：计算并返回标准化矩阵 
+		ui' = (ui - mean_x) * sX =  ui * sX + vi * 0  + (-mean_x * sX) * 1
+		vi' = (vi - mean_y) * sY =  ui * 0  + vi * sY + (-mean_y * sY) * 1   
+		1   =                       ui * 0  + vi * 0  +      1         * 1
+
+		可以得到：
+			ui'     sX  0   (-mean_x * sX)      ui
+			vi' =   0   sY  (-mean_y * sY)   *  vi
+			1       0   0        1              1
+		标准化后的的坐标 = 标准化矩阵T * 原坐标
+		所以标准化矩阵:
+			T =  sX  0   (-mean_x * sX) 
+			     0   sY  (-mean_y * sY)
+			     0   0        1 
+		而由标准化坐标 还原 回 原坐标(左乘T 逆)：
+			原坐标 = 标准化矩阵T 逆矩阵 * 标准化后的的坐标
+
 ### a. fundamental matrix(基础矩阵F) Initializer::FindHomography()
 
 ### b. homography(单应性矩阵)  Initializer::FindFundamental()
-
 
 ### c. 基础矩阵F恢复R,t  Initializer::ReconstructF()
 
 ### d. 单应矩阵H恢复R,t  Initializer::ReconstructH()
 	
 ### e. 创建初始地图      CreateInitialMapMonocular();
+
+
+
 
 ## 2. 双目/RGBD初始化 Tracking::StereoInitialization()
 
