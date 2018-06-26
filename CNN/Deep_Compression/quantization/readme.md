@@ -381,6 +381,7 @@
 
 
 **异或网络 XNOR-Networks  对 I(神经元激活输出，下一层的输入) 及 W(权重参数) 都二值化
+[代码](https://github.com/Ewenwan/XNOR-Net)
 
      最开始的输入X，权重W, 使用b*H代替X, 使用a*B代替W , a,b为缩放比例，H,B为 二值矩阵。
 ![](https://img-blog.csdn.net/20160715114052958)
