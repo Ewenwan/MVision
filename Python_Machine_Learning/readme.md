@@ -1,5 +1,8 @@
 # Python Machine Learning 机器学习
-[见](https://github.com/Ewenwan/PyML)
+[我的代码](https://github.com/Ewenwan/PyML)
+
+[机器学习实战 一整套教学 ](https://github.com/Ewenwan/MachineLearning)
+
 
 [Machine Learning 课程](https://www.cs.cmu.edu/~aarti/Class/10701/lecs.html)
 
