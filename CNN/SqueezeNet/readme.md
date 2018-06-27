@@ -1,5 +1,7 @@
 # SqueezeNet
 
+[NCNN上的inference分类](https://github.com/Ewenwan/MVision/tree/master/CNN/HighPerformanceComputing)
+
 [参考博客](https://blog.csdn.net/csdnldp/article/details/78648543#fn:1)
 
 [论文](https://arxiv.org/pdf/1602.07360.pdf)
