@@ -852,12 +852,31 @@
         这意味着有限精度数值实际上都存储在浮点数组中。
     3、Scoring
         对于量化网络的评分，Ristretto要求
+          a. 训练好的32位FP网络参数
+          b. 网络定义降低精度的层
+        第一项是Caffe传统训练的结果。Ristretto可以使用全精度参数来测试网络。
+             这些参数默认情况下使用最接近的方案，即时转换为有限精度。
+        至于第二项——模型说明——您将不得不手动更改Caffe模型的网络描述，
+             或使用Ristretto工具自动生成Google Protocol Buffer文件。
+            # score the dynamic fixed point SqueezeNet model on the validation set*
+            ./build/tools/caffe test --model=models/SqueezeNet/RistrettoDemo/quantized.prototxt \
+            --weights=models/SqueezeNet/RistrettoDemo/squeezenet_finetuned.caffemodel \
+            --gpu=0 --iterations=2000
 
-        训练好的32位FP网络参数
-        网络定义降低精度的层
-        第一项是Caffe传统训练的结果。Ristretto可以使用全精度参数来测试网络。这些参数默认情况下使用最接近的方案，即时转换为有限精度。
+### Ristretto: SqueezeNet 示例
 
-        至于第二项——模型说明——您将不得不手动更改Caffe模型的网络描述，或使用Ristretto工具自动生成Google Protocol Buffer文件。
+    1、下载原始 32bit FP 浮点数 网络权重
+[地址](https://github.com/DeepScale/SqueezeNet/tree/master/SqueezeNet_v1.0)
+
+    2、微调再训练一个低精度 网络权重 
+[微调了一个8位动态定点SqueezeNet]()
+    3、
+    4、
+    5、
+
+
+
+
 
 ## 8.其他
 
