@@ -39,20 +39,30 @@
       
 # 在深度神经网络中 特指提高卷积计算方式的方法
 
-     腾讯NCNN框架入门到应用
-     
+      1、OpenVINO
+      Intel推出OpenVINO工具包，将计算机视觉带到物联网终端
+      OpenVINO（开放的视觉推理和神经网络优化）工具包
+      使开发人员能够在云上（如TensorFlow，MXNet和Caffe等流行款框架）构建和训练人工智能模型，
+      并将其部署到各种产品中。
+      Windows*
+      Linux* (supports Ubuntu*, CentOS*, and Yocto Project*)
+      Linux for FPGA 
+      
+      
+      2、腾讯NCNN框架入门到应用
+
 [代码](https://github.com/Ewenwan/ncnn)
      
-     FeatherCNN
+     3、FeatherCNN
 [代码](https://github.com/Ewenwan/FeatherCNN)
 
-     Tengine 高性能神经网络推理引擎
+     4、Tengine 高性能神经网络推理引擎
 [代码](https://github.com/Ewenwan/Tengine)
 
-      百度MDL
+      5、百度MDL
 [代码](https://github.com/Ewenwan/paddle-mobile)
 
-      九言科技 绝影（Prestissimo）
+      6、九言科技 绝影（Prestissimo）
 [代码](https://github.com/Ewenwan/In-Prestissimo)
 
 [代码]()
