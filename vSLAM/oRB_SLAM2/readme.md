@@ -225,7 +225,7 @@
 
 >**单目跟踪SLAM.TrackMonocular()框架**
 ```asm
-	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
+	1. 模式变换的检测  跟踪+定位  or  跟踪+定位+建图
 	2. 检查跟踪tracking线程重启
 	3. 单目跟踪
 	   mpTracker->GrabImageMonocular(im,timestamp);// Tracking.cc中
@@ -237,7 +237,7 @@
 ```
 >**双目跟踪System::TrackStereo()框架**
 ```asm
-	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
+	1. 模式变换的检测  跟踪+定位  or  跟踪+定位+建图
 	2. 检查跟踪tracking线程重启
 	3. 双目跟踪
 	   mpTracker->GrabImageStereo(imLeft,imRight,timestamp); // Tracking.cc中
@@ -249,7 +249,7 @@
 ```
 >**深度相机跟踪System::TrackRGBD()框架**
 ```asm
-	1. 模式变换的检测  跟踪+建图  or  跟踪+定位+建图
+	1. 模式变换的检测  跟踪+定位  or  跟踪+定位+建图
 	2. 检查跟踪tracking线程重启
 	3. 双目跟踪
 	   mpTracker->GrabImageRGBD(im,depthmap,timestamp); // Tracking.cc中
