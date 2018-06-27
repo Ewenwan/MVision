@@ -196,7 +196,7 @@ namespace ORB_SLAM2
 		  exit(-1);
 	      }   
 
-  // 1.  模式变换的检测   跟踪+建图  or  跟踪+定位+建图 Check mode change============   
+  // 1.  模式变换的检测   跟踪+定位  or  跟踪+定位+建图 Check mode change============   
 	      {
 		/*
 		* 类 unique_lock 是一个一般性质的 mutex 属主的封装，
@@ -256,7 +256,7 @@ namespace ORB_SLAM2
 		  exit(-1);
 	      }
     
-     // 1.  模式变换的检测   跟踪+建图  or  跟踪+定位+建图 Check mode change===========   
+     // 1.  模式变换的检测   跟踪+定位  or  跟踪+定位+建图 Check mode change===========   
 	      {
 		  unique_lock<mutex> lock(mMutexMode);
 		  //  跟踪+定位
@@ -324,7 +324,7 @@ namespace ORB_SLAM2
 		  exit(-1);
 	      }
 
-    // 1.  模式变换的检测   跟踪+建图  or  跟踪+定位+建图 Check mode change==========
+    // 1.  模式变换的检测   跟踪+定位  or  跟踪+定位+建图 Check mode change==========
 	      {
 		  unique_lock<mutex> lock(mMutexMode);// 地图上锁
 	       //  跟踪+定位 
