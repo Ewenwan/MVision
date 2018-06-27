@@ -384,7 +384,11 @@
 		  T1*p1 -----> Hn -------> T2*p2 , T2*p2 = Hn*(T1*p1)
 		  左乘 T2逆 ，得到   p2 = T2逆 * Hn*(T1*p1)= H21i*p1
 		  H21i = T2逆 * Hn * T1
-### a. fundamental matrix(基础矩阵F) Initializer::FindHomography()
+### a. fundamental matrix(基础矩阵F)  随机采样 找到最好的 基础矩阵 Initializer::FindFundamental() 
+
+			
+
+### b. homography(单应性矩阵) 随机采样 找到最好的单元矩阵 Initializer::FindHomography()
 	思想：
 		计算单应矩阵,随机采样序列8点法,采用归一化的直接线性变换（normalized DLT）求解，
 		假设场景为平面情况下通过前两帧求取Homography矩阵(current frame 2 到 reference frame 1)，
@@ -415,9 +419,52 @@
 			    vbMatchesInliers = vbCurrentInliers;//对应的匹配点对   
 			    score = currentScore;// 最高的得分
 			}
-			
+#### Initializer::ComputeH21()  4对点直接线性变换求解H矩阵
+	一点对：
+		p2   =  H21 * p1
+	写成矩阵形式：
+		u2         h1  h2  h3       u1
+		v2  =      h4  h5  h6    *  v1
+		1          h7  h8  h9       1  
 
-### b. homography(单应性矩阵)  Initializer::FindFundamental()
+	可以使用叉乘 得到0    p2叉乘p2 = H21 *p1 = 0 
+		| 0 -1  v2|    |h1 h2 h3|      |u1|    |0|
+		| 1  0 -u2| *  |h4 h5 h6| *    |v1| =  |0|
+		|-v2 u2  0|    |h7 h8 h9|      |1 |    |0|
+
+	也可以展开得到(使用第三项进行归一化)：
+		u2 = (h1*u1 + h2*v1 + h3) /( h7*u1 + h8*v1 + h9)
+		v2 = (h4*u1 + h5*v1 + h6) /( h7*u1 + h8*v1 + h9)
+	写成矩阵形式：
+		-((h4*u1 + h5*v1 + h6) - ( h7*u1*v2 + h8*v1*v2 + h9*v2))=0  右乘分子，再移动得0
+		h1*u1    + h2*v1 + h3  - ( h7*u1*u2 + h8*v1*u2 + h9*u2) =0
+
+		|0    0   0  -u1  -v1  -1   u1*v2   v1*v2    v2|
+		|u1 v1    1  0    0    0   -u1*u2  - v1*u2  -u2| *|h1 h2 h3 h4 h5 h6 h7 h8 h9|转置  = 0
+	一对点提供两个约束：H 9个元素，8个自由度，包含一个比例因子(尺度来源)，需要四对点
+	四对点提供8个约束方程,可以写成矩阵形式：
+	 A * h = 0
+	对A进行SVD奇异值分解 [U,S,V]=svd(A)，其中U和V代表二个相互正交矩阵，而S代表一对角矩阵
+	cv::SVDecomp(A,S,U,VT,SVD::FULL_UV);  //后面的FULL_UV表示把U和VT补充称单位正交方阵	
+	H = VT.row(8).reshape(0, 3);// v的最后一列
+
+	SVD奇异值分解 解齐次方程组（Ax = 0）原理：
+		把问题转化为最小化|| Ax ||2的非线性优化问题，
+		我们已经知道了x = 0是该方程组的一个特解，
+		为了避免x = 0这种情况（因为在实际的应用中x = 0往往不是我们想要的），
+		我们增加一个约束，比如|| x ||2 = 1，
+		这样，问题就变为：
+		min(|| Ax ||2) ， || x ||2 = 1 或 min(|| Ax ||) ， || x || = 1
+		对矩阵A进行分解 A = UDV'
+		 || Ax || = || UDV' x || = || DV' x||
+		 ( 对于一个正交矩阵U，满足这样一条性质： || UD || = || D || , 
+		   正交矩阵，正交变换，仅仅对向量，只产生旋转，无尺度缩放，和变形，即模长不变)
+
+		令y = V'x， 因此，问题变为min(|| Dy ||)， 
+		因为|| x || = 1, V'为正交矩阵，则|| y || = 1。
+		由于D是一个对角矩阵，对角元的元素按递减的顺序排列，因此最优解在y = (0, 0,..., 1)'
+		又因为x = Vy， 所以最优解x，就是V的最小奇异值对应的列向量，
+		比如，最小奇异值在第8行8列，那么x = V的第8个列向量。
 
 ### c. 基础矩阵F恢复R,t  Initializer::ReconstructF()
 
