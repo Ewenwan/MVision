@@ -1,4 +1,5 @@
-# 7. Ristretto是一个和Caffe类似的框架。
+# Ristretto是一个和Caffe类似的框架。
+[博客介绍](https://blog.csdn.net/yiran103/article/details/80336425)
 
     Ristretto是一个自动化的CNN近似工具，可以压缩32位浮点网络。
     Ristretto是Caffe的扩展，允许以有限的数字精度测试、训练和微调网络。
