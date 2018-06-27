@@ -769,13 +769,15 @@
 [Quantized Convolutional Neural Networks for Mobile Devices](https://arxiv.org/pdf/1512.06473.pdf)
 
 
-## 7.其他
 
-
-## Ristretto是一个和Caffe类似的框架。
+## 8. Ristretto是一个和Caffe类似的框架。
 
     本文介绍了几种网络压缩的方法，压缩特征图和参数。
-    方法包括定点法、动态定点法、迷你浮点法和乘法变移位法，所压缩的网络包括LeNet、CIFAR-10、AlexNet和CaffeNet等。
+    方法包括定点法（Fixed Point Approximation）、
+    动态定点法（Dynamic Fixed Point Approximation）、
+    迷你浮点法（Minifloat Approximation）和
+    乘法变移位法（Turning Multiplications Into Bit Shifts），
+    所压缩的网络包括LeNet、CIFAR-10、AlexNet和CaffeNet等。
     注：Ristretto原指一种特浓咖啡（Caffe），本文的Ristretto沿用了Caffe的框架。
     
 [Ristretto: Hardware-Oriented Approximation of Convolutional Neural Networks](https://arxiv.org/pdf/1605.06402.pdf)
@@ -783,7 +785,8 @@
 [代码](https://github.com/MichalBusta/caffe/commit/55c64c202fc8fca875e108b48c13993b7fdd0f63)
 
 
-## 
+## 8.其他
+
 
 [Fixed-point Factorized Networks](https://arxiv.org/pdf/1611.01972.pdf)
 
