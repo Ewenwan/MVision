@@ -52,6 +52,7 @@
     layer {
       name: "conv1"
       type: "ConvolutionRistretto"
+      // 其他类还有 FcRistretto（全连接层），LRNRistretto(局部响应归一化)、DeconvolutionRistretto(反卷积)。
       bottom: "data"
       top: "conv1"
       convolution_param {
@@ -64,10 +65,27 @@
       }
       quantization_param {
         precision: MINIFLOAT   # MANT:mantissa，尾数(有效数字) 
-        mant_bits: 10
-        exp_bits: 5
+        // precision 量化策略  DYNAMIC_FIXED_POINT  \ MINIFLOAT  或  INTEGER_POWER_OF_2_WEIGHTS
+        // rounding_scheme 量化的舍入方案  最近偶数（NEAREST）或随机舍入（STOCHASTIC） 
+        mant_bits: 10  // [default：23]：用于表示尾数的位数
+        exp_bits: 5    /
       }
     }
+//////////////////////////
+Minifloat
+精度类型：MINIFLOAT
+参数： 
+mant_bits[默认值：23]：用于表示尾数的位数
+exp_bits[default：8]：用于表示指数的位数
+默认值对应于单精度格式
+////////////////////////////
+整数幂参数
+精度类型：INTEGER_POWER_OF_2_WEIGHTS
+参数： 
+exp_min[默认值：-8]：使用的最小指数
+exp_max[默认值：-1]：使用的最大指数
+对于默认值，网络参数可以用硬件中的4位表示（1个符号位，3位指数值）
+    
 ```
     该层将使用半精度（16位浮点）数字表示。
     卷积内核、偏差以及层激活都被修剪为这种格式。
@@ -298,6 +316,12 @@ for(m =0; m<M; m++)               // 每个卷积核
 
 
 ## 4、  乘法变移位法（Turning Multiplications Into Bit Shifts）
+    直接量化成 二进制位的形式，最高位位符号位S，后面的二进制指数部分
+    例如4bits
+    1100
+    第一个1为符号位，后面3个表示指数部分(-1~-8) 
+    n=(−1)^s * 2^exp
+## 应用时一般是网络的前面的部分使用量化，后面部分还使用 32位的浮点数运算
 
 
 # Ristretto: SqueezeNet 示例
