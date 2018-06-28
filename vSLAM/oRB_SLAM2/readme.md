@@ -350,178 +350,316 @@
 
 ### 0. 2D-2D配点对求变换矩阵前先进行标准化处理去 均值后再除以绝对矩 Initializer::Normalize()
 ```asm
-	步骤1：计算两坐标的均值
-	       mean_x  =  sum(ui) / N ；
-	       mean_y  =  sum(vi) / N；
-	步骤2：计算绝对局倒数
-	      绝对矩：
-		 mean_x_dev = sum（abs(ui - mean_x)）/ N ；
-		 mean_y_dev = sum（abs(vi - mean_y)）/ N ； 
-	      绝对矩倒数：
-		 sX = 1/mean_x_dev 
-		 sY = 1/mean_y_dev
-	步骤3：计算标准化后的点坐标
-		ui' = (ui - mean_x) * sX
-		vi' = (vi - mean_y) * sY 
-	步骤4：计算并返回标准化矩阵 
-		ui' = (ui - mean_x) * sX =  ui * sX + vi * 0  + (-mean_x * sX) * 1
-		vi' = (vi - mean_y) * sY =  ui * 0  + vi * sY + (-mean_y * sY) * 1   
-		1   =                       ui * 0  + vi * 0  +      1         * 1
+步骤1：计算两坐标的均值
+       mean_x  =  sum(ui) / N ；
+       mean_y  =  sum(vi) / N；
+步骤2：计算绝对局倒数
+      绝对矩：
+	 mean_x_dev = sum（abs(ui - mean_x)）/ N ；
+	 mean_y_dev = sum（abs(vi - mean_y)）/ N ； 
+      绝对矩倒数：
+	 sX = 1/mean_x_dev 
+	 sY = 1/mean_y_dev
+步骤3：计算标准化后的点坐标
+	ui' = (ui - mean_x) * sX
+	vi' = (vi - mean_y) * sY 
+步骤4：计算并返回标准化矩阵 
+	ui' = (ui - mean_x) * sX =  ui * sX + vi * 0  + (-mean_x * sX) * 1
+	vi' = (vi - mean_y) * sY =  ui * 0  + vi * sY + (-mean_y * sY) * 1   
+	1   =                       ui * 0  + vi * 0  +      1         * 1
 
-		可以得到：
-			ui'     sX  0   (-mean_x * sX)      ui
-			vi' =   0   sY  (-mean_y * sY)   *  vi
-			1       0   0        1              1
-		标准化后的的坐标 = 标准化矩阵T * 原坐标
-		所以标准化矩阵:
-			T =  sX  0   (-mean_x * sX) 
-			     0   sY  (-mean_y * sY)
-			     0   0        1 
-		而由标准化坐标 还原 回 原坐标(左乘T 逆)：
-			原坐标 = 标准化矩阵T 逆矩阵 * 标准化后的的坐标
-			
-                再者用于还原 单应矩阵 下面需要用到
-		  p1'  ------> Hn -------> p2'   , p2'   = Hn*p1'
-		  T1*p1 -----> Hn -------> T2*p2 , T2*p2 = Hn*(T1*p1)
-		  左乘 T2逆 ，得到   p2 = T2逆 * Hn*(T1*p1)= H21i*p1
-		  H21i = T2逆 * Hn * T1
+	可以得到：
+		ui'     sX  0   (-mean_x * sX)      ui
+		vi' =   0   sY  (-mean_y * sY)   *  vi
+		1       0   0        1              1
+	标准化后的的坐标 = 标准化矩阵T * 原坐标
+	所以标准化矩阵:
+		T =  sX  0   (-mean_x * sX) 
+		     0   sY  (-mean_y * sY)
+		     0   0        1 
+	而由标准化坐标 还原 回 原坐标(左乘T 逆)：
+		原坐标 = 标准化矩阵T 逆矩阵 * 标准化后的的坐标
+
+	再者用于还原 单应矩阵 下面需要用到：
+	  p1'  ------> Hn -------> p2'   , p2'   = Hn*p1'
+	  T1*p1 -----> Hn -------> T2*p2 , T2*p2 = Hn*(T1*p1)
+	  左乘 T2逆 ，得到   p2 = T2逆 * Hn*(T1*p1)= H21i*p1
+	  H21i = T2逆 * Hn * T1
 ```
 ### a. fundamental matrix(基础矩阵F)  随机采样 找到最好的 基础矩阵 Initializer::FindFundamental() 
+```asm
+思想：
+计算基础矩阵F,随机采样序列8点法,采用归一化的直接线性变换（normalized DLT）求解，
+极线几何约束(current frame 1 变换到 reference frame 2)，
+在最大迭代次数内调用 ComputeF21计算F,
+使用 CheckFundamental 计算此 基础矩阵的得分，
+在最大迭代次数内保留最高得分的基础矩阵F。
 
-			
+步骤：
+步骤1：将两帧上对应的2d-2d匹配点对进行归一化
+	Initializer::Normalize(mvKeys1,vPn1, T1);//  mvKeys1原坐标 vPn1归一化坐标，T1标准化矩阵
+	Initializer::Normalize(mvKeys2,vPn2, T2);// 
+	cv::Mat T2inv = T2.inv();// 标准化矩阵 逆矩阵
+步骤2：在最大迭代次数mMaxIterations内，从标准化后的点中随机选取8对点对
+	int idx = mvSets[it][j];//随机数集合 总匹配点数范围内
+	vPn1i[j] = vPn1[mvMatches12[idx].first];
+	vPn2i[j] = vPn2[mvMatches12[idx].second]; 
+步骤3：通过标准化逆矩阵 和 标准化点对的基础矩阵 计算原点对的 基础矩阵   
+	cv::Mat Fn = ComputeF21(vPn1i,vPn2i);// 计算 标准化后的点对 对应的 基础矩阵 Fn
+	cv::Mat T2t = T2.t(); // 标准化矩阵的 转置矩阵
+	 推到：
+	 x2 = R*x1 + t
+	 t 叉乘 x2 = t 叉乘 R*x1
+	 x2转置 * t 叉乘 x2 = x2转置 * t 叉乘 R*x1 = 0
+	 得到： 
+	 x2转置 * t 叉乘 R  * x1 = x2转置 * R21  * x1 =  0
+	 (K逆*p2)转置 * t 叉乘 R  * (K逆*p1) = 
+	 p2转置 * K转置逆 * t 叉乘 R  * K逆 * p1 = p2转置 * F21 *  p1
+
+	 上面求到的是 归一化后的点对的变换矩阵：
+	 p2'转置 * Fn * p1' = 0
+	 (T2*p2)转置 * Fn * (T1 * p1) = 0
+	 p2转置 * T2转置 * Fn * T1 * p1 = 0
+	 所以得到：
+	   未归一化点对对应的变换矩阵F21为：
+	   F21 =  T2转置 * Fn * T1 = T2t * Fn * T1
+
+步骤4：通过计算重投影误差来计算单应矩阵的好坏，得分 
+	currentScore =Initializer::CheckFundamental(); 
+步骤5：保留迭代中，得分最高的单应矩阵和对应的得分
+	if(currentScore > score)//此次迭代 计算的单应H的得分较高
+	{
+	    F21 = F21i.clone();// 保留最优的 基础矩阵 F
+	    vbMatchesInliers = vbCurrentInliers;//对应的匹配点对   标记内点
+	    score = currentScore;// 最高的得分
+	}
+```
+#### Initializer::ComputeF21(vPn1i,vPn2i) 8对点求解 基础矩阵F
+```asm
+ 推到：
+ x2 = R*x1 + t
+ t 叉乘 x2 = t 叉乘 R*x1
+ x2转置 * t 叉乘 x2 = x2转置 * t 叉乘 R*x1 = 0
+ 得到： 
+ x2转置 * t 叉乘 R  * x1 = x2转置 * R21  * x1 =  0
+ (K逆*p2)转置 * t 叉乘 R  * (K逆*p1) = 
+ p2转置 * K转置逆 * t 叉乘 R  * K逆 * p1 = p2转置 * F21 *  p1
+
+ 一对2d-2d点对 p1-p2得到:
+	 p2转置 * F21 *  p1
+写成矩阵形式：
+             |f1   f2   f3|     |u1|
+|u2 v2 1| *  |f4   f5   f6|  *  |v1|    = 0 , 应该=0 不等于零的就是误差
+             |f7   f8   f9|     |1|
+前两项展开得到：
+	a1 = f1*u2 + f4*v2 + f7;
+	b1 = f2*u2 + f5*v2 + f8;
+	c1 = f3*u2 + f6*v2 + f9;
+得到:
+		     |u1|
+	|a1 b1 c1| * |v1| = 0
+		     |1|
+得到:
+       a1*u1+ b1*v1 + c1= 0
+一个点对 得到一个约束方程:
+  f1*u1*u2 + f2*v1*u2  + f3*u2 + f4*u1*v2  + f5*v1*v2 + f6*v2 +  f7*u1 + f8*v1 + f9 = 0
+写成矩阵形式：
+ |u1*u2 v1*u2 u2 u1*v2 v1*v2 v2 u1 v1 1| * |f1 f2 f3 f4 f5 f6 f7 f8 f9|转置 = 0
+采样8个点对 可以到八个约束, f 9个参数，8个自由度，另一个为尺度因子(单目尺度不确定的来源)
+线性方程组 求解 A * f = 0  
+对矩阵A进行奇异值分解得到f ,
+
+对A进行SVD奇异值分解 [U,S,V]=svd(A)，其中U和V代表二个相互正交矩阵，而S代表一对角矩阵
+cv::SVDecomp(A,S,U,VT,SVD::FULL_UV);  //后面的FULL_UV表示把U和VT补充称单位正交方阵
+Fpre  = VT.row(8).reshape(0, 3);      // V的最后一列
+F矩阵的其秩为2,需要再对Fpre进行奇异值分解, 后取对角矩阵U, 秩为2,后再合成F。
+cv::SVDecomp(Fpre,S,U,VT,cv::SVD::MODIFY_A | cv::SVD::FULL_UV);
+S.at<float>(2)=0;                     //  基础矩阵的秩为2，重要的约束条件
+F21 = U * cv::Mat::diag(S)* VT        // 再合成F
+
+```
+#### Initializer::CheckFundamental() 计算基本矩阵得分
+```asm
+思想:
+	1. 根据基本矩阵，可以求得两组对点相互变换得到的误差平方和，
+	2. 基于卡方检验计算出的阈值（假设测量有一个像素的偏差），
+	3. 误差大的记录为外点，误差小的记录为内点，
+	4. 使用阈值减去内点的误差，得到该匹配点对的得分(误差小的，得分高)，
+	5. 记录相互变换中所有内点的得分之和作为该单元矩阵的得分，并更新匹配点对的内点外点标记。
+	
+步骤1: 误差阈值 th = 3.841; 得分最大值 thScore = 5.991; 误差方差倒数 invSigmaSquare
+步骤2: 遍历每一对2d-2d点对计算误差：
+
+        如： p2 ->  F12  -> p1 
+		     |f1   f2   f3|     |u1|
+	|u2 v2 1| *  |f4   f5   f6|  *  |v1|    = 0 , 应该=0 不等于零的就是误差
+		     |f7   f8   f9|     |1|
+前两项展开得到：
+	a1 = f1*u2 + f4*v2 + f7;
+	b1 = f2*u2 + f5*v2 + f8;
+	c1 = f3*u2 + f6*v2 + f9;
+得到：
+		     |u1|
+	|a1 b1 c1| * |v1| = 0 ，其实就是点 (u1, v1) 在线段 (a1, b1, c1) 上的形式
+		     |1|
+极线l1：a1*x + b1*y + c1 = 0,这里把p2投影到帧1平面上对应的极线形式,p1应该在上面。
+点p1,(u1,v1) 到 l1的距离为：    
+        d = |a1*u + b1*v + c| / sqrt(a1^2 + b1^2) 
+距离平方：
+        chiSquare1 = d^2 = (a1*u + b1*v + c)^2 / (a1^2 + b1^2)
+
+根据方差归一化误差:
+	const float chiSquare1 = squareDist1*invSigmaSquare;
+	
+使用阈值更新内外点标记 并记录内点得分:
+	if(chiSquare1 > th)
+	    bIn = false;                  // 距离大于阈值  该点 变换的效果差，记录为外点
+	else
+	    score += thScore - chiSquare1;// 得分上限 - 距离差值 得到 得分，差值越小，得分越高
+
+同时记录 p1 ->  F21  -> p2 的误差，也如上述步骤。
+更新内外点记录数组：
+	if(bIn)
+		vbMatchesInliers[i]=true;// 是内点  误差较小
+	else
+		vbMatchesInliers[i]=false;// 是野点 误差较大
+```
+
+
+
 
 ### b. homography(单应性矩阵) 随机采样 找到最好的单元矩阵 Initializer::FindHomography()
 ```asm
-	思想：
-		计算单应矩阵,随机采样序列8点法,采用归一化的直接线性变换（normalized DLT）求解，
-		假设场景为平面情况下通过前两帧求取Homography矩阵(current frame 2 到 reference frame 1)，
-		在最大迭代次数内调用 ComputeH21计算H,
-		使用 CheckHomography 计算此单应变换得分，
-		在最大迭代次数内保留最高得分的单应矩阵H。
+思想：
+计算单应矩阵,随机采样序列4点法,采用归一化的直接线性变换（normalized DLT）求解，
+假设场景为平面情况下通过前两帧求取Homography矩阵(current frame 2 到 reference frame 1)，
+在最大迭代次数内调用 ComputeH21计算H,
+使用 CheckHomography 计算此单应变换得分，
+在最大迭代次数内保留最高得分的单应矩阵H。
 
-	步骤：
-		步骤1：将两帧上对应的2d-2d匹配点对进行归一化
-			Initializer::Normalize(mvKeys1,vPn1, T1);//  mvKeys1原坐标 vPn1归一化坐标，T1标准化矩阵
-			Initializer::Normalize(mvKeys2,vPn2, T2);// 
-			cv::Mat T2inv = T2.inv();// 标准化矩阵 逆矩阵
-		步骤2：在最大迭代次数mMaxIterations内，从标准化后的点中随机选取8对点对
-			int idx = mvSets[it][j];//随机数集合 总匹配点数范围内
-			vPn1i[j] = vPn1[mvMatches12[idx].first];
-			vPn2i[j] = vPn2[mvMatches12[idx].second]; 
-		步骤3：通过标准化逆矩阵和标准化点对的单应变换计算原点对的单应变换矩阵 Initializer::ComputeH21()
-			cv::Mat Hn = ComputeH21(vPn1i,vPn2i);// 计算 标准化后的点对 对应的 单应矩阵Hn
-			// H21i = T2逆 * Hn * T1  见上面  0步骤的推导
-			H21i = T2inv * Hn * T1;// 原始点    p1 -----------> p2 的单应
-			H12i = H21i.inv();     // 原始点    p2 -----------> p1 的单应
-		步骤4：通过计算重投影误差来计算单应矩阵的好坏，得分 
-                        currentScore =Initializer::CheckHomography(); 
-		步骤5：保留迭代中，得分最高的单应矩阵和对应的得分
-			if(currentScore > score)//此次迭代 计算的单应H的得分较高
-			{
-			    H21 = H21i.clone();//保留较高得分的单应
-			    vbMatchesInliers = vbCurrentInliers;//对应的匹配点对   
-			    score = currentScore;// 最高的得分
-			}
+步骤：
+步骤1：将两帧上对应的2d-2d匹配点对进行归一化
+	Initializer::Normalize(mvKeys1,vPn1, T1);//  mvKeys1原坐标 vPn1归一化坐标，T1标准化矩阵
+	Initializer::Normalize(mvKeys2,vPn2, T2);// 
+	cv::Mat T2inv = T2.inv();                // 标准化矩阵 逆矩阵
+步骤2：在最大迭代次数mMaxIterations内，从标准化后的点中随机选取8对点对
+	int idx = mvSets[it][j];                 //随机数集合 总匹配点数范围内
+	vPn1i[j] = vPn1[mvMatches12[idx].first];
+	vPn2i[j] = vPn2[mvMatches12[idx].second]; 
+步骤3：通过标准化逆矩阵和标准化点对的单应变换计算原点对的单应变换矩阵 Initializer::ComputeH21()
+	cv::Mat Hn = ComputeH21(vPn1i,vPn2i);// 计算 标准化后的点对 对应的 单应矩阵Hn
+	// H21i = T2逆 * Hn * T1  见上面  0步骤的推导
+	H21i = T2inv * Hn * T1;// 原始点    p1 -----------> p2 的单应
+	H12i = H21i.inv();     // 原始点    p2 -----------> p1 的单应
+步骤4：通过计算重投影误差来计算单应矩阵的好坏，得分 
+	currentScore =Initializer::CheckHomography(); 
+步骤5：保留迭代中，得分最高的单应矩阵和对应的得分
+	if(currentScore > score)//此次迭代 计算的单应H的得分较高
+	{
+	    H21 = H21i.clone();//保留较高得分的单应
+	    vbMatchesInliers = vbCurrentInliers;//对应的匹配点对   
+	    score = currentScore;// 最高的得分
+	}
 ```
 #### Initializer::ComputeH21()  4对点直接线性变换求解H矩阵
 ```asm
-	一点对：
-		p2   =  H21 * p1
-	写成矩阵形式：
-		u2         h1  h2  h3       u1
-		v2  =      h4  h5  h6    *  v1
-		1          h7  h8  h9       1  
+一点对：
+	p2   =  H21 * p1
+写成矩阵形式：
+	u2         h1  h2  h3       u1
+	v2  =      h4  h5  h6    *  v1
+	1          h7  h8  h9       1  
 
-	可以使用叉乘 得到0    p2叉乘p2 = H21 *p1 = 0 
-		| 0 -1  v2|    |h1 h2 h3|      |u1|    |0|
-		| 1  0 -u2| *  |h4 h5 h6| *    |v1| =  |0|
-		|-v2 u2  0|    |h7 h8 h9|      |1 |    |0|
+可以使用叉乘 得到0    p2叉乘p2 = H21 *p1 = 0 
+	| 0 -1  v2|    |h1 h2 h3|      |u1|    |0|
+	| 1  0 -u2| *  |h4 h5 h6| *    |v1| =  |0|
+	|-v2 u2  0|    |h7 h8 h9|      |1 |    |0|
 
-	也可以展开得到(使用第三项进行归一化)：
-		u2 = (h1*u1 + h2*v1 + h3) /( h7*u1 + h8*v1 + h9)
-		v2 = (h4*u1 + h5*v1 + h6) /( h7*u1 + h8*v1 + h9)
-	写成矩阵形式：
-		-((h4*u1 + h5*v1 + h6) - ( h7*u1*v2 + h8*v1*v2 + h9*v2))=0  右乘分子，再移动得0
-		h1*u1    + h2*v1 + h3  - ( h7*u1*u2 + h8*v1*u2 + h9*u2) =0
+也可以展开得到(使用第三项进行归一化)：
+	u2 = (h1*u1 + h2*v1 + h3) /( h7*u1 + h8*v1 + h9)
+	v2 = (h4*u1 + h5*v1 + h6) /( h7*u1 + h8*v1 + h9)
+写成矩阵形式：
+	-((h4*u1 + h5*v1 + h6) - ( h7*u1*v2 + h8*v1*v2 + h9*v2))=0  右乘分子，再移动得0
+	h1*u1    + h2*v1 + h3  - ( h7*u1*u2 + h8*v1*u2 + h9*u2) =0
 
-		|0    0   0  -u1  -v1  -1   u1*v2   v1*v2    v2|
-		|u1 v1    1  0    0    0   -u1*u2  - v1*u2  -u2| *|h1 h2 h3 h4 h5 h6 h7 h8 h9|转置  = 0
-	一对点提供两个约束：H 9个元素，8个自由度，包含一个比例因子(尺度来源)，需要四对点
-	四对点提供8个约束方程,可以写成矩阵形式：
-	 A * h = 0
-	对A进行SVD奇异值分解 [U,S,V]=svd(A)，其中U和V代表二个相互正交矩阵，而S代表一对角矩阵
-	cv::SVDecomp(A,S,U,VT,SVD::FULL_UV);  //后面的FULL_UV表示把U和VT补充称单位正交方阵	
-	H = VT.row(8).reshape(0, 3);// v的最后一列
+	|0    0   0  -u1  -v1  -1   u1*v2   v1*v2    v2|
+	|u1 v1    1  0    0    0   -u1*u2  - v1*u2  -u2| *|h1 h2 h3 h4 h5 h6 h7 h8 h9|转置  = 0
+一对点提供两个约束：H 9个元素，8个自由度，包含一个比例因子(尺度来源)，需要四对点
+四对点提供8个约束方程,可以写成矩阵形式：
+ A * h = 0
+对A进行SVD奇异值分解 [U,S,V]=svd(A)，其中U和V代表二个相互正交矩阵，而S代表一对角矩阵
+cv::SVDecomp(A,S,U,VT,SVD::FULL_UV);  //后面的FULL_UV表示把U和VT补充称单位正交方阵	
+H = VT.row(8).reshape(0, 3);// v的最后一列
 
-	SVD奇异值分解 解齐次方程组（Ax = 0）原理：
-		把问题转化为最小化|| Ax ||2的非线性优化问题，
-		我们已经知道了x = 0是该方程组的一个特解，
-		为了避免x = 0这种情况（因为在实际的应用中x = 0往往不是我们想要的），
-		我们增加一个约束，比如|| x ||2 = 1，
-		这样，问题就变为：
-		min(|| Ax ||2) ， || x ||2 = 1 或 min(|| Ax ||) ， || x || = 1
-		对矩阵A进行分解 A = UDV'
-		 || Ax || = || UDV' x || = || DV' x||
-		 ( 对于一个正交矩阵U，满足这样一条性质： || UD || = || D || , 
-		   正交矩阵，正交变换，仅仅对向量，只产生旋转，无尺度缩放，和变形，即模长不变)
+SVD奇异值分解 解齐次方程组（Ax = 0）原理：
+	把问题转化为最小化|| Ax ||2的非线性优化问题，
+	我们已经知道了x = 0是该方程组的一个特解，
+	为了避免x = 0这种情况（因为在实际的应用中x = 0往往不是我们想要的），
+	我们增加一个约束，比如|| x ||2 = 1，
+	这样，问题就变为：
+	min(|| Ax ||2) ， || x ||2 = 1 或 min(|| Ax ||) ， || x || = 1
+	对矩阵A进行分解 A = UDV'
+	 || Ax || = || UDV' x || = || DV' x||
+	 ( 对于一个正交矩阵U，满足这样一条性质： || UD || = || D || , 
+	   正交矩阵，正交变换，仅仅对向量，只产生旋转，无尺度缩放，和变形，即模长不变)
 
-		令y = V'x， 因此，问题变为min(|| Dy ||)， 
-		因为|| x || = 1, V'为正交矩阵，则|| y || = 1。
-		由于D是一个对角矩阵，对角元的元素按递减的顺序排列，因此最优解在y = (0, 0,..., 1)'
-		又因为x = Vy， 所以最优解x，就是V的最小奇异值对应的列向量，
-		比如，最小奇异值在第8行8列，那么x = V的第8个列向量。
+	令y = V'x， 因此，问题变为min(|| Dy ||)， 
+	因为|| x || = 1, V'为正交矩阵，则|| y || = 1。
+	由于D是一个对角矩阵，对角元的元素按递减的顺序排列，因此最优解在y = (0, 0,..., 1)'
+	又因为x = Vy， 所以最优解x，就是V的最小奇异值对应的列向量，
+	比如，最小奇异值在第8行8列，那么x = V的第8个列向量。
 ```
 #### 计算单应变换得分 Initializer::CheckHomography()
 ```asm
-	思想:
-		1. 根据单应变换，可以求得两组对点相互变换得到的误差平方和，
-		2. 基于卡方检验计算出的阈值（假设测量有一个像素的偏差），
-		3. 误差大的记录为外点，误差小的记录为内点，
-		4. 使用阈值减去内点的误差，得到该匹配点对的得分(误差小的，得分高)，
-		5. 记录相互变换中所有内点的得分之和作为该单元矩阵的得分，并更新匹配点对的内点外点标记。
+思想:
+	1. 根据单应变换，可以求得两组对点相互变换得到的误差平方和，
+	2. 基于卡方检验计算出的阈值（假设测量有一个像素的偏差），
+	3. 误差大的记录为外点，误差小的记录为内点，
+	4. 使用阈值减去内点的误差，得到该匹配点对的得分(误差小的，得分高)，
+	5. 记录相互变换中所有内点的得分之和作为该单元矩阵的得分，并更新匹配点对的内点外点标记。
 
-	步骤1：获取单应变换误差阈值th,以及误差归一化的方差倒数    
-		const float th = 5.991;                        // 单应变换误差 阈值
-		const float invSigmaSquare = 1.0/(sigma*sigma);//方差 倒数，用于将误差归一化
+步骤1：获取单应变换误差阈值th,以及误差归一化的方差倒数    
+	const float th = 5.991;                        // 单应变换误差 阈值
+	const float invSigmaSquare = 1.0/(sigma*sigma);//方差 倒数，用于将误差归一化
 
-	步骤2：遍历每个点对，计算单应矩阵 变换 时产生 的 对称的转换误差
-	  p1点 变成 p2点  p2 = H21*p1---------------------------------------
-		|u2'|      |h11  h12  h13|     |u1|    |h11*u1 + h12*v1 + h13|
-		|v2'|  =   |h21  h22  h23|  *  |v1| =  |h21*u1 + h22*v1 + h23|
-		|1|        |h31  h32  h33|     |1|     |h31*u1 + h32*v1 + h33|
-		 使用第三行进行归一化： u2' = (h11*u1 + h12*v1 + h13)/(h31*u1 + h32*v1 + h33);
-				      v2' = (h21*u1 + h22*v1 + h23)/(h31*u1 + h32*v1 + h33);
-		 所以 p1通过 H21 投影到另一帧上 应该和p2的左边一致，但是实际不会一致，可以求得坐标误差
-		 误差平方和            squareDist2 = (u2-u2')*(u2-u2') + (v2-v2')*(v2-v2');
-		 使用方差倒数进行归一化 chiSquare2 = squareDist2*invSigmaSquare;
+步骤2：遍历每个点对，计算单应矩阵 变换 时产生 的 对称的转换误差
+  p1点 变成 p2点  p2 = H21*p1---------------------------------------
+	|u2'|      |h11  h12  h13|     |u1|    |h11*u1 + h12*v1 + h13|
+	|v2'|  =   |h21  h22  h23|  *  |v1| =  |h21*u1 + h22*v1 + h23|
+	|1|        |h31  h32  h33|     |1|     |h31*u1 + h32*v1 + h33|
+	 使用第三行进行归一化： u2' = (h11*u1 + h12*v1 + h13)/(h31*u1 + h32*v1 + h33);
+			      v2' = (h21*u1 + h22*v1 + h23)/(h31*u1 + h32*v1 + h33);
+	 所以 p1通过 H21 投影到另一帧上 应该和p2的左边一致，但是实际不会一致，可以求得坐标误差
+	 误差平方和            squareDist2 = (u2-u2')*(u2-u2') + (v2-v2')*(v2-v2');
+	 使用方差倒数进行归一化 chiSquare2 = squareDist2*invSigmaSquare;
 
-	   使用阈值更新内外点标记 并记录内点得分:
-		if(chiSquare2>th)
-			bIn = false;              //距离大于阈值  该点 变换的效果差，记录为外点
-		else
-			score += th - chiSquare2; // 阈值 - 距离差值 得到 得分，差值越小  得分越高
+  使用阈值更新内外点标记 并记录内点得分:
+	if(chiSquare2>th)
+		bIn = false;              //距离大于阈值  该点 变换的效果差，记录为外点
+	else
+		score += th - chiSquare2; // 阈值 - 距离差值 得到 得分，差值越小  得分越高
 
-	   p2点 变成 p1点  p1 = H12 * p2 ------------------------------------
-		 |u1'|     |h11inv   h12inv   h13inv|    |u2|   |h11inv*u2 + h12inv*v2 + h13inv|
-		 |v1'|  =  |h21inv   h22inv   h23inv|  * |v2| = |h21inv*u2 + h22inv*v2 + h23inv|
-		 |1|       |h31inv   h32inv   h33inv|    |1|    |h31inv*u2 + h32inv*v2 + h33inv|
-		 使用第三行进行归一化： u1' = (h11inv*u2 + h12inv*v2 + h13inv)/(h31inv*u2 + h32inv*v2 + h33inv);
-				      v1' = (h21inv*u2 + h22inv*v2 + h23inv)/(h31inv*u2 + h32inv*v2 + h33inv);
-		 所以 p1通过 H21 投影到另一帧上 应该和p2的左边一致，但是实际不会一致，可以求得坐标误差
-		 误差平方和            squareDist1 = (u1-u1')*(u1-u1') + (v1-v1')*(v1-v1');
-		 使用方差倒数进行归一化 chiSquare1 = squareDist1*invSigmaSquare; 
+  p2点 变成 p1点  p1 = H12 * p2 ------------------------------------
+	 |u1'|     |h11inv   h12inv   h13inv|    |u2|   |h11inv*u2 + h12inv*v2 + h13inv|
+	 |v1'|  =  |h21inv   h22inv   h23inv|  * |v2| = |h21inv*u2 + h22inv*v2 + h23inv|
+	 |1|       |h31inv   h32inv   h33inv|    |1|    |h31inv*u2 + h32inv*v2 + h33inv|
+	 使用第三行进行归一化： u1' = (h11inv*u2 + h12inv*v2 + h13inv)/(h31inv*u2 + h32inv*v2 + h33inv);
+			      v1' = (h21inv*u2 + h22inv*v2 + h23inv)/(h31inv*u2 + h32inv*v2 + h33inv);
+	 所以 p1通过 H21 投影到另一帧上 应该和p2的左边一致，但是实际不会一致，可以求得坐标误差
+	 误差平方和            squareDist1 = (u1-u1')*(u1-u1') + (v1-v1')*(v1-v1');
+	 使用方差倒数进行归一化 chiSquare1 = squareDist1*invSigmaSquare; 
 
-	   使用阈值更新内外点标记 并记录内点得分:
-		if(chiSquare1>th)    
-			bIn = false;             // 距离大于阈值  该点 变换的效果差，记录为外点
-		else
-			score += th - chiSquare1;// 阈值 - 距离差值 得到 得分，差值越小  得分越高
+  使用阈值更新内外点标记 并记录内点得分:
+	if(chiSquare1>th)    
+		bIn = false;             // 距离大于阈值  该点 变换的效果差，记录为外点
+	else
+		score += th - chiSquare1;// 阈值 - 距离差值 得到 得分，差值越小  得分越高
 
-	   更新内外点记录数组：
-		if(bIn)
-			vbMatchesInliers[i]=true;// 是内点  误差较小
-		else
-			vbMatchesInliers[i]=false;// 是野点 误差较大
+  更新内外点记录数组：
+	if(bIn)
+		vbMatchesInliers[i]=true;// 是内点  误差较小
+	else
+		vbMatchesInliers[i]=false;// 是野点 误差较大
 ```
 
 ### c. 基础矩阵F恢复R,t  Initializer::ReconstructF()
@@ -529,8 +667,6 @@
 ### d. 单应矩阵H恢复R,t  Initializer::ReconstructH()
 	
 ### e. 创建初始地图      CreateInitialMapMonocular();
-
-
 
 
 ## 2. 双目/RGBD初始化 Tracking::StereoInitialization()
