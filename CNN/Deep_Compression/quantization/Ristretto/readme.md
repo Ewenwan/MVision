@@ -5,10 +5,11 @@
     Ristretto是Caffe的扩展，允许以有限的数字精度测试、训练和微调网络。
     
     本文介绍了几种网络压缩的方法，压缩特征图和参数。
-    方法包括定点法（Fixed Point Approximation）、
-    动态定点法（Dynamic Fixed Point Approximation）、
-    迷你浮点法（Minifloat Approximation）和
-    乘法变移位法（Turning Multiplications Into Bit Shifts），
+    方法包括：
+        定点法（Fixed Point Approximation）、
+        动态定点法（Dynamic Fixed Point Approximation）、
+        迷你浮点法（Minifloat Approximation）和
+        乘法变移位法（Turning Multiplications Into Bit Shifts），
     所压缩的网络包括LeNet、CIFAR-10、AlexNet和CaffeNet等。
     注：Ristretto原指一种特浓咖啡（Caffe），本文的Ristretto沿用了Caffe的框架。
     
@@ -41,7 +42,7 @@
     下面解释了Ristretto的主要扩展：
     
 # Ristretto的主要扩展
-    1、Ristretto Layers
+## 1、新添加的层  Ristretto Layers
     
     Ristretto引入了新的有限数值精度层类型。
     这些层可以通过传统的Caffe网络描述文件（* .prototxt）使用。 
@@ -76,11 +77,11 @@
         2、增加了一个额外的层参数：quantization_param；
         3、该层参数包含用于量化的所有信息。
         
-    2、 Blobs
+## 2、 数据存储 Blobs
         Ristretto允许精确模拟资源有限的硬件加速器。
         为了与Caffe规则保持一致，Ristretto在层参数和输出中重用浮点Blob。
         这意味着有限精度数值实际上都存储在浮点数组中。
-    3、Scoring
+## 3、评价 Scoring
         对于量化网络的评分，Ristretto要求
           a. 训练好的32位FP网络参数
           b. 网络定义降低精度的层
@@ -93,6 +94,48 @@
             --weights=models/SqueezeNet/RistrettoDemo/squeezenet_finetuned.caffemodel \
             --gpu=0 --iterations=2000
 
+## 4、 网络微调 Fine-tuning
+
+      了提高精简网络的准确性，应该对其进行微调。
+      在Ristretto中，Caffe命令行工具支持精简网络微调。
+      与传统训练的唯一区别是网络描述文件应该包含Ristretto层。 
+
+
+      微调需要以下项目：
+
+         1、32位FP网络参数， 网络参数是Caffe全精度训练的结果。
+         2、用于训练的Solver和超参数
+            解算器（solver）包含有限精度网络描述文件的路径。
+            这个网络描述和我们用来评分的网络描述是一样的。
+```sh
+# fine-tune dynamic fixed point SqueezeNet*
+    ./build/tools/caffe train \
+      --solver=models/SqueezeNet/RistrettoDemo/solver_finetune.prototxt \
+      --weights=models/SqueezeNet/squeezenet_v1.0.caffemodel
+```
+
+## 5、 实施细节
+
+       在这个再训练过程中，网络学习如何用限定字参数对图像进行分类。
+       由于网络权重只能具有离散值，所以主要挑战在于权重更新。
+       我们采用以前的工作（Courbariaux等1）的思想，它使用全精度因子权重。
+       对32位FP权重w应用小权重更新，从中进行采样得到离散权重w'。
+       微调中的采样采用 随机舍入方法(Round nearest sampling)  进行，Gupta等2人成功地使用了这种方法，
+       以16位固定点来训练网络。
+       
+![](https://img-blog.csdn.net/20180516141818988?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpcmFuMTAz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+# Ristretto：逼近策略
+
+## 1、 定点法（Fixed Point Approximation） 
+
+## 2、 动态定点法（Dynamic Fixed Point Approximation）
+
+## 3、 迷你浮点法（Minifloat Approximation）
+
+## 4、  乘法变移位法（Turning Multiplications Into Bit Shifts）
+
+
 # Ristretto: SqueezeNet 示例
 
     1、下载原始 32bit FP 浮点数 网络权重
@@ -103,5 +146,9 @@
     3、
     4、
     5、
+
+
+
+
 
 
