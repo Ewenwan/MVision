@@ -125,6 +125,24 @@
        
 ![](https://img-blog.csdn.net/20180516141818988?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpcmFuMTAz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
+# 卷积运算复杂度
+
+    输入特征图input feature maps( IFM) ： 通道数量 N   
+    卷积核尺寸kernel：M*N*K*K  大小K*K 数量：M  每个卷积核的深度： N
+    输出特征图output feature map( OFM )： 通道数量 M尺寸大小(R,C, 与输入尺寸和步长、填充有关)
+
+```c
+for(m =0; m<M; m++)               // 每个卷积核
+   for(n =0; n<N; n++)            // 每个输入通道
+      for(r =0; r<R; r++)         // 输出尺寸的每一行
+         for(c =0; c<C; c++)      // 输出尺寸的每一列
+            for(i =0; i<K; i++)   // 方框卷积运算的每一行
+               for(j =0; j<K; j++)// 方框卷积运算的每一列
+                  OFM[m][r][c] += IFM[n][r*S + i][c*S + j] * kernel[m][n][i][j]; // S为卷积步长
+```
+    时间复杂度：    O(R*C*M*N*K^2)
+    卷积核参数数量：O(M*N*K^2)       内存复杂度
+
 # Ristretto：逼近策略
 
 ## 1、 定点法（Fixed Point Approximation） 
