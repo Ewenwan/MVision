@@ -196,10 +196,11 @@ for(m =0; m<M; m++)               // 每个卷积核
         float的内存结构，我用一个带位域的结构体描述如下：
         struct MYFLOAT
         {
-        bool bSign : 1;                // 符号，表示正负，1位
-        char cExponent : 8;            // 指数，8位
-        unsigned long ulMantissa : 23; // 尾数，23位
+        bool bSign : 1;                // S 符号，表示正负，1位
+        char cExponent : 8;            // E 指数，8位
+        unsigned long ulMantissa : 23; // M 尾数，23位
         };
+        // B = (-1)^S * 2^E * M
         
     8.5，用二进制的科学计数法表示为: 1.0001*2^3
     按照上面的存储方式，符号位为:0，表示为正，指数位为:3+127=130 ,尾数部分为1.0001，省略最前面的1，为 0001
@@ -224,7 +225,10 @@ for(m =0; m<M; m++)               // 每个卷积核
     而浮点格式可表示的数值的范围很大，但要求的处理硬件比较复杂。
     
     IL.FL
-    固定整数位二进制长度和小数位二进制长度
+    固定整数位二进制长度和小数位二进制长度。
+    最大表示数： 
+       Xmax = 2^(IL-1) - 2^(-FL)
+    
     32浮点数----->8位定点(Q4.4)
            ----->16位定点 ( Q8.8    Q9.7)
 ## 2、 动态定点法（Dynamic Fixed Point Approximation）
@@ -254,9 +258,38 @@ for(m =0; m<M; m++)               // 每个卷积核
     所以第二组的分数长度是-1，整数长度是9，位宽是8。
     第一组的分数长度为2，整数长度为6，位宽为8.
 
-
-
 ## 3、 迷你浮点法（Minifloat Approximation）
+    IEEE-754 32位浮点数:
+                struct MYFLOAT
+                {
+                bool bSign : 1;                // S 符号，表示正负，1位
+                char cExponent : 8;            // E 指数，8位
+                unsigned long ulMantissa : 23; // M 尾数，23位
+                };
+                // B = (-1)^S * 2^E * M
+        bSign --- cExponent --- ulMantissa
+        符号位 --- 指数位    --- 尾数位
+![](https://img-blog.csdn.net/20180516141919363?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lpcmFuMTAz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+    由于神经网络的训练是以浮点的方式完成的，
+    所以将这些模型压缩成比特宽度减少的浮点数是一种直观的方法。
+
+    为了压缩网络并减少计算和存储需求，Ristretto可以用比IEEE-754标准少得多的位表示浮点数。
+
+    我们在16bit、8bit甚至更小的数字上都遵循这个标准，但是我们的格式在一些细节上有所不同。
+
+    也就是说，根据分配给指数的比特数降低指数偏差：
+       bias = 2^(exp_bits−1) − 1, 这里exp_bits提供分配给指数的位数
+    与IEEE标准的另一个区别是我们不支持非规范化的数字，I
+
+    NF和NaN。INF由饱和数字代替，
+    非规格化数字NaN 由0代替。
+
+    最后，分配给指数和尾数部分的位数不遵循特定的规则。
+    更确切地说，Ristretto选择指数位，以避免发生饱和。  
+
+
+
 
 ## 4、  乘法变移位法（Turning Multiplications Into Bit Shifts）
 
