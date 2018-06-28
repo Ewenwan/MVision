@@ -349,6 +349,7 @@
 	     return ReconstructF(vbMatchesInliersF,F,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
 
 ### 0. 2D-2D配点对求变换矩阵前先进行标准化处理去 均值后再除以绝对矩 Initializer::Normalize()
+```asm
 	步骤1：计算两坐标的均值
 	       mean_x  =  sum(ui) / N ；
 	       mean_y  =  sum(vi) / N；
@@ -384,11 +385,13 @@
 		  T1*p1 -----> Hn -------> T2*p2 , T2*p2 = Hn*(T1*p1)
 		  左乘 T2逆 ，得到   p2 = T2逆 * Hn*(T1*p1)= H21i*p1
 		  H21i = T2逆 * Hn * T1
+```
 ### a. fundamental matrix(基础矩阵F)  随机采样 找到最好的 基础矩阵 Initializer::FindFundamental() 
 
 			
 
 ### b. homography(单应性矩阵) 随机采样 找到最好的单元矩阵 Initializer::FindHomography()
+```asm
 	思想：
 		计算单应矩阵,随机采样序列8点法,采用归一化的直接线性变换（normalized DLT）求解，
 		假设场景为平面情况下通过前两帧求取Homography矩阵(current frame 2 到 reference frame 1)，
@@ -410,8 +413,8 @@
 			// H21i = T2逆 * Hn * T1  见上面  0步骤的推导
 			H21i = T2inv * Hn * T1;// 原始点    p1 -----------> p2 的单应
 			H12i = H21i.inv();     // 原始点    p2 -----------> p1 的单应
-		步骤4：通过计算重投影误差来计算单应矩阵的好坏，得分 currentScore =Initializer::CheckHomography()
-
+		步骤4：通过计算重投影误差来计算单应矩阵的好坏，得分 
+                        currentScore =Initializer::CheckHomography(); 
 		步骤5：保留迭代中，得分最高的单应矩阵和对应的得分
 			if(currentScore > score)//此次迭代 计算的单应H的得分较高
 			{
@@ -419,7 +422,9 @@
 			    vbMatchesInliers = vbCurrentInliers;//对应的匹配点对   
 			    score = currentScore;// 最高的得分
 			}
+```
 #### Initializer::ComputeH21()  4对点直接线性变换求解H矩阵
+```asm
 	一点对：
 		p2   =  H21 * p1
 	写成矩阵形式：
@@ -465,6 +470,59 @@
 		由于D是一个对角矩阵，对角元的元素按递减的顺序排列，因此最优解在y = (0, 0,..., 1)'
 		又因为x = Vy， 所以最优解x，就是V的最小奇异值对应的列向量，
 		比如，最小奇异值在第8行8列，那么x = V的第8个列向量。
+```
+#### 计算单应变换得分 Initializer::CheckHomography()
+```asm
+	思想:
+		1. 根据单应变换，可以求得两组对点相互变换得到的误差平方和，
+		2. 基于卡方检验计算出的阈值（假设测量有一个像素的偏差），
+		3. 误差大的记录为外点，误差小的记录为内点，
+		4. 使用阈值减去内点的误差，得到该匹配点对的得分(误差小的，得分高)，
+		5. 记录相互变换中所有内点的得分之和作为该单元矩阵的得分，并更新匹配点对的内点外点标记。
+
+	步骤1：获取单应变换误差阈值th,以及误差归一化的方差倒数    
+		const float th = 5.991;                        // 单应变换误差 阈值
+		const float invSigmaSquare = 1.0/(sigma*sigma);//方差 倒数，用于将误差归一化
+
+	步骤2：遍历每个点对，计算单应矩阵 变换 时产生 的 对称的转换误差
+	  p1点 变成 p2点  p2 = H21*p1---------------------------------------
+		|u2'|      |h11  h12  h13|     |u1|    |h11*u1 + h12*v1 + h13|
+		|v2'|  =   |h21  h22  h23|  *  |v1| =  |h21*u1 + h22*v1 + h23|
+		|1|        |h31  h32  h33|     |1|     |h31*u1 + h32*v1 + h33|
+		 使用第三行进行归一化： u2' = (h11*u1 + h12*v1 + h13)/(h31*u1 + h32*v1 + h33);
+				      v2' = (h21*u1 + h22*v1 + h23)/(h31*u1 + h32*v1 + h33);
+		 所以 p1通过 H21 投影到另一帧上 应该和p2的左边一致，但是实际不会一致，可以求得坐标误差
+		 误差平方和            squareDist2 = (u2-u2')*(u2-u2') + (v2-v2')*(v2-v2');
+		 使用方差倒数进行归一化 chiSquare2 = squareDist2*invSigmaSquare;
+
+	   使用阈值更新内外点标记 并记录内点得分:
+		if(chiSquare2>th)
+			bIn = false;              //距离大于阈值  该点 变换的效果差，记录为外点
+		else
+			score += th - chiSquare2; // 阈值 - 距离差值 得到 得分，差值越小  得分越高
+
+	   p2点 变成 p1点  p1 = H12 * p2 ------------------------------------
+		 |u1'|     |h11inv   h12inv   h13inv|    |u2|   |h11inv*u2 + h12inv*v2 + h13inv|
+		 |v1'|  =  |h21inv   h22inv   h23inv|  * |v2| = |h21inv*u2 + h22inv*v2 + h23inv|
+		 |1|       |h31inv   h32inv   h33inv|    |1|    |h31inv*u2 + h32inv*v2 + h33inv|
+		 使用第三行进行归一化： u1' = (h11inv*u2 + h12inv*v2 + h13inv)/(h31inv*u2 + h32inv*v2 + h33inv);
+				      v1' = (h21inv*u2 + h22inv*v2 + h23inv)/(h31inv*u2 + h32inv*v2 + h33inv);
+		 所以 p1通过 H21 投影到另一帧上 应该和p2的左边一致，但是实际不会一致，可以求得坐标误差
+		 误差平方和            squareDist1 = (u1-u1')*(u1-u1') + (v1-v1')*(v1-v1');
+		 使用方差倒数进行归一化 chiSquare1 = squareDist1*invSigmaSquare; 
+
+	   使用阈值更新内外点标记 并记录内点得分:
+		if(chiSquare1>th)    
+			bIn = false;             // 距离大于阈值  该点 变换的效果差，记录为外点
+		else
+			score += th - chiSquare1;// 阈值 - 距离差值 得到 得分，差值越小  得分越高
+
+	   更新内外点记录数组：
+		if(bIn)
+			vbMatchesInliers[i]=true;// 是内点  误差较小
+		else
+			vbMatchesInliers[i]=false;// 是野点 误差较大
+```
 
 ### c. 基础矩阵F恢复R,t  Initializer::ReconstructF()
 
