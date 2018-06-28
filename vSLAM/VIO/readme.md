@@ -3,6 +3,8 @@
 ![](https://pic2.zhimg.com/v2-18cb9f97ac7f759a128b789b681c534f_1200x500.jpg)
 
 
+[视觉惯性单目SLAM知识 ](https://blog.csdn.net/myarrow/article/details/54694472)
+
       IO和之前的几种SLAM最大的不同在于两点：
         首先，VIO在硬件上需要传感器的融合，包括相机和六轴陀螺仪，
              相机产生图片，
