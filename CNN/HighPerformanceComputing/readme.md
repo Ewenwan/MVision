@@ -38,6 +38,10 @@
      
       
 # 在深度神经网络中 特指提高卷积计算方式的方法
+      0、小米 mace
+[代码](https://github.com/Ewenwan/mace)
+      
+      Mobile AI Compute Engine (MACE) 是一个专为移动端异构计算平台优化的神经网络计算框架。
 
       1、OpenVINO
       Intel推出OpenVINO工具包，将计算机视觉带到物联网终端
