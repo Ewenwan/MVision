@@ -478,7 +478,7 @@ S.at<float>(2)=0;                     //  基础矩阵的秩为2，重要的约�
 F21 = U * cv::Mat::diag(S)* VT        // 再合成F
 
 ```
-#### Initializer::CheckFundamental() 计算基本矩阵得分
+#### Initializer::CheckFundamental() 计算基本矩阵得分       得分为SF
 ```asm
 思想:
 	1. 根据基本矩阵，可以求得两组对点相互变换得到的误差平方和，
@@ -515,7 +515,7 @@ F21 = U * cv::Mat::diag(S)* VT        // 再合成F
 	if(chiSquare1 > th)
 	    bIn = false;                  // 距离大于阈值  该点 变换的效果差，记录为外点
 	else
-	    score += thScore - chiSquare1;// 得分上限 - 距离差值 得到 得分，差值越小，得分越高
+	    score += thScore - chiSquare1;// 得分上限 - 距离差值 得到 得分，差值越小，得分越高      得分为SF
 
 同时记录 p1 ->  F21  -> p2 的误差，也如上述步骤。
 更新内外点记录数组：
@@ -524,9 +524,6 @@ F21 = U * cv::Mat::diag(S)* VT        // 再合成F
 	else
 		vbMatchesInliers[i]=false;// 是野点 误差较大
 ```
-
-
-
 
 ### b. homography(单应性矩阵) 随机采样 找到最好的单元矩阵 Initializer::FindHomography()
 ```asm
@@ -609,7 +606,7 @@ SVD奇异值分解 解齐次方程组（Ax = 0）原理：
 	又因为x = Vy， 所以最优解x，就是V的最小奇异值对应的列向量，
 	比如，最小奇异值在第8行8列，那么x = V的第8个列向量。
 ```
-#### 计算单应变换得分 Initializer::CheckHomography()
+#### 计算单应变换得分 Initializer::CheckHomography()      得分为SH
 ```asm
 思想:
 	1. 根据单应变换，可以求得两组对点相互变换得到的误差平方和，
@@ -653,7 +650,7 @@ SVD奇异值分解 解齐次方程组（Ax = 0）原理：
 	if(chiSquare1>th)    
 		bIn = false;             // 距离大于阈值  该点 变换的效果差，记录为外点
 	else
-		score += th - chiSquare1;// 阈值 - 距离差值 得到 得分，差值越小  得分越高
+		score += th - chiSquare1;// 阈值 - 距离差值 得到 得分，差值越小  得分越高  SH
 
   更新内外点记录数组：
 	if(bIn)
@@ -662,10 +659,84 @@ SVD奇异值分解 解齐次方程组（Ax = 0）原理：
 		vbMatchesInliers[i]=false;// 是野点 误差较大
 ```
 
-### c. 基础矩阵F恢复R,t  Initializer::ReconstructF()
+#### 从两个模型 H F 得分为 Sh   Sf 中选着一个 最优秀的 模型 的方法为
+	文中认为，当场景是一个平面、或近似为一个平面、或者视差较小的时候，可以使用单应性矩阵H恢复运动，
+	当场景是一个非平面、视差大的场景时，使用基础矩阵F恢复运动,
+	两个变换矩阵得分分别为 SH 、SF,
+        根据两者得分计算一个评价指标RH:
+	RH = SH / ( SH + SF)
+	当大于0.45时，选择从单应性变换矩阵还原运动,反之使用基础矩阵恢复运动。
+	不过ORB_SLAM2源代码中使用的是0.4作为阈值。
 
-### d. 单应矩阵H恢复R,t  Initializer::ReconstructH()
-	
+### c. 单应矩阵H恢复R,t  Initializer::ReconstructH()
+	单应矩阵恢复  旋转矩阵 R 和平移向量t
+	p2   =  H21 * p1   
+	p2 = K( RP + t)  = KTP = H21 * KP  
+	A = T =  K 逆 * H21*K = [ R t; 0 0 0 1]
+	对A进行奇异值分解
+	cv::SVD::compute(A,w,U,Vt,cv::SVD::FULL_UV);
+	使用FAUGERAS的论文[1]的方法，提出8种运动假设,分别可以得到8组R,t
+	正常来说，第二帧能够看到的点都在相机的前方，即深度值Z大于0.
+	但是如果在低视差的情况下，使用 三角变换Initializer::Triangulate() 得到的3d点云，
+	使用 Initializer::CheckRT() 统计符合该R，t的内点数量。
+#### Initializer::Triangulate() 使用2d-2d点对 和 变换矩阵 R，t 三角变换恢复2d点对应的3d点
+	Trianularization: 已知匹配特征点对{p1  p2} 和 
+	各自相机投影矩阵{P1 P2}, P1 = K*[I 0], P2 = K*[R t], 尺寸为[3,4]
+	估计三维点 X3D
+	     p1 = P1 * X3D
+	     p2 = P2 * X3D
+	采用直接线性变换DLT的方法(将式子变换成A*X=0的形式后使用SVD奇异值分解求解线性方程组)：
+	对于 p1 = P1 * X3D: 方程两边 左边叉乘 p1，可使得式子为0
+	p1叉乘P1*X3D = 0
+	其叉乘矩阵为:
+	叉乘矩阵 =  
+		  |0  -1  y|
+		  |1   0 -x| 
+		  |-y  x  0| 
+	上述等式可写: 
+	  |0  -1  y|  |P1.row(0)|  
+	  |1   0 -x| *|P1.row(1)|* X3D = 0
+	  |-y  x  0|  |P1.row(2)|  
+
+	对于第一行 |0  -1  y| 会与P的三行分别相乘 得到四个值 与齐次3d点坐标相乘得到 0
+	有 (y * P1.row(2) - P1.row(1) ) * X3D = 0
+	对于第二行 |1   0 -x|有：
+	有 (x * P1.row(2) - P1.row(0) ) * X3D = 0
+	得到两个约束，另外一个点 p2 = P2 * X3D,也可以得到两个式子：
+	(y‘ * P2.row(2) - P2.row(1) ) * X3D = 0
+	(x’ * P2.row(2) - P2.row(0) ) * X3D = 0
+	写成 A*X = 0的形式有：
+	A =(维度4*4)
+	|y * P1.row(2) - P1.row(1) |
+	|x * P1.row(2) - P1.row(0) |
+	|y‘ * P2.row(2) - P2.row(1)|
+	|x’ * P2.row(2) - P2.row(0)|
+	对A进行奇异值分解求解X
+	cv::SVD::compute(A,w,u,vt,cv::SVD::MODIFY_A| cv::SVD::FULL_UV);
+	x3D = vt.row(3).t();// vt的最后一列,为X的解
+	x3D = x3D.rowRange(0,3)/x3D.at<float>(3);//  转换成非齐次坐标  归一化
+
+#### initializer::CheckRT() 计算R , t 的得分(内点数量)
+	统计规则，使用 Initializer::Triangulate()  三角化的3d点，
+	会有部分点云跑到相机的后面(Z<0)，该部分点是噪点，需要剔除.
+	另外一个准则是将上述符合条件的3d点分别重投影会前后两帧上，
+	与之前的orb特征点对的坐标做差，误差平方超过阈值，剔除。
+	统计剩余符合条件的点对数量。
+	在8种假设中，记录得到最大内点数量 和 次大内点数量 
+	当最大内点数量 远大于 次大内点数量( 有明显的差异性)，
+	该最大内点数量对应的R,t，具有较大的可靠性，返回该，R，t。
+
+
+### d. 基础矩阵F恢复R,t  Initializer::ReconstructF()
+	计算 本质矩阵 E  =  K转置 * F  * K
+	E = t叉乘 R
+	奇异值分解 E= U C  V   , U 、V 为正交矩阵， C 为奇异值矩阵  C =  diag(1, 1, 0)
+	从本质矩阵E 恢复 旋转矩阵R 和 平移向量t
+	有四种假设 得到四种 R,t
+	理论参考 Result 9.19 in Multiple View Geometry in Computer Vision
+	使用 initializer::CheckRT() 计算R , t 的得分(内点数量)
+	使用4中情况中得分最高的R,t 作为最终恢复的R，t
+ 
 ### e. 创建初始地图      CreateInitialMapMonocular();
 
 
