@@ -959,7 +959,7 @@ if(!bOK)// 当前帧与最近邻关键帧的匹配也失败了，那么意味着
 					     3d点坐标  ： e->Xw[0] Xw[1] Xw[2] 2d点对应的上一帧的3d点
 			 优化多次，根据误差，更新2d-3d匹配质量内外点标记，当前帧设置优化后的位姿。
 	    步骤8：如果优化时记录的匹配点对内点数量少于50，会把参考关键中还没有在当前帧有2d匹配的点反投影到当前帧下，再次搜索2d匹配点
-		   matcher2.SearchByProjection();
+		  ORBmatcher::SearchByProjection();
 	    步骤9： 如果再次反投影搜索的匹配点数量和之前得到的匹配点数量 大于50，再次使用 Optimizer::PoseOptimization() 优化算法进行优化
 	    步骤10：如果上面优化后的内点数量还比较少可以再次搜索 matcher2.SearchByProjection(),再次优化  Optimizer::PoseOptimization()
 	    步骤11：如果内点数量 大于等于50 ，则重定位成功。
@@ -970,22 +970,56 @@ if(!bOK)// 当前帧与最近邻关键帧的匹配也失败了，那么意味着
 	思想:
 		上面完成初始位姿的跟踪后，需要 使用局部地图(参考帧的一二级共视帧组成) 来 进行局部地图优化，来提高鲁棒性。
 		局部地图中与当前帧有相同点的关键帧序列成为一级相关帧K1，
-		而与一级相关帧K1有共视地图点的关键帧序列成为二级相关帧K2，在其中搜索局部地图点，投影到当前帧上，
+		而与一级相关帧K1有共视地图点的关键帧序列成为二级相关帧K2，
+		把局部地图中的局部地图点，投影到当前帧上，如果在当前帧的视野内
 		使用 位姿优化 Optimizer::PoseOptimization(&mCurrentFrame)， 进行优化，
 		更新 地图点的信息(关键帧的观测关系)
 	步骤：
-	     步骤1：
-	     步骤2：
-	     步骤3：
-	     步骤4：
-	     步骤5：
-	     步骤6：
-	     步骤7：
-	     步骤8：
-	     步骤9：
-	     步骤10：
-
-
+	     步骤1：首先对局部地图进行更新(UpdateLocalMap) 生成对应当前帧的局部地图(小图)
+	           Tracking::UpdateLocalMap();
+		     ---更新局部关键帧：Tracking::UpdateLocalKeyFrames();
+		             始终限制局部关键帧(小图中关键帧的数量)数量不超过80
+			     包含三个部分：
+			       1. 共视化程度高的关键帧： 观测到当前帧的地图点次数多的关键帧；
+			       2. 这些关键帧的孩子关键帧；(这里没看到具体的方式，应该就是根据时间顺序记录了一些父子关键帧)
+			       3. 这些关键帧的父亲关键帧。
+		     ---更新局部地图点：Tracking::UpdateLocalPoints();
+		            所有局部关键帧 包含的地图点构成 局部地图点
+			    遍历每一个局部关键帧的每一个地图点：
+			          加入到局部地图点中： mvpLocalMapPoints.push_back(pMP)；
+				  同时设置地图点更新标志，来避免重复添加出现在多帧上的地图点。
+	     步骤2：在局部地图中为当前帧搜索匹配点对
+	           Tracking::SearchLocalPoints();// 在对应当前帧的局部地图内搜寻和 当前帧地图点匹配点的 局部地图点
+	           1. 遍历当前帧的特征点，如果已经有相应的3D地图点,则进行标记，不需要进行重投影匹配，并且标记已经被遍历过
+	           2. 遍历局部地图的所有地图点，如果没有被遍历过，把地图点反投影到当前帧下，保留在当前帧视野内的地图点
+	           3. 根据反投影后的2d位置，设置一个半径为th的范围进行搜索匹配点
+	              SearchByProjection(mCurrentFrame,mvpLocalMapPoints,th);
+		      遍历可以匹配的点，计算描述子距离，记录最小的匹配距离，小于阈值的，再记录匹配点特征方向差值
+		      如果需要进行方向验证，剔除方向差直方图统计中，方向差值数量少的点对，保留前三个数量多的点对。
+	     步骤3：使用之前得到的初始位姿和 在局部地图中搜索到的3d-2d匹配点对，使用最小化重投影误差BA算法来优化位姿
+	            Optimizer::PoseOptimization(&mCurrentFrame);
+		    输入前一帧3d点 和 当前帧2d点对，以及帧的初始化位姿Tcw
+			3D-2D 最小化重投影误差 e = (u,v) - project(Tcw*Pw)，只优化Frame的Tcw，不优化MapPoints的坐标。
+			1. 顶点 Vertex: g2o::VertexSE3Expmap()，初始值为当前帧的Tcw
+			2. 边 Edge:
+			       单目
+			     - g2o::EdgeSE3ProjectXYZOnlyPose()，一元边 BaseUnaryEdge
+				 + 顶点 Vertex：待优化当前帧的Tcw
+				 + 测量值 measurement：MapPoint在当前帧中的二维位置(u,v)
+				 + 误差信息矩阵 InfoMatrix: Eigen::Matrix2d::Identity()*invSigma2(与特征点所在的尺度有关)
+				 + 附加信息： 相机内参数： e->fx fy cx cy
+					     3d点坐标  ： e->Xw[0] Xw[1] Xw[2] 2d点对应的上一帧的3d点
+				双目 
+			     - g2o::EdgeStereoSE3ProjectXYZOnlyPose()，BaseUnaryEdge
+				 + Vertex：待优化当前帧的Tcw
+				 + measurement：MapPoint在当前帧中的二维位置(ul,v, ur) 左相机3d点 右相机横坐标匹配点坐标ur
+				 + InfoMatrix: invSigma2(与特征点所在的尺度有关)
+				 + 附加信息： 相机内参数： e->fx fy cx cy
+					     3d点坐标  ： e->Xw[0] Xw[1] Xw[2] 2d点对应的上一帧的3d点
+			 优化多次，根据误差，更新2d-3d匹配质量内外点标记，当前帧设置优化后的位姿。
+	     步骤4：更新地图点状态
+	     步骤5：如果刚刚进行过重定位 则需要 内点匹配点对数 大于50 才认为 成功
+	           正常情况下，找到的内点匹配点对数 大于30 算成功
 
 # 4.5 闭环检测线程 LoopClosing
 [参考](https://blog.csdn.net/u010128736/article/details/53409199)
