@@ -799,7 +799,7 @@ if(!bOK)// 当前帧与最近邻关键帧的匹配也失败了，那么意味着
 
 ```
 
-### a. Tracking::TrackWithMotionModel() 跟踪上一帧模式， 相机移动量较大，当前帧和上一帧相差较大，做匹配三角变换可以获得很好的效果
+### a. Tracking::TrackWithMotionModel() 跟踪上一帧模式，两帧相差不大，对应位置区域领域半径搜索匹配点对
 	参考：
 		这个模型是假设物体处于匀速运动，例如匀速运动的汽车、机器人、行人等，
 		就可以用上一帧的位姿和速度来估计当前帧的位姿。
@@ -856,16 +856,57 @@ if(!bOK)// 当前帧与最近邻关键帧的匹配也失败了，那么意味着
 	    步骤7：如果2d-3d匹配效果差，被标记为外点，则当前帧2d点对于的3d点设置为空，留着以后再优化
 	    步骤8：根据内点的匹配数量，判断 跟踪上一帧是否成功。
 	    
-### b. Tracking::TrackReferenceKeyFrame() 跟踪参考帧模式，相机移动量较小，和上一帧相差不大，需要和前面的帧(参考帧)匹配
-	当使用运动模式匹配到的特征点数较少时，就会选用关键帧模式。
-	即尝试和最近一个关键帧去做匹配。为了快速匹配，本文利用了bag of words（BoW）来加速。
-	首先，计算当前帧的BoW，并设定初始位姿为上一帧的位姿；
-	其次，根据位姿和BoW词典来寻找特征匹配，使用函数matcher.SearchByBoW()；
-	最后，利用匹配的特征优化位姿。
+### b. Tracking::TrackReferenceKeyFrame() 跟踪参考帧模式，bow特征向量加速匹配
 
+	思想: 
+		当使用运动模式匹配到的特征点数较少时，就会选用关键帧模式。
+		即尝试和最近一个关键帧去做匹配。
+		为了快速匹配，本文利用了bag of words（BoW）来加速匹配。
+		首先，计算当前帧的BoW，并设定初始位姿为上一帧的位姿；
+		其次，根据两帧的BoW特征向量同属于一个node下来加速搜索匹配点对，使用函数matcher.SearchByBoW()；
+		最后，利用匹配的特征优化位姿。
 
-	
-	
+	步骤：
+		步骤1：创建 ORB特征点匹配器 最小距离 < 0.7*次小距离 匹配成功
+		      ORBmatcher matcher(0.7,true);
+		步骤2: 在当前帧 和 参考关键帧帧之间搜索匹配点对(需要>15对匹配点对，否者失败)
+		      ORBmatcher::SearchByBoW(mpReferenceKF,mCurrentFrame,vpMapPointMatches);
+		      计算当前帧 和 参考帧 orb特征的 词袋表示的 词典表示向量，属于同一个词典node下的点才可能是撇屁颠对
+		      遍历所有的参考帧特征点 和 当前帧特征点：
+		      同一个词典node下，有一些属于参考帧的点，也有一些属于当前帧的点，其中有一些匹配点。
+		      遍历属于一个node下的 参考帧的点
+			      遍历对应node下的当前帧的点
+				  计算orb描述子之间的距离
+				       记录最小的距离和次小的距离
+			      最小的距离小于阈值，且最小的距离明显小于次小的距离的话，
+			      记录次匹配点对特征的方向差，统计到方向差直方图
+		      如果需要根据方向一致性剔除不好的匹配点：
+			      计算方向差直方图中三个计数最多的方向差，
+			      根据数量差异选择保留第一/第一+第二/第一+第二+第三方向差对应的匹配点对。
+                步骤3：设置当前帧位置为上一帧的位姿，使用步骤2得到的匹配点对3d-2d点对，进行 当前帧位姿的优化
+		        Optimizer::PoseOptimization(&mCurrentFrame);
+			输入前一帧3d点 和 当前帧2d点对，以及帧的初始化位姿Tcw
+			3D-2D 最小化重投影误差 e = (u,v) - project(Tcw*Pw)，只优化Frame的Tcw，不优化MapPoints的坐标。
+			1. 顶点 Vertex: g2o::VertexSE3Expmap()，初始值为当前帧的Tcw
+			2. 边 Edge:
+			       单目
+			     - g2o::EdgeSE3ProjectXYZOnlyPose()，一元边 BaseUnaryEdge
+				 + 顶点 Vertex：待优化当前帧的Tcw
+				 + 测量值 measurement：MapPoint在当前帧中的二维位置(u,v)
+				 + 误差信息矩阵 InfoMatrix: Eigen::Matrix2d::Identity()*invSigma2(与特征点所在的尺度有关)
+				 + 附加信息： 相机内参数： e->fx fy cx cy
+					     3d点坐标  ： e->Xw[0] Xw[1] Xw[2] 2d点对应的上一帧的3d点
+				双目 
+			     - g2o::EdgeStereoSE3ProjectXYZOnlyPose()，BaseUnaryEdge
+				 + Vertex：待优化当前帧的Tcw
+				 + measurement：MapPoint在当前帧中的二维位置(ul,v, ur) 左相机3d点 右相机横坐标匹配点坐标ur
+				 + InfoMatrix: invSigma2(与特征点所在的尺度有关)
+				 + 附加信息： 相机内参数： e->fx fy cx cy
+					     3d点坐标  ： e->Xw[0] Xw[1] Xw[2] 2d点对应的上一帧的3d点
+			 优化多次，根据误差，更新2d-3d匹配质量内外点标记，当前帧设置优化后的位姿。
+	        步骤4：如果2d-3d匹配效果差，被标记为外点，则当前帧2d点对于的3d点设置为空，留着以后再优化
+	        步骤5：根据内点的匹配数量，判断 跟踪上一帧是否成功。
+		
 ### c. bool Tracking::Relocalization() 上面两种模式都没有跟踪成功，需要使用重定位模式，使用orb字典编码在关键帧数据库中找相似的关键帧，进行匹配跟踪
 
 			 
