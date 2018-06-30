@@ -1053,7 +1053,85 @@ if(!bOK)// 当前帧与最近邻关键帧的匹配也失败了，那么意味着
 		   地图点更新最优区别性的描述子
 		   地图点更新深度
 		   地图添加地图点
-# 4.6 闭环检测线程 LoopClosing
+		   
+# 局部建图线程 LocalMapping::LocalMapping()
+	功能总览：
+		LocalMapping作用是将Tracking中送来的关键帧放在mlNewKeyFrame列表中；
+		处理新关键帧，地图点检查剔除，生成新地图点，Local BA，关键帧剔除。
+		主要工作在于维护局部地图，也就是SLAM中的Mapping。
+		Tracking线程 只是判断当前帧是否需要加入关键帧，并没有真的加入地图，
+		因为Tracking线程的主要功能是局部定位， 而处理地图中的关键帧，地图点，包括如何加入，
+		如何删除的工作是在LocalMapping线程完成的
+
+	void LocalMapping::Run()：
+		局部建图 ：处理新的关键帧 KeyFrame 完成局部地图构建，
+		插入关键帧 ------>  
+		处理地图点(筛选生成的地图点 生成地图点)  -------->  
+		局部 BA最小化重投影误差  -调整-------->  
+		筛选 新插入的 关键帧
+
+	步骤：
+		mlNewKeyFrames     list 列表队列存储关键帧
+		步骤1：设置进程间的访问标志 告诉Tracking线程，LocalMapping线程正在处理新的关键帧，处于繁忙状态
+		步骤2：检查队列  LocalMapping::CheckNewKeyFrames(); 等待处理的关键帧列表不为空
+		步骤3：处理新关键帧，计算关键帧特征点的词典单词向量BoW映射，将关键帧插入地图  
+		      更新地图点MapPoints 和 关键帧 KepFrame 的关联关系  UpdateConnections() 更新关联关系
+		      LocalMapping::ProcessNewKeyFrame();
+		步骤4:创建新的地图点 相机运动过程中与相邻关键帧通过三角化恢复出一些新的地图点MapPoints
+		      LocalMapping::CreateNewMapPoints();
+		步骤5：对新添加的地图点进行融合处理 ,剔除 地图点 MapPoints
+		      对于 ProcessNewKeyFrame 和 CreateNewMapPoints 中 最近添加的MapPoints进行检查剔除
+		      删除地图中新添加的但 质量不好的 地图点
+		      LocalMapping::MapPointCulling();
+		      a)  IncreaseFound / IncreaseVisible < 25%
+		      b) 观测到该 点的关键帧太少
+		步骤6：相邻帧地图点融合  
+		      LocalMapping::SearchInNeighbors();
+		      检测当前关键帧和相邻 关键帧(两级相邻) 中 重复的 地图点 
+
+		步骤7：局部地图BA 最小化重投影误差
+		      Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame,&mbAbortBA, mpMap);
+		      和当前关键帧相邻的关键帧 中相匹配的 地图点对 最局部 BA最小化重投影误差优化点坐标 和 位姿
+
+		步骤7：关键帧融合，剔除当前帧相邻的关键帧中冗余的关键帧
+		      LocalMapping::KeyFrameCulling();
+		      其90%以上的 地图点 能够被其他 共视 关键帧(至少3个) 观测到，认为该关键帧多余，可以删除
+		步骤8：将当前帧加入到闭环检测队列中 mpLoopCloser
+		步骤9：等待线程空闲 完成一帧关键帧的插入融合工作
+		步骤10：告诉 Tracking 线程，Local Mapping 线程现在空闲，可一处理接收下一个关键帧。
+### 恢复3d点 LocalMapping::CreateNewMapPoints()
+	思想：
+		相机运动过程中和共视程度比较高的关键帧，通过三角化恢复出一些MapPoints地图点
+		根据当前关键帧恢复出一些新的地图点，不包括和当前关键帧匹配的局部地图点（已经在ProcessNewKeyFrame中处理）
+		先处理新关键帧与局部地图点之间的关系，然后对局部地图点进行检查，
+		最后再通过新关键帧恢复 新的局部地图点：CreateNewMapPoints()
+	步骤：
+	   步骤1：在当前关键帧的 共视关键帧 中找到 共视程度 最高的前nn帧 相邻帧vpNeighKFs
+	   步骤2：遍历和当前关键帧 相邻的 每一个关键帧vpNeighKFs
+	   步骤3：判断相机运动的基线在（两针间的相机相对坐标）是不是足够长
+	   步骤4：根据两个关键帧的位姿计算它们之间的基本矩阵 F =  inv(K1 转置) * t12 叉乘 R12 * inv(K2)
+	   步骤5：通过帧间词典向量加速匹配，极线约束限制匹配时的搜索范围，进行特征点匹配
+	   步骤6：对每对匹配点 2d-2d 通过三角化生成3D点,和 Triangulate函数差不多
+		步骤6.1：取出匹配特征点
+		步骤6.2：利用匹配点反投影得到视差角   
+			用来决定使用三角化恢复(视差角较大) 还是 直接2d点反投影(视差角较小)
+		步骤6.3：对于双目，利用双目基线 深度 得到视差角
+		步骤6.4：视差角较大时 使用 三角化恢复3D点 (两个点,四个方程,奇异值分解求解)
+		步骤6.4：对于双目 视差角较小时, 2d点利用深度值 反投影 成三维点 ,单目的话直接跳过
+		步骤6.5：检测生成的3D点是否在相机前方(Z>0)
+		步骤6.6：计算3D点在当前关键帧下的重投影误差,误差较大的跳过
+		步骤6.7：计算3D点在邻接关键帧 下的重投影误差，误差较大的跳过
+		步骤6.9：三角化生成3D点成功，构造成地图点 MapPoint
+		步骤6.9：为该MapPoint添加属性 
+				地图点关键关键帧
+				关键帧关联地图点
+				地图点更新最优区别性的描述子
+				地图点更新深度
+				地图添加地图点   
+		步骤6.10：将新产生的点放入检测队列 mlpRecentAddedMapPoints  交给 MapPointCulling() 检查生成的点是否合适
+
+
+# 4.7 闭环检测线程 LoopClosing
 [参考](https://blog.csdn.net/u010128736/article/details/53409199)
 
  
