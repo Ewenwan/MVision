@@ -1020,8 +1020,40 @@ if(!bOK)// 当前帧与最近邻关键帧的匹配也失败了，那么意味着
 	     步骤4：更新地图点状态
 	     步骤5：如果刚刚进行过重定位 则需要 内点匹配点对数 大于50 才认为 成功
 	           正常情况下，找到的内点匹配点对数 大于30 算成功
-
-# 4.5 闭环检测线程 LoopClosing
+# 4.5 跟踪成功之后判断是否需要新建关键帧 
+## 判断是否需要创建关键帧 Tracking::NeedNewKeyFrame(); 
+	确定关键帧的标准如下：
+		（1）在上一个全局重定位后，又过了20帧               (时间过了许久)；
+		（2）局部建图闲置，或在上一个关键帧插入后，又过了20帧(时间过了许久)；
+		（3) 当前帧跟踪到点数量比较少，tracking质量较弱     (跟踪要跪的节奏)；
+		（4）当前帧跟踪到的点比参考关键帧的点少90%          (环境变化较大了)。
+	步骤：
+	     步骤1：系统模式判断，如果仅仅需要跟踪定位，不需要建图，那么不需要新建关键帧。
+	     步骤2：根据地图中关键帧的数量设置一些参数(系统一开始关键帧少的时候，可以放宽一些条件，多创建一些关键帧)
+	     步骤3：很长时间没有插入关键帧 
+		    bool c1a = mCurrentFrame.mnId >= mnLastKeyFrameId + mMaxFrames;
+	     步骤4：在过去一段时间但是局部建图闲置
+		    bool c1b = (mCurrentFrame.mnId >= mnLastKeyFrameId+mMinFrames && bLocalMappingIdle
+	     步骤5：当前帧跟踪到点数量比较少，tracking质量较弱
+		    bool c1c = mnMatchesInliers < nRefMatches*0.25
+	     步骤6：上面条件成立之前必须当 当前帧与之前参考帧（最近的一个关键帧）重复度不是太高。
+		    bool c2 = ((mnMatchesInliers < nRefMatches*thRefRatio|| bNeedToInsertClose) && mnMatchesInliers>15)
+	     步骤7：需要新建关键帧的条件 (c1a || c1b || c1c) && c2
+	     步骤8：当待插入的关键帧队列里关键帧数量不多时在插入，队列里不能阻塞太多关键帧。
+     
+## 创建关键帧 Tracking::CreateNewKeyFrame();
+	步骤：
+	     步骤1：将当前帧构造成关键帧
+	     步骤2：将当前关键帧设置为当前帧的参考关键帧
+	     步骤3：对于双目或rgbd摄像头，为当前帧生成新的MapPoints
+		   将深度距离比较近的点包装成MapPoints
+		     这些添加属性的操作是每次创建MapPoint后都要做的：
+		   地图点关键关键帧
+		   关键帧关联地图点
+		   地图点更新最优区别性的描述子
+		   地图点更新深度
+		   地图添加地图点
+# 4.6 闭环检测线程 LoopClosing
 [参考](https://blog.csdn.net/u010128736/article/details/53409199)
 
  
