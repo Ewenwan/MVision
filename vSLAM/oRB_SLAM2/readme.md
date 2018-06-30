@@ -771,12 +771,64 @@ SVD奇异值分解 解齐次方程组（Ax = 0）原理：
 
 # 4.3 两帧跟踪得到初始化位姿(跟踪上一帧/跟踪参考帧/重定位)
 [参考](https://blog.csdn.net/u010128736/article/details/53339311)
+
+	本文做匹配的过程中，是用的都是ORB特征描述子。
+	先在8层图像金字塔中，提取FAST特征点。
+	提取特征点的个数根据图像分辨率不同而不同，高分辨率的图像提取更多的角点。
+	然后对检测到的特征点用ORB来描述，用于之后的匹配和识别。
+	跟踪这部分主要用了几种模型：
+	运动模型（Tracking with motion model）、
+	关键帧（Tracking with reference keyframe）和
+	重定位（Relocalization）。
+```
+if(mVelocity.empty() || mCurrentFrame.mnId<mnLastRelocFrameId+2)
+// 没有移动(跟踪参考关键帧的运动模型是空的)  或 刚完成重定位不久
+{
+    bOK = TrackReferenceKeyFrame();// 跟踪参考帧模式
+}
+else
+{
+    bOK = TrackWithMotionModel();// 跟踪上一帧模式
+    if(!bOK)//没成功
+        bOK = TrackReferenceKeyFrame();//再次使用 跟踪参考帧模式
+}
+if(!bOK)// 当前帧与最近邻关键帧的匹配也失败了，那么意味着需要重新定位才能继续跟踪。
+{       // 此时，只有去和所有关键帧匹配，看能否找到合适的位置。
+    bOK = Relocalization();//重定位  BOW搜索，PnP 3d-2d匹配 求解位姿
+}
+
+```
+
 ### a. Tracking::TrackWithMotionModel() 跟踪上一帧模式， 相机移动量较大，当前帧和上一帧相差较大，做匹配三角变换可以获得很好的效果
+	参考：
+		这个模型是假设物体处于匀速运动，例如匀速运动的汽车、机器人、行人等，
+		就可以用上一帧的位姿和速度来估计当前帧的位姿。
+		使用的函数为 Tracking::TrackWithMotionModel()。
+		这里匹配是通过投影来与上一帧看到的地图点匹配，使用的是 
+		matcher.SearchByProjection()。
 
-
+	思想：
+		移动模式跟踪  跟踪前后两帧  得到 变换矩阵。
+		上一帧的地图3d点反投影到当前帧图像像素坐标上，
+		和当前帧的关键点落在 同一个 格子内的(差不多10*10像素一个格子大小)，
+		做描述子匹配 搜索 可以加快匹配。
+		在投影点附近根据描述子距离进行匹配（需要>20对匹配，否则匀速模型跟踪失败,
+		运动变化太大时会出现这种情况），然后以运动模型预测的位姿为初值，优化当前位姿，
+		优化完成后再剔除外点，若剩余的匹配依然>=10对，
+		则跟踪成功，否则跟踪失败，需要Relocalization：
+	步骤：
+	
 
 ### b. Tracking::TrackReferenceKeyFrame() 跟踪参考帧模式，相机移动量较小，和上一帧相差不大，需要和前面的帧(参考帧)匹配
+	当使用运动模式匹配到的特征点数较少时，就会选用关键帧模式。
+	即尝试和最近一个关键帧去做匹配。为了快速匹配，本文利用了bag of words（BoW）来加速。
+	首先，计算当前帧的BoW，并设定初始位姿为上一帧的位姿；
+	其次，根据位姿和BoW词典来寻找特征匹配，使用函数matcher.SearchByBoW()；
+	最后，利用匹配的特征优化位姿。
 
+
+	
+	
 ### c. bool Tracking::Relocalization() 上面两种模式都没有跟踪成功，需要使用重定位模式，使用orb字典编码在关键帧数据库中找相似的关键帧，进行匹配跟踪
 
 			 
