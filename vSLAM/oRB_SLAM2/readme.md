@@ -1133,8 +1133,77 @@ if(!bOK)// 当前帧与最近邻关键帧的匹配也失败了，那么意味着
 
 # 4.7 闭环检测线程 LoopClosing
 [参考](https://blog.csdn.net/u010128736/article/details/53409199)
+	思想：
+	    闭环检测线程
+	    对新加入的关键帧，
+		1. 进行回环检测(WOB 二进制词典匹配检测，通过Sim3算法计算相似变换)---------> 
+		2. 闭环校正(闭环融合 和 图优化)
 
- 
+	LoopClosing::Run() 闭环检测步骤：
+	   mlpLoopKeyFrameQueue  闭环检测关键帧队列（localMapping线程 加入的）
+	   只要闭环检测关键帧队列不为空下面的检测会一直执行
+	步骤0：进行闭环检测 LoopClosing::DetectLoop()
+		步骤1：从队列中抽取一帧 
+		      mpCurrentKF = mlpLoopKeyFrameQueue.front();
+		      mlpLoopKeyFrameQueue.pop_front();//出队
+		步骤2：判断距离上次闭环检测是否超过10帧，如果数量过少则不进行闭环检测。
+		步骤3：遍历所有共视关键帧，计算当前关键帧与每个共视关键帧 的bow相似度得分，并得到最低得分minScore 
+		      GetVectorCovisibleKeyFrames(); // 当前帧的所有 共视关键帧
+		      mpORBVocabulary->score(CurrentBowVec, BowVec);// bow向量相似性得分
+		步骤4：在所有关键帧数据库中找出与当前帧按最低得分minScore 匹配得到的闭环候选帧 vpCandidateKFs
+		步骤5：在候选帧中检测具有连续性的候选帧，相邻一起的分成一组，组与组相邻的再成组(pKF, minScore)  
+		步骤6：找出与当前帧有 公共单词的 非相连 关键帧 lKFsharingwords
+		步骤7：统计候选帧中 与 pKF 具有共同单词最多的单词数 maxcommonwords
+		步骤8：得到阈值 minCommons = 0.8 × maxcommonwords  
+		步骤9：筛选共有单词大于 minCommons  且词带 BOW 匹配 最低得分  大于  minScore ， lscoreAndMatch
+		步骤10：将存在相连的分为一组，计算组最高得分 bestAccScore，同时得到每组中得分最高的关键帧  lsAccScoreAndMatch
+		步骤11：得到阈值 minScoreToRetain = 0.75  ×  bestAccScore  
+		步骤12：得到 闭环检测候选帧
+	步骤13：计算 闭环处两针的 相似变换  [sR|t]
+		LoopClosing::ComputeSim3()
+	步骤14：闭环融合位姿图优化
+	       LoopClosing::CorrectLoop()
+	       
+## LoopClosing::ComputeSim3() 计算当前帧与闭环帧的Sim3变换 
+	思想：
+	    通过Bow词袋量化加速描述子的匹配，利用RANSAC粗略地计算出当前帧与闭环帧的Sim3（当前帧---闭环帧）
+	    根据估计的Sim3，对3D点进行投影找到更多匹配，通过优化的方法计算更精确的Sim3（当前帧---闭环帧）
+	    将闭环帧以及闭环帧相连的关键帧的MapPoints与当前帧的点进行匹配（当前帧---闭环帧+相连关键帧）
+	    注意以上匹配的结果均都存在成员变量 mvpCurrentMatchedPoints 中，
+	    实际的更新步骤见CorrectLoop()步骤3：Start Loop Fusion
+	步骤：
+	    步骤1：遍历每一个闭环候选关键帧  构造 sim3 求解器
+	    步骤2：从筛选的闭环候选帧中取出一帧关键帧pKF
+	    步骤3：将当前帧mpCurrentKF与闭环候选关键帧pKF匹配 得到匹配点对
+		  步骤3.1 跳过匹配点对数少的 候选闭环帧
+		  步骤3.2：  根据匹配点对 构造Sim3求解器
+	    步骤4：迭代每一个候选闭环关键帧  Sim3利用 相似变换求解器求解 候选闭环关键帧到档期帧的 相似变换
+	    步骤5：通过步骤4求取的Sim3变换，使用sim3变换匹配得到更多的匹配点 弥补步骤3中的漏匹配
+	    步骤6：G2O Sim3优化，只要有一个候选帧通过Sim3的求解与优化，就跳出停止对其它候选帧的判断
+	    步骤7：如果没有一个闭环匹配候选帧通过Sim3的求解与优化 清空候选闭环关键帧
+	    步骤8：取出闭环匹配上 关键帧的相连关键帧，得到它们的地图点MapPoints放入mvpLoopMapPoints
+	    步骤9：将闭环匹配上关键帧以及相连关键帧的 地图点 MapPoints 投影到当前关键帧进行投影匹配 为当前帧查找更多的匹配
+	    步骤10：判断当前帧 与检测出的所有闭环关键帧是否有足够多的MapPoints匹配	
+	    步骤11：满足匹配点对数>40 寻找成功 清空mvpEnoughConsistentCandidates
+
+## LoopClosing::CorrectLoop() 闭环融合 全局优化
+	步骤： 
+	    步骤1：通过求解的Sim3以及相对姿态关系，调整与 当前帧相连的关键帧 mvpCurrentConnectedKFs 位姿 
+		  以及这些 关键帧观测到的MapPoints的位置（相连关键帧---当前帧）
+	    步骤2：用当前帧在闭环地图点 mvpLoopMapPoints 中匹配的 当前帧闭环匹配地图点 mvpCurrentMatchedPoints  
+		  更新当前帧 之前的 匹配地图点 mpCurrentKF->GetMapPoint(i)
+	    步骤3：将闭环帧以及闭环帧相连的关键帧的 所有地图点 mvpLoopMapPoints 和  当前帧相连的关键帧的点进行匹配 
+	    步骤4：通过MapPoints的匹配关系更新这些帧之间的连接关系，即更新covisibility graph
+	    步骤5：对Essential Graph（Pose Graph）进行优化，MapPoints的位置则根据优化后的位姿做相对应的调整
+	   步骤6：创建线程进行全局Bundle Adjustment
+
+	mvpCurrentConnectedKFs    当前帧相关联的关键帧
+	vpLoopConnectedKFs        闭环帧相关联的关键帧  这些关键帧的地图点 闭环地图点 mvpLoopMapPoints
+	mpMatchedKF               与当前帧匹配的  闭环帧
+	mpCurrentKF 当前关键帧     优化的位姿 mg2oScw     原先的地图点 mpCurrentKF->GetMapPoint(i)
+	mvpCurrentMatchedPoints   当前帧在闭环地图点中匹配的地图点  当前帧闭环匹配地图点 
+
+
 # 5. 数学理论总结
 [参考]()
 
