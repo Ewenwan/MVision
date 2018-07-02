@@ -412,6 +412,16 @@
 ![](https://img-blog.csdn.net/20170831082647603?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDM4MDE2NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 
+	 
+## HORQ XNOR的改进版
+[Performance Guaranteed Network Acceleration viaHigh-Order Residual Quantization](https://arxiv.org/pdf/1708.08687.pdf)
+
+	接下来详细介绍HORQ，因为HORQ可以看做是XNOR的改进版，所以建议先看看XNOR：XNOR-Net算法详解。
+	HORQ和XNOR都包含对weight和input做二值化，weight二值化方面基本一样，接下来主要介绍对input的二值化。
+	将CNN网络层的输入 进行高精度二值量化，从而实现高精度的二值网络计算。
+![](https://img-blog.csdn.net/20170831151129332?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvemhhbmdqdW5oaXQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+	
+
  
 ## 4. QNN 量化网络 量化激活函数 nbit量化
 [QNN Quantized Neural Networks ](https://arxiv.org/pdf/1609.07061.pdf)
@@ -1049,10 +1059,8 @@ WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原�
 	 我们还引入计算上更廉价的百分位数的近似值来减少由平衡量化引入的计算开销。
 	 总体而言，我们的方法提高了QNN的预测精度，对训练速度的影响可以忽略不计，且不会在推理过程中引入额外的计算。
 	 该方法适用于卷积神经网络和循环神经网络。
-	 
-## 
-[Performance Guaranteed Network Acceleration viaHigh-Order Residual Quantization](https://arxiv.org/pdf/1708.08687.pdf)
-
+	
+	
 ## 
 [Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference](https://arxiv.org/abs/1712.05877)
 
