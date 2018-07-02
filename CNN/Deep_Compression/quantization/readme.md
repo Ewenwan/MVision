@@ -1061,7 +1061,8 @@ WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原�
 	 该方法适用于卷积神经网络和循环神经网络。
 	
 	
-## 
+## Google量化方法 r=S(q-Z) 其中q为定点结果，r为对应的浮点数据，S和Z分别为范围和偏移参数 在 TFlite中应用
+
 [Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference](https://arxiv.org/abs/1712.05877)
 
 ## 
