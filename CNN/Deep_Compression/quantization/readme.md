@@ -875,6 +875,10 @@
     5、
 
 
+## INQ 神经网络无损低比特量化技术
+    英特尔中国研究院：INQ神经网络无损低比特量化技术;
+    全精度网络输入，输出权值为0或2的整数次幂的网络.
+[INCREMENTAL NETWORK QUANTIZATION: TOWARDS LOSSLESS CNNS WITH LOW-PRECISION WEIGHTS](https://arxiv.org/pdf/1702.03044.pdf)
 
 
 
@@ -884,9 +888,6 @@
 [Fixed-point Factorized Networks](https://arxiv.org/pdf/1611.01972.pdf)
 
 [Deep Learning with Low Precision by Half-wave Gaussian Quantization](https://arxiv.org/pdf/1702.00953.pdf)
-
-[INCREMENTAL NETWORK QUANTIZATION: TOWARDS LOSSLESS CNNS WITH LOW-PRECISION WEIGHTS](https://arxiv.org/pdf/1702.03044.pdf)
-
 
 [Network Sketching: Exploiting Binary Structure in Deep CNNs ](https://arxiv.org/pdf/1706.02021.pdf)
 
