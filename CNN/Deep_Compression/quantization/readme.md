@@ -1065,10 +1065,15 @@ WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原�
 
 [Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference](https://arxiv.org/abs/1712.05877)
 
-## 
+## 阿里巴巴 AQN:一种通过交替量化对深度学习模型压缩以及加速推理的方法
 [ALTERNATING MULTI-BIT QUANTIZATION FOR RECURRENT NEURAL NETWORKS](https://arxiv.org/pdf/1802.00150.pdf)
+
+[参考](https://yq.aliyun.com/articles/555997)
+
+
 
 ## 
 [Deep Neural Network Compression with Single and Multiple Level Quantization](https://arxiv.org/pdf/1803.03289.pdf)
+
 ## 
 [Expectation Backpropagation: Parameter-Free Training of Multilayer Neural Networks with Continuous or Discrete Weights](http://papers.nips.cc/paper/5269-expectation-backpropagation-parameter-free-training-of-multilayer-neural-networks-with-continuous-or-discrete-weights.pdf)
