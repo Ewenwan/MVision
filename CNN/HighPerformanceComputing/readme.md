@@ -69,7 +69,8 @@
       6、九言科技 绝影（Prestissimo）
 [代码](https://github.com/Ewenwan/In-Prestissimo)
 
-[代码]()
+      7、Google量化方法 r=S(q-Z)  tflite  TensorFlow Lite
+[代码](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)
 
 [代码]()
 
