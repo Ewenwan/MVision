@@ -765,13 +765,10 @@
 [Fixed Point Quantization of Deep Convolutional Networks ](https://arxiv.org/pdf/1511.06393.pdf)
 
     r=S(q-Z) 其中q为定点结果，r为对应的浮点数据，S和Z分别为范围和偏移参数
-    
-## 6. Quantized Convolutional Neural Networks for Mobile Devices  8bit
-[Quantized Convolutional Neural Networks for Mobile Devices](https://arxiv.org/pdf/1512.06473.pdf)
 
 
 
-## 7. Ristretto是一个和Caffe类似的框架。
+## 6. Ristretto是一个和Caffe类似的框架。
 
     Ristretto是一个自动化的CNN近似工具，可以压缩32位浮点网络。
     Ristretto是Caffe的扩展，允许以有限的数字精度测试、训练和微调网络。
@@ -864,19 +861,164 @@
             --weights=models/SqueezeNet/RistrettoDemo/squeezenet_finetuned.caffemodel \
             --gpu=0 --iterations=2000
 
-### Ristretto: SqueezeNet 示例
-
+#### Ristretto: SqueezeNet 示例 构造一个8位动态定点SqueezeNet网络
+## 准备数据 和 预训练的 全精度模型权重
     1、下载原始 32bit FP 浮点数 网络权重
+       并将它们放入models/SqueezeNet/文件夹中。这些是由DeepScale提供的预训练好的32位FP权重。
 [地址](https://github.com/DeepScale/SqueezeNet/tree/master/SqueezeNet_v1.0)
 
     2、微调再训练一个低精度 网络权重 
-[微调了一个8位动态定点SqueezeNet]()
-    3、
-    4、
-    5、
+       我们已经为您fine-tuned了一个8位动态定点SqueezeNet。
+       从models/SqueezeNet/RistrettoDemo/ristrettomodel-url提供的链接下载它，并将其放入该文件夹。
 
 
-## 9. INQ 神经网络无损低比特量化技术
+    3、对SqueezeNet prototxt（models/SqueezeNet/train_val.prototxt）做两个修改
+
+     a. imagenet 数据集下载    较大 train 100G+
+        http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_val.tar
+        http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_train.tar
+        解压：
+        tar -zxvf 
+
+    b. 标签文件下载
+       http://dl.caffe.berkeleyvision.org/caffe_ilsvrc12.tar.gz
+       解压：
+       tar -xf caffe_ilsvrc12.tar.gz
+       放在 data/ilsvrc12 下面
+
+    c. 生成 lmdb数据库文件
+       ./examples/imagenet/create_imagenet.sh 里面需要修改 上面下载的数据集的路径
+       得到两个数据库文件目录：
+       examples/imagenet/ilsvrc12_train_leveldb
+       examples/imagenet/ilsvrc12_val_leveldb
+
+    d. 生成数据库图片的均值文件
+      ./examples/imagenet/make_imagenet_mean.sh
+       得到：
+       data/ilsvrc12/imagenet_mean.binaryproto
+
+    e. 修改 models/SqueezeNet/train_val.prototxt 
+       网络配置文件中 训练和测试数据集数据库格式文件地址
+       source: "examples/imagenet/ilsvrc12_train_lmdb"
+       source: "examples/imagenet/ilsvrc12_val_lmdb"
+
+##  量化到动态定点
+    首先安装Ristretto（make all -j 见最上面的代码 ），并且在Caffe的根路径下运行所有命令。
+    SqueezeNet在32位和16位动态定点上表现良好，但是我们可以进一步缩小位宽。
+    参数压缩和网络准确性之间有一个折衷。
+    Ristretto工具可以自动为网络的每个部分找到合适的位宽：
+    
+    运行量化网络： 
+    ./examples/ristretto/00_quantize_squeezenet.sh
+```bash
+    ./build/tools/ristretto quantize \       # 工具
+	--model=models/SqueezeNet/train_val.prototxt \   # 全精度网络模型
+	--weights=models/SqueezeNet/squeezenet_v1.0.caffemodel \ #全精度网络权重
+	--model_quantized=models/SqueezeNet/RistrettoDemo/quantized.prototxt \ # 自动生成的量化网络模型文件 
+	--trimming_mode=dynamic_fixed_point \ # 量化类型 动态定点
+    --gpu=0 \
+    --iterations=2000 \
+	--error_margin=3
+```
+
+    这个脚本将量化SqueezeNet模型。
+    你会看到飞现的信息，Ristretto以不同字宽测试量化模型。
+    最后的总结将如下所示：
+```sh
+    I0626 16:56:25.035650 14319 quantization.cpp:260] Network accuracy analysis for
+    I0626 16:56:25.035667 14319 quantization.cpp:261] Convolutional (CONV) and fully
+    I0626 16:56:25.035681 14319 quantization.cpp:262] connected (FC) layers.
+    I0626 16:56:25.035693 14319 quantization.cpp:263] Baseline 32bit float: 0.5768
+    I0626 16:56:25.035715 14319 quantization.cpp:264] Dynamic fixed point CONV
+    I0626 16:56:25.035728 14319 quantization.cpp:265] weights: 
+    I0626 16:56:25.035740 14319 quantization.cpp:267] 16bit: 0.557159
+    I0626 16:56:25.035761 14319 quantization.cpp:267] 8bit:  0.555959
+    I0626 16:56:25.035781 14319 quantization.cpp:267] 4bit:  0.00568
+    I0626 16:56:25.035802 14319 quantization.cpp:270] Dynamic fixed point FC
+    I0626 16:56:25.035815 14319 quantization.cpp:271] weights: 
+    I0626 16:56:25.035828 14319 quantization.cpp:273] 16bit: 0.5768
+    I0626 16:56:25.035848 14319 quantization.cpp:273] 8bit:  0.5768
+    I0626 16:56:25.035868 14319 quantization.cpp:273] 4bit:  0.5768
+    I0626 16:56:25.035888 14319 quantization.cpp:273] 2bit:  0.5768
+    I0626 16:56:25.035909 14319 quantization.cpp:273] 1bit:  0.5768
+    I0626 16:56:25.035938 14319 quantization.cpp:275] Dynamic fixed point layer
+    I0626 16:56:25.035959 14319 quantization.cpp:276] activations:
+    I0626 16:56:25.035979 14319 quantization.cpp:278] 16bit: 0.57578
+    I0626 16:56:25.036012 14319 quantization.cpp:278] 8bit:  0.57058
+    I0626 16:56:25.036051 14319 quantization.cpp:278] 4bit:  0.0405805
+    I0626 16:56:25.036073 14319 quantization.cpp:281] Dynamic fixed point net:
+    I0626 16:56:25.036087 14319 quantization.cpp:282] 8bit CONV weights,
+    I0626 16:56:25.036100 14319 quantization.cpp:283] 1bit FC weights,
+    I0626 16:56:25.036113 14319 quantization.cpp:284] 8bit layer activations:
+    I0626 16:56:25.036126 14319 quantization.cpp:285] Accuracy: 0.5516
+    I0626 16:56:25.036141 14319 quantization.cpp:286] Please fine-tune.
+```
+    分析表明，卷积层的激活和参数都可以降低到8位，top-1精度下降小于3％。
+    由于SqueezeNet不包含全连接层，因此可以忽略该层类型的量化结果。
+    最后，该工具同时量化所有考虑的网络部分。
+    结果表明，8位SqueezeNet具有55.16％的top-1精度（与57.68％的基准相比）。
+    为了改善这些结果，我们将在下一步中对网络进行微调。
+    
+## finetune 微调动态固定点参数
+    上一步将 32位浮点 SqueezeNet 量化为 8位固定点，
+    并生成相应的量化网络描述文件（models/SqueezeNet/RistrettoDemo/quantized.prototxt）。
+    现在我们可以微调浓缩的网络，尽可能多地恢复原始的准确度。
+    
+    在微调期间，Ristretto会保持一组高精度的 权重。
+    对于每个训练batch，这些32位浮点权重 随机 四舍五入为 8位固定点。
+    然后将8位参数 用于前向 和 后向传播，最后将 权重更新 应用于 高精度权重。
+    
+    微调程序可以用传统的caffe工具 ./build/tools/caffe train 来完成。
+    只需启动以下脚本：
+```sh
+./examples/ristretto/01_finetune_squeezenet.sh
+//////////内容
+#!/usr/bin/env sh
+# finetune 微调
+
+SOLVER="../../models/SqueezeNet/RistrettoDemo/solver_finetune.prototxt"   # 微调求解器
+WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原始 全精度权重
+
+./build/tools/caffe train \
+    --solver=$SOLVER \
+    --weights=$WEIGHTS
+
+``` 
+    经过1200次微调迭代（Tesla K-40 GPU〜5小时）， batch大小为32 * 32，
+    压缩后的SqueezeNet将具有57％左右的top-1验证精度。
+    微调参数位于models/SqueezeNet/RistrettoDemo/squeezenet_iter_1200.caffemodel。
+    总而言之，您成功地将SqueezeNet缩减为8位动态定点，精度损失低于1％。
+    请注意，通过改进数字格式（即对网络的不同部分 选择整数 和 分数长度），可以获得稍好的最终结果。
+    
+## SqueezeNet动态固定点基准 测试
+    
+    在这一步中，您将对现有的动态定点SqueezeNet进行基准测试，我们将为您进行微调。
+    即使跳过上一个微调步骤，也可以进行评分。
+    该模型可以用传统的caffe-tool进行基准测试。
+    所有的工具需求都是一个网络描述文件以及网络参数。
+    
+```sh
+./examples/ristretto/02_benchmark_fixedpoint_squeezenet.sh
+//////////内容
+./build/tools/caffe test \ # 测试模式
+	--model=models/SqueezeNet/RistrettoDemo/quantized.prototxt \ # 量化网络文件
+	--weights=models/SqueezeNet/RistrettoDemo/squeezenet_finetuned.caffemodel \ # 量化网络权重
+	--gpu=0 \
+    --iterations=2000
+```
+
+    
+## 原始全精度网络测试 与上面的8位定点量化的测试结果 作对比
+```sh
+./examples/ristretto/benchmark_floatingpoint_squeezenet.sh
+//////////内容
+./build/tools/caffe test \
+	--model=models/SqueezeNet/train_val.prototxt \
+	--weights=models/SqueezeNet/squeezenet_v1.0.caffemodel \
+	--gpu=0 --iterations=2000
+```
+
+## 7. INQ 神经网络无损低比特量化技术
     英特尔中国研究院：INQ神经网络无损低比特量化技术;
     全精度网络输入，输出权值为0或2的整数次幂的网络.
 [INCREMENTAL NETWORK QUANTIZATION: TOWARDS LOSSLESS CNNS WITH LOW-PRECISION WEIGHTS](https://arxiv.org/pdf/1702.03044.pdf)
