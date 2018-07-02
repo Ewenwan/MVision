@@ -765,6 +765,7 @@
 [Fixed Point Quantization of Deep Convolutional Networks ](https://arxiv.org/pdf/1511.06393.pdf)
 
     r=S(q-Z) 其中q为定点结果，r为对应的浮点数据，S和Z分别为范围和偏移参数
+    
 ## 6. Quantized Convolutional Neural Networks for Mobile Devices  8bit
 [Quantized Convolutional Neural Networks for Mobile Devices](https://arxiv.org/pdf/1512.06473.pdf)
 
@@ -875,12 +876,12 @@
     5、
 
 
-## INQ 神经网络无损低比特量化技术
+## 9. INQ 神经网络无损低比特量化技术
     英特尔中国研究院：INQ神经网络无损低比特量化技术;
     全精度网络输入，输出权值为0或2的整数次幂的网络.
 [INCREMENTAL NETWORK QUANTIZATION: TOWARDS LOSSLESS CNNS WITH LOW-PRECISION WEIGHTS](https://arxiv.org/pdf/1702.03044.pdf)
 
-
+[代码](https://github.com/Ewenwan/Incremental-Network-Quantization)
 
 ## 8.其他
 
