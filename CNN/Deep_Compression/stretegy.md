@@ -102,9 +102,7 @@
 
 
 # 模型
-![](https://img-blog.csdn.net/20180322140623808)
-
-
+## 目标分类 
     ImageNet2012比赛冠军 (AlexNet)   ~ 60954656 params (top-5错误率16.4%，使用额外数据可达到15.3%，8层神经网络）
                         AlexNet是现代深度CNN的奠基之作。
                         2012年，Hinton的学生Alex Krizhevsky提出了深度卷积神经网络模型AlexNet。
@@ -136,7 +134,6 @@
                             2016年2月， Inception V4（top-5错误率3.08%）
 
 
-
     ImageNet2015年的冠军（ResNet，top-5错误率3.57%，152层神经网络）
                         ResNet（Residual Neural Network）由微软研究院的Kaiming He等4名华人提出，
                         通过使用Residual Unit成功训练152层深的神经网络
@@ -145,8 +142,46 @@
                         ResNet最初的灵感出自这个问题：在不断加神经网络的深度时，
                            会出现一个Degradation的问题，
                            即准确率会先上升然后达到饱和，再持续增加深度则会导致准确率下降。
+    
+    移动端模型：
+    
+     mobilenet
+     
+     squeezeet
+     
+     shufflenet
+     
+    
+
+## 目标检测
+
+### SSD检测框架
+
+### vgg16-ssd
 
 
+
+### mobilenet-ssd
+
+
+
+### squeezeet-ssd
+
+
+
+### yolo 检测框架
+
+### yolo-v1
+
+
+### yolo-v2
+
+
+
+### yolo-v3
+
+
+### fastert-rcnn检测框架
 
 
 
