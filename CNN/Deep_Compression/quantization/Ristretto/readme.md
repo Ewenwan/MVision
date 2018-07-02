@@ -377,13 +377,42 @@ for(m =0; m<M; m++)               // 每个卷积核
     1、下载原始 32bit FP 浮点数 网络权重
        并将它们放入models/SqueezeNet/文件夹中。这些是由DeepScale提供的预训练好的32位FP权重。
 [地址](https://github.com/DeepScale/SqueezeNet/tree/master/SqueezeNet_v1.0)
-     
+
     2、微调再训练一个低精度 网络权重 
        我们已经为您fine-tuned了一个8位动态定点SqueezeNet。
        从models/SqueezeNet/RistrettoDemo/ristrettomodel-url提供的链接下载它，并将其放入该文件夹。
+
+
     3、对SqueezeNet prototxt（models/SqueezeNet/train_val.prototxt）做两个修改
-       您需要调整两个source字段为本地ImageNet数据的路径。
- 
+
+     a. imagenet 数据集下载    较大 train 100G+
+        http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_val.tar
+        http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_train.tar
+        解压：
+        tar -zxvf 
+
+    b. 标签文件下载
+       http://dl.caffe.berkeleyvision.org/caffe_ilsvrc12.tar.gz
+       解压：
+       tar -xf caffe_ilsvrc12.tar.gz
+       放在 data/ilsvrc12 下面
+
+    c. 生成 lmdb数据库文件
+       ./examples/imagenet/create_imagenet.sh 里面需要修改 上面下载的数据集的路径
+       得到两个数据库文件目录：
+       examples/imagenet/ilsvrc12_train_leveldb
+       examples/imagenet/ilsvrc12_val_leveldb
+
+    d. 生成数据库图片的均值文件
+      ./examples/imagenet/make_imagenet_mean.sh
+       得到：
+       data/ilsvrc12/imagenet_mean.binaryproto
+
+    e. 修改 models/SqueezeNet/train_val.prototxt 
+       网络配置文件中 训练和测试数据集数据库格式文件地址
+       source: "examples/imagenet/ilsvrc12_train_lmdb"
+       source: "examples/imagenet/ilsvrc12_val_lmdb"
+
 ##  量化到动态定点
     本指南假设您已安装了Ristretto（make all），并且在Caffe的根路径下运行所有命令。
     在第一步中，我们将32位浮点网络压缩为动态的固定点。
