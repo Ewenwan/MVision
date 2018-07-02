@@ -9,5 +9,5 @@
 
 [解读](https://www.leiphone.com/news/201708/0MNOwwfvWiAu43WO.html)
 
-![DenseNet 密集网络](https://img-blog.csdn.net/20170715081827257?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxNDM4MDE2NQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![DenseNet 密集网络](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_jpg/BP6HQN6ROpyQibmKJr5d1icSBGa2XseyIxicgib2CFLblt9icyib0b5wZJJHOyv1p0L42syH1bsHH6LvIb5bQEO0BsIg/640?wx_fmt=jpeg)
 
