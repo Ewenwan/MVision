@@ -1026,12 +1026,10 @@ WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原�
 [代码](https://github.com/Ewenwan/Incremental-Network-Quantization)
 
 ## 8.其他
-
-
-[Fixed-point Factorized Networks](https://arxiv.org/pdf/1611.01972.pdf)
-
+## 半波高斯量化的低精度深度学习 
 [Deep Learning with Low Precision by Half-wave Gaussian Quantization](https://arxiv.org/pdf/1702.00953.pdf)
 
+## 
 [Network Sketching: Exploiting Binary Structure in Deep CNNs ](https://arxiv.org/pdf/1706.02021.pdf)
 
 
