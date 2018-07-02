@@ -373,7 +373,7 @@ for(m =0; m<M; m++)               // 每个卷积核
 
 
 # Ristretto: SqueezeNet 示例 构造一个8位动态定点SqueezeNet网络
-
+## 准备数据 和 预训练的 全精度模型权重
     1、下载原始 32bit FP 浮点数 网络权重
        并将它们放入models/SqueezeNet/文件夹中。这些是由DeepScale提供的预训练好的32位FP权重。
 [地址](https://github.com/DeepScale/SqueezeNet/tree/master/SqueezeNet_v1.0)
@@ -414,14 +414,26 @@ for(m =0; m<M; m++)               // 每个卷积核
        source: "examples/imagenet/ilsvrc12_val_lmdb"
 
 ##  量化到动态定点
-    本指南假设您已安装了Ristretto（make all），并且在Caffe的根路径下运行所有命令。
-    在第一步中，我们将32位浮点网络压缩为动态的固定点。
+    首先安装Ristretto（make all -j 见最上面的代码 ），并且在Caffe的根路径下运行所有命令。
     SqueezeNet在32位和16位动态定点上表现良好，但是我们可以进一步缩小位宽。
     参数压缩和网络准确性之间有一个折衷。
     Ristretto工具可以自动为网络的每个部分找到合适的位宽：
     
+    运行量化网络： 
     ./examples/ristretto/00_quantize_squeezenet.sh
-    
+```bash
+    ./build/tools/ristretto quantize \       # 工具
+	--model=models/SqueezeNet/train_val.prototxt \   # 全精度网络模型
+	--weights=models/SqueezeNet/squeezenet_v1.0.caffemodel \ #全精度网络权重
+	--model_quantized=models/SqueezeNet/RistrettoDemo/quantized.prototxt \ # 自动生成的量化网络模型文件 
+	--trimming_mode=dynamic_fixed_point \ # 量化类型
+    --gpu=0 \
+    --iterations=2000 \
+	--error_margin=3
+```
+
+
+
     这个脚本将量化SqueezeNet模型。
     你会看到飞现的信息，Ristretto以不同字宽测试量化模型。
     最后的总结将如下所示：
@@ -460,27 +472,38 @@ for(m =0; m<M; m++)               // 每个卷积核
     结果表明，8位SqueezeNet具有55.16％的top-1精度（与57.68％的基准相比）。
     为了改善这些结果，我们将在下一步中对网络进行微调。
     
-## 微调动态固定点参数
-    上一步将32位浮点SqueezeNet量化为8位固定点，
-    并生成相应的网络描述文件（models/SqueezeNet/RistrettoDemo/quantized.prototxt）。
+## finetune 微调动态固定点参数
+    上一步将 32位浮点 SqueezeNet 量化为 8位固定点，
+    并生成相应的量化网络描述文件（models/SqueezeNet/RistrettoDemo/quantized.prototxt）。
     现在我们可以微调浓缩的网络，尽可能多地恢复原始的准确度。
     
-    在微调期间，Ristretto会保持一组高精度的重量。
-    对于每个训练batch，这些32位浮点权重随机四舍五入为8位固定点。
-    然后将8位参数用于前向和后向传播，最后将权重更新应用于高精度权重。
+    在微调期间，Ristretto会保持一组高精度的 权重。
+    对于每个训练batch，这些32位浮点权重 随机 四舍五入为 8位固定点。
+    然后将8位参数 用于前向 和 后向传播，最后将 权重更新 应用于 高精度权重。
     
-    微调程序可以用传统的caffe工具来完成。
+    微调程序可以用传统的caffe工具 ./build/tools/caffe train 来完成。
     只需启动以下脚本：
 ```sh
 ./examples/ristretto/01_finetune_squeezenet.sh
+//
+#!/usr/bin/env sh
+# finetune 微调
+
+SOLVER="../../models/SqueezeNet/RistrettoDemo/solver_finetune.prototxt"   # 微调求解器
+WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原始 全精度权重
+
+./build/tools/caffe train \
+    --solver=$SOLVER \
+    --weights=$WEIGHTS
+
 ``` 
     经过1200次微调迭代（Tesla K-40 GPU〜5小时）， batch大小为32 * 32，
     压缩后的SqueezeNet将具有57％左右的top-1验证精度。
     微调参数位于models/SqueezeNet/RistrettoDemo/squeezenet_iter_1200.caffemodel。
     总而言之，您成功地将SqueezeNet缩减为8位动态定点，精度损失低于1％。
-    请注意，通过改进数字格式（即对网络的不同部分选择整数和分数长度），可以获得稍好的最终结果。
+    请注意，通过改进数字格式（即对网络的不同部分 选择整数 和 分数长度），可以获得稍好的最终结果。
     
-## SqueezeNet动态固定点基准
+## SqueezeNet动态固定点基准 测试
     
     在这一步中，您将对现有的动态定点SqueezeNet进行基准测试，我们将为您进行微调。
     即使跳过上一个微调步骤，也可以进行评分。
@@ -489,6 +512,12 @@ for(m =0; m<M; m++)               // 每个卷积核
     
 ```sh
 ./examples/ristretto/02_benchmark_fixedpoint_squeezenet.sh
+//
+./build/tools/caffe test \ # 测试模式
+	--model=models/SqueezeNet/RistrettoDemo/quantized.prototxt \ # 量化网络文件
+	--weights=models/SqueezeNet/RistrettoDemo/squeezenet_finetuned.caffemodel \ # 量化网络权重
+	--gpu=0 \
+    --iterations=2000
 ```
 
     
