@@ -426,7 +426,7 @@ for(m =0; m<M; m++)               // 每个卷积核
 	--model=models/SqueezeNet/train_val.prototxt \   # 全精度网络模型
 	--weights=models/SqueezeNet/squeezenet_v1.0.caffemodel \ #全精度网络权重
 	--model_quantized=models/SqueezeNet/RistrettoDemo/quantized.prototxt \ # 自动生成的量化网络模型文件 
-	--trimming_mode=dynamic_fixed_point \ # 量化类型
+	--trimming_mode=dynamic_fixed_point \ # 量化类型 动态定点
     --gpu=0 \
     --iterations=2000 \
 	--error_margin=3
@@ -485,7 +485,7 @@ for(m =0; m<M; m++)               // 每个卷积核
     只需启动以下脚本：
 ```sh
 ./examples/ristretto/01_finetune_squeezenet.sh
-//
+//////////内容
 #!/usr/bin/env sh
 # finetune 微调
 
@@ -512,7 +512,7 @@ WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原�
     
 ```sh
 ./examples/ristretto/02_benchmark_fixedpoint_squeezenet.sh
-//
+//////////内容
 ./build/tools/caffe test \ # 测试模式
 	--model=models/SqueezeNet/RistrettoDemo/quantized.prototxt \ # 量化网络文件
 	--weights=models/SqueezeNet/RistrettoDemo/squeezenet_finetuned.caffemodel \ # 量化网络权重
@@ -521,8 +521,15 @@ WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原�
 ```
 
     
-    
-    
+## 原始全精度网络测试 与上面的8位定点量化的测试结果 作对比
+```sh
+./examples/ristretto/benchmark_floatingpoint_squeezenet.sh
+//////////内容
+./build/tools/caffe test \
+	--model=models/SqueezeNet/train_val.prototxt \
+	--weights=models/SqueezeNet/squeezenet_v1.0.caffemodel \
+	--gpu=0 --iterations=2000
+```
 
 
 
