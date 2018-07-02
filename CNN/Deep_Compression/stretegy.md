@@ -34,7 +34,7 @@
 
 # 模型
 
-![](https://img-blog.csdn.net/20170313131253663?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd3NwYmE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![](https://img-blog.csdn.net/20180322140623808)
 
 
     ImageNet2012比赛冠军 (AlexNet)   ~ 60954656 params (top-5错误率16.4%，使用额外数据可达到15.3%，8层神经网络）
