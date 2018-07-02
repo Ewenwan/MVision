@@ -1029,24 +1029,37 @@ WEIGHTS="../../models/SqueezeNet/squeezenet_v1.0.caffemodel"              # 原�
 ## 半波高斯量化的低精度深度学习 
 [Deep Learning with Low Precision by Half-wave Gaussian Quantization](https://arxiv.org/pdf/1702.00953.pdf)
 
-## 
+##  
 [Network Sketching: Exploiting Binary Structure in Deep CNNs ](https://arxiv.org/pdf/1706.02021.pdf)
 
-
+## 
 [Training Quantized Nets: A Deeper Understanding ](https://arxiv.org/pdf/1706.02379.pdf)
 
-
+## 平衡优化:一种量化神经网络的有效与高效方法 百分位数 直方图均衡化 均匀量化     
 [Balanced Quantization: An Effective and Efficient Approach to Quantized Neural Networks](https://arxiv.org/pdf/1706.07145.pdf)
-
-
+	
+	 量化神经网络（Quantized Neural Network）
+	 使用低位宽数来表示参数和执行计算，以降低神经网络的计算复杂性，存储大小和存储器使用。
+	 在QNN中，参数和激活被均匀地量化为低位宽数，从而可以用高效的位运算来代替更复杂的乘加操作。
+	 然而，神经网络中的参数分布通常是钟形的并且包含几个大的异常值，
+	 因此从极值确定的均匀量化可能造成对位宽的不充分利用，造成错误率升高。
+	 在本文中，我们提出了一种产生平衡分布的量化值的新型量化方法。
+	 我们的方法先将参数按百分位数递归划分为一些平衡的箱，
+	 再应用均匀量化。这样产生的量化值均匀分布在可能的值之间，从而增加了有效位宽。
+	 我们还引入计算上更廉价的百分位数的近似值来减少由平衡量化引入的计算开销。
+	 总体而言，我们的方法提高了QNN的预测精度，对训练速度的影响可以忽略不计，且不会在推理过程中引入额外的计算。
+	 该方法适用于卷积神经网络和循环神经网络。
+	 
+## 
 [Performance Guaranteed Network Acceleration viaHigh-Order Residual Quantization](https://arxiv.org/pdf/1708.08687.pdf)
 
+## 
 [Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference](https://arxiv.org/abs/1712.05877)
 
-
+## 
 [ALTERNATING MULTI-BIT QUANTIZATION FOR RECURRENT NEURAL NETWORKS](https://arxiv.org/pdf/1802.00150.pdf)
 
-
+## 
 [Deep Neural Network Compression with Single and Multiple Level Quantization](https://arxiv.org/pdf/1803.03289.pdf)
-
+## 
 [Expectation Backpropagation: Parameter-Free Training of Multilayer Neural Networks with Continuous or Discrete Weights](http://papers.nips.cc/paper/5269-expectation-backpropagation-parameter-free-training-of-multilayer-neural-networks-with-continuous-or-discrete-weights.pdf)
