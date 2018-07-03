@@ -1,5 +1,8 @@
 # svo： semi-direct visual odometry 半直接视觉里程计
 
+![](https://images2015.cnblogs.com/blog/990334/201706/990334-20170630091523868-2008067667.png)
+
+
 [svo代码注释](https://github.com/Ewenwan/rpg_svo)
 
 [SVO代码分析 较细致](https://www.cnblogs.com/hxzkh/p/8607714.html)
@@ -104,6 +107,14 @@
         按照3d-2d匹配，
         将3d点按照变换矩阵以及相机内参数投影到当前帧，获取亚像素灰度值，
         和原有的匹配点做差，得到灰度差值，使用加权LM算法进行优化，得到变换矩阵[R t]。
+![](https://images2015.cnblogs.com/blog/990334/201706/990334-20170630091437586-1514699234.png)
+
+![](https://images2015.cnblogs.com/blog/990334/201706/990334-20170630091445805-1028273992.png)
+
+![](https://images2015.cnblogs.com/blog/990334/201706/990334-20170630091455571-2125585254.png)
+
+        
+        
 ## 半直接法
         利用特征块的配准来对direct method估计的位姿进行优化。
 ## 特征点法
