@@ -1,4 +1,6 @@
 # Parallel Tracking And Mapping (PTAM) 特征点法 
+![](http://image.mamicode.com/info/201802/20180211193608683439.png)
+
       2007年，Klein等人提出了PTAM（Parallel Tracking and Mapping），
       这也是视觉SLAM发展过程中的重要事件。
       
