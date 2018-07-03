@@ -1,6 +1,11 @@
 # Parallel Tracking And Mapping (PTAM) 特征点法 
 ![](http://image.mamicode.com/info/201802/20180211193608683439.png)
-
+      
+      PTAM[1]是视觉SLAM领域里程碑式的项目。
+      在此之前，MonoSLAM[2]为代表的基于卡尔曼滤波的算法架构是主流，
+      它用单个线程逐帧更新相机位置姿态和地图。
+      
+      
       2007年，Klein等人提出了PTAM（Parallel Tracking and Mapping），
       这也是视觉SLAM发展过程中的重要事件。
       
@@ -48,7 +53,9 @@
       
       PTAM主要分为这几部分：
             1) Track线程
-                1. FAST特征提取
+                1. 金字塔分层，FAST特征提取
+                   (对图片构造金字塔的目的有两个：1）加快匹配；2）提高地图点相对于相机远近变化时的鲁棒性)
+                   (FAST是常用的特征点，优点是快，缺点是不鲁棒.通常先提取出大量匹配点，后使用SSD快匹配，剔除误匹配)
                 2. 地图初始化
                 3. 跟踪定位
                　　（极线几何与极线搜索，
@@ -56,6 +63,7 @@
                 4. 选取添加关键帧到缓存队列
                 5. 重定位(每帧高斯模糊小图SSD相似度匹配)
             2) Map线程
+                5.5 先五点法加RANSAC求出初值
                 6. 局部BundleAdjustment
                 7. 全局BundleAdjustment
                 8. 从缓存队列取出关键帧到地图
