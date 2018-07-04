@@ -340,6 +340,11 @@
     检测准确度：
         SSD300：voc2007 map0.5: 77.2; coco上 map0.5: 43.1, map0.7: 25.8;
         SSD512: voc2007 map0.5: 79.8; coco上 map0.5: 48.5, map0.7: 30.3;
+        
+      YOLO-V2下的准确度
+        SSD300：voc2007 map0.5: 74.3; coco上 map0.5: 41.2
+        SSD500：voc2007 map0.5: 76.8; coco上 map0.5: 46.5
+        
     模型：
         https://github.com/weiliu89/caffe/tree/ssd  有链接，需要翻墙，其他资源未找到。
         SSD300_VOC0712 
@@ -350,6 +355,11 @@
         COCO https://github.com/Ewenwan/MVision/blob/master/CNN/SSD/coco_vgg16-ssd-300-300/VGG_coco_SSD_300x300_deploy.prototxt
         VOC0712 https://github.com/Ewenwan/MVision/blob/master/CNN/SSD/SSD_300x300/ssd_33_deploy.prototxt
 ### yolo-v2 检测
-
-
-
+    论文：https://arxiv.org/pdf/1612.08242.pdf
+      YOLO-V2 的准确度(darknet下)
+        YOLOv2：voc2007 map0.5: 76.8; 
+        YOLOv2 544x544：voc2007 map0.5: 78.6; 
+        YOLOv2 608x608:coco上 map0.5: 48.1
+      caffe下 
+#### 裁剪
+#### 量化
