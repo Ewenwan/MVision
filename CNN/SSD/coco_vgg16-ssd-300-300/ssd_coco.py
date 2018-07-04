@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from __future__ import print_function
 import caffe
 from caffe.model_libs import *
@@ -77,14 +78,17 @@ run_soon = True
 resume_training = True
 # If true, Remove old model files.
 remove_old_models = False
-
+# 数据集地址
 # The database file for training data. Created by data/coco/create_data.sh
 train_data = "examples/coco/coco_train_lmdb"
 # The database file for testing data. Created by data/coco/create_data.sh
 test_data = "examples/coco/coco_minival_lmdb"
 # Specify the batch sampler.
-resize_width = 300
-resize_height = 300
+# 定义网络输入大小
+#resize_width = 300
+#resize_height = 300
+resize_width = 512
+resize_height = 512
 resize = "{}x{}".format(resize_width, resize_height)
 batch_sampler = [
         {
