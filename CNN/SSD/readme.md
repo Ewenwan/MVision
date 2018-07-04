@@ -1,4 +1,6 @@
 # SSD 
+![](https://img-blog.csdn.net/20170630194511381?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVzc2VfTXg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
     该框架和 Faster RCNN 最重要的两个区别在于：
         1. 将 Faster RCNN 的卷积加全连接层的网络结构，转换为：全卷机结构。
            这一改变，使得检测的速度，得到很大的提升。
