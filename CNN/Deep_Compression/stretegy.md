@@ -346,7 +346,9 @@
         SSD512_VOC0712 
         SSD300_COCO 
         SSD512_COCO 
-
+    框架文件：
+        COCO https://github.com/Ewenwan/MVision/blob/master/CNN/SSD/coco_vgg16-ssd-300-300/VGG_coco_SSD_300x300_deploy.prototxt
+        VOC0712 https://github.com/Ewenwan/MVision/blob/master/CNN/SSD/SSD_300x300/ssd_33_deploy.prototxt
 ### yolo-v2 检测
 
 
