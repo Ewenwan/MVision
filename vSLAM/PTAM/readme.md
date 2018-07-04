@@ -228,3 +228,5 @@
 [PTAM之姿态估计 ](https://blog.csdn.net/ilotuo/article/details/51830928)
    
 ## 9. 代码分析
+[依赖库安装](https://github.com/Ewenwan/MVision/blob/master/vSLAM/PTAM/3rdParty_install.sh)
+
