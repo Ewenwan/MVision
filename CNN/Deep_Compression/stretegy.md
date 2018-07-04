@@ -183,7 +183,7 @@
 
 ### fastert-rcnn 检测框架
 #### vgg16-fastert-rcnn
-    Faster R-CNN 
+    Faster R-CNN coco数据集上
     baseline mAP@.5  mAP@.5:.95
     VGG-16     41.5  21.5
     ResNet-101 48.4  27.2
@@ -231,6 +231,35 @@
         top-5：7.5
 
 ###  ResNet模型
+
+    论文: 
+        https://arxiv.org/pdf/1512.03385.pdf
+    模型结构：最后一个 1000-d全连接层，其他均为卷积层，18/34 是两个3*3卷积，后面是 1*1 + 3*3 + 1*1
+    权重文件： https://onedrive.live.com/?authkey=%21AAFW2-FVoxeVRck&id=4006CBB8476FF777%2117887&cid=4006CBB8476FF777  需要翻墙
+              csdn上有下载 需要金币
+              https://download.csdn.net/download/shaxinqing/10426907  ResNet-152-model.caffemodel
+              https://download.csdn.net/download/zhs233/10311355      ResNet-101-model.caffemodel
+              https://download.csdn.net/download/zhs233/10311350      ResNet-50-model.caffemodel
+    prototxt文件：         
+        https://github.com/Ewenwan/MVision/blob/master/CNN/ResNet/ResNet-50-deploy.prototxt
+        https://github.com/Ewenwan/MVision/blob/master/CNN/ResNet/ResNet-101-deploy.prototxt
+        https://github.com/Ewenwan/MVision/blob/master/CNN/ResNet/ResNet-152-deploy.prototxt
+    分类结果：    
+        ResNet18: 
+            top-1：27.88
+            top-5：-
+        ResNet34：
+            top-1：21.53
+            top-5：5.60   
+        ResNet50:
+            top-1：20.74
+            top-5：5.25
+        ResNet101:
+            top-1：19.87
+            top-5：4.60
+        ResNet152: 
+            top-1：19.38
+            top-5：4.49   / 3.57
 
 ###  mobilenet模型
 
