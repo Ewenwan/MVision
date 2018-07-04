@@ -793,12 +793,16 @@
     4、执行命令
     ./darknet detector recall cfg/voc_my_cfg.data cfg/yolov3-voc.cfg backup/yolov3-voc_final.weights
 [训练参考](https://blog.csdn.net/hrsstudy/article/details/65644517?utm_source=itdadao&utm_medium=referral)
+
 ## 11 在coco数据集上训练
 [数据集主页](http://cocodataset.org/)
 
     微软发布的COCO数据库, 除了图片以外还提供物体检测, 分割(segmentation)和对图像的语义文本描述信息.
+    
 [COCO数据库的网址是: MS COCO API - ](http://mscoco.org/) 
+
 [Github网址 -  ](https://github.com/pdollar/coco)
+
 [关于API更多的细节在网站: ](http://mscoco.org/dataset/#download) 
 
     数据库提供Matlab, Python和Lua的API接口. 其中matlab和python的API接口可以提供完整的图像标签数据的加载, 
@@ -904,34 +908,34 @@
       toothbrush        }}
       
 ## 11.2下载数据集   
-        cp scripts/get_coco_dataset.sh data
-        cd data
-        bash get_coco_dataset.sh
+    cp scripts/get_coco_dataset.sh data
+    cd data
+    bash get_coco_dataset.sh
 
-        脚本细节
-        1. 下载 数据库API
-           git clone https://github.com/pdollar/coco
-           cd coco
-        2. 创建 images文件夹 并下载 图像数据 解压
-           在images文件夹下下载  点击链接可直接下载
-           wget -c https://pjreddie.com/media/files/train2014.zip
-           wget -c https://pjreddie.com/media/files/val2014.zip
+    脚本细节
+    1. 下载 数据库API
+     git clone https://github.com/pdollar/coco
+     cd coco
+    2. 创建 images文件夹 并下载 图像数据 解压
+     在images文件夹下下载  点击链接可直接下载
+     wget -c https://pjreddie.com/media/files/train2014.zip
+     wget -c https://pjreddie.com/media/files/val2014.zip
 
-           解压
-           unzip -q train2014.zip
-           unzip -q val2014.zip
-        3. 下载标注文件等
-            cd ..
-            wget -c https://pjreddie.com/media/files/instances_train-val2014.zip
-            wget -c https://pjreddie.com/media/files/coco/5k.part
-            wget -c https://pjreddie.com/media/files/coco/trainvalno5k.part
-            wget -c https://pjreddie.com/media/files/coco/labels.tgz
-            sudo tar xzf labels.tgz                        标签
-            sudo unzip -q instances_train-val2014.zip     分割  得到 annotations  实例分割
+     解压
+     unzip -q train2014.zip
+     unzip -q val2014.zip
+    3. 下载标注文件等
+      cd ..
+      wget -c https://pjreddie.com/media/files/instances_train-val2014.zip
+      wget -c https://pjreddie.com/media/files/coco/5k.part
+      wget -c https://pjreddie.com/media/files/coco/trainvalno5k.part
+      wget -c https://pjreddie.com/media/files/coco/labels.tgz
+      sudo tar xzf labels.tgz                        标签
+      sudo unzip -q instances_train-val2014.zip     分割  得到 annotations  实例分割
 
-            生成训练/测试图像列表文件
-            paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt   测试验证数据
-            paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt  训练数据
+      生成训练/测试图像列表文件
+      paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt   测试验证数据
+      paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt  训练数据
 
 ## 11.3修改 coco数据集的配置文件
     vim cfg/coco_my.data
