@@ -6,6 +6,10 @@
            转移到各个 scale 的 feature map 上进行，使得检测的精度也非常高。
            
         基于这两个改善的基础上，使得SSD在物体检测算法中脱颖而出
+
+
+[论文](https://arxiv.org/pdf/1512.02325.pdf)
+
 [幻灯片介绍](http://www.cs.unc.edu/~wliu/papers/ssd_eccv2016_slide.pdf)
 
 [caffeSSD ](https://github.com/weiliu89/caffe/tree/ssd)
