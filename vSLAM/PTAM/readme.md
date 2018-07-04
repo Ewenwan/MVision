@@ -227,6 +227,16 @@
  
 [PTAM之姿态估计 ](https://blog.csdn.net/ilotuo/article/details/51830928)
    
+   
 ## 9. 代码分析
 [依赖库安装](https://github.com/Ewenwan/MVision/blob/master/vSLAM/PTAM/3rdParty_install.sh)
+
+      下载代码并安装： 
+      git clone https://github.com/Ewenwan/PTAM4AR.git
+      cd PTAM4AR
+      mkdir build
+      cd build
+      cmake ..
+      make -j
+
 
