@@ -1,4 +1,13 @@
 # SSD 
+    该框架和 Faster RCNN 最重要的两个区别在于：
+        1. 将 Faster RCNN 的卷积加全连接层的网络结构，转换为：全卷机结构。
+           这一改变，使得检测的速度，得到很大的提升。
+        2. 将 RPN 提取 proposal 的机制，
+           转移到各个 scale 的 feature map 上进行，使得检测的精度也非常高。
+           
+        基于这两个改善的基础上，使得SSD在物体检测算法中脱颖而出
+[幻灯片介绍](http://www.cs.unc.edu/~wliu/papers/ssd_eccv2016_slide.pdf)
+
 [caffeSSD ](https://github.com/weiliu89/caffe/tree/ssd)
 
 [mxnet-ssd](https://github.com/Ewenwan/mxnet-ssd)
