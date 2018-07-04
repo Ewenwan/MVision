@@ -186,3 +186,38 @@
 
 
 # 实验
+
+## 分类
+### imagenet2012数据集 140G
+    类别总数：1000类
+    图片格式：256*256*3 彩色图；
+    数据集结构： 130万训练图片 (732 to 1300 每一类)，
+                10万测试图片(100/类)，
+                5万验证图片(50/类)
+下载地址：
+
+    测试集 http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_test.tar    12.7G
+    验证集 http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_val.tar     6.28G
+    训练集 http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_train.tar   138G
+
+    对应标签：
+    http://dl.caffe.berkeleyvision.org/caffe_ilsvrc12.tar.gz
+    
+训练时间：
+    
+    
+数据集抽取: 
+    
+
+###  VGGnet模型
+
+###  ResNet模型
+
+
+
+## 检测
+
+### coco数据集 
+
+
+
