@@ -244,7 +244,7 @@
         https://github.com/Ewenwan/MVision/blob/master/CNN/ResNet/ResNet-50-deploy.prototxt
         https://github.com/Ewenwan/MVision/blob/master/CNN/ResNet/ResNet-101-deploy.prototxt
         https://github.com/Ewenwan/MVision/blob/master/CNN/ResNet/ResNet-152-deploy.prototxt
-    分类结果：    
+    分类结果(错误率)：    
         ResNet18: 
             top-1：27.88
             top-5：-
@@ -262,6 +262,27 @@
             top-5：4.49   / 3.57
 
 ###  mobilenet模型
+
+    MobileNets-v1:
+        论文：https://arxiv.org/pdf/1704.04861.pdf
+        分类准确率：
+        top-1：70.81
+        top-5：89.85 
+        模型大小： 16.2 MB
+        模型：https://github.com/shicai/MobileNet-Caffe/blob/master/mobilenet.caffemodel
+        框架：https://github.com/Ewenwan/MVision/blob/master/CNN/MobileNet/mobilenet_v1_deploy.prototxt
+    MobileNets-v2:
+        论文：https://arxiv.org/pdf/1801.04381.pdf
+        分类准确率：
+        top-1：71.90
+        top-5：90.49
+        模型大小：13.5 MB
+        模型：https://github.com/shicai/MobileNet-Caffe/blob/master/mobilenet_v2.caffemodel
+        框架：https://github.com/Ewenwan/MVision/blob/master/CNN/MobileNet/mobilenet_v2_deploy.prototxt
+
+    
+
+
 
 ### squeezeet模型
 
