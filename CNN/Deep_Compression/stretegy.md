@@ -182,8 +182,11 @@
 
 
 ### fastert-rcnn 检测框架
-#### vgg6-fastert-rcnn
-
+#### vgg16-fastert-rcnn
+    Faster R-CNN 
+    baseline mAP@.5  mAP@.5:.95
+    VGG-16     41.5  21.5
+    ResNet-101 48.4  27.2
 
 # 实验
 
