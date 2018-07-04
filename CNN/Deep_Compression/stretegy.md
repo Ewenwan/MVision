@@ -226,7 +226,7 @@
         vgg19：16个卷积层+3个全链接层=19
             http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_19_layers.caffemodel   548M
             https://github.com/Ewenwan/MVision/blob/master/CNN/SSD/VGG_ILSVRC_19_layers_deploy.prototxt
-    分类结果：两者多次度分类差不多
+    分类结果(错误率)：两者多次度分类差不多
         top-1：24.8
         top-5：7.5
 
@@ -290,7 +290,7 @@
     框架：https://github.com/Ewenwan/MVision/blob/master/CNN/SqueezeNet/squeezenet_v1.1_deploy.prototxt
 
 ### shufflenet模型
-    论文：https://arxiv.org/pdf/1602.07360.pdf
+    论文：https://arxiv.org/pdf/1707.01083.pdf
     分类准确率：
         top-1：65.45%
         top-5：86.38%
