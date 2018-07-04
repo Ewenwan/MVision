@@ -336,6 +336,15 @@
       
 
 ### vgg16-ssd 检测
+论文：https://arxiv.org/pdf/1512.02325.pdf
+检测准确度：
+    SSD300：voc2007 map0.5: 77.2; coco上 map0.5: 43.1, map0.7: 25.8;
+    SSD512: voc2007 map0.5: 79.8; coco上 map0.5: 48.5, map0.7: 30.3;
+模型：
+    SSD300_VOC0712 
+    SSD512_VOC0712 
+    SSD300_COCO 
+    SSD512_COCO 
 
 ### yolo-v2 检测
 
