@@ -274,19 +274,29 @@
     MobileNets-v2:
         论文：https://arxiv.org/pdf/1801.04381.pdf
         分类准确率：
-        top-1：71.90
-        top-5：90.49
+            top-1：71.90%
+            top-5：90.49%
         模型大小：13.5 MB
         模型：https://github.com/shicai/MobileNet-Caffe/blob/master/mobilenet_v2.caffemodel
         框架：https://github.com/Ewenwan/MVision/blob/master/CNN/MobileNet/mobilenet_v2_deploy.prototxt
 
-    
-
-
-
 ### squeezeet模型
+    论文：https://arxiv.org/pdf/1602.07360.pdf
+    分类准确率：
+        top-1：60.4%
+        top-5：82.5%
+    模型大小：4.8MB    
+    模型：https://github.com/DeepScale/SqueezeNet/blob/master/SqueezeNet_v1.1/squeezenet_v1.1.caffemodel
+    框架：https://github.com/Ewenwan/MVision/blob/master/CNN/SqueezeNet/squeezenet_v1.1_deploy.prototxt
 
 ### shufflenet模型
+    论文：https://arxiv.org/pdf/1602.07360.pdf
+    分类准确率：
+        top-1：65.45%
+        top-5：86.38%
+    模型大小：7.04MB    
+    模型：https://github.com/msnqqer/ShuffleNet/blob/master/shufflenet_1x_g3.caffemodel
+    框架：https://github.com/Ewenwan/MVision/blob/master/CNN/ShuffleNet/shufflenet_1x_g3_deploy.prototxt
 
 
 
@@ -324,5 +334,10 @@
       paste <(awk "{print \"$PWD\"}" <5k.part) 5k.part | tr -d '\t' > 5k.txt   测试验证数据
       paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt  训练数据
       
+
+### vgg16-ssd 检测
+
+### yolo-v2 检测
+
 
 
