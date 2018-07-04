@@ -1,9 +1,13 @@
 # 残差网络
 [v2_tf](https://github.com/tensorflow/models/blob/master/research/adv_imagenet_models/inception_resnet_v2.py)
 
+[何凯明深度残差学习 幻灯片](http://image-net.org/challenges/talks/ilsvrc2015_deep_residual_learning_kaiminghe.pdf)
+
+[论文](https://arxiv.org/pdf/1512.03385.pdf)
+
 # 核心思想
  
-    结合不同卷积层的特征
+    结合不同卷积层的特征，添加直通通路，可以使得梯度传播的更远，网络可以更深
     f(x) + W*x
     f(x) 为 23x3的卷积 
     实际中，考虑计算的成本，对残差块做了计算C，即将2个3x3的卷积层替换为 1x1 + 3x3 + 1x1 。
