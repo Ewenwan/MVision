@@ -20,6 +20,7 @@
 
 [基于TensorFlow的SSD车辆检测](https://blog.csdn.net/shuzfan/article/details/79034555)
 
+[改进 DSSD : Deconvolutional Single Shot Detector 反卷积后再多尺度预测](https://arxiv.org/pdf/1701.06659.pdf)
 
 # VGG16 结构图 13个卷积层+3个全链接层=16
 ```asm
