@@ -5,6 +5,8 @@
 
 [论文](https://arxiv.org/pdf/1512.03385.pdf)
 
+[官方代码](https://github.com/Ewenwan/deep-residual-networks)
+
 # 核心思想
  
     结合不同卷积层的特征，添加直通通路，可以使得梯度传播的更远，网络可以更深
