@@ -216,17 +216,16 @@
         https://arxiv.org/pdf/1409.1556.pdf
 
     权重和框架：
-        vgg16：13个卷积层+3个全链接层=16  含全连接层（较大）
+        vgg16：13个卷积层+3个全链接层=16
             http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_16_layers.caffemodel    528M
             https://github.com/Ewenwan/MVision/blob/master/CNN/SSD/VGG_ILSVRC_16_layers_deploy.prototxt
 
-        vgg19：
-            http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_19_layers.caffemodel
+        vgg19：16个卷积层+3个全链接层=19
+            http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_19_layers.caffemodel   548M
             https://github.com/Ewenwan/MVision/blob/master/CNN/SSD/VGG_ILSVRC_19_layers_deploy.prototxt
-
-
-
-        
+    分类结果：两者多次度分类差不多
+        top-1：24.8
+        top-5：7.5
 
 ###  ResNet模型
 
