@@ -12,6 +12,44 @@
 
 [darknet yolov1](https://pjreddie.com/darknet/yolov1/)
 
+# yolov3改进
+## 1. 多级预测(多尺度预测)
+    终于为 YOLO 增加了 top down 的多级预测，解决了 YOLO 颗粒度粗，对小目标无力的问题。
+    v2 只有一个 detection，v3 一下变成了 3 个，分别是一个下采样的，feature map 为 13*13，
+    还有 2 个上采样的 eltwise sum，feature map 为 26*26，52*52，
+    也就是说 v3 的 416 版本已经用到了 52 的 feature map，
+    而 v2 把多尺度考虑到训练的 data 采样上，最后也只是用到了 13 的 feature map，这应该是对小目标影响最大的地方。
+    在论文中从单层预测五种 boundingbox 变成 每层 3 种 boundongbox(3*3=9种)。
+    
+## 2. loss不同
+
+    作者 v3 替换了 v2 的 softmax loss 变成 logistic loss，
+    由于每个点所对应的 bounding box 少并且差异大，
+    每个 bounding 与 ground truth 的 matching 策略变成了 1 对 1。
+    
+    当预测的目标类别很复杂的时候，采用 logistic regression 进行分类是更有效的，
+    比如在 Open Images Dataset 数据集进行分类。
+    在这个数据集中，会有很多重叠的标签，比如女人、人，
+    如果使用 softmax 则意味着每个候选框只对应着一个类别，但是实际上并不总是这样。
+    复合标签的方法能对数据进行更好的建模。
+    
+## 3. 加深网络
+    采用简化的 residual block 取代了原来 1×1 和 3×3 的 block,
+    其实就是加了一个 shortcut(直通捷径)，也是网络加深必然所要采取的手段(梯度就可以传播的更远)。
+    这和上一点是有关系的，v2 的 darknet-19 变成了 v3 的 darknet-53，
+    为啥呢？就是需要上采样啊，卷积层的数量自然就多了，
+    另外作者还是用了一连串的  3*3、1*1 卷积，3*3 的卷积增加 channel，
+    而 1*1 的卷积在于压缩 3*3 卷积后的特征表示。
+
+## 4. Router
+    由于 top down 的多级预测，进而改变了 router（或者说 concatenate，不同尺度特征的融合方式）时的方式，
+    将原来诡异的 reorg(大尺度拆分成小尺度) 改成了 upsample(上采样合并)。
+## 说点题外话
+    YOLO 让人联想到龙珠里的沙鲁（cell），不断吸收同化对手，进化自己，提升战斗力：
+    YOLOv1 吸收了 SSD 的长处（加了 BN 层，扩大输入维度，使用了 Anchor，训练的时候数据增强），进化到了 YOLOv2； 
+    吸收 DSSD 和 FPN 的长处，仿 ResNet 的 Darknet-53，仿 SqueezeNet 的纵横交叉网络，又进化到 YOLO 第三形态。 
+    
+    
     =============================================
     =============================================
   ## 1.安装 编译darknet
