@@ -21,6 +21,7 @@
     5. 生成数据库文件
         生成图像列表文件：
             python data/coco/create_list.py
+            生成子集  minival.txt, testdev.txt, test.txt, train.txt
         生成对应的数据库：
             ./data/coco/create_data.sh
             得到：
