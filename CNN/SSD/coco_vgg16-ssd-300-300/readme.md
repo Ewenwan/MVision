@@ -74,4 +74,8 @@
       
       生成训练集和验证集 
       
-      
+# 以上处理有点问题
+    下载最新的 2017
+    http://images.cocodataset.org/zips/train2017.zip 
+    http://images.cocodataset.org/annotations/annotations_trainval2017.zip
+    http://images.cocodataset.org/zips/val2017.zip 
