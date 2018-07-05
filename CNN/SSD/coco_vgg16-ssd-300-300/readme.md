@@ -61,14 +61,17 @@
       paste <(awk "{print \"$PWD\"}" <trainvalno5k.part) trainvalno5k.part | tr -d '\t' > trainvalno5k.txt  训练数据
       
     4. caffe下的后处理
-      生成 文件名
+      生成 文件名id
       训练集中的 val 部分
       cat trainvalno5k.txt | awk -F "/" '{for(i=1;i<=NF;i++){ if(i==11) print $i; }}' | grep val | cut -b 1-25 | tee train_val_list.txt
       训练集的 train 部分
-      cat trainvalno5k.txt | awk -F "/" '{for(i=1;i<=NF;i++){ if(i==11) print $i; }}' | grep tra | cut -b 1-27 | tee train_list.txt
+      cat trainvalno5k.txt | awk -F "/" '{for(i=1;i<=NF;i++){ if(i==11) print $i; }}' | grep tra | cut -b 1-27 | tee train2014.txt
       
       验证集中的 验证 部分
-      cat 5k.txt | awk -F "/" '{for(i=1;i<=NF;i++){ if(i==11) print $i; }}' | cut -b 1-25 | tee val_list.txt
+      cat 5k.txt | awk -F "/" '{for(i=1;i<=NF;i++){ if(i==11) print $i; }}' | cut -b 1-25 | tee val2014.txt
       
+      将 train2014.txt 和 val2014.txt 放入 coco/idSets 下
+      
+      生成训练集和验证集 
       
       
