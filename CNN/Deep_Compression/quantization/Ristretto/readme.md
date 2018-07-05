@@ -19,6 +19,9 @@
 
 [代码 主要修改](https://github.com/MichalBusta/caffe/commit/55c64c202fc8fca875e108b48c13993b7fdd0f63)
 
+
+[ristretto_ssd 代码 ](https://github.com/Ewenwan/ristretto_ssd)
+
 # Ristretto速览
 ## Ristretto Tool  Ristretto工具：
            Ristretto工具使用不同的比特宽度进行数字表示，
