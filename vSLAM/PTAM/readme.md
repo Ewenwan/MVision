@@ -238,7 +238,72 @@
       cd build
       cmake ..
       make -j
+### 主要依赖库
+#### libCVD (computer vision library) - 计算机视觉库，主要用于计算机视觉和视频、图片处理
+      fast_corner fast角点检测
+      video yuv420 yuv411编解码  视频读取 
+[代码](https://github.com/Ewenwan/libcvd)
 
+#### GVars3 (configuration system library) - 系统配置库，属于libCVD的子项目，功能是读取配置文件，获取命令行数
+      GUI  简单 用户界面程序
+      GV3::get() 获取配置参数
+[代码](https://github.com/Ewenwan/gvars)
+
+
+#### TooN (Tom’s Object-oriented numerics library) - 主要用于大量小矩阵的运算，尤其是矩阵分解和优化
+
+### 代码结构分析
 [代码分析参考](https://blog.csdn.net/aquathinker/article/details/7768519)
-
       
+      入口函数 src/main.cc
+            //GVars3::GUI
+            GUI.LoadFile("../config/settings.cfg");// 载入相机参数等配置文件
+            System s;// 创建系统对象 自动执行 System::System()函数
+            s.Run(); // 运行
+      src/System.cc
+            A. 系统对象构造函数 System::System()
+                  1. 注册一系列命令、添加相对应的功能按钮。
+                      //GVars3::GUI
+                      GUI.RegisterCommand("exit", GUICommandCallBack, this);// 退出
+                      GUI.RegisterCommand("quit", GUICommandCallBack, this);// 停止
+
+                  2. 检查相机参数是否已经传入，否则退出，去进行相机标定
+                      使用GVars3库函数
+                      vTest = GV3::get<Vector<NUMTRACKERCAMPARAMETERS> >("Camera.Parameters", ATANCamera::mvDefaultParams, HIDDEN);
+
+                 3. 创建摄像机ATANCamera对象 
+                      // ATANCamera.cc 相机内参数、畸变参数、图像大小、归一化平面投影
+                      mpCamera = new ATANCamera("Camera");
+
+                 4. 创建地图Map 地图创建管理器MapMaker 跟踪器Tracker 增强现实AR驱动ARDriver 地图显示MapViewer 
+                        mpMap = new Map;                              // src/Map.cc      地图
+                        mpMapMaker = new MapMaker(*mpMap, *mpCamera); // src/MapMaker.cc 地图管理器
+                        mpTracker = new Tracker(mpVideoSource->Size(), *mpCamera, *mpMap, *mpMapMaker);// src/Tracker.cc   跟踪器
+                        mpARDriver = new ARDriver(*mpCamera, mpVideoSource->Size(), mGLWindow);        // src/ARDriver.cc  虚拟物体
+                        mpMapViewer = new MapViewer(*mpMap, mGLWindow);                                // src/MapViewer.cc 地图显示
+                 5. 初始化GUI游戏菜单及相应功能按钮。
+                        GUI.ParseLine("GLWindow.AddMenu Menu Menu");
+                        GUI.ParseLine("Menu.ShowMenu Root");
+                        GUI.ParseLine("Menu.AddMenuButton Root Reset Reset Root");
+                        GUI.ParseLine("Menu.AddMenuButton Root Spacebar PokeTracker Root");
+                        GUI.ParseLine("DrawAR=0");
+                        GUI.ParseLine("DrawMap=0");
+                        GUI.ParseLine("Menu.AddMenuToggle Root \"View Map\" DrawMap Root");
+                        GUI.ParseLine("Menu.AddMenuToggle Root \"Draw AR\" DrawAR Root");
+                 6. 初始化标志 
+                        mbDone = false;// 初始化时mbDone = false;  
+                        
+            B. 系统运行函数 void System::Run()
+                  1. 创建图像处理对象
+                        CVD::Image<CVD::Rgb<CVD::byte> > imFrameRGB(mpVideoSource->Size());// 彩色图像用于最终的显示
+                        CVD::Image<CVD::byte> imFrameBW(mpVideoSource->Size());//黑白(灰度)图像用于处理追踪相关等功能
+                  2. 采集上述两种图像
+                        mpVideoSource->GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB);
+                  3. 系统跟踪和建图， 更新系统帧
+                        UpdateFrame(imFrameBW, imFrameRGB);
+
+                        
+                  
+                  
+                  
+                  
