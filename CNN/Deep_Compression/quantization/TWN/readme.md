@@ -48,3 +48,31 @@
     由于相同大小的filter，
     三值化比二值化能蕴含更多的信息，
     因此相比于BWN准确率有所提高。
+    
+[this blog](http://blog.csdn.net/xjtu_noc_wei/article/details/52862282) is useful for implementation
+
+## Experimental Results
+
+Three data sets are used in this paper, including MNIST, CIFAR-10, ImageNet. To different data sets, the authors conducted experiments using LeNet-5 (32-C5 + MP2 + 64-C5 + MP2 + 512FC + SVM), VGG-inspired network (2$$\times$$(128-C3) + MP2 + 2$$\times$$(256-C3) + MP2 + 2$$\times$$(512-C3) + MP2 + 1024-FC + Softmax), ResNet-18, respectively. Network architecture and parameters setting for different data sets are shown as follows:
+
+|                                          | MNIST   | CIFAR-10 | ImageNet             |
+| ---------------------------------------- | ------- | -------- | -------------------- |
+| network architecture                     | LeNet-5 | VGG-7    | ResNet-18 (B)        |
+| weight decay                             | 1e-4    | 1e-4     | 1e-4                 |
+| mini-batch size of BN                    | 50      | 100      | 64($$\times$$4 GPUs) |
+| initial learning rate                    | 0.01    | 0.1      | 0.1                  |
+| learning rate decay (divided by 10) epochs | 15, 25  | 80, 120  | 30, 40, 50           |
+| momentum                                 | 0.9     | 0.9      | 0.9                  |
+
+Comparison of the proposed method and the previous methods are shown as follows:
+
+|          Method           | MINIST | CIFAR-10 | ImageNet Top1 (ResNet-18 / ResNet-18B) | ImageNet Top5 (ResNet-18 / ResNet-18B) |
+| :-----------------------: | :----: | :------: | :------------------------------------: | :------------------------------------: |
+|            TWN            | 99.35  |  92.56   |              61.8 / 65.3               |              84.2 / 86.2               |
+|           BPWN            | 99.05  |  90.18   |              57.5 / 61.6               |              81.2 / 83.9               |
+|   FPWN (full precision)   | 99.41  |  92.88   |              65.4 / 67.6               |              86.76 / 88.0              |
+|      Binary Connect       | 98.82  |  91.73   |                   -                    |                   -                    |
+| Binarized Neural Networks |  88.6  |  89.85   |                   -                    |                   -                    |
+|  Binary Weight Networks   |   -    |    -     |                  60.8                  |                  83.0                  |
+|         XNOR-Net          |   -    |    -     |                  51.2                  |                  73.2                  |
+
