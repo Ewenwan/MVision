@@ -254,7 +254,7 @@
 
 ### 代码结构分析
 [代码分析参考](https://blog.csdn.net/aquathinker/article/details/7768519)
-      
+
       入口函数 src/main.cc
             //GVars3::GUI
             GUI.LoadFile("../config/settings.cfg");// 载入相机参数等配置文件
@@ -265,7 +265,7 @@
                   0. 对象继承于
                      mpVideoSource(new VideoSourceV4L())      // 视频处理对象 V4L库视频对象 src/VideoSource.cc
                      mGLWindow(mpVideoSource->Size(), "PTAM") // 菜单 GLWindow2 mGLWindow      src/GLWindow2.cc  
-                     
+
                   1. 注册一系列命令、添加相对应的功能按钮。
                       //GVars3::GUI
                       GUI.RegisterCommand("exit", GUICommandCallBack, this);// 退出
@@ -296,7 +296,7 @@
                         GUI.ParseLine("Menu.AddMenuToggle Root \"Draw AR\" DrawAR Root");
                  6. 初始化标志 
                         mbDone = false;// 初始化时mbDone = false;  
-                        
+
             B. 系统运行函数 void System::Run()
                   1. 创建图像处理对象
                         CVD::Image<CVD::Rgb<CVD::byte> > imFrameRGB(mpVideoSource->Size());// 彩色图像用于最终的显示
@@ -305,10 +305,16 @@
                         mpVideoSource->GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB);
                   3. 系统跟踪和建图， 更新系统帧
                         UpdateFrame(imFrameBW, imFrameRGB);
-                        
+
             C. 系统跟踪和建图， 更新系统帧 System::UpdateFrame()
-            
-                  
-                  
-                  
-                  
+                  1. 系统初始化，第一帧的处理，单应变换求解3D点云，生成初始地图
+                  2. 设置可是化窗口相关属性
+                  3. 读取 显示配置参数
+                  4. 显示表示更新，DrawMap及DrawAR状态变量的判断
+                  5. 开始追踪黑白图像(相机位姿跟踪)
+                         多层级金字塔图像(多金字塔尺度) FAST角点检测匹配跟踪
+                         每一个层级的阈值有所不同。最后生成按列角点查询表，便于以后近邻角点的查询任务.
+                        mpTracker->TrackFrame(imBW, !bDrawAR && !bDrawMap);// Tracker::TrackFrame() src/Tracker.cc
+                  6. 可视化显示点云和 虚拟物体
+                  7.可视化文字菜单显示
+
