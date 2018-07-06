@@ -2,14 +2,14 @@ train_net: "./VGG_coco_SSD_300x300_train.prototxt"
 test_net: "./VGG_coco_SSD_300x300_test.prototxt"
 test_iter: 625
 test_interval: 10000
-base_lr: 0.001
+base_lr: 0.0001
 display: 10
 max_iter: 400000
 lr_policy: "multistep"
 gamma: 0.1
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 40000
+snapshot: 1000
 snapshot_prefix: "models/VGG_coco_SSD_300x300"
 solver_mode: GPU
 device_id: 0
@@ -24,4 +24,3 @@ iter_size: 1
 type: "SGD"
 eval_type: "detection"
 ap_version: "11point"
-
