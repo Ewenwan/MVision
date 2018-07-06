@@ -1,26 +1,21 @@
 # 性能提升方法
     1. 小模型 mobilenet , 更精细模型的设计，紧致网络设计
        mobilenet squeezenet shufflenet 
-[MobileNet逐通道卷积 + 普通点卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet) 
-
-[SqueezeNet 1∗1 和3∗3 卷积较少通道数量 ](https://github.com/Ewenwan/MVision/tree/master/CNN/SqueezeNet)
-
-[ShuffleNet 分组点卷积+通道重排+逐通道卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/ShuffleNet)
+[MobileNet逐通道卷积 + 普通点卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet) [SqueezeNet 1∗1 和3∗3 卷积较少通道数量 ](https://github.com/Ewenwan/MVision/tree/master/CNN/SqueezeNet)[ShuffleNet 分组点卷积+通道重排+逐通道卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/ShuffleNet)
 
     2. 模型压缩：参数稀疏、剪裁、量化、分解
        本部分
        
     3. 软件优化-高性能计算 
-       腾讯 ncnn
+       腾讯 ncnn 小米
 [见](https://github.com/Ewenwan/MVision/tree/master/CNN/HighPerformanceComputing)
-       
-       
+           
     4. 硬件优化-AI芯片
        TPU
        FPGA上的应用
-       
+       赛灵思Xilinx
        暂时未涉及
-
+[利用 赛灵思Xilinx 器件的INT8优化开展深度学习](https://china.xilinx.com/support/documentation/white_papers/c_wp486-deep-learning-int8.pdf)
 
 [Binarized Neural Network TF training code + C matrix / eval library 量化网络框架](https://github.com/Ewenwan/tinier-nn)
 
