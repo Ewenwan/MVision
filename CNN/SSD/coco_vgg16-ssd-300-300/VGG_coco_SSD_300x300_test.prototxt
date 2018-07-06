@@ -21,14 +21,14 @@ layer {
     }
   }
   data_param {
-    source: "examples/coco/coco_minival_lmdb"
-    batch_size: 8
+    source: "../../../data/coco2017/coco/lmdb/coco_val2017_img_label_lmdb"
+    batch_size: 4
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
     }
-    label_map_file: "data/coco/labelmap_coco.prototxt"
+    label_map_file: "./labelmap_coco.prototxt"
   }
 }
 layer {
@@ -1639,11 +1639,11 @@ layer {
       top_k: 400
     }
     save_output_param {
-      output_directory: "/root/data/mscoco/results/SSD_300x300"
-      output_name_prefix: "detections_minival_ssd300_results"
+      output_directory: "./val_reault"
+      output_name_prefix: "detections_val2017_ssd300_results"
       output_format: "COCO"
-      label_map_file: "data/coco/labelmap_coco.prototxt"
-      name_size_file: "data/coco/minival2014_name_size.txt"
+      label_map_file: "./labelmap_coco.prototxt"
+      name_size_file: "./val2017_name_size.txt"
       num_test_image: 5000
     }
     code_type: CENTER_SIZE
@@ -1665,7 +1665,6 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.5
     evaluate_difficult_gt: false
-    name_size_file: "data/coco/minival2014_name_size.txt"
+    name_size_file: "./val2017_name_size.txt"
   }
 }
-
