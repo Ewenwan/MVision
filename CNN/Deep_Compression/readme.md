@@ -1,14 +1,33 @@
+---
+layout: post
+title: "神经网络压缩"
+date: 2018-07-06
+description: "量化 剪枝 ncnn Ristretto"
+tag: 深度学习
+---   
+
 # 性能提升方法
+[本文github链接](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/readme.md)
+
     1. 小模型 mobilenet , 更精细模型的设计，紧致网络设计
        mobilenet squeezenet shufflenet 
-[MobileNet逐通道卷积 + 普通点卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet) [SqueezeNet 1∗1 和3∗3 卷积较少通道数量 ](https://github.com/Ewenwan/MVision/tree/master/CNN/SqueezeNet)[ShuffleNet 分组点卷积+通道重排+逐通道卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/ShuffleNet)
+       
+[MobileNet逐通道卷积 + 普通点卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet) 
+
+[SqueezeNet 1∗1 和3∗3 卷积较少通道数量 ](https://github.com/Ewenwan/MVision/tree/master/CNN/SqueezeNet)
+
+[ShuffleNet 分组点卷积+通道重排+逐通道卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/ShuffleNet)
 
     2. 模型压缩：参数稀疏、剪裁、量化、分解
        本部分
-       
+[量化](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/readme.md)
+
+[剪枝](https://github.com/Ewenwan/MVision/tree/master/CNN/Deep_Compression/pruning)
+
     3. 软件优化-高性能计算 
-       腾讯 ncnn 小米
-[见](https://github.com/Ewenwan/MVision/tree/master/CNN/HighPerformanceComputing)
+       腾讯 ncnn 小米mace 百度MDL Google TensorFlow Lite
+       
+[高性能计算](https://github.com/Ewenwan/MVision/tree/master/CNN/HighPerformanceComputing)
            
     4. 硬件优化-AI芯片
        TPU
@@ -33,6 +52,7 @@
         开发基于硬件例如 FPGA 的硬件加速平台显得很有必要。
         其实硬件加速神经网络前向运算的最主要的任务就是完成卷积优化，
         减少卷积运算的资源和能源消耗非常核心。
+        
 ## 卷积优化的主要思路
 
 ### 1. 内存换取时间：
@@ -1174,3 +1194,5 @@
        这样学习来的小网络可以具备和大的复杂网络相想接近的性能效果，实现网络的压缩。
 
 
+<br>
+*转载请注明原地址，万有文的博客：[ewenwan.github.io](https://ewenwan.github.io) 谢谢！*
