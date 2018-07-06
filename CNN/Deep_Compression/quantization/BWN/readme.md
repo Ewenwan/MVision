@@ -11,6 +11,28 @@
 ![](https://img-blog.csdn.net/20160715112109483)
 
 
+### Implementation in PyTorch
+
+The implementation of XNOR-Net is similar to those of BWN which including three steps: quantization, forward propagation and backward propagation.
+
+### Experimental Results
+
+In this paper, the authors conducted experiments on AlexNet and ResNet and validated the proposed methods using validation data set of ImageNet with single crop. The optimization method used in there experiments is ADAM as it can converge faster and have better performance with binary inputs. Experimental results are shown as follows:
+
+| Model               | Top-1 Accuracy/ Top-5 Accuracy | Accuracy Loss    |
+| ------------------- | ------------------------------ | ---------------- |
+| AlexNet reference   | 56.6% / 80.2%                  |                  |
+| AlexNet BC          | 35.4% / 61.0%                  | -21.2% / -19.2%  |
+| AlexNet BWN         | 56.8% / 79.4%                  | 0.2% / -0.8%     |
+| AlexNet BNN         | 27.9 % / 50.42%                | -28.7% / -29.78% |
+| AlexNet XNOR-Net    | 44.2% / 69.2%                  | -12.4% / -11%    |
+| ResNet-18 reference | 69.3% / 89.2%                  |                  |
+| ResNet-18 BWN       | 60.8% / 83.0%                  | -8.5% / -5.8%    |
+| ResNet-18 XNOR-Net  | 51.2% / 73.2%                  | -18.1% / -16%    |
+| GoogLeNet reference | 71.3% / 90.0%                  |                  |
+| GoogLeNet BWN       | 65.5% / 86.1%                  | -5.8% / -3.9%    |
+
+
       每年的年初是机器学习相关会议扎堆的时段，Matthieu与Itay于3月17日更新了他们的合作论文，
       进行了一些细节的调整，看起来是投稿前的最后准备。
       但就在一天前的3月16日，来自西雅图的Allen institute for AI和
