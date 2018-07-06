@@ -46,8 +46,8 @@ layer {
     }
   }
   data_param {
-    source: "examples/coco/coco_train_lmdb"
-    batch_size: 8
+    source: "../../../data/coco2017/coco/lmdb/coco_train2017_img_label_lmdb"
+    batch_size: 4
     backend: LMDB
   }
   annotated_data_param {
@@ -133,7 +133,7 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    label_map_file: "data/coco/labelmap_coco.prototxt"
+    label_map_file: "./labelmap_coco.prototxt"
   }
 }
 layer {
@@ -1730,4 +1730,3 @@ layer {
     mining_type: MAX_NEGATIVE
   }
 }
-
