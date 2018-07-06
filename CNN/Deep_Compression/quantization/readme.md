@@ -3,6 +3,9 @@
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAPOcSAACWBTome1c039.png)
 
 
+[其他博客参考](https://github.com/ICEORY/iceory.gitbook.io/tree/master/Network%20Quantization)
+
+
 # 量化(quantization)。
     对象：对权重量化，对特征图量化(神经元输出)，对梯度量化(训练过程中)
     过程：在inference网络前传，在训练过程(反传)
