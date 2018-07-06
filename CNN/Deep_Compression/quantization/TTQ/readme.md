@@ -1,6 +1,27 @@
 # 训练三值量化 TTQ  训练浮点数量化
 [Trained Ternary Quantization  TTQ](https://arxiv.org/pdf/1612.01064.pdf)
 
+[代码](https://github.com/Ewenwan/ternarynet)
+
+## Experimental Results:
+
+#### Error Rate of Finetuned TTQ ResNet models on CIFAR-10:
+
+| Network       | Full Precision | TTQ         |
+| ------------- | ------------- | ----------- |
+| ResNet-20     | 8.23          | 8.87        |
+| ResNet-32     | 7.67          | 7.63        |
+| ResNet-44     | 7.18          | 7.02        |
+| ResNet-56     | 6.80          | 6.44        |
+
+#### Error Rate of TTQ AlexNet model on ImageNet from scratch:
+
+| Network       | Full Precision | TTQ         |
+| ------------- | ------------- | ----------- |
+| Top1-error    | 42.8          | 42.5        |
+| Top5-error    | 19.7          | 20.3        |
+
+
 [博客参考](https://blog.csdn.net/yingpeng_zhong/article/details/80382704)
 
     提供一个三值网络的训练方法。
