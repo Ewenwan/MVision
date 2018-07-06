@@ -2,10 +2,117 @@
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAPOcSAACWBTome1c039.png)
 
-
 [其他博客参考](https://github.com/ICEORY/iceory.gitbook.io/tree/master/Network%20Quantization)
 
 [论文合集](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/quantizedNN_paper.md)
+
+
+# NN的INT8计算
+
+## 概述
+
+	NN的INT8计算是近来NN计算优化的方向之一。
+	相比于传统的浮点计算，整数计算无疑速度更快，
+	而NN由于自身特性，对单点计算的精确度要求不高，
+	且损失的精度还可以通过retrain的方式恢复大部分，
+	因此通常的科学计算的硬件（没错就是指的GPU）并不太适合NN运算，尤其是NN Inference。
+
+>传统的GPU并不适合NN运算，因此Nvidia也好，还是其他GPU厂商也好，通常都在GPU中又集成了NN加速的硬件，因此虽然商品名还是叫做GPU，但是工作原理已经有别于传统的GPU了。
+
+这方面的文章以Xilinx的白皮书较为经典：
+
+https://china.xilinx.com/support/documentation/white_papers/c_wp486-deep-learning-int8.pdf
+
+利用Xilinx器件的INT8优化开展深度学习
+
+## INT量化
+
+论文：
+
+《On the efficient representation and execution of deep acoustic models》
+
+![](/images/img2/INT8.png)
+
+一个浮点数包括底数和指数两部分。将两者分开，就得到了一般的INT量化。
+
+## UINT量化
+
+论文：
+
+《Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference》
+
+![](/images/img2/INT8_2.png)
+
+UINT量化使用bias将数据搬移到正数区间。
+
+这篇论文的另一个贡献在于：原先的INT8量化是针对已经训练好的模型。而现在还可以在训练的时候就进行量化——前向计算进行量化，而反向的误差修正不做量化。
+
+## NN硬件的指标术语
+
+MACC：multiply-accumulate，乘法累加。
+
+FLOPS：Floating-point Operations Per Second，每秒所执行的浮点运算次数。
+
+显然NN的INT8计算主要以MACC为单位。
+
+## 低精度数据计算库 gemmlowp
+
+gemmlowp是Google提出的一个支持低精度数据的GEMM（General Matrix Multiply）库。
+
+代码：
+
+https://github.com/google/gemmlowp
+
+## 论文
+
+《Quantizing deep convolutional networks for efficient inference: A whitepaper》
+
+## 参考
+
+https://www.chiphell.com/thread-1620755-1-1.html
+
+新Titan X的INT8计算到底是什么鬼
+
+https://mp.weixin.qq.com/s/S9VcoS_59nbZWe_P3ye2Tw
+
+减少模型半数内存用量：百度&英伟达提出混合精度训练法
+
+https://zhuanlan.zhihu.com/p/35700882
+
+CNN量化技术
+
+https://mp.weixin.qq.com/s/9DXMqiPIK5P5wzUMT7_Vfw
+
+基于交替方向法的循环神经网络多比特量化
+
+https://mp.weixin.qq.com/s/PDeChj1hQqUrZiepxXODJg
+
+ICLR oral：清华提出离散化架构WAGE，神经网络训练推理合二为一
+
+http://blog.csdn.net/tangwei2014/article/details/55077172
+
+二值化神经网络介绍
+
+https://mp.weixin.qq.com/s/oumf8l28ijYLxc9fge0FMQ
+
+嵌入式深度学习之神经网络二值化（1）
+
+https://mp.weixin.qq.com/s/tbRj5Wd69n9gvSzW4oKStg
+
+嵌入式深度学习之神经网络二值化（2）
+
+https://mp.weixin.qq.com/s/RsZCTqCKwpnjATUFC8da7g
+
+嵌入式深度学习之神经网络二值化（3）
+
+https://mp.weixin.qq.com/s/tbRj5Wd69n9gvSzW4oKStg
+
+异或神经网络
+
+https://mp.weixin.qq.com/s/KgM1k1bziLTCec67hQ8hlQ
+
+超全总结：神经网络加速之量化模型
+
 
 # 量化(quantization)。
     对象：对权重量化，对特征图量化(神经元输出)，对梯度量化(训练过程中)
