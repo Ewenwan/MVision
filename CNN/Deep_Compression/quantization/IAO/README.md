@@ -97,36 +97,36 @@ Integer-Arithmetic-Only Inference](https://arxiv.org/pdf/1712.05877.pdf)
 
 - origin
 
-![simple_graph_origin](https://github.com/ICEORY/iceory.gitbook.io/tree/39ddec85f635ab3b4ac127efe6172e53e487f9fa/Network%20Quantization/fig/integer_arithmetic_only/simple_origin.png)
+![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/simple_origin.png)
 
 - quantized
 
-![simple_graph_origin](https://github.com/ICEORY/iceory.gitbook.io/tree/39ddec85f635ab3b4ac127efe6172e53e487f9fa/Network%20Quantization/fig/integer_arithmetic_only/simple_quantize.png)
+![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/simple_quantize.png)
 
 #### layer with bypass
 
 - origin
 
-![simple_graph_origin](https://github.com/ICEORY/iceory.gitbook.io/tree/39ddec85f635ab3b4ac127efe6172e53e487f9fa/Network%20Quantization/fig/integer_arithmetic_only/bypass_origin.png)
+![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/bypass_origin.png)
 
 - quantized
 
-![simple_graph_origin](https://github.com/ICEORY/iceory.gitbook.io/tree/39ddec85f635ab3b4ac127efe6172e53e487f9fa/Network%20Quantization/fig/integer_arithmetic_only/bypass_quantize.png)
+![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/bypass_quantize.png)
 
 #### convolutional layer with batch normalization
 
 - training
 
-![simple_graph_origin](https://github.com/ICEORY/iceory.gitbook.io/tree/39ddec85f635ab3b4ac127efe6172e53e487f9fa/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training.png)
+![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training.png)
 
 - inference
 
-![simple_graph_origin](https://github.com/ICEORY/iceory.gitbook.io/tree/39ddec85f635ab3b4ac127efe6172e53e487f9fa/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_inference.png)
+![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_inference.png)
 
 - training with fold
 
-![simple_graph_origin](https://github.com/ICEORY/iceory.gitbook.io/tree/39ddec85f635ab3b4ac127efe6172e53e487f9fa/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training_fold.png)
+![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training_fold.png)
 
 - training with fold quantized
 
-![simple_graph_origin](https://github.com/ICEORY/iceory.gitbook.io/tree/39ddec85f635ab3b4ac127efe6172e53e487f9fa/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training_fold_quantize.png)
+![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training_fold_quantize.png)
