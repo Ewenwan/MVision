@@ -262,6 +262,10 @@
             s.Run(); // 运行
       src/System.cc
             A. 系统对象构造函数 System::System()
+                  0. 对象继承于
+                     mpVideoSource(new VideoSourceV4L())      // 视频处理对象 V4L库视频对象 src/VideoSource.cc
+                     mGLWindow(mpVideoSource->Size(), "PTAM") // 菜单 GLWindow2 mGLWindow      src/GLWindow2.cc  
+                     
                   1. 注册一系列命令、添加相对应的功能按钮。
                       //GVars3::GUI
                       GUI.RegisterCommand("exit", GUICommandCallBack, this);// 退出
@@ -301,8 +305,9 @@
                         mpVideoSource->GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB);
                   3. 系统跟踪和建图， 更新系统帧
                         UpdateFrame(imFrameBW, imFrameRGB);
-
                         
+            C. 系统跟踪和建图， 更新系统帧 System::UpdateFrame()
+            
                   
                   
                   
