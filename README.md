@@ -1,5 +1,7 @@
 # MVision　Machine Vision 机器视觉
 
+[优秀的博客论文笔记](https://github.com/Ewenwan/antkillerfarm.github.com)
+
 [CSCI 1430: Introduction to Computer Vision 计算机视觉课程](http://cs.brown.edu/courses/csci1430/#schedule)
 
 [计算机视觉和算法 书籍](http://szeliski.org/Book/drafts/SzeliskiBook_20100903_draft.pdf)
