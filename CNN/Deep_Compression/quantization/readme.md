@@ -5,6 +5,7 @@
 
 [其他博客参考](https://github.com/ICEORY/iceory.gitbook.io/tree/master/Network%20Quantization)
 
+[论文合集](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/quantizedNN_paper.md)
 
 # 量化(quantization)。
     对象：对权重量化，对特征图量化(神经元输出)，对梯度量化(训练过程中)
