@@ -31,7 +31,7 @@ https://china.xilinx.com/support/documentation/white_papers/c_wp486-deep-learnin
 
 《On the efficient representation and execution of deep acoustic models》
 
-![](/images/img2/INT8.png)
+![](https://github.com/Ewenwan/antkillerfarm.github.com/tree/master/images/img2/INT8.png)
 
 一个浮点数包括底数和指数两部分。将两者分开，就得到了一般的INT量化。
 
@@ -41,7 +41,7 @@ https://china.xilinx.com/support/documentation/white_papers/c_wp486-deep-learnin
 
 《Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference》
 
-![](/images/img2/INT8_2.png)
+![](https://github.com/Ewenwan/antkillerfarm.github.com/tree/master/images/img2/INT8_2.png)
 
 UINT量化使用bias将数据搬移到正数区间。
 
