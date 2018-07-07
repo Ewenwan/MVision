@@ -16,6 +16,55 @@ Note: the project aims at imitating the well-implemented algorithms in [Deep Lea
 
 [吴恩达老师的深度学习课程笔记及资源](https://github.com/fengdu78/deeplearning_ai_books)
 
+# 博客资源
+
+[深度学习（一）——MP(多层感知器)神经元模型, BP(反向传播)算法, 《机器学习》周志华著; 台湾大学李宏毅副教授的深度学习课程; Deep Learning书籍](http://antkillerfarm.github.io/dl/2017/01/13/Deep_Learning.html)
+
+其他：
+
+    09 Jun 2018 » 深度学习（四十一）——迁移学习, AlphaGo
+    25 Apr 2018 » 深度学习（四十）——模型压缩与加速, OCR, 目标检测进阶, Spatial Transformer Networks
+    29 Mar 2018 » 深度学习（三十九）——GAN进阶, 行人重识别
+    20 Mar 2018 » 深度学习（三十八）——深度强化学习（2）, Multi-agent, CNN进阶, 图像变换
+    08 Mar 2018 » 深度学习（三十七）——人脸识别, Graph NN
+    06 Mar 2018 » 深度学习（三十六）——深度推荐系统, Recursive NN, 多任务学习, AutoDL
+    30 Jan 2018 » 深度学习（三十五）——姿态/行为检测, 深度目标跟踪, Mask R-CNN, 手势识别, Spiking Neuron Networks, DNC
+    27 Jan 2018 » 深度学习（三十四）——深度强化学习（1）
+    25 Jan 2018 » 深度学习（三十三）——Capsule
+    19 Jan 2018 » 深度学习（三十二）——词向量进阶, NN的INT8计算, 视频目标分割
+    17 Jan 2018 » 深度学习（三十一）——依存分析, 信息检索, Image Caption Generation
+    15 Jan 2018 » 深度学习（三十）——Deep Speech, WaveNet
+    13 Jan 2018 » 深度学习（二十九）——语音识别, 语音合成, CTC
+    08 Jan 2018 » 深度学习（二十八）——SOM, Group Normalization, MobileNet, 花式卷积进阶
+    04 Jan 2018 » 深度学习（二十七）——RBM & DBN & Deep Autoencoder
+    03 Jan 2018 » 深度学习（二十六）——VAE
+    22 Dec 2017 » 深度学习（二十五）——Attention（2）
+    05 Dec 2017 » 深度学习（二十四）——L2 Normalization, Attention（1）
+    25 Nov 2017 » 深度学习（二十三）——ShuffleSeg, Fast Image Processing, SVDF, LCNN, LSTM进阶
+    22 Oct 2017 » 深度学习（二十二）——VDSR, ESPCN, FSRCNN, VESPCN, SRGAN, DemosaicNet, MemNet, RDN
+    18 Oct 2017 » 深度学习（二十一）——图像超分辨率算法, SRCNN, DRCN
+    12 Oct 2017 » 深度学习（二十）——GCN, Ultra Deep Network
+    10 Oct 2017 » 深度学习（十九）——FCN, SegNet, DeconvNet, DeepLab, ENet
+    01 Oct 2017 » 深度学习（十八）——YOLOv2, 语义分割
+    23 Sep 2017 » 深度学习（十七）——YOLO, SSD
+    09 Sep 2017 » 深度学习（十六）——Fast R-CNN, Faster R-CNN
+    06 Sep 2017 » 深度学习（十五）——RCNN, SPPNet
+    29 Aug 2017 » 深度学习（十四）——Softmax详解, 目标检测
+    28 Aug 2017 » 深度学习（十三）——花式池化, Batch Normalization
+    27 Aug 2017 » 深度学习（十二）——Winograd（2）
+    26 Aug 2017 » 深度学习（十一）——数据增强, Winograd（1）
+    25 Aug 2017 » 深度学习（十）——fine-tuning, 李飞飞, 花式卷积
+    06 Aug 2017 » 深度学习（九）——GAN
+    23 Jun 2017 » 深度学习（八）——CNN进化史
+    22 Jun 2017 » 深度学习（七）——Bi-directional RNN, seq2seq, DMN
+    21 Jun 2017 » 深度学习（六）——神经元激活函数进阶, DRN
+    15 Jun 2017 » 深度学习（五）——RNN, LSTM
+    14 Jun 2017 » 深度学习（四）——词向量
+    27 May 2017 » 深度学习（三）——Neural Network Zoo, CNN, Autoencoder
+    17 May 2017 » 深度学习（二）——神经元激活函数, Dropout, 深度学习常用术语解释
+    13 Jan 2017 » 深度学习（一）——MP神经元模型, BP算法
+
+
 ## 1. 神经网络的编程基础(Basics of Neural Network programming)
 ### 1.1 二分类(Binary Classification)
 ### 1.2 逻辑回归(Logistic Regression)
