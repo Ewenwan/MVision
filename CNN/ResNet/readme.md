@@ -7,6 +7,12 @@
 
 [官方代码](https://github.com/Ewenwan/deep-residual-networks)
 
+* ResNet 论文翻译
+[Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385)
+[中文版](http://noahsnail.com/2017/07/31/2017-7-31-ResNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E6%96%87%E7%89%88/)
+[中英文对照](http://noahsnail.com/2017/07/31/2017-7-31-ResNet%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E8%8B%B1%E6%96%87%E5%AF%B9%E7%85%A7/)
+
+
 # 核心思想
  
     结合不同卷积层的特征，添加直通通路，可以使得梯度传播的更远，网络可以更深
