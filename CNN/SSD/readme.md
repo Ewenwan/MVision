@@ -1,5 +1,12 @@
 # SSD 
-![](https://img-blog.csdn.net/20170630194511381?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVzc2VfTXg=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+* SSD  
+[SSD: Single Shot MultiBox Detector](https://arxiv.org/abs/1512.02325)
+[中文版](http://noahsnail.com/2017/12/11/2017-12-11-Single%20Shot%20MultiBox%20Detector%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E6%96%87%E7%89%88/)
+[中英文对照](http://noahsnail.com/2017/12/11/2017-12-11-Single%20Shot%20MultiBox%20Detector%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E8%8B%B1%E6%96%87%E5%AF%B9%E7%85%A7/)
+
+
+![](https://img-blog.csdn.net/20160918092701558)
 
     该框架和 Faster RCNN 最重要的两个区别在于：
         1. 将 Faster RCNN 的卷积加全连接层的网络结构，转换为：全卷机结构。
