@@ -1,4 +1,6 @@
 # Deformable-ConvNets 可变卷积（Deformable ConvNets）算法 卷积核形状可变 
+[博客参考](https://www.jianshu.com/p/940d21c79aa3)
+
 
 * Deformable-ConvNets  
 [Deformable Convolutional Networks](https://arxiv.org/abs/1703.06211)
@@ -12,3 +14,6 @@
       (b)(c)(d) 为可变形卷积，在正常的采样坐标上加上一个位移量（蓝色箭头），
       其中 (c)(d) 作为 (b) 的特殊情况，
       展示了可变形卷积可以作为尺度变换，比例变换和旋转变换的特殊情况
+
+![https://upload-images.jianshu.io/upload_images/4998541-dbdcd5cf2fe67d5c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/475]
+
