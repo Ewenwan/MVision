@@ -64,6 +64,8 @@ Note: the project aims at imitating the well-implemented algorithms in [Deep Lea
     17 May 2017 » 深度学习（二）——神经元激活函数, Dropout, 深度学习常用术语解释
     13 Jan 2017 » 深度学习（一）——MP神经元模型, BP算法
 
+![Neural Network Zoo](http://antkillerfarm.github.io/images/article/Neural_Networks.png)
+
 
 ## 1. 神经网络的编程基础(Basics of Neural Network programming)
 ### 1.1 二分类(Binary Classification)
