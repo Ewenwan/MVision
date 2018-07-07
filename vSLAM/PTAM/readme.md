@@ -263,7 +263,8 @@
             GUI.LoadFile("../config/settings.cfg");// 载入相机参数等配置文件
             System s;// 创建系统对象 自动执行 System::System()函数
             s.Run(); // 运行
-      src/System.cc
+            
+src/System.cc
 #### A. 系统对象构造函数 System::System()
       0. 对象继承于
          mpVideoSource(new VideoSourceV4L())      // 视频处理对象 V4L库视频对象 src/VideoSource.cc
@@ -320,4 +321,55 @@
             mpTracker->TrackFrame(imBW, !bDrawAR && !bDrawMap);// Tracker::TrackFrame() src/Tracker.cc
       6. 可视化显示点云和 虚拟物体
       7.可视化文字菜单显示
+      
+src/Tracker.cc
 
+#### Tracker::TrackFrame() 跟踪每一帧图像
+
+      步骤1： 预处理，为当前关键帧生成4级金字塔图像(多尺度金字塔)，进行FAST角点检测，生成角点查找表
+              mCurrentKF.MakeKeyFrame_Lite(imFrame);// src/KeyFrame.cc, KeyFrame::MakeKeyFrame_Lite()
+              1. 生成金字塔图像，上一层下采样得到下一层图像
+                  lev.im.resize(aLevels[i - 1].im.size() / 2);// 尺寸减半
+                  halfSample(aLevels[i - 1].im, lev.im);// 上一层下采样，得到下一层图像
+
+              2. FAST角点 检测，对每一层进行 FAST角点 检测
+                  if (i == 0)// 第0层 图像
+                        fast_corner_detect_10(lev.im, lev.vCorners, 10);
+                  if (i == 1)// 第1层 图像
+                        fast_corner_detect_10(lev.im, lev.vCorners, 15);
+                  if (i == 2)// 第2层 图像
+                        fast_corner_detect_10(lev.im, lev.vCorners, 15);
+                  if (i == 3)// 第4层 图像
+                        fast_corner_detect_10(lev.im, lev.vCorners, 10);
+
+               3. 建立角点查找表，加快查找，对每一行的角点创建查找表LUT 加速查找邻居角点
+      步骤2：更新小图，为估计旋转矩阵做准备
+      步骤3：显示图像(第0层)和FAST角点
+                  1. 运动模型跟踪上一帧(求解初始位置，上一帧速度乘上上一帧位姿)
+                        Tracker::PredictPoseWithMotionModel();
+
+                  2. 跟踪地图 最重要的部分
+                        Tracker::TrackMap();
+                            a. 地图点根据帧初始位姿和相机参数投影到帧的二维图像平面上，
+                               跳过不在相机平面上的点
+                            b. patch 匹配查找匹配点对
+                            c. 3d-2d p6p求解 
+
+                  3. 更新运动模型(前后两帧变换矩阵)
+                        Tracker::UpdateMotionModel();
+
+                  4. 确保跟踪质量
+                        Tracker::AssessTrackingQuality();
+                  5. 显示更新系统跟踪状态信息(跟踪质量好坏 每一层fast角点熟练 地图点和关键帧数量)
+                        manMeasFound[i]；
+                        manMeasAttempted[i];
+                        mMap.vpPoints.size()；
+                        mMap.vpKeyFrames.size()；
+                  6. 关键帧判断+创建关键帧   
+                        mMapMaker.IsNeedNewKeyFrame(mCurrentKF);//是否需要创建关键帧
+                        mMapMaker.AddKeyFrame(mCurrentKF);// 创建关键帧
+                  7. 跟踪丢失的处理--类似重定位处理
+                        Tracker::AttemptRecovery();// 重定位
+                        Tracker::TrackMap();       // 跟踪地图，更新位姿
+                  8. 起初地图质量不好(点比较少)，初始地图跟踪
+                        Tracker::TrackForInitialMap();
