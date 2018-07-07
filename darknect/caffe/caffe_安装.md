@@ -72,3 +72,13 @@
 ### 8. cudnn 新老版本 编译错误兼容性问题
 [cudnn.hpp](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_src_change/cudnn.hpp)
 
+### 9. 单机多 caffe 版本问题
+
+> 修改 caffe/Makefile
+
+    # Complete build flags.
+    # 407行附近
+    # COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-isystem $(includedir))
+      COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I $(includedir))
+      
+      
