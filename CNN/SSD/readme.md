@@ -6,7 +6,7 @@
 [中英文对照](http://noahsnail.com/2017/12/11/2017-12-11-Single%20Shot%20MultiBox%20Detector%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E8%8B%B1%E6%96%87%E5%AF%B9%E7%85%A7/)
 
 
-![](https://img-blog.csdn.net/20160918092701558)
+![](https://images2015.cnblogs.com/blog/1005315/201703/1005315-20170321214539611-212225585.png)
 
     该框架和 Faster RCNN 最重要的两个区别在于：
         1. 将 Faster RCNN 的卷积加全连接层的网络结构，转换为：全卷机结构。
