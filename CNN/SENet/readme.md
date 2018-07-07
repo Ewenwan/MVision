@@ -1,5 +1,14 @@
 # 融合局部感受野内的空间信息和通道信息来提取信息特征
 
+* SENet  
+[Squeeze-and-Excitation Networks](https://arxiv.org/abs/1709.01507)
+[中文版](http://noahsnail.com/2017/11/20/2017-11-20-Squeeze-and-Excitation%20Networks%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E6%96%87%E7%89%88/)
+[中英文对照](http://noahsnail.com/2017/11/20/2017-11-20-Squeeze-and-Excitation%20Networks%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E8%8B%B1%E6%96%87%E5%AF%B9%E7%85%A7/)
+
+[博客翻译](https://blog.csdn.net/Quincuntial/article/details/78605463)
+
+[SENet代码](https://github.com/Ewenwan/SENet/blob/master/README.md)
+
 # Squeeze-and-Excitation Networks <sub>([arXiv](https://arxiv.org/pdf/1709.01507.pdf))</sub>
 By Jie Hu<sup>[1]</sup>, Li Shen<sup>[2]</sup>, Gang Sun<sup>[1]</sup>.
 
