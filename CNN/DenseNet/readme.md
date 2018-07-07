@@ -9,6 +9,7 @@
 
 [MXNet版本代码（有ImageNet预训练模型）](https://github.com/miraclewkf/DenseNet)
 
+[Caffe代码](https://github.com/shicai/DenseNet-Caffe)
 
 [解读](https://www.leiphone.com/news/201708/0MNOwwfvWiAu43WO.html)
 
