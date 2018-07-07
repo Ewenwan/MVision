@@ -60,6 +60,10 @@
 
 [pytorch学习 各种实现](https://github.com/Ewenwan/pytorch_workplace)
 
+[Caffe 全卷积网络 Fully Convolutional Networks ](http://tutorial.caffe.berkeleyvision.org/caffe-cvpr15-pixels.pdf)
+
+[Fast R-CNN Object detection with Caffe](http://tutorial.caffe.berkeleyvision.org/caffe-cvpr15-detection.pdf)
+
 # 损失函数 交叉熵CrossEntropy 以及 Focal Loss 
 [交叉熵损失 Focal Loss 博客介绍](http://www.cnblogs.com/xuanyuyt/p/7444468.html)
 
@@ -78,3 +82,29 @@
 [CUDA C 矩阵乘的分块优化](https://blog.csdn.net/mrhiuser/article/details/51750907)
 
 [CNN 模型压缩与加速算法综述](https://blog.csdn.net/qq_40027052/article/details/78645122)
+
+
+# RNN循环神经网络
+
+[Sequences in Caffe 序列学习 视频 语言 文字](http://tutorial.caffe.berkeleyvision.org/caffe-cvpr15-sequences.pdf)
+
+
+[Caffe学习：RNN源码阅读 ](http://www.meltycriss.com/2016/07/13/caffe_2_rnn/)
+
+[ Caffe学习：LSTM源码阅读 ](http://www.meltycriss.com/2016/08/05/caffe_4_lstm/)
+
+[Understanding LSTM Networks 理解LSTM](http://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+
+[Attention and Augmented Recurrent Neural Networks 注意力模型LSTM](https://distill.pub/2016/augmented-rnns/)
+
+
+
+
+
+[]()
+
+
+
+
+
+
