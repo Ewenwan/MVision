@@ -1,4 +1,5 @@
 # caffe使用
+[caffe 安装](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_%E5%AE%89%E8%A3%85.md)
 
 [Caffe代码解析](http://alanse7en.github.io/caffedai-ma-jie-xi-2/)
 
@@ -6,6 +7,13 @@
 
 [CAFFE使用 源码分析等](https://blog.csdn.net/fangjin_kl/article/list/3)
 
+[caffe 模型配置文件 prototxt 详解](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_%E7%AE%80%E4%BB%8B_%E4%BD%BF%E7%94%A8.md)
+
+[caffe.proto 系统变量层类型参数配置文件](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe.proto%E7%AE%80%E4%BB%8B.md)
+
+[ caffe_简介_使用.md](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_%E7%AE%80%E4%BB%8B_%E4%BD%BF%E7%94%A8.md)
+
+[Caffe使用教程_c++接口](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/Caffe%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B_c%2B%2B%E6%8E%A5%E5%8F%A3.md)
 
 [caffe 模型搜集](https://github.com/SnailTyan/caffe-model-zoo)
 ![screenshot](https://user-images.githubusercontent.com/21311442/33640664-cbcbeff2-da6c-11e7-97c8-1ad8d7fdf4c0.png)
