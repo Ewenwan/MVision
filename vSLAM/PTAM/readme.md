@@ -5,6 +5,7 @@
 [github 代码 makefile工程改成了cmake工程](https://github.com/Ewenwan/PTAM4AR)
 
 
+
 ![](http://image.mamicode.com/info/201802/20180211193608683439.png)
       
       PTAM[1]是视觉SLAM领域里程碑式的项目。
@@ -263,60 +264,60 @@
             System s;// 创建系统对象 自动执行 System::System()函数
             s.Run(); // 运行
       src/System.cc
-            A. 系统对象构造函数 System::System()
-                  0. 对象继承于
-                     mpVideoSource(new VideoSourceV4L())      // 视频处理对象 V4L库视频对象 src/VideoSource.cc
-                     mGLWindow(mpVideoSource->Size(), "PTAM") // 菜单 GLWindow2 mGLWindow      src/GLWindow2.cc  
+#### A. 系统对象构造函数 System::System()
+      0. 对象继承于
+         mpVideoSource(new VideoSourceV4L())      // 视频处理对象 V4L库视频对象 src/VideoSource.cc
+         mGLWindow(mpVideoSource->Size(), "PTAM") // 菜单 GLWindow2 mGLWindow      src/GLWindow2.cc  
 
-                  1. 注册一系列命令、添加相对应的功能按钮。
-                      //GVars3::GUI
-                      GUI.RegisterCommand("exit", GUICommandCallBack, this);// 退出
-                      GUI.RegisterCommand("quit", GUICommandCallBack, this);// 停止
+      1. 注册一系列命令、添加相对应的功能按钮。
+          //GVars3::GUI
+          GUI.RegisterCommand("exit", GUICommandCallBack, this);// 退出
+          GUI.RegisterCommand("quit", GUICommandCallBack, this);// 停止
 
-                  2. 检查相机参数是否已经传入，否则退出，去进行相机标定
-                      使用GVars3库函数
-                      vTest = GV3::get<Vector<NUMTRACKERCAMPARAMETERS> >("Camera.Parameters", ATANCamera::mvDefaultParams, HIDDEN);
+      2. 检查相机参数是否已经传入，否则退出，去进行相机标定
+          使用GVars3库函数
+          vTest = GV3::get<Vector<NUMTRACKERCAMPARAMETERS> >("Camera.Parameters", ATANCamera::mvDefaultParams, HIDDEN);
 
-                 3. 创建摄像机ATANCamera对象 
-                      // ATANCamera.cc 相机内参数、畸变参数、图像大小、归一化平面投影
-                      mpCamera = new ATANCamera("Camera");
+      3. 创建摄像机ATANCamera对象 
+          // ATANCamera.cc 相机内参数、畸变参数、图像大小、归一化平面投影
+          mpCamera = new ATANCamera("Camera");
 
-                 4. 创建地图Map 地图创建管理器MapMaker 跟踪器Tracker 增强现实AR驱动ARDriver 地图显示MapViewer 
-                        mpMap = new Map;                              // src/Map.cc      地图
-                        mpMapMaker = new MapMaker(*mpMap, *mpCamera); // src/MapMaker.cc 地图管理器
-                        mpTracker = new Tracker(mpVideoSource->Size(), *mpCamera, *mpMap, *mpMapMaker);// src/Tracker.cc   跟踪器
-                        mpARDriver = new ARDriver(*mpCamera, mpVideoSource->Size(), mGLWindow);        // src/ARDriver.cc  虚拟物体
-                        mpMapViewer = new MapViewer(*mpMap, mGLWindow);                                // src/MapViewer.cc 地图显示
-                 5. 初始化GUI游戏菜单及相应功能按钮。
-                        GUI.ParseLine("GLWindow.AddMenu Menu Menu");
-                        GUI.ParseLine("Menu.ShowMenu Root");
-                        GUI.ParseLine("Menu.AddMenuButton Root Reset Reset Root");
-                        GUI.ParseLine("Menu.AddMenuButton Root Spacebar PokeTracker Root");
-                        GUI.ParseLine("DrawAR=0");
-                        GUI.ParseLine("DrawMap=0");
-                        GUI.ParseLine("Menu.AddMenuToggle Root \"View Map\" DrawMap Root");
-                        GUI.ParseLine("Menu.AddMenuToggle Root \"Draw AR\" DrawAR Root");
-                 6. 初始化标志 
-                        mbDone = false;// 初始化时mbDone = false;  
+      4. 创建地图Map 地图创建管理器MapMaker 跟踪器Tracker 增强现实AR驱动ARDriver 地图显示MapViewer 
+            mpMap = new Map;                              // src/Map.cc      地图
+            mpMapMaker = new MapMaker(*mpMap, *mpCamera); // src/MapMaker.cc 地图管理器
+            mpTracker = new Tracker(mpVideoSource->Size(), *mpCamera, *mpMap, *mpMapMaker);// src/Tracker.cc   跟踪器
+            mpARDriver = new ARDriver(*mpCamera, mpVideoSource->Size(), mGLWindow);        // src/ARDriver.cc  虚拟物体
+            mpMapViewer = new MapViewer(*mpMap, mGLWindow);                                // src/MapViewer.cc 地图显示
+      5. 初始化GUI游戏菜单及相应功能按钮。
+            GUI.ParseLine("GLWindow.AddMenu Menu Menu");
+            GUI.ParseLine("Menu.ShowMenu Root");
+            GUI.ParseLine("Menu.AddMenuButton Root Reset Reset Root");
+            GUI.ParseLine("Menu.AddMenuButton Root Spacebar PokeTracker Root");
+            GUI.ParseLine("DrawAR=0");
+            GUI.ParseLine("DrawMap=0");
+            GUI.ParseLine("Menu.AddMenuToggle Root \"View Map\" DrawMap Root");
+            GUI.ParseLine("Menu.AddMenuToggle Root \"Draw AR\" DrawAR Root");
+      6. 初始化标志 
+            mbDone = false;// 初始化时mbDone = false;  
 
-            B. 系统运行函数 void System::Run()
-                  1. 创建图像处理对象
-                        CVD::Image<CVD::Rgb<CVD::byte> > imFrameRGB(mpVideoSource->Size());// 彩色图像用于最终的显示
-                        CVD::Image<CVD::byte> imFrameBW(mpVideoSource->Size());//黑白(灰度)图像用于处理追踪相关等功能
-                  2. 采集上述两种图像
-                        mpVideoSource->GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB);
-                  3. 系统跟踪和建图， 更新系统帧
-                        UpdateFrame(imFrameBW, imFrameRGB);
+####   B. 系统运行函数 void System::Run()
+      1. 创建图像处理对象
+            CVD::Image<CVD::Rgb<CVD::byte> > imFrameRGB(mpVideoSource->Size());// 彩色图像用于最终的显示
+            CVD::Image<CVD::byte> imFrameBW(mpVideoSource->Size());//黑白(灰度)图像用于处理追踪相关等功能
+      2. 采集上述两种图像
+            mpVideoSource->GetAndFillFrameBWandRGB(imFrameBW, imFrameRGB);
+      3. 系统跟踪和建图， 更新系统帧
+            UpdateFrame(imFrameBW, imFrameRGB);
 
-            C. 系统跟踪和建图， 更新系统帧 System::UpdateFrame()
-                  1. 系统初始化，第一帧的处理，单应变换求解3D点云，生成初始地图
-                  2. 设置可是化窗口相关属性
-                  3. 读取 显示配置参数
-                  4. 显示表示更新，DrawMap及DrawAR状态变量的判断
-                  5. 开始追踪黑白图像(相机位姿跟踪)
-                         多层级金字塔图像(多金字塔尺度) FAST角点检测匹配跟踪
-                         每一个层级的阈值有所不同。最后生成按列角点查询表，便于以后近邻角点的查询任务.
-                        mpTracker->TrackFrame(imBW, !bDrawAR && !bDrawMap);// Tracker::TrackFrame() src/Tracker.cc
-                  6. 可视化显示点云和 虚拟物体
-                  7.可视化文字菜单显示
+####  C. 系统跟踪和建图， 更新系统帧 System::UpdateFrame()
+      1. 系统初始化，第一帧的处理，单应变换求解3D点云，生成初始地图
+      2. 设置可是化窗口相关属性
+      3. 读取 显示配置参数
+      4. 显示表示更新，DrawMap及DrawAR状态变量的判断
+      5. 开始追踪黑白图像(相机位姿跟踪)
+             多层级金字塔图像(多金字塔尺度) FAST角点检测匹配跟踪
+             每一个层级的阈值有所不同。最后生成按列角点查询表，便于以后近邻角点的查询任务.
+            mpTracker->TrackFrame(imBW, !bDrawAR && !bDrawMap);// Tracker::TrackFrame() src/Tracker.cc
+      6. 可视化显示点云和 虚拟物体
+      7.可视化文字菜单显示
 
