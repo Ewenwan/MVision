@@ -9,6 +9,8 @@
 
 Note: the project aims at imitating the well-implemented algorithms in [Deep Learning Tutorials](http://www.deeplearning.net/tutorial/) (coded by [Theano](http://deeplearning.net/software/theano/index.html)).
 
+[TensorFlow 学习](http://antkillerfarm.github.io/ai/2017/08/21/tensorflow.html)
+
 
 [参考博客](https://github.com/DragonFive/myblog/blob/master/source/_posts/DL-learningNote1.md)
 
