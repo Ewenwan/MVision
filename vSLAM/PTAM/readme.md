@@ -322,7 +322,7 @@ src/System.cc
       6. 可视化显示点云和 虚拟物体
       7.可视化文字菜单显示
       
-src/Tracker.cc
+跟踪线程主要函数文件 src/Tracker.cc
 
 #### Tracker::TrackFrame() 跟踪每一帧图像
 
@@ -366,10 +366,27 @@ src/Tracker.cc
                         mMap.vpPoints.size()；
                         mMap.vpKeyFrames.size()；
                   6. 关键帧判断+创建关键帧   
-                        mMapMaker.IsNeedNewKeyFrame(mCurrentKF);//是否需要创建关键帧
+                        mMapMaker.IsNeedNewKeyFrame(mCurrentKF);//是否需要创建关键帧 MapMaker::IsNeedNewKeyFrame()
                         mMapMaker.AddKeyFrame(mCurrentKF);// 创建关键帧
                   7. 跟踪丢失的处理--类似重定位处理
                         Tracker::AttemptRecovery();// 重定位
                         Tracker::TrackMap();       // 跟踪地图，更新位姿
                   8. 起初地图质量不好(点比较少)，初始地图跟踪
                         Tracker::TrackForInitialMap();
+                        
+                        
+建图线程主要函数文件 src/MapMaker.cc
+#### MapMaker::run()
+      步骤1. 局部地图优化
+             MapMaker::BundleAdjustRecent();
+      步骤2. 地图点投影到关键帧，无匹配到的角点，三角化，创建新的地图点
+            MapMaker::ReFindNewlyMade();
+                MapMaker::Triangulate();
+      步骤3. 全局地图优化
+            MapMaker::BundleAdjustAll();
+      步骤4. 查找外点
+            MapMaker::ReFindFromFailureQueue();
+      步骤5. 处理外点
+            MapMaker::HandleBadPoints();
+      步骤6. 添加关键帧到地图
+            MapMaker::AddKeyFrameFromTopOfQueue();
