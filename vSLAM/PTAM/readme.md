@@ -1,4 +1,10 @@
 # Parallel Tracking And Mapping (PTAM) 特征点法 
+
+[项目主页](http://www.robots.ox.ac.uk/~gk/PTAM/)
+
+[github 代码 makefile工程改成了cmake工程](https://github.com/Ewenwan/PTAM4AR)
+
+
 ![](http://image.mamicode.com/info/201802/20180211193608683439.png)
       
       PTAM[1]是视觉SLAM领域里程碑式的项目。
@@ -75,10 +81,6 @@
             3) 后端优化（Bundle Adjustment）
             4) 建图（极线搜索加点）
             5) 没有回环检测
-
-[项目主页](http://www.robots.ox.ac.uk/~gk/PTAM/)
-
-[github 代码 makefile工程改成了cmake工程](https://github.com/Ewenwan/PTAM4AR)
 
 ## 主要原理是: 
       从摄影图像上捕捉特征点，
