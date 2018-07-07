@@ -1,5 +1,7 @@
 # Parallel Tracking And Mapping (PTAM) 特征点法 
 
+[本文github](https://github.com/Ewenwan/MVision/tree/master/vSLAM/PTAM)
+
 [项目主页](http://www.robots.ox.ac.uk/~gk/PTAM/)
 
 [github 代码 makefile工程改成了cmake工程](https://github.com/Ewenwan/PTAM4AR)
