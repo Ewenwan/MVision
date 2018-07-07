@@ -1,10 +1,17 @@
+# caffe使用
+
 [Caffe代码解析](http://alanse7en.github.io/caffedai-ma-jie-xi-2/)
 
 [caffe网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
 
 [CAFFE使用 源码分析等](https://blog.csdn.net/fangjin_kl/article/list/3)
 
-      caffe 中 BatchNorm层  要和  Scale 层一起用才有 批规范化的效果
+
+[caffe 模型搜集](https://github.com/SnailTyan/caffe-model-zoo)
+![screenshot](https://user-images.githubusercontent.com/21311442/33640664-cbcbeff2-da6c-11e7-97c8-1ad8d7fdf4c0.png)
+
+
+# caffe 中 BatchNorm层  要和  Scale 层一起用才有 批规范化的效果
 [参考 ](https://blog.csdn.net/Suan2014/article/details/79623495)
 > 批规范化：
 
