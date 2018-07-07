@@ -69,3 +69,6 @@
     解决方法：
     pip install -U scikit-image #若没有安装pip: sudo apt install python-pip
     有时安装不了
+### 8. cudnn 新老版本 编译错误兼容性问题
+[cudnn.hpp](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_src_change/cudnn.hpp)
+
