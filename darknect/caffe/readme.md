@@ -19,6 +19,24 @@
 ![screenshot](https://user-images.githubusercontent.com/21311442/33640664-cbcbeff2-da6c-11e7-97c8-1ad8d7fdf4c0.png)
 
 
+# prototxt文件的可视化
+
+      1.使用在线工具netscope。
+
+      https://ethereon.github.io/netscope/quickstart.html
+
+      2.使用自带draw_net.py脚本。
+
+      参考：
+
+      http://www.cnblogs.com/zjutzz/p/5955218.html
+
+      caffe绘制网络结构图
+
+      http://yanglei.me/gen_proto/
+
+      另一个在线工具。
+
 # caffe 中 BatchNorm层  要和  Scale 层一起用才有 批规范化的效果
 [参考 ](https://blog.csdn.net/Suan2014/article/details/79623495)
 > 批规范化：
