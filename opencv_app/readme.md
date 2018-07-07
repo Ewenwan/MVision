@@ -5,6 +5,25 @@
 
 [opencv大师 项目](https://github.com/Ewenwan/code)
 
+[OpenCV + 数字成像](http://antkillerfarm.github.io/ai/2016/07/19/opencv.html)
+
+
+[图像处理理论（一）——直方图, 二值化, 滤波基础](http://antkillerfarm.github.io/graphics/2016/04/30/graphics.html)
+
+[图像处理理论（二）——形态学, 边缘检测, 图像金字塔](http://antkillerfarm.github.io/graphics/2016/06/30/graphics_2.html)
+
+[图像处理理论（三）——双边滤波, Steerable滤波, Gabor滤波](http://antkillerfarm.github.io/graphics/2016/07/16/graphics_3.html)
+
+[图像处理理论（四）——Schmid滤波, 霍夫变换, HOG, Haar, SIFT](http://antkillerfarm.github.io/graphics/2017/08/23/graphics_4.html)
+
+[图像处理理论（五）——SIFT 图像格式 YUV & YCbCr & RGB ISP(Image Signal Processor)，图像信号处理器](http://antkillerfarm.github.io/graphics/2017/10/17/graphics_5.html)
+
+[图像处理理论（六）——人脸识别算法Eigenface基于PCA, LBPLocal Binary Patterns）局部二值模式, Fisherface 基于LD(ALinear Discriminant Analysis，线性判别分析）](http://antkillerfarm.github.io/graphics/2017/12/25/graphics_6.html)
+
+[人脸识别经典算法三：Fisherface（LDA）](https://blog.csdn.net/smartempire/article/details/23377385)
+
+[图像处理理论（七）——Viola-Jones 积分图像, 经典目标跟踪算法（camshift、meanshift、Kalman filter、particle filter、Optical flow、TLD、KCF、Struck）, 从BOW(Bag-of-words词带模型)到SPM(Spatial Pyramid Matching,空间金字塔匹配), ILSVRC 2010考古](http://antkillerfarm.github.io/graphics/2018/04/03/graphics_7.html)
+
 
 
 ## window下安装
