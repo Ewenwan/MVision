@@ -7,9 +7,9 @@
 <iframe 
     width="800" 
     height="450" 
-    src="http://visual.cs.ucl.ac.uk/pubs/maskfusion/MaskFusion.webm"
+    src=" http://visual.cs.ucl.ac.uk/pubs/maskfusion/MaskFusion.webm "
     frameborder="0" 
     allowfullscreen>
 </iframe>
 
-<iframe height=498 width=510 src="http://visual.cs.ucl.ac.uk/pubs/maskfusion/MaskFusion.webm">
+<iframe height=498 width=510 src = " http://visual.cs.ucl.ac.uk/pubs/maskfusion/MaskFusion.webm ">
