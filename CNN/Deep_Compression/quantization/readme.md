@@ -263,7 +263,7 @@ https://mp.weixin.qq.com/s/KgM1k1bziLTCec67hQ8hlQ
         2. 运算量减少， 原先浮点数的乘法运算，可以变成 二进制位的异或运算。
         
 
-## 1. BNN全二值网络
+## 2.1. BNN全二值网络
 
     BNN的 激活函数值 和 权重参数 都被二值化了, 前向传播是使用二值，反向传播时使用全精度梯度。 
     
@@ -383,7 +383,7 @@ https://mp.weixin.qq.com/s/KgM1k1bziLTCec67hQ8hlQ
 ![](https://img-blog.csdn.net/20170214010005900?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGFuZ3dlaTIwMTQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
     
     
-## 2. BCN 混有单精度与二值的神经网络BinaryConnect 与BNN合并**
+## 2.2. BCN 混有单精度与二值的神经网络BinaryConnect 与BNN合并**
 
 [BinaryConnect: Training Deep Neural Networks with binary weights](https://arxiv.org/pdf/1511.00363.pdf)
 
@@ -414,7 +414,7 @@ https://mp.weixin.qq.com/s/KgM1k1bziLTCec67hQ8hlQ
     由于达成了中间结果的二值化，BinaryNet的一个样例实现无需额外硬件，
     在现有的GPU上即达成了7倍加速。
   
-## 3. 二值系数网络 BWN  异或网络XNOR-Net  
+## 2.3. 二值系数网络 BWN  异或网络XNOR-Net  
 [BWN(Binary-Weights-Networks) ](https://arxiv.org/pdf/1603.05279.pdf)
 
 ![](http://file.elecfans.com/web1/M00/55/79/pIYBAFssV_SAaYgnAACz9cXw6vE854.png)
@@ -534,7 +534,7 @@ https://mp.weixin.qq.com/s/KgM1k1bziLTCec67hQ8hlQ
 	
 
  
-## 4. QNN 量化网络 量化激活函数 nbit量化
+## 2.4. QNN 量化网络 量化激活函数 nbit量化
 [QNN Quantized Neural Networks ](https://arxiv.org/pdf/1609.07061.pdf)
 
         对BNN的简单扩展，
@@ -579,7 +579,7 @@ https://mp.weixin.qq.com/s/KgM1k1bziLTCec67hQ8hlQ
         其次，利用ILSVRC-12训练集对量化网络的全连接层进行微调，恢复分类精度。
         最后，纠错量化微调的层网络的全连接。
 
-## 5. 约束低比特(3比特)量化 Extremely Low Bit Neural Networks 
+## 2.5. 约束低比特(3比特)量化 Extremely Low Bit Neural Networks 
 
 [论文 Extremely Low Bit Neural Network: Squeeze the Last Bit Out with ADMM](https://arxiv.org/pdf/1707.09870.pdf)
 
@@ -668,7 +668,7 @@ https://mp.weixin.qq.com/s/KgM1k1bziLTCec67hQ8hlQ
     参数空间中加入2、4、8等值后，仍然不需要乘法运算，只需进行移位操作。
     因此，通过这种方法将神经网络中的乘法操作全部替换为移位和加操作。
      
-## 6. 哈希函数两比特缩放量化 BWNH 
+## 2.6. 哈希函数两比特缩放量化 BWNH 
 [论文](https://arxiv.org/pdf/1802.02733.pdf)
 
 [博客解析](https://blog.csdn.net/ajj15120321/article/details/80571748)
@@ -694,6 +694,24 @@ https://mp.weixin.qq.com/s/KgM1k1bziLTCec67hQ8hlQ
     
     为了减轻用哈希方法所带来的loss，
     本文将binary codes乘以了一个scaling factor并用交替优化的策略来更新binary codes以及factor.
+## 2.7 高阶残差量化网络 二值网络+量化残差二值网络 HORQ
+论文：Performance Guaranteed Network Acceleration via High-Order Residual Quantization
+
+[论文链接](https://arxiv.org/abs/1708.08687.pdf)
+
+
+	本文是对 XNOR-Networks 的改进，将CNN网络层的输入 进行高精度二值量化，
+	从而实现高精度的二值网络计算，XNOR-Networks 也是对每个CNN网络层的权值和输入进行二值化，
+	这样整个CNN计算都是二值化的，这样计算速度快，占内存小。
+	一般对输入做二值化后模型准确率会下降特别厉害，
+	而这篇文章提出的对权重和输入做high-order residual quantization的方法,
+	可以在保证准确率的情况下大大压缩和加速模型。
+	
+	XNOR-Networks 对输入进行一级量化
+	HORQ          对输入进行多级量化(对上级量化的残差再进行量化)
+	
+![](https://static.leiphone.com/uploads/new/article/740_740/201710/59e2f036c850f.png?imageMogr2/format/jpg/quality/90)
+	
 
 # 3. 三值化网络 
 
