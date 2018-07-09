@@ -13,3 +13,5 @@
 </iframe>
 
 <iframe height=498 width=510 src = " http://visual.cs.ucl.ac.uk/pubs/maskfusion/MaskFusion.webm ">
+
+<iframe width="560" height="315" src=" http://visual.cs.ucl.ac.uk/pubs/maskfusion/MaskFusion.webm " frameborder="0" allowfullscreen></iframe>
