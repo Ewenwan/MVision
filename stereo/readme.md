@@ -1,6 +1,8 @@
 # 双目相机
 ![](https://images.cnblogs.com/cnblogs_com/gemstone/201112/201112192015473934.png)
+![](https://images.cnblogs.com/cnblogs_com/gemstone/201112/201112192015488493.png)
 
+[计算机视觉基础1——视差与深度信息](http://www.cnblogs.com/gemstone/archive/2011/12/19/2293806.html)
 
 # 双目　ros 包
 [wiki.ros](http://wiki.ros.org/elas_ros)
