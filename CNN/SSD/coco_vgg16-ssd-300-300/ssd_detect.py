@@ -1,4 +1,5 @@
 #-*- coding:utf-8 -*-
+# ssd_300_300_coco数据集
 '''
 Detection with SSD
 In this example, we will load a SSD model 
@@ -71,7 +72,7 @@ class CaffeDetection:
         SSD detection
         '''
         # set net to batch size of 1
-        # image_resize = 300         1张图片 3通道 300*300
+        # image_resize = 300 # 1张图片 3通道 300*300
         self.net.blobs['data'].reshape(1, 3, self.image_resize, self.image_resize)
         image = caffe.io.load_image(image_file)
         # Run the net and examine the top_k results
@@ -152,17 +153,19 @@ def main(args):
 def parse_args():
     '''parse args'''
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu_id', type=int, default=1, help='gpu id')
+    parser.add_argument('--gpu_id', type=int, default=7, help='gpu id')
     parser.add_argument('--labelmap_file',
-                        default='labelmap_voc.prototxt')
+                        default='./labelmap_coco.prototxt')
     parser.add_argument('--model_def',
-                        default='ssd_33_deploy.prototxt')
+                        default='./VGG_coco_SSD_300x300_deploy.prototxt')
     parser.add_argument('--image_resize', default=300, type=int)
     parser.add_argument('--model_weights',
-                        default='models/ssd_33_iter_8000.caffemodel')
-    #parser.add_argument('--image_file', default='fish-bike.jpg')
-    parser.add_argument('--image_file', default='dog.jpg')
+                        default='models/VGG_coco_SSD_300x300_iter_9000.caffemodel')
+    #parser.add_argument('--image_file', default='../SSD_300x300/fish-bike.jpg')
+    #parser.add_argument('--image_file', default='../SSD_300x300/dog.jpg')
+    parser.add_argument('--image_file', default='../SSD_300x300/person.jpg')
     return parser.parse_args()
 
 if __name__ == '__main__':
     main(parse_args())
+    
