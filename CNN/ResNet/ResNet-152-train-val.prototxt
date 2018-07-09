@@ -1,4 +1,5 @@
 # ResNet-152
+# input 224*224
 layer {
 name: "data"
 type: "Data"
@@ -8,7 +9,7 @@ include {
 phase: TRAIN
 }
 transform_param {
-crop_size: 227
+crop_size: 224
 mean_value: 104
 mean_value: 117
 mean_value: 123
@@ -29,7 +30,7 @@ include {
 phase: TEST
 }
 transform_param {
-crop_size: 227
+crop_size: 224
 mean_value: 104
 mean_value: 117
 mean_value: 123
