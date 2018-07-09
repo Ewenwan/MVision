@@ -21,7 +21,7 @@ layer {
   }
   data_param {
     source: "/home/wanyouwen/ewenwan/software/darknet/data/voc/VOCdevkit/VOC0712/lmdb/VOC0712_test_lmdb"
-    batch_size: 8
+    batch_size: 4
     backend: LMDB
   }
   annotated_data_param {
@@ -1588,6 +1588,9 @@ layer {
     axis: 2
   }
 }
+
+
+#===========test======= mbox_conf Reshape to one demension
 layer {
   name: "mbox_conf_reshape"
   type: "Reshape"
@@ -1638,7 +1641,7 @@ layer {
       top_k: 400
     }
     save_output_param {
-      output_directory: "/root/data/VOCdevkit/results/VOC2007/SSD_300x300/Main"
+      output_directory: "./SSD_300x300_test"
       output_name_prefix: "comp4_det_test_"
       output_format: "VOC"
       label_map_file: "./labelmap_voc.prototxt"
