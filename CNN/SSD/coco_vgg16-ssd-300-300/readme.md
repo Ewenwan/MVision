@@ -75,7 +75,28 @@
       生成训练集和验证集 
       
 # 以上处理有点问题
-    下载最新的 2017
-    http://images.cocodataset.org/zips/train2017.zip 
-    http://images.cocodataset.org/annotations/annotations_trainval2017.zip
-    http://images.cocodataset.org/zips/val2017.zip 
+      下载最新的 2017
+      http://images.cocodataset.org/zips/train2017.zip 
+      http://images.cocodataset.org/annotations/annotations_trainval2017.zip
+      http://images.cocodataset.org/zips/val2017.zip 
+
+    处理 ：
+
+      下载 coco数据库处理脚本 
+          git clone https://github.com/weiliu89/coco.git
+          cd coco
+          git checkout dev  # 必要 在 PythonAPI 或出现 scripts/ 文件夹 一些处理脚本
+      安装：
+          cd coco/PythonAPI
+          python setup.py build_ext --inplace
+
+      将总的json文件拆分成 各个图像的json
+          python scripts/batch_split_annotation.py 
+
+      获取 图片id 对应的图片尺寸大小 长宽
+          python scripts/batch_get_image_size.py
+
+      创建图片地址+标签地址的 列表文件    
+          python data/coco/create_list.py
+      生成lmdb 文件 and make soft links at examples/coco/
+         ./create_data.sh
