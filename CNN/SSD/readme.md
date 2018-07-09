@@ -25,6 +25,8 @@
 
 [mxnet-ssd](https://github.com/Ewenwan/mxnet-ssd)
 
+[ristretto_ssd 量化](https://github.com/Ewenwan/ristretto_ssd)
+
 [VGG16与训练权重 csdn上需要金币](https://download.csdn.net/download/zhayushui/10132277)
 
 [VGG16与训练权重 可能需要翻墙下载 ](http://cs.unc.edu/~wliu/projects/ParseNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel)
