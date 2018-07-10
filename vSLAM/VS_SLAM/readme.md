@@ -77,6 +77,10 @@
 # orbslam2 + ssd物体检测实现3d物体分割
 ![](http://5b0988e595225.cdn.sohucs.com/images/20171130/4f7de56d3e374e13935d3a2601ccbdd2.jpeg)
 
+    场景映射 semantic Mapping ：  SLAM定位和建图
+    目标检测和场景分割 bject Detection and Semantic Segmentation ： RCNN\YOLO\SSD
+
+
         基本框架图如下： 
                 输入RGB-D图像 -> ORB-SLAM2应用于每一帧->
                 SSD（Single Shot MultiBox Detector）用于每一个关键帧进行目标检测，3D无监督分割方法对于每一个检测结果生成一个3D点云分割 ->
