@@ -170,7 +170,7 @@
 
 [ElasticFusion 代码](https://github.com/Ewenwan/ElasticFusion)
 
-[SemanticFusion代码 ](https://bitbucket.org/dysonroboticslab/semanticfusion/src)
+[SemanticFusion代码 ](https://github.com/Ewenwan/semanticfusion)
 
 
 偏重怎样结合CNN搭建一套稠密语义SLAM的系统。SemanticFusion架构上主要分为三部分：
