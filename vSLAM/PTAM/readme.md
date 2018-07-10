@@ -1,11 +1,10 @@
-# Parallel Tracking And Mapping (PTAM) 特征点法 
+# Parallel Tracking And Mapping (PTAM) 特征点法 fast角点+灰度块匹配 2d-2d单应变换
 
 [本文github](https://github.com/Ewenwan/MVision/tree/master/vSLAM/PTAM)
 
 [项目主页](http://www.robots.ox.ac.uk/~gk/PTAM/)
 
 [github 代码 makefile工程改成了cmake工程](https://github.com/Ewenwan/PTAM4AR)
-
 
 
 ![](http://image.mamicode.com/info/201802/20180211193608683439.png)
