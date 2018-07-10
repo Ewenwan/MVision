@@ -71,16 +71,18 @@
         虽然这些方法目前还没有成为主流，但将SLAM与深度学习结合来处理图像，亦是一个很有前景的研究方向。
 
         语义slam应用:
-        基本框架图如下： 
-                输入RGB-D图像 -> ORB-SLAM2应用于每一帧->
-        SSD（Single Shot MultiBox Detector）用于每一个关键帧进行目标检测，3D无监督分割方法对于每一个检测结果生成一个3D点云分割 ->         使用类似ICP的匹配值方法进行数据关联，以决定是否在地图中创建新的对象或者跟已有对象建立检测上的关联 -> 
-        地图对象的3D模型（3D点云分割，指向ORB-SLAM2中位姿图的指针，对每个类别的累计置信度）
-        
 ![](http://7xk58v.com2.z0.glb.qiniucdn.com/mmbiz_png/rkVzuT6J81HscekG0icQeoCsFictCol1PzexlS9rGT3NhJTkZGwbd1QX6hFTUM1SoxjF5YxmQXoyQALM1E3Msq0g/0?wx_fmt=png)
 
 
 # orbslam2 + ssd物体检测实现3d物体分割
 ![](http://5b0988e595225.cdn.sohucs.com/images/20171130/4f7de56d3e374e13935d3a2601ccbdd2.jpeg)
+
+        基本框架图如下： 
+                输入RGB-D图像 -> ORB-SLAM2应用于每一帧->
+                SSD（Single Shot MultiBox Detector）用于每一个关键帧进行目标检测，3D无监督分割方法对于每一个检测结果生成一个3D点云分割 ->
+                使用类似ICP的匹配值方法进行数据关联，以决定是否在地图中创建新的对象或者跟已有对象建立检测上的关联 -> 
+                地图对象的3D模型（3D点云分割，指向ORB-SLAM2中位姿图的指针，对每个类别的累计置信度）
+       
 
         利用现在检测速度很快的SSD，以及基本上可以达到实时定位的ORB-SLAM2相互促进。
         然后通过把深度图进行划分，物体检测，最终输出带有语义信息的语义地图。
