@@ -134,15 +134,32 @@
                 利用LSD-SLAM作为框架，结合CNN进行有机融合，
                 选择关键帧进行做深度学习实现语义分割，之后选择相邻的几帧做增强。
 
-# rgbdslam + RNN  RNN语义分割+KinectFusion =3d Semantic Scene 
+# rgbdslam + RNN  数据联合RNN语义分割+  KinectFusion跟踪 =3d Semantic Scene 
 [DA-RNN 代码](https://github.com/Ewenwan/DA-RNN)
 
 [论文](https://arxiv.org/pdf/1703.03098.pdf)
-  
-  
-  
-  
-  
+
+    高层特征具备更好的区分性 , 同时帮助机器人更好完成数据关联 . DARNN [66] 引入数据联合
+    (Data association, DA) 下的 RNN (Recurrent neural network), 
+    同时对 RGBD 图像进行语义标注和场景重建 . 
+    将 RGB 图像 和 深度图像 分别输入全卷积网络 , 在反卷积层加入 数据联合 RNN 层 , 
+    将不同帧图像的特征进行融合 , 同时能够融合 RGBD 图像和深度图像 . 
+    该文章使用 KinectFusion [67] 完成相机的跟踪 , 估计当前相机的 6DOF 位姿 , 
+    将 3D 场景表示为 3D 体素 , 保存于 TSDF (Truncated signed distance function).
+# SLAM++
+    语义地图表示为一个图网络 , 其中节点有两种 : 
+      1) 相机在世界坐标系的位姿 ; 
+      2) 物体在世界坐标系的位姿 . 
+    物体在相机坐标系的位姿作为网络中的一个约束 , 连接相机节点和物体节点 . 
+    另外网络中还加入了平面结构等约束提高定位的精度 .
+# MO-SLAM (Multi object SLAM)
+    对于场景中重复出现的物体进行检测 , 该方法不需要离线训练以及预制物体数据库 . 
+    系统将重建的路标点分类 , 标记该点所属的物体类别 . 
+    一个物体表示为一个路标点集合 , 相同的物体的不同实例的路标点之间存在如下关系：
+    P2 = E * P1
+    系统对于生成的关键帧建立 ORB 描述子的单词树 , 在新的关键帧和候选关键帧之间进行汉明距离匹配 . 
+    如果匹配点的数量不够 , 那么识别线程停止处理当前帧 , 等待下一个关键帧 . 
+    使用 RANSAC (Random sample consensus, 随机采样序列一致性) 框架初始化一个位姿变换 ,
 
 
 
