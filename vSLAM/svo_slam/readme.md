@@ -1,4 +1,4 @@
-# svo： semi-direct visual odometry 半直接视觉里程计
+# svo： semi-direct visual odometry 半直接视觉里程计 FAST角点+最小化广度误差直接法的半直接法
 
 ![](https://images2015.cnblogs.com/blog/990334/201706/990334-20170630091523868-2008067667.png)
 
