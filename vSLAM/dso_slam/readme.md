@@ -54,6 +54,61 @@
 
     2.1 代码框架与数据表示 
 ![](https://pic3.zhimg.com/80/v2-6a9dcd379ce3c772e8e14aeae09b6e0a_hd.jpg)
+    
+    DSO整体代码由四个部分组成：
+        系统与各算法集成于src/FullSystem，
+        后端优化位于src/OptimizationBackend，
+        这二者组成了DSO大部分核心内容。
+        src/utils和src/IOWrapper为一些去畸变、数据集读写和可视化UI代码。
+    先来看核心部分的FullSystem和OptimizationBackend。
+    
+    在FullSystem里，DSO致力于维护一个滑动窗口内部的关键帧序列。
+## FrameHessian 帧
+    每个帧的数据存储于FrameHessian结构体中，FrameHessian即是一个带着状态变量与Hessian信息的帧。
+    然后，每个帧亦携带一些地图点的信息，包括：
+    
+        pointHessians              是所有活跃点的信息。
+                                   所谓活跃点，是指它们在相机的视野中，其残差项仍在参与优化部分的计算；
+        pointHessiansMarginalized  是已经边缘化的地图点。
+        pointHessiansOut           是被判为外点（outlier）的地图点。
+        immaturePoints             为未成熟地图点的信息。
+          在单目SLAM中，所有地图点在一开始被观测到时，都只有一个2D的像素坐标，其深度是未知的。这种点在DSO中称为未成熟的地图点。
+          
+        随着相机的运动，DSO会在每张图像上追踪这些未成熟的地图点，
+        这个过程称为trace——实际上是一个沿着极线搜索的过程，十分类似于svo的depth filter。
+        
+## PointHessian 地图点
+        Trace的过程会确定每个Immature Point的逆深度和它的变化范围。
+        如果Immature Point的深度（实际中为深度的倒数，即逆深度）在这个过程中收敛，
+        那么我们就可以确定这个未成熟地图点的三维坐标，形成了一个正常的地图点。
+        具有三维坐标的地图点，在DSO中称为PointHessian。
+        与FrameHessian相对，PointHessian亦记录了这个点的三维坐标，以及Hessian信息。
+        
+        与很多其他SLAM方案不同，DSO使用单个参数描述一个地图点，即它的逆深度。
+        而ORB-SLAM等多数方案，则会记录地图点的x,y,z三个坐标。
+        逆深度参数化形式具有形式简单、类似高斯分布、对远处场景更为鲁棒等优点，
+        但基于逆深度参数化的Bundle adjustment，每个残差项需要比通常的BA多计算一个雅可比矩阵。
+        为了使用逆深度，每个PointHessian必须拥有一个主导帧（host frame），说明这个点是由该帧反投影得到的。
+## 滑窗信息
+        于是，滑动窗口的所有信息，可以由若干个FrameHessian，加上每个帧带有的PointHessian来描述。
+        所有的PointHessian又可以在除主导帧外的任意一帧中进行投影，形成一个残差项，记录于PointHessian::residuals中。
+        所有的残差加起来，就构成了DSO需要求解的优化问题。
+        当然，由于运动、遮挡的原因，并非每个点都可以成功地投影到其余任意一帧中去，
+        
+        于是我们还需要设置每个点的状态：有效的/被边缘化的/无效的。
+        
+        不同状态的点，被存储于它主导帧的pointHessians/pointHessianMarginalized/PointHessiansOut三个容器内。
+        
+## 后端优化部分 EnergyFunctional
+    除此之外，DSO将相机的内参、曝光参数等信息，亦作为优化变量考虑在内。相
+    机内参由针孔相机参数fx, fy, cx, cy表达，曝光参数则由两个参数a,b描述。
+    这部分内容在光度标定一节内。
 
+    后端优化部分单独具有独立的Frame, Point, Residual结构。
+    由于DSO的优化目标是最小化能量（energy，和误差类似），所以有关后端的类均以EF开头，
+    且与FullSystem中存储的实例一一对应，互相持有对方的指针。
+    优化部分由EnergyFunctional类统一管理。
+    它从FullSystem中获取所有帧和点的数据，进行优化后，再将优化结果返回。
+    它也包含整个滑动窗口内的所有帧和点信息，负责处理实际的非线性优化矩阵运算。
 
 
