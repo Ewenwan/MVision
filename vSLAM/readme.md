@@ -87,10 +87,35 @@
     
     SVO（选取关键点来采用直接法，这类方法称为稀疏方法（sparse）, 结合了直接法和特征点法，因此，称它为半直接法）
     
+      
+    按照 2D−2D 数据关联方式的不同 ,视觉定位方法可以分为直接法、非直接法和混合法
+    
+    1. 直接法假设帧间光度值具有不变性 , 即相机运动前后特征点的灰度值是相同的 . 
+       数据关联时 , 根据灰度值对特征点进行匹配，通过最小化光度误差，来优化匹配.
+       直接法使用了简单的成像模型 , 
+       适用于帧间运动较小的情形 , 但在场景的照明发生变化时容易失败 .
+       
+    2. 非直接法 , 又称为特征法 , 该方法提取图像中的特征进行匹配 , 
+       最小化重投影误差得到位姿 . 图像中的特征点以及对应描述子用于数据关联 , 
+       通过特征描述子的匹配 ,完成初始化中 2D−2D 以及之后的 3D−2D 的数据关联 .
+       例如 ORB (Oriented FAST and rotatedBRIEF， ORBSLAM中 ) 、
+            FAST (Features from accelerated seg-ment test) 、 
+            BRISK (Binary robust invariant scalable keypoints) 、 
+            SURF (Speeded up robustfeatures) , 
+            或者直接的灰度块(PTAM中， 使用fast角点+灰度快匹配)
+            可用于完成帧间点匹配。
+            
+    3. 混合法，又称为半直接法，结合直接法和特征点法
+       使用特征点法中的特征点提取部分，而特征点匹配不使用 特征描述子进行匹配，
+       而使用直接法进行匹配，利用最小化光度误差，来优化特征点的匹配，
+       直接法中是直接对普通的像素点(DTAM),或者灰度梯度大的点(lsd-slam)进行直接法匹配。
+    
+    
+    
     间接法与直接法的区别:
 ![](https://img-blog.csdn.net/20170428164809095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvS2V2aW5fY2M5OA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
-#　基础资料
+# 基础资料
 [基于视觉的 SLAM/Visual Odometry (VO) 开源资料、博客和论文列表](http://www.voidcn.com/article/p-amraedch-nh.html)
  
 [视觉惯性里程计Visual–Inertial Odometry(VIO)概述](https://www.cnblogs.com/hitcm/p/6327442.html)
