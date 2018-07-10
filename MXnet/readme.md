@@ -12,14 +12,20 @@
 # 安装 Ubuntu/Debian上构建
 	  安装依赖:
 
-	    sudo apt-get update
-	    sudo apt-get install -y build-essential git libatlas-base-dev libopencv-dev
+		sudo apt-get update
+		sudo apt-get install -y build-essential git libatlas-base-dev libopencv-dev
 
 	  构建MXnet:
 
-	    git clone --recursive https://github.com/dmlc/mxnet
-	    cd mxnet;
-	    make -j 
+		git clone --recursive https://github.com/dmlc/mxnet
+		cd mxnet;
+		make -j 
+	 安装python 接口
+	 进入源码目录编译好的python子目录安装python语言包即可
+
+		cd ./python/
+		sudo python setup.py install
+
 
 # MXnet基本概念和操作
 ## NDArray
