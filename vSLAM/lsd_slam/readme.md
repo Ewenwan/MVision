@@ -1,21 +1,7 @@
 # lsd是一个 大规模的 单目直接法 视觉半稠密 slam系统   Semi-Dense Large Scale Direct SLAM
-    
-    LSD (Large scale direct) SLAM (Simultane-ous localization and mapping)，
-    采用直接方法进行数据关联(2d-2d, 灰度不变性) , 
-    建立深度估计、跟踪 和 建图三个线程 . 
-    该方法对图像点建立随机深度图 , 并在后续帧中对深度进行调整直至收敛 . 
-    该方法的初始化不需要两视几何约束 , 不会陷入两视几何退化的困境 , 
-    但初始化过程需要多个关键帧之后深度图才会收敛 , 
-    此期间跟踪器产生的地图是不可靠的 . 
-    LSD SLAM 通过权值高斯 – 牛顿迭代方法最小化光度值误差 . 
-    光度值误差是 当前帧 和 参考关键帧 之间所有对应点的灰度值差的平方和 .
-    LSD-SLAM 建图对 关键帧 及非关键帧分开处理 , 
-    对于前者 , 过往关键帧的深度图投影到当前关键帧 , 并作为深度图的初始值 ; 
-    对于后者 , 则进行图像匹配并计算位姿 , 对当前帧更新深度信息 , 对深度信息进行平滑并移除外点.
 
     DTAM里面对每个像素都进行直接法的跟踪，
-    而 LSD SLAM里 只对 “有纹理”(梯度大的地方) 的区域进行估计，
-    不估计令每一个做SLAM的人都害怕的终极大魔头——“大白墙”部分
+    而 LSD SLAM里 只对 “有纹理”(梯度大的地方) 的区域进行估计，不估计令每一个做SLAM的人都害怕的终极大魔头——“大白墙”部分
     估计深度的部分在原理上也是direct method，和DTAM类似.
 ![](https://img-blog.csdn.net/20160706173859609)
     
@@ -66,6 +52,29 @@
     基本套路是：特征点+匹配+优化方法求解最小化重投影误差。 
     典型代表： 
     Mono-SLAM,PTAM(FAST角点),ORB-SLAM(ORB特征点),以及现在大部分SLAM 
+    
+    按照 2D−2D 数据关联方式的不同 ,视觉定位方法可以分为直接法、非直接法和混合法
+    
+    1. 直接法假设帧间光度值具有不变性 , 即相机运动前后特征点的灰度值是相同的 . 
+       数据关联时 , 根据灰度值对特征点进行匹配，通过最小化光度误差，来优化匹配.
+       直接法使用了简单的成像模型 , 
+       适用于帧间运动较小的情形 , 但在场景的照明发生变化时容易失败 .
+       
+    2. 非直接法 , 又称为特征法 , 该方法提取图像中的特征进行匹配 , 
+       最小化重投影误差得到位姿 . 图像中的特征点以及对应描述子用于数据关联 , 
+       通过特征描述子的匹配 ,完成初始化中 2D−2D 以及之后的 3D−2D 的数据关联 .
+       例如 ORB (Oriented FAST and rotatedBRIEF， ORBSLAM中 ) 、
+            FAST (Features from accelerated seg-ment test) 、 
+            BRISK (Binary robust invariant scalable keypoints) 、 
+            SURF (Speeded up robustfeatures) , 
+            或者直接的灰度块(PTAM中， 使用fast角点+灰度快匹配)
+            可用于完成帧间点匹配。
+            
+    3. 混合法，又称为半直接法，结合直接法和特征点法
+       使用特征点法中的特征点提取部分，而特征点匹配不使用 特征描述子进行匹配，
+       而使用直接法进行匹配，利用最小化光度误差，来优化特征点的匹配，
+       直接法中是直接对普通的像素点(DTAM),或者灰度梯度大的点(lsd-slam)进行直接法匹配。
+    
     
     间接法与直接法的区别:
 ![](https://img-blog.csdn.net/20170428164809095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvS2V2aW5fY2M5OA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
