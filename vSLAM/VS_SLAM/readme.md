@@ -188,8 +188,49 @@
 
     3）通过贝叶斯更新(CRF,条件随机场)来把识别的结果和SLAM生成的关联信息整合进统一的稠密语义地图中。
 
-# 3. 端到端SLAM
-    待整理
+## Pop-up SLAM: Semantic Monocular Plane SLAM for Low-texture Environments
+[论文]()
+
+[代码](https://github.com/Ewenwan/pop_up_image/blob/master/readme.md)
+
+# 3. 端到端SLAM   结合深度增强学习 DRL
+
+## 使用DRL深度加强学习实现机器人自主导航
+[论文  Target-driven Visual Navigation in Indoor Scenes using Deep Reinforcement Learning ](http://ai2-website.s3.amazonaws.com/publications/target_driven_visual.pdf)
+
+![](https://upload-images.jianshu.io/upload_images/165932-34b57e120c46183f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
+
+
+    深度强化学习中有两个较少被提及的问题：
+      1. 对于新的目标泛化能力不足，
+      2. 数据低效，比如说，模型需要几个（通常开销较大）试验和误差集合，使得其应用于真实世界场景时并不实用。 
+    在这篇文章中，解决了这两个问题，并将我们的模型应用于目标驱动的视觉导航中。
+    为了解决第一个问题，我们提出了一个actor-critic演员评论家模型，它的策略是目标函数以及当前状态，能够更好地泛化。
+    为了解决第二个问题，我们提出了 AI2-THOR框架，它提供了一个有高质量的3D场景和物理引擎的环境。
+    我们的框架使得agent智能体能够采取行动并和对象之间进行交互。因此，我们可以高效地收集大量训练样本。
+    我们提出的方法 
+      1）比state-of-the-art的深度强化学习方法收敛地更快，
+      2）可以跨目标跨场景泛化，
+      3）通过少许微调就可以泛化到真实机器人场景中（尽管模型是在仿真中训练的）
+      4）不需要特征工程，帧间的特征匹配和对于环境的特征重建，是可以端到端训练的。
+      
+      
+## 用于视觉导航的感知建图和规划
+[论文 ]()
+
+      我们提出了一个用于在陌生环境中导航的神经网络结构。
+      我们提出的这个结构以第一视角进行建图，并面向环境中的目标进行路径规划。
+      The Cognitive Mapper and Planner (CMP)主要依托于两个观点：
+        1.一个用于建图和规划的统一的联合架构中，建图由规划的需求所驱动的。
+        2. 引入空间记忆，使得能够在一个并不完整的观察集合的基础之上进行规划。
+      CMP构建了一个自上而下的belief map置信地图，
+      并且应用了一个可微的神经网络规划器，在每一个时间步骤中决策下一步的行动。
+      对环境积累的置信度使得可以追踪已被观察到的区域。
+      我们的实验表明CMP的性能优于reactive strategies反应性策略 和standard memory-based architectures 
+      标准的基于记忆的体系结构 两种方法，
+      并且在陌生环境中表现良好。另外，CMP也可以完成特定的语义目标，
+      比如说“go to a chair”到椅子那儿去。 
+
 
 
 
