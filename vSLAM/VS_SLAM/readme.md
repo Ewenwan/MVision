@@ -134,5 +134,23 @@
                 利用LSD-SLAM作为框架，结合CNN进行有机融合，
                 选择关键帧进行做深度学习实现语义分割，之后选择相邻的几帧做增强。
 
+# rgbdslam + RNN  RNN语义分割+KinectFusion =3d Semantic Scene 
+[DA-RNN 代码](https://github.com/Ewenwan/DA-RNN)
+
+[论文](https://arxiv.org/pdf/1703.03098.pdf)
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
 
 
