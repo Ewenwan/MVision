@@ -433,6 +433,9 @@ model = mx.model.FeedForward.create(symbol = net, X = data, kvstore = kv, ...)
 	######################################
 # MXnet体验
 	以下借助 MXnet 实现了一个简单的单变量线性回归程序：
+
+![](http://s3.51cto.com/wyfs02/M01/83/EC/wKiom1d_dv-wA9zXAABhstRxJCc364.png)
+
 ```python
 import mxnet as mx
 import numpy as np
