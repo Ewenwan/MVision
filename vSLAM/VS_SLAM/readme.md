@@ -193,6 +193,14 @@
 
 [代码](https://github.com/Ewenwan/pop_up_image/blob/master/readme.md)
 
+    概述
+
+    好像用LSD SLAM的双目图像 得到深度信息 然后直接构建三维环境（反正是低纹理地区 很好建）
+
+    在低纹理条件下（这里可能已经是3D图了？）提取边界线，然后选择地线（这个例子里面分割出地面和门 ） ，
+    然后构建三维建模 感觉只适用于室内的没什么杂物的环境内，规格化场景可以使用。
+
+
 # 3. 端到端SLAM   结合深度增强学习 DRL
 
 ## 使用DRL深度加强学习实现机器人自主导航
@@ -216,7 +224,10 @@
       
       
 ## 用于视觉导航的感知建图和规划
-[论文 ]()
+[论文  Cognitive Mapping and Planning for Visual Navigation ](https://arxiv.org/pdf/1702.03920.pdf)
+
+[博客笔记](https://blog.csdn.net/weixin_37251044/article/details/78569428)
+
 
       我们提出了一个用于在陌生环境中导航的神经网络结构。
       我们提出的这个结构以第一视角进行建图，并面向环境中的目标进行路径规划。
