@@ -23,7 +23,9 @@
 ## 3. 端到端SLAM
         其实端到端就不能算是SLAM问题了吧，SLAM是同步定位与地图构建，端到端是输入image输出action，没有定位和建图。 
         - 机器人自主导航（深度强化学习）等
-
+        
+# 1. 用深度学习方法替换传统slam中的一个/几个模块：
+    待整理
 
 # 2. Vision Semantic SLAM  视觉分割SLAM   语义SLAM
         SLAM的另一个大方向就是和深度学习技术结合。
@@ -94,7 +96,7 @@
 
           4）将3D目标对象插入到SLAM得到的空间位置序列中。
 
-# orbslam2 + ssd物体检测实现3d物体分割
+## orbslam2 + ssd物体检测实现3d物体分割
 ![](http://5b0988e595225.cdn.sohucs.com/images/20171130/4f7de56d3e374e13935d3a2601ccbdd2.jpeg)
 
     场景映射 semantic Mapping ：  SLAM定位和建图
@@ -120,7 +122,7 @@
 
 [Meaningful Maps With Object-Oriented Semantic Mapping](https://arxiv.org/pdf/1609.07849.pdf)
 
-# 单目 LSD-SLAM + CNN卷积网络物体分割 
+## 单目 LSD-SLAM + CNN卷积网络物体分割 
 
         基本框架图如下： 
         输入RGB图像->选择关键帧并refine->2D语义分割->3D重建，语义优化 
@@ -134,7 +136,7 @@
                 利用LSD-SLAM作为框架，结合CNN进行有机融合，
                 选择关键帧进行做深度学习实现语义分割，之后选择相邻的几帧做增强。
 
-# rgbdslam + RNN  数据联合RNN语义分割+  KinectFusion跟踪 =3d Semantic Scene 
+## rgbdslam + RNN  数据联合RNN语义分割+  KinectFusion跟踪 =3d Semantic Scene 
 [DA-RNN 代码](https://github.com/Ewenwan/DA-RNN)
 
 [论文](https://arxiv.org/pdf/1703.03098.pdf)
@@ -146,13 +148,13 @@
     将不同帧图像的特征进行融合 , 同时能够融合 RGBD 图像和深度图像 . 
     该文章使用 KinectFusion [67] 完成相机的跟踪 , 估计当前相机的 6DOF 位姿 , 
     将 3D 场景表示为 3D 体素 , 保存于 TSDF (Truncated signed distance function).
-# SLAM++
+## SLAM++
     语义地图表示为一个图网络 , 其中节点有两种 : 
       1) 相机在世界坐标系的位姿 ; 
       2) 物体在世界坐标系的位姿 . 
     物体在相机坐标系的位姿作为网络中的一个约束 , 连接相机节点和物体节点 . 
     另外网络中还加入了平面结构等约束提高定位的精度 .
-# MO-SLAM (Multi object SLAM)
+## MO-SLAM (Multi object SLAM)
     对于场景中重复出现的物体进行检测 , 该方法不需要离线训练以及预制物体数据库 . 
     系统将重建的路标点分类 , 标记该点所属的物体类别 . 
     一个物体表示为一个路标点集合 , 相同的物体的不同实例的路标点之间存在如下关系：
@@ -160,11 +162,18 @@
     系统对于生成的关键帧建立 ORB 描述子的单词树 , 在新的关键帧和候选关键帧之间进行汉明距离匹配 . 
     如果匹配点的数量不够 , 那么识别线程停止处理当前帧 , 等待下一个关键帧 . 
     使用 RANSAC (Random sample consensus, 随机采样序列一致性) 框架初始化一个位姿变换 ,
+    
+## SemanticFusion:  卷积-反卷积语义分割cnn +  ElasticFusion(SLAM)
+[Dense 3D Semantic Mapping with Convolutional Neural Networks 论文](http://wp.doc.ic.ac.uk/bjm113/wp-content/uploads/sites/113/2017/07/SemanticFusion_ICRA17_CameraReady.pdf)
+
+[ElasticFusion](https://github.com/Ewenwan/ElasticFusion)
+
+[代码 ](https://bitbucket.org/dysonroboticslab/semanticfusion/src)
 
 
 
-
-
+# 3. 端到端SLAM
+    待整理
 
 
 
