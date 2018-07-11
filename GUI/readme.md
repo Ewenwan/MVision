@@ -1,6 +1,7 @@
 # 可视化界面软件
     PCL Visialization,  Pangolin,  ros下的rviz
-# 2. Pangolin 用于可视化和用户接口
+#  Pangolin 用于可视化和用户接口 基于opengl
+
 ## 安装，
 	是一款开源的OPENGL显示库，可以用来视频显示、而且开发容易。
 	是对OpenGL进行封装的轻量级的OpenGL输入/输出和视频显示的库。
@@ -37,3 +38,13 @@
 	cmake ..
 	make -j
 	sudo make install
+# OpenGL
+	中文教程地址
+	https://learnopengl-cn.github.io/
+
+	github 代码
+	https://github.com/JoeyDeVries/LearnOpenGL/tree/master/src
+	
+	
+	
+	
