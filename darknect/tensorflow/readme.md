@@ -1,6 +1,6 @@
-# yolo tensorflow 实现
+# tensorflow  使用
 
-# pip安装
+# tensorflow  pip安装
     Ubuntu/Linux 64-bit$ 
     安装 python
           sudo apt-get install python-pip python-dev
@@ -36,7 +36,7 @@
     安装新 版本前需要卸载旧版本
     sudo pip uninstall TensorFlowsudo pip uninstall protobuf 
     
-# 源码安装
+# tensorflow  源码安装
     最新 的软件仓库安装 不包含一些最新的功能
     ubuntu 软件仓库 https://packages.ubuntu.com/
     
@@ -133,4 +133,6 @@
     安装   python2.7 get-pip.py
     再次查看版本  sudo pip --versionpip 9.0.1 from /usr/local/lib/python2.7/dist-packages (python 2.7)
     再次进行安装  cd /tmp/tensorflow_pkg  sudo pip install tensorflow-1.2.0rc0-cp27-cp27mu-linux_x86_64.whl  (替换为生成的whl文件名)
+# tensorflow教程
 
+# yolo tensorflow 实现
