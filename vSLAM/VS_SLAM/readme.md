@@ -214,7 +214,7 @@
 ## G. Pop-up SLAM: Semantic Monocular Plane SLAM for Low-texture Environments
 [论文]()
 
-[代码](https://github.com/Ewenwan/pop_up_image/blob/master/readme.md)
+[代码](https://github.com/Ewenwan/pop_up_image)
 
     概述
 
@@ -227,7 +227,13 @@
 [代码](https://github.com/Ewenwan/ros_object_analytics)
 
 
-## I. MaskFusion rgbd-slam + 语义分割mask-rcnn
+## I. Co-Fusion   CRF图像分割　+  ElasticFusion(RGBD-SLAM)
+[论文 Co-Fusion: Real-time Segmentation, Tracking and Fusion of Multiple Objects](http://visual.cs.ucl.ac.uk/pubs/cofusion/icra2017_co-fusion_web.pdf)
+
+[代码](https://github.com/Ewenwan/co-fusion)
+
+
+## . MaskFusion ElasticFusion(RGBD-SLAM)　+ 语义分割mask-rcnn
 [论文 MaskFusion: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects ](https://arxiv.org/pdf/1804.09194.pdf)
 
 
