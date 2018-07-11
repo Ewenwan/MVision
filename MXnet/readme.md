@@ -1,6 +1,26 @@
 # MXnet
 [参考](http://lucianlv.blog.51cto.com/9871307/1812733)
 
+[通过 MXNet / Gluon 来动手学习深度学习　在线](http://zh.gluon.ai/)
+
+[pdf](http://zh.gluon.ai/gluon_tutorials_zh.pdf)
+
+[代码](https://github.com/Ewenwan/gluon-tutorials-zh)
+
+
+    引言
+    预备知识
+    深度学习基础
+    深度学习计算
+    卷积神经网络
+    循环神经网络
+    优化算法
+    计算性能
+    计算机视觉
+    自然语言处理
+    附录
+
+
 	  深度学习库。
 	  MXNet 由 dmlc/cxxnet, dmlc/minerva 和 Purine2 的作者发起，
 	  融合了Minerva 的动态执行，cxxnet 的静态优化和 Purine2 的符号计算等思想，
