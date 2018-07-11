@@ -508,6 +508,8 @@
             else if(alg==STEREO_SGBM)  sgbm->setMode(StereoSGBM::MODE_SGBM);
             else if(alg==STEREO_3WAY)   sgbm->setMode(StereoSGBM::MODE_SGBM_3WAY);
         各参数设置如BM方法，速度比较快，320*240的灰度图匹配时间为78ms，
+        
+[SGM-disparity代码](https://github.com/xxsong5/SGM-disparity/blob/master/src/sgm.cpp)
 
 ### 第三种为GC方法：
         该方法速度超慢，但效果超好。
