@@ -1,5 +1,8 @@
 # MVision　Machine Vision 机器视觉
 
+[Computer Vision and Pattern Recognition arxiv.org 最新提交的论文](https://arxiv.org/list/cs.CV/recent)
+
+
 [优秀的博客论文笔记](https://github.com/Ewenwan/antkillerfarm.github.com)
 
 [CSCI 1430: Introduction to Computer Vision 计算机视觉课程](http://cs.brown.edu/courses/csci1430/#schedule)
