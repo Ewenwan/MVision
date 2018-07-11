@@ -265,8 +265,11 @@
       并且在陌生环境中表现良好。另外，CMP也可以完成特定的语义目标，
       比如说“go to a chair”到椅子那儿去。 
 
-
-
+## DeepVO：基于深度循环卷积神经网络的端到端视觉里程计 CNN+RNN
+    本文使用深度递归卷积神经网络（RCNNs），提出了一种新颖的端到端单目VO的框架。
+    由于它是以端到端的方式进行训练和配置的，
+    因此它可以直接从一系列原始的RGB图像（视频）中计算得到姿态，而无需采用任何传统VO框架中的模块。
+![](http://img2.jintiankansha.me/get?src=http://mmbiz.qpic.cn/mmbiz_png/O60Uib8kfuu8VkdRD7x1zAohE6JQZ9lbPSwVB7ZxibXMRTHGYvwYB8bTZmTek1icuDXlEPFaN1sgmZUDrbDBQ6hjg/0?wx_fmt=png)
 
 
 
