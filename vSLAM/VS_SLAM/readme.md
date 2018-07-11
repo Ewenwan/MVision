@@ -270,7 +270,14 @@
     由于它是以端到端的方式进行训练和配置的，
     因此它可以直接从一系列原始的RGB图像（视频）中计算得到姿态，而无需采用任何传统VO框架中的模块。
 ![](http://img2.jintiankansha.me/get?src=http://mmbiz.qpic.cn/mmbiz_png/O60Uib8kfuu8VkdRD7x1zAohE6JQZ9lbPSwVB7ZxibXMRTHGYvwYB8bTZmTek1icuDXlEPFaN1sgmZUDrbDBQ6hjg/0?wx_fmt=png)
-
+  
+    基于RCNN，一方面它可以通过卷积神经网络(Convolutional Neural Network)自动学习VO问题的有效特征表示，
+    另一方面可以通过递归神经网络(Recurrent Neural Network)对时序模型(运动模型)、数据关联模型(图像序列)进行隐式建模。
+![](http://img2.jintiankansha.me/get?src=http://mmbiz.qpic.cn/mmbiz_png/O60Uib8kfuu8VkdRD7x1zAohE6JQZ9lbP3cKSlhUr9XlSMxWwyd0slkPVpnzJW1eYEcPVQTt4UpaXxBywbYWcoQ/0?wx_fmt=png)
+  
+  
+  
+  
 
 
 
