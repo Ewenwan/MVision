@@ -26,7 +26,7 @@
         
 # 1. 用深度学习方法替换传统slam中的一个/几个模块：
 
-## CNN-SLAM: Real-time dense monocular SLAM with learned depth prediction
+## a. CNN-SLAM: Real-time dense monocular SLAM with learned depth prediction
 [论文](https://arxiv.org/pdf/1704.03489.pdf)
 ![](https://img-blog.csdn.net/20180105220413952)
 
@@ -119,7 +119,7 @@
 
           4）将3D目标对象插入到SLAM得到的空间位置序列中。
 
-## orbslam2 + ssd物体检测实现3d物体分割
+## A.  orbslam2 + ssd物体检测实现3d物体分割
 ![](http://5b0988e595225.cdn.sohucs.com/images/20171130/4f7de56d3e374e13935d3a2601ccbdd2.jpeg)
 
     场景映射 semantic Mapping ：  SLAM定位和建图
@@ -145,7 +145,7 @@
 
 [Meaningful Maps With Object-Oriented Semantic Mapping](https://arxiv.org/pdf/1609.07849.pdf)
 
-## 单目 LSD-SLAM + CNN卷积网络物体分割 
+## B. 单目 LSD-SLAM + CNN卷积网络物体分割 
 
         基本框架图如下： 
         输入RGB图像->选择关键帧并refine->2D语义分割->3D重建，语义优化 
@@ -159,7 +159,7 @@
                 利用LSD-SLAM作为框架，结合CNN进行有机融合，
                 选择关键帧进行做深度学习实现语义分割，之后选择相邻的几帧做增强。
 
-## rgbdslam + RNN  数据联合RNN语义分割+  KinectFusion跟踪 =3d Semantic Scene 
+## C. rgbdslam + RNN  数据联合RNN语义分割+  KinectFusion跟踪 =3d Semantic Scene 
 [DA-RNN 代码](https://github.com/Ewenwan/DA-RNN)
 
 [论文](https://arxiv.org/pdf/1703.03098.pdf)
@@ -171,13 +171,13 @@
     将不同帧图像的特征进行融合 , 同时能够融合 RGBD 图像和深度图像 . 
     该文章使用 KinectFusion [67] 完成相机的跟踪 , 估计当前相机的 6DOF 位姿 , 
     将 3D 场景表示为 3D 体素 , 保存于 TSDF (Truncated signed distance function).
-## SLAM++
+## D. SLAM++
     语义地图表示为一个图网络 , 其中节点有两种 : 
       1) 相机在世界坐标系的位姿 ; 
       2) 物体在世界坐标系的位姿 . 
     物体在相机坐标系的位姿作为网络中的一个约束 , 连接相机节点和物体节点 . 
     另外网络中还加入了平面结构等约束提高定位的精度 .
-## MO-SLAM (Multi object SLAM)
+## E. MO-SLAM (Multi object SLAM)
     对于场景中重复出现的物体进行检测 , 该方法不需要离线训练以及预制物体数据库 . 
     系统将重建的路标点分类 , 标记该点所属的物体类别 . 
     一个物体表示为一个路标点集合 , 相同的物体的不同实例的路标点之间存在如下关系：
@@ -186,7 +186,7 @@
     如果匹配点的数量不够 , 那么识别线程停止处理当前帧 , 等待下一个关键帧 . 
     使用 RANSAC (Random sample consensus, 随机采样序列一致性) 框架初始化一个位姿变换 ,
     
-## SemanticFusion:  卷积-反卷积语义分割cnn(基于caffe) +  ElasticFusion(稠密SLAM) + CRF融合
+## F. SemanticFusion:  卷积-反卷积语义分割cnn(基于caffe) +  ElasticFusion(稠密SLAM) + CRF融合
 [Dense 3D Semantic Mapping with Convolutional Neural Networks 论文](http://wp.doc.ic.ac.uk/bjm113/wp-content/uploads/sites/113/2017/07/SemanticFusion_ICRA17_CameraReady.pdf)
 
 [ElasticFusion: Real-Time Dense SLAM and Light Source Estimation 论文](http://www.thomaswhelan.ie/Whelan16ijrr.pdf)
@@ -211,7 +211,7 @@
 
     3）通过贝叶斯更新(CRF,条件随机场)来把识别的结果和SLAM生成的关联信息整合进统一的稠密语义地图中。
 
-## Pop-up SLAM: Semantic Monocular Plane SLAM for Low-texture Environments
+## G. Pop-up SLAM: Semantic Monocular Plane SLAM for Low-texture Environments
 [论文]()
 
 [代码](https://github.com/Ewenwan/pop_up_image/blob/master/readme.md)
@@ -223,13 +223,18 @@
     在低纹理条件下（这里可能已经是3D图了？）提取边界线，然后选择地线（这个例子里面分割出地面和门 ） ，
     然后构建三维建模 感觉只适用于室内的没什么杂物的环境内，规格化场景可以使用。
 
-## ros_object_analytics  yolo_v2/mobileNetSSD + rgbd
+## H. ros_object_analytics  yolo_v2/mobileNetSSD目标检测  + rgbd-slam 
+[代码](https://github.com/Ewenwan/ros_object_analytics)
+
+
+## I. MaskFusion rgbd-slam + 语义分割mask-rcnn
+[论文 MaskFusion: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects ](https://arxiv.org/pdf/1804.09194.pdf)
 
 
 
 # 3. 端到端SLAM   结合深度增强学习 DRL
 
-## 使用DRL深度加强学习实现机器人自主导航
+## A. 使用DRL深度加强学习实现机器人自主导航
 [论文  Target-driven Visual Navigation in Indoor Scenes using Deep Reinforcement Learning ](http://ai2-website.s3.amazonaws.com/publications/target_driven_visual.pdf)
 
 ![](https://upload-images.jianshu.io/upload_images/165932-34b57e120c46183f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700)
@@ -249,7 +254,7 @@
       4）不需要特征工程，帧间的特征匹配和对于环境的特征重建，是可以端到端训练的。
       
       
-## 用于视觉导航的感知建图和规划
+## B. 用于视觉导航的感知建图和规划
 [论文  Cognitive Mapping and Planning for Visual Navigation ](https://arxiv.org/pdf/1702.03920.pdf)
 
 [博客笔记](https://blog.csdn.net/weixin_37251044/article/details/78569428)
@@ -268,7 +273,7 @@
       并且在陌生环境中表现良好。另外，CMP也可以完成特定的语义目标，
       比如说“go to a chair”到椅子那儿去。 
 
-## DeepVO：基于深度循环卷积神经网络的端到端视觉里程计 CNN+RNN
+## C. DeepVO：基于深度循环卷积神经网络的端到端视觉里程计 CNN+RNN
 [论文 End-to-end, sequence-to-sequence probabilistic visual odometry through deep neural networks](http://journals.sagepub.com/doi/pdf/10.1177/0278364917734298)
 
  [DeepVO: Towards End-to-End Visual Odometry with Deep RecurrentConvolutional Neural Networks](http://senwang.gitlab.io/DeepVO/files/wang2017DeepVO.pdf)
