@@ -171,6 +171,14 @@
     将不同帧图像的特征进行融合 , 同时能够融合 RGBD 图像和深度图像 . 
     该文章使用 KinectFusion [67] 完成相机的跟踪 , 估计当前相机的 6DOF 位姿 , 
     将 3D 场景表示为 3D 体素 , 保存于 TSDF (Truncated signed distance function).
+    
+    本文利用可以实现Data Associate的RNN产生Semantic Label。然后作用于KinectFusion，来插入语义信息。
+    所以本文利用了RNN与KinectFusion来实现语义地图的构建！
+    
+    本文采用了DA-RNN与KinectFusion合作的方式来产生最终的Semantic Mapping，
+    而文章采用的则是ORB-SLAM与CNN结合，他们有一些共同的结构，如Data Associate，虽然我现在还不明白这个DA具体得怎么实现！？
+    
+    
 ## D. SLAM++
     语义地图表示为一个图网络 , 其中节点有两种 : 
       1) 相机在世界坐标系的位姿 ; 
@@ -195,6 +203,7 @@
 
 [SemanticFusion代码 ](https://github.com/Ewenwan/semanticfusion)
 
+主要框架，用到了ElasticFusion和CNN来产生稠密的Semantic Mapping.
 
 偏重怎样结合CNN搭建一套稠密语义SLAM的系统。SemanticFusion架构上主要分为三部分：
 
@@ -210,6 +219,19 @@
     2） CNN用RGB或RGBD图来生成一个概率图，每个像素都对应着识别出来的物体类别；
 
     3）通过贝叶斯更新(CRF,条件随机场)来把识别的结果和SLAM生成的关联信息整合进统一的稠密语义地图中。
+    
+    本文的算法，利用SLAM来实现2D Frame与3D Map之间的匹配(Corresponding)。
+    通过这种方式，可以实现把CNN的语义预测以概率的方式融合到Dense semantically annotated map.
+
+    为什么选择ElasticFusion呢，是因为这种算法是surfel-based surface representation，可以支持每一帧的语义融合。
+
+    比较重要的一点是，通过实验说明，引入SLAM甚至可以提高单帧图像的语义分割效果。
+    尤其在存在wide viewpoint variation，可以帮助解决单目2D Semantic中的一些Ambiguations.
+
+    之前存在方法使用Dense CRF来获得语义地图。
+
+    本文的主要不同是：利用CNN来产生语义分割，然后是在线以 Incremental 的方式生成Semantic Map。即新来一帧就生成一帧的语义地图。
+
 
 ## G. Pop-up SLAM: Semantic Monocular Plane SLAM for Low-texture Environments
 [论文]()
@@ -235,6 +257,28 @@
 
 ## . MaskFusion ElasticFusion(RGBD-SLAM)　+ 语义分割mask-rcnn
 [论文 MaskFusion: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects ](https://arxiv.org/pdf/1804.09194.pdf)
+
+    本文提出的MaskFusion算法可以解决这两个问题，首先，可以从Object-level理解环境，
+    在准确分割运动目标的同时，可以识别、检测、跟踪以及重建目标。
+    分割算法由两部分组成：
+    Mask RCNN:提供多达80类的目标识别等,利用Depth以及Surface Normal等信息向Mask RCNN提供更精确的目标边缘分割。
+    上述算法的结果输入到本文的Dynamic SLAM框架中。
+     使用Instance-aware semantic segmentation比使用pixel-level semantic segmentation更好。
+     目标Mask更精确，并且可以把不同的object instance分配到同一object category
+     
+    本文的作者又提到了现在SLAM所面临的另一个大问题：Dynamic的问题。
+    作者提到，本文提出的算法在两个方面具有优势：
+        相比于这些算法，本文的算法可以解决Dynamic Scene的问题。
+        本文提出的算法具有Object-level Semantic的能力。
+        
+        
+    所以总的来说，作者就是与那些Semantic Mapping的方法比Dynamic Scene的处理能力，
+    与那些Dynamic Scene SLAM的方法比Semantic能力，在或者就是比速度。
+    确实，前面的作者都只关注Static Scene， 现在看来，
+    实际的SLAM中还需要解决Dynamic Scene(Moving Objects存在)的问题。}
+    
+    
+
 
 
 
