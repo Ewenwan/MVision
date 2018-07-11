@@ -41,16 +41,11 @@
     我们展示了使用深度预测来估计重建的绝对尺度，从而克服了单眼SLAM的主要局限性之一。
     最后，我们提出一个框架，从单个帧获得的语义标签有效地融合了密集的SLAM，从单个视图产生语义相干的场景重构。
     两个基准数据集的评估结果显示了我们的方法的鲁棒性和准确性。
-    
-    
-    
-    
-
-
-
 
 
 # 2. Vision Semantic SLAM  视觉分割SLAM   语义SLAM
+[语义SLAM参考](https://github.com/Ewenwan/texs/blob/master/PaperReader/SemanticSLAM/SemanticSLAM.md)
+
         SLAM的另一个大方向就是和深度学习技术结合。
         到目前为止，SLAM的方案都处于特征点或者像素的层级。
         关于这些特征点或像素到底来自于什么东西，我们一无所知。
