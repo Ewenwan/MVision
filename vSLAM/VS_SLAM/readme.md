@@ -240,9 +240,12 @@
     在低纹理条件下（这里可能已经是3D图了？）提取边界线，然后选择地线（这个例子里面分割出地面和门 ） ，
     然后构建三维建模 感觉只适用于室内的没什么杂物的环境内，规格化场景可以使用。
 
-## H. ros_object_analytics  yolo_v2/mobileNetSSD目标检测  + rgbd-slam 
+## H. ros_object_analytics  单帧点云(pcl模型平面分割+欧氏距离聚类物体分割) + Yolo_v2(GPU) / MobileNet_SSD(VPU NCS加速棒) 物体检测
 [代码](https://github.com/Ewenwan/ros_object_analytics)
 
+    使用pcl算法提供的点云 多平面模型分割　和　多目标欧氏距离聚类分割算法 对单帧　RGBD相机捕获的点云　进行分割,　得到3d分割
+    使用 Yolo_v2(GPU) / MobileNet_SSD(VPU NCS加速棒) 物体检测算法对 RGB图像进行物体检测, 得到2d检测框
+    两者根据位置信息进行融合，得到物体的 3d标注框
 
 ## I. Co-Fusion   CRF图像分割　+  ElasticFusion(RGBD-SLAM)
 [论文 Co-Fusion: Real-time Segmentation, Tracking and Fusion of Multiple Objects](http://visual.cs.ucl.ac.uk/pubs/cofusion/icra2017_co-fusion_web.pdf)
