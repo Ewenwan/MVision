@@ -1,4 +1,6 @@
 # ros_object_analytics　单帧点云(欧氏距离聚类分割) + Yolo_v2/MobileNet_SSD 物体检测
+[项目主页](https://github.com/Ewenwan/ros_object_analytics)
+
       物体分析　Object Analytics (OA) 是一个ros包，
       支持实时物体检测定位和跟踪(realtime object detection, localization and tracking.)
       使用　RGB-D 相机输入,提供物体分析服务，为开发者开发更高级的机器人高级特性应用， 
