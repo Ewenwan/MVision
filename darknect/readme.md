@@ -1,5 +1,8 @@
 # yolo darknet
 
+[FOR Raspberry Pi 3 ](https://github.com/digitalbrain79/darknet-nnpack)
+
+
 * YOLO-v1 论文翻译
 [You Only Look Once: Unified, Real-Time Object Detection](https://arxiv.org/abs/1506.02640)
 [中文版](http://noahsnail.com/2017/08/02/2017-8-2-YOLO%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E6%96%87%E7%89%88/)
