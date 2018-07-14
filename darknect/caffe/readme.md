@@ -316,11 +316,50 @@ void GlobalInit(int* pargc, char*** pargv) {
       
       1. 安装ATLAS 
             sudo apt-get install libatlas-base-dev
+            
       2. 安装OpenBLAS
             sudo apt-get install libopenblas-base
+## BLAS与boost::thread加速
+## BLAS 
+      BLAS (Basic Linear Algebra Subprograms, 基础线性代数子程序库),
+      是一个应用程序接口（API）标准，说的简单点就是向量、矩阵之间乘加这些运算。
+      BLAS虽然本身就有实现但 效率不高，因此有大量的开源或商业项目对BLAS进行优化,
+      比如OpenBLAS（开源），Intel MKL（收费），ATLAS（开源）。
+      我用的是OpenBLAS这个库。
+## OpenBLAS
+      OpenBLAS是C语言实现的，这个库安装比较简单，如上面，唯一的一个问题是使用方法。
+      前面介绍BLAS提供了接口，文档在这里 http://www.netlib.org/blas/blasqr.pdf 
+      这个文档中：
+         Level 1 是vector与vector的操作， 向量与向量
+         Level 2 是vector与matrix的操作， 向量与矩阵
+         Level 3是matrix与matrix的操作。  矩阵与矩阵
+      每个函数的开头有一个x表示精度比如替换成 s表示float类型(实数)，d表示double类型，c表示复数。
       
+      其实虽然函数很多但其实使用方法大同小异，BLAS之所以分的这么细（区分到对称矩阵，三角矩阵）是为了方便针对不同的情况做优化。
+      所以其实搞清楚最关键的矩阵与矩阵的运算就已经理解了一大半。
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08bf33fabd.png?imageMogr2/format/jpg/quality/90)
 
-
+### 矩阵相乘  
+      以dgemm为例，全称为double-precision generic matrix-matrix muliplication，就是矩阵相乘，
+      在OpenBLAS中的声明是:
+```c
+cblas_dgemm(const enum CBLAS_ORDER Order,
+            const enum CBLAS_TRANSPOSE TransA,
+            const enum CBLAS_TRANSPOSE TransB,
+            const blasint M,
+            const blasint N,
+            const blasint K,
+            const double alpha,
+            const double *A,
+            const blasint lda,
+            const double *B,
+            const blasint ldb,
+            const double beta,
+            double *C,
+            const blasint ldc)
+```
+      
+      
       
 # prototxt
 ## 文件的可视化
