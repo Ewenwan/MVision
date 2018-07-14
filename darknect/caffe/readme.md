@@ -1,3 +1,5 @@
+[yolo_darknet 转 caffe](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/yolo_darknet_to_caffe.md)
+
 # caffe使用
 [caffe 安装](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_%E5%AE%89%E8%A3%85.md)
 
@@ -292,7 +294,7 @@ void GlobalInit(int* pargc, char*** pargv) {
       5. 最后，编译成可执行文件之后，用户可以使用：executable --参数1=值1 --参数2=值2 ... 来为这些命令行参数赋值。
 
             ./mycmd --var1="test" --var2=3.141592654 --var3=32767 --mybool1=true --mybool2 --nomybool3
-## gflags进阶使用
+### gflags进阶使用
       1. 在其他文件中使用定义的flags变量：
             有些时候需要在main之外的文件使用定义的flags变量，
             这时候可以使用宏定义DECLARE_xxx(变量名)声明一下（就和c++中全局变量的使用是一样的，extern一下一样）
@@ -302,7 +304,24 @@ void GlobalInit(int* pargc, char*** pargv) {
             help信息：使用google::SetUsageMessage设定，使用google::ProgramUsage访问
             注意：google::SetUsageMessage和google::SetVersionString必须在google::ParseCommandLineFlags之前执行
             
-            
+## gtest Google的开源C++单元测试框架 
+      gtest Google的开源C++单元测试框架，caffe里面test代码中大量用到，网上教程也是一大堆。
+[参考](http://www.cnblogs.com/coderzh/archive/2009/04/06/1426755.html)
+
+## 关于CPU加速
+      Caffe推荐的BLAS（Basic Linear Algebra Subprograms）有三个选择ATLAS，Intel MKL，OpenBLAS。
+      其中ATLAS是caffe是默认选择开源免费，如果没有安装CUDA的不太推荐使用，因为CPU多线程的支持不太好；
+      Intel MKL是商业库要收费，我没有试过但caffe的作者安装的是这个库，估计效果应该是最好的；
+      OpenBLAS开源免费，支持CPU多线程，我安装的就是这个。
+      
+      1. 安装ATLAS 
+            sudo apt-get install libatlas-base-dev
+      2. 安装OpenBLAS
+            sudo apt-get install libopenblas-base
+      
+
+
+      
 # prototxt
 ## 文件的可视化
       1.使用在线工具netscope。
