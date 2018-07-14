@@ -16,6 +16,11 @@
     1、im2col + GEMM。
        caffe等很多框架中都使用了这种计算方式，
        原因是将问题转化为矩阵乘法后可以方便的使用很多矩阵运算库（如MKL、openblas、Eigen等）。
+[openblas](https://www.leiphone.com/news/201704/Puevv3ZWxn0heoEv.html)
+       
+[GEMM 普通矩阵乘法（General Matrix Multiplication）](https://github.com/flame/how-to-optimize-gemm/wiki)
+       
+       
     2、FFT变换。 
        时域卷积等于频域相乘，因此可将问题转化为简单的乘法问题。
     3、Winograd。 
@@ -37,7 +42,48 @@
 
 [博客解析](https://blog.csdn.net/shuzfan/article/details/77427979)
     
-     
+## openblas GEMM 矩阵乘法优化
+
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08bf33fabd.png?imageMogr2/format/jpg/quality/90)
+
+最原始3个for循环 (矩阵比较小的时候，速度还能快一些，当矩阵大了的时候，一定会跌下去,cache缓存问题):
+
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08d87a8397.png?imageMogr2/format/jpg/quality/90)
+
+矩阵分块，块复用，减少仿存，相当于减少内存访问：
+
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08dd7b16d4.png?imageMogr2/format/jpg/quality/90)
+
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08e08680b9.png?imageMogr2/format/jpg/quality/90)
+
+操作寄存器，不是操作内存：
+
+我可以申请一堆C 00，01这样的寄存器变量，在C语言中是register double，还有矩阵A的部分，也用寄存器变量。
+
+当然B还是之前的方式，最后再写回C里面。
+
+只是我们引入了寄存器变量，让更多的数据保存到寄存器里，而不是放到cache缓存里，来减轻cache的压力.
+
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08e24d0ee0.png?imageMogr2/format/jpg/quality/90)
+
+
+B矩阵仿存，使用指针访问，
+
+一开始先把对应的指针位置指好，每次计算的时候只要指针连续移动就好，而不是每次读一个位置重新算一遍，这样速度就会快一些。
+
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08ea8442c1.png?imageMogr2/format/jpg/quality/90)
+
+最里层循环展开：
+
+在最里层循环，是不是可以展开成4次，在做这个的时候，我们可以降低整个循环这部分的开销，而且让它流水的情况更好。
+
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08f08cf086.png?imageMogr2/format/jpg/quality/90)
+
+通过使用寄存器变量，使用了指针，在做了一定的底层循环展开之后，达到了红色线的性能:
+
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08f44ae0fa.png?imageMogr2/format/jpg/quality/90)
+
+之后可以使用更大的分块，在进行寄存器，指针，展开优化。
       
 # 在深度神经网络中 特指提高卷积计算方式的方法
       0、小米 mace
