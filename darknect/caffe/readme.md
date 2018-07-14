@@ -321,46 +321,89 @@ void GlobalInit(int* pargc, char*** pargv) {
             sudo apt-get install libopenblas-base
 ## BLAS与boost::thread加速
 ## BLAS 
+http://www.netlib.org/blas/blasqr.pdf 
+      
+      
       BLAS (Basic Linear Algebra Subprograms, 基础线性代数子程序库),
       是一个应用程序接口（API）标准，说的简单点就是向量、矩阵之间乘加这些运算。
       BLAS虽然本身就有实现但 效率不高，因此有大量的开源或商业项目对BLAS进行优化,
       比如OpenBLAS（开源），Intel MKL（收费），ATLAS（开源）。
       我用的是OpenBLAS这个库。
 ## OpenBLAS
+[参考](https://www.leiphone.com/news/201704/Puevv3ZWxn0heoEv.html)
+
       OpenBLAS是C语言实现的，这个库安装比较简单，如上面，唯一的一个问题是使用方法。
       前面介绍BLAS提供了接口，文档在这里 http://www.netlib.org/blas/blasqr.pdf 
       这个文档中：
-         Level 1 是vector与vector的操作， 向量与向量
-         Level 2 是vector与matrix的操作， 向量与矩阵
-         Level 3是matrix与matrix的操作。  矩阵与矩阵
+         BLAS 1级 ,Level 1: 是vector与vector的操作， 向量与向量, 主要做向量与向量间的dot或乘加运算，对应元素的计算
+         BLAS 2级, Level 2: 是vector与matrix的操作， 向量与矩阵, 就类似下图中蓝色部分所示，矩阵A*向量x， 得到一个向量y。
+         BLAS 3级，Level 3: 是matrix与matrix的操作,  矩阵与矩阵, 最典型的是A矩阵*B矩阵，得到一个C矩阵。由矩阵的宽、高，得到一个m*n的C矩阵。
       每个函数的开头有一个x表示精度比如替换成 s表示float类型(实数)，d表示double类型，c表示复数。
       
       其实虽然函数很多但其实使用方法大同小异，BLAS之所以分的这么细（区分到对称矩阵，三角矩阵）是为了方便针对不同的情况做优化。
       所以其实搞清楚最关键的矩阵与矩阵的运算就已经理解了一大半。
 ![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08bf33fabd.png?imageMogr2/format/jpg/quality/90)
 
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08c200cf65.png?imageMogr2/format/jpg/quality/90)
+      
+      基于矩阵类学习的深度学习，有90%或者更多的时间是通过BLAS来操作的。
+      当然，随着新的算法出现，卷积层对3*3的卷积核有专门的算法，
+      或者用FFT类类算法也可以做，但是在通用上，展矩阵来做也非常广泛。
+      
+      针对开源的而言，有如下几种，之前比较知名的是GoToBLAS，和OpenBLAS有很深的渊源，但是在2010年终止开发了.
+![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08c6b9c8ff.png?imageMogr2/format/jpg/quality/90)
+
 ### 矩阵相乘  
+      https://github.com/xianyi/OpenBLAS/wiki/User-Manual
       以dgemm为例，全称为double-precision generic matrix-matrix muliplication，就是矩阵相乘，
-      在OpenBLAS中的声明是:
+      在OpenBLAS中的声明是:  
+      A * B = C
+      [M K] * [K N] = [M N]
 ```c
-cblas_dgemm(const enum CBLAS_ORDER Order,
-            const enum CBLAS_TRANSPOSE TransA,
-            const enum CBLAS_TRANSPOSE TransB,
-            const blasint M,
-            const blasint N,
-            const blasint K,
-            const double alpha,
-            const double *A,
-            const blasint lda,
-            const double *B,
-            const blasint ldb,
-            const double beta,
-            double *C,
-            const blasint ldc)
+cblas_dgemm(const enum CBLAS_ORDER Order,         // 指定矩阵的存储方式如RowMajor 行优先/列优先
+            const enum CBLAS_TRANSPOSE TransA,    // A运算后是否转置
+            const enum CBLAS_TRANSPOSE TransB,    // B运算后是否转置
+            const blasint M,                      // A的行数
+            const blasint N,                      // B的列数
+            const blasint K,                      // A的列数
+            const double alpha,                   // 公式中的alpha
+            const double *A,                      // A
+            const blasint lda,                    // A一行的存储间隔
+            const double *B,                      // B
+            const blasint ldb,                    // B一行的存储间隔
+            const double beta,                    // 公式中的beta
+            double *C,                            // C
+            const blasint ldc)                    // C一行的存储间隔
 ```
+因为这里的A、B、C矩阵都是以一维数组的形式存储所以需要告诉函数他们一行的存储间隔就是lda、ldb、ldc它们。      
       
-      
-      
+      示例：
+```c
+#include <cblas.h>
+#include <stdio.h>
+
+void main()
+{
+  int i=0;
+  double A[6] = {1.0,2.0,1.0,-3.0,4.0,-1.0};// 3*2   
+  double B[6] = {1.0,2.0,1.0,-3.0,4.0,-1.0};// 2*3
+  double C[9] = {.5,.5,.5,.5,.5,.5,.5,.5,.5};// 3*3
+  cblas_dgemm(CblasColMajor, CblasNoTrans, CblasTrans,3,3,2,1,A, 3, B, 3,2,C,3);
+
+  for(i=0; i<9; i++)
+    printf("%lf ", C[i]);
+  printf("\n");
+}
+编译:
+gcc -o test_cblas_open test_cblas_dgemm.c -I /your_path/OpenBLAS/include/ -L/your_path/OpenBLAS/lib -lopenblas -lpthread -lgfortran
+```
+## Boost 相当强大的C++拓展库
+      用百度百科的话说，Boost库是一个经过千锤百炼、可移植、
+      提供源代码的C++库,作为标准库的后备,是C++标准化进程的发动机之一。
+      实际感受就是一个相当强大的C++拓展库，很多C++标准库里面没有的功能得以实现。
+      最近就用到了ublas，thread，date_time这三个模块。这里做一些简要的介绍。
+[参考](https://yufeigan.github.io/2015/01/02/Caffe%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B05-BLAS%E4%B8%8Eboost-thread%E5%8A%A0%E9%80%9F/)
+
 # prototxt
 ## 文件的可视化
       1.使用在线工具netscope。
