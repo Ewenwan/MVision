@@ -175,7 +175,7 @@ Layer是所有层的基类，在Layer的基础上衍生出来的有5种Layers：
           forward和backward有GPU(大部分)和CPU两个版本的实现。
       还有其他一些特有的操作
 # 依赖库介绍
-## glog google出的一个C++轻量级日志库
+## 1. glog,  google出的一个C++轻量级日志库
 [博文介绍](http://www.cnblogs.com/tianyajuanke/archive/2013/02/22/2921850.html)
 
       代码中充斥这类似 
@@ -189,6 +189,8 @@ Layer是所有层的基类，在Layer的基础上衍生出来的有5种Layers：
       当通过该宏指定的条件不成立的时候，程序会中止，并且记录对应的日志信息。
       
       还有打印日志函数 LOG(INFO),日志输出到 stderr(标准错误输出)
+### glog捕捉 程序段错误信息 在 caffe::GlobalInit(&argc, &argv); 有用到
+      
 ```c 
 捕捉 段错误 核心已转储 信息 core dumped  方便调试错误
 
@@ -213,7 +215,7 @@ class GLogHelper
 public:
     GLogHelper(char* program)
     {
-        google::InitGoogleLogging(program);
+        google::InitGoogleLogging(program);// 传入可执行文件吗
         FLAGS_colorlogtostderr=true;
         google::InstallFailureSignalHandler();
         //默认捕捉 SIGSEGV 信号信息输出会输出到 stderr，可以通过下面的方法自定义输出方式：
@@ -239,8 +241,68 @@ int main(int argc,char* argv[])
     fun();
 }
 ```
+## 2.gflags ,是google的一个开源的处理命令行参数的库
+[参考](https://blog.csdn.net/lezardfu/article/details/23753741)
 
-      
+      首先需要 使用 gflags的宏：DEFINE_xxxxx(变量名，默认值，help-string)  定义命令行参数
+```c
+// 求解器prototxt文件名
+DEFINE_string(solver, "",
+    "The solver definition protocol buffer text file.");
+```
+      1. 首先需要include "gflags.h"（废话，-_-b）
+            #include <gflags/gflags.h>
+
+      2. 将需要的命令行参数使用gflags的宏：DEFINE_xxxxx(变量名，默认值，help-string) 定义在文件当中，注意全局域(放在文件最前面的部分)。
+      gflags支持以下类型：
+
+          DEFINE_bool: boolean         布尔量
+          DEFINE_int32: 32-bit integer 32位整形
+          DEFINE_int64: 64-bit integer 64位整形
+          DEFINE_uint64: unsigned 64-bit integer 64位无符号整形
+          DEFINE_double: double        64位浮点型
+          DEFINE_string: C++ string    字符串string
+```c
+// 求解器prototxt文件名
+DEFINE_string(solver, "",
+    "The solver definition protocol buffer text file.");
+```
+      3. 在main函数中加入：（一般是放在main函数的头几行，越早了解用户的需求越好么^_^）
+            google::ParseCommandLineFlags(&argc, &argv, true);
+            argc　参数计数 counter
+            argv  参数列表 vector 字符串列表向量
+            第三个参数，如果设为true，则该函数处理完成后，argv中只保留argv[0]，argc会被设置为1。
+                       如果为false，则argv和argc会被保留，但是注意函数会调整argv中的顺序
+```c
+caffe::GlobalInit(&argc, &argv);
+// 原函数
+void GlobalInit(int* pargc, char*** pargv) {
+  // Google flags.   namespace gflags = google;
+  ::gflags::ParseCommandLineFlags(pargc, pargv, true);
+  // Google logging.   glog中的日志等级
+  ::google::InitGoogleLogging(*(pargv)[0]);
+  // Provide a backtrace on segfault.
+  ::google::InstallFailureSignalHandler();//  glog的 异常捕获(段错误)处理
+}
+```
+      4. 这样，在后续代码中可以使用FLAGS_变量名访问对应的命令行参数了
+
+            printf("%s", FLAGS_mystr);
+
+      5. 最后，编译成可执行文件之后，用户可以使用：executable --参数1=值1 --参数2=值2 ... 来为这些命令行参数赋值。
+
+            ./mycmd --var1="test" --var2=3.141592654 --var3=32767 --mybool1=true --mybool2 --nomybool3
+## gflags进阶使用
+      1. 在其他文件中使用定义的flags变量：
+            有些时候需要在main之外的文件使用定义的flags变量，
+            这时候可以使用宏定义DECLARE_xxx(变量名)声明一下（就和c++中全局变量的使用是一样的，extern一下一样）
+            
+      2. 定制你自己的help信息与version信息：(gflags里面已经定义了-h和--version，你可以通过以下方式定制它们的内容)
+            version信息：使用google::SetVersionString设定，使用google::VersionString访问
+            help信息：使用google::SetUsageMessage设定，使用google::ProgramUsage访问
+            注意：google::SetUsageMessage和google::SetVersionString必须在google::ParseCommandLineFlags之前执行
+            
+            
 # prototxt文件的可视化
 
       1.使用在线工具netscope。
