@@ -160,12 +160,85 @@ Layer是所有层的基类，在Layer的基础上衍生出来的有5种Layers：
       1. 数据层 data_layer
       2. 神经元层 neuron_layer
       3. 损失函数层 loss_layer
-      4. 网络连接层和激活函数 common_layer
-      5. 特征表达层 vision_layer
+      4. 网络连接层和激活函数 common_layer 替换成各种层名字的文件
+      5. 特征表达层 vision_layer   也展开成各自层对应的文件 
+      ... 新版本caffe 把每种层类型都写了一个头文件和源文件
 
-它们都有对应的[.hpp .cpp]文件声明和实现了各个类的接口。下面一个一个地讲这5个Layer。
-## 1. 数据层 data_layer
+它们都有对应的[.hpp .cpp]文件声明和实现了各个类的接口。
 
+      在Layer中 输入数据input data用bottom表示，
+                输出数据 output data用top表示。
+      每一层军定义了三种操作:
+          1. setup（Layer初始化）, 
+          2. forward（正向传导，根据input计算output）, 
+          3. backward（反向传导计算，根据output计算input的梯度）。
+          forward和backward有GPU(大部分)和CPU两个版本的实现。
+      还有其他一些特有的操作
+# 依赖库介绍
+## glog google出的一个C++轻量级日志库
+[博文介绍](http://www.cnblogs.com/tianyajuanke/archive/2013/02/22/2921850.html)
+
+      代码中充斥这类似 
+      HECK_EQ(数字相等检查)、 CHECK_NE(不相等)、CHECK_LE(小于等于)、CHECK_LT(小于)、CHECK_GE(大于等于)、CHECK_GT(大于)
+      CHECK_NOTNULL(指针非空检查)、CHECK_STRNE()
+      CHECK_STREQ(字符串相等检查)、
+      CHECK_DOUBLE_EQ(浮点数相等检查)、
+      CHECK_GT(大于检查)
+      函数,
+      这就是glog里面的 (CHECK 宏) ，类似ASSERT()的断言。
+      当通过该宏指定的条件不成立的时候，程序会中止，并且记录对应的日志信息。
+      
+      还有打印日志函数 LOG(INFO),日志输出到 stderr(标准错误输出)
+```c 
+捕捉 段错误 核心已转储 信息 core dumped  方便调试错误
+
+// 通过 google::InstallFailureSignalHandler(); 即可注册，将 core dumped 信息输出到 stderr，如：
+
+#include <glog/logging.h>
+#include <string>
+#include <fstream>
+
+//将信息输出到单独的文件和 LOG(ERROR)
+void SignalHandle(const char* data, int size)
+{
+    std::ofstream fs("glog_dump.log",std::ios::app);
+    std::string str = std::string(data,size);
+    fs<<str;
+    fs.close();
+    LOG(ERROR)<<str;
+}
+
+class GLogHelper
+{
+public:
+    GLogHelper(char* program)
+    {
+        google::InitGoogleLogging(program);
+        FLAGS_colorlogtostderr=true;
+        google::InstallFailureSignalHandler();
+        //默认捕捉 SIGSEGV 信号信息输出会输出到 stderr，可以通过下面的方法自定义输出方式：
+        google::InstallFailureWriter(&SignalHandle);
+    }
+    ~GLogHelper()
+    {
+        google::ShutdownGoogleLogging();
+    }
+};
+
+void fun()
+{
+    int* pi = new int;// 在堆中申请一个变量，由在栈中的指针pi指针指向
+    delete pi;//删除对应堆中的内存
+    pi = 0;   // 指针置空
+    int j = *pi;// 对一个空指针进行解引用，报段错误
+}
+
+int main(int argc,char* argv[])
+{
+    GLogHelper gh(argv[0]);//这个可以捕捉core dump的详细信息，可以定位到在fun()函数处出错
+    fun();
+}
+```
 
       
 # prototxt文件的可视化
