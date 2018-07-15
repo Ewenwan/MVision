@@ -151,7 +151,28 @@
         实际上两者应该是相辅相成的，只不过貌似后者还没有人做罢了。
 
         本文在实时性和计算量应该算是比较合理的，一般GPU应该能跑起来；缺点是地图可读性比较差。
-
+        
+        由于需要非常精确的图像分割，所以本文利用Depth图来帮助分割。
+        所以需要对Depth进行分割的算法，本文采用了文章@Felzenszwalb2004@Pham2016Geometrically等人的算法。
+        也是涉及到基于图的分割的过程。
+        
+        数据关联 Data Association
+          当完成了把3D Point投影到识别的物体后，数据关联要做的事：
+          判断检测到的物体是否已经在已经构建的地图中存在了呢，
+          如果不存在的话，就需要新增这个物体。
+          
+        通过一个二阶的流程来实现：
+          对于每一个检测到的Object，根据点云的欧式距离，来选择一系列的Landmarks(已经检测到并在地图里面已经有的Object)
+          对Object和Point Cloud of landmark进行最近邻搜索，使用了k-d tree来提高效率，
+          其实这一步也就是判断当前图像检测到的Object与已有的地图中的Landmark(Object)是否相匹配。
+          
+          在第二步中，如果多余50 % 的Points的都距离小于2cm的话，就说明这个检测到的Object已经存在了。
+          这个也就是把CNN的分割结果与地图中的Object进行关联起来，并用颜色表示Map中Object的类别。
+        
+          在上一篇SematicFusion中，采用的Recursive Bayesian 的更新规则来完成地图更新的！
+          看来，这个是CNN与传统的SLAM框架结合的时候的一个需要解决的问题，
+          那就是如何把新来的物体与已有的地图中的物体相互关联起来，并更新！
+        
 [Meaningful Maps With Object-Oriented Semantic Mapping](https://arxiv.org/pdf/1609.07849.pdf)
 
 ## B. 单目 LSD-SLAM + CNN卷积网络物体分割 
@@ -168,7 +189,12 @@
                 利用LSD-SLAM作为框架，结合CNN进行有机融合，
                 选择关键帧进行做深度学习实现语义分割，之后选择相邻的几帧做增强。
 
-## C. rgbdslam + RNN  数据联合RNN语义分割+  KinectFusion跟踪 =3d Semantic Scene 
+## C. 数据联合RNN语义分割+  KinectFusion跟踪(rgbdslam) =3d Semantic Scene 
+      看得出来，RNN在帮助建立相邻帧之间的一致性方面具有很大的优势。
+
+      本文利用可以实现Data Associate的RNN产生Semantic Label。然后作用于KinectFusion，来插入语义信息。
+
+      所以本文利用了RNN与KinectFusion来实现语义地图的构建！
 [DA-RNN 代码](https://github.com/Ewenwan/DA-RNN)
 
 [论文](https://arxiv.org/pdf/1703.03098.pdf)
@@ -204,6 +230,8 @@
     使用 RANSAC (Random sample consensus, 随机采样序列一致性) 框架初始化一个位姿变换 ,
     
 ## F. SemanticFusion:  卷积-反卷积语义分割cnn(基于caffe) +  ElasticFusion(稠密SLAM) + CRF融合
+![](https://github.com/Ewenwan/texs/blob/master/PaperReader/SemanticSLAM/SemanticFusion0.png)
+
 [Dense 3D Semantic Mapping with Convolutional Neural Networks 论文](http://wp.doc.ic.ac.uk/bjm113/wp-content/uploads/sites/113/2017/07/SemanticFusion_ICRA17_CameraReady.pdf)
 
 [ElasticFusion: Real-Time Dense SLAM and Light Source Estimation 论文](http://www.thomaswhelan.ie/Whelan16ijrr.pdf)
@@ -272,11 +300,14 @@
 
     本文提出的MaskFusion算法可以解决这两个问题，首先，可以从Object-level理解环境，
     在准确分割运动目标的同时，可以识别、检测、跟踪以及重建目标。
+    
     分割算法由两部分组成：
-    Mask RCNN:提供多达80类的目标识别等,利用Depth以及Surface Normal等信息向Mask RCNN提供更精确的目标边缘分割。
+     1. 2d语义分割： Mask RCNN:提供多达80类的目标识别等
+     2. 利用Depth以及Surface Normal等信息向Mask RCNN提供更精确的目标边缘分割。
+     
     上述算法的结果输入到本文的Dynamic SLAM框架中。
-     使用Instance-aware semantic segmentation比使用pixel-level semantic segmentation更好。
-     目标Mask更精确，并且可以把不同的object instance分配到同一object category
+       使用Instance-aware semantic segmentation比使用pixel-level semantic segmentation更好。
+       目标Mask更精确，并且可以把不同的object instance分配到同一object category。
      
     本文的作者又提到了现在SLAM所面临的另一个大问题：Dynamic的问题。
     作者提到，本文提出的算法在两个方面具有优势：
@@ -289,6 +320,27 @@
     确实，前面的作者都只关注Static Scene， 现在看来，
     实际的SLAM中还需要解决Dynamic Scene(Moving Objects存在)的问题。}
     
+![](https://github.com/Ewenwan/texs/blob/master/PaperReader/SemanticSLAM/MaskFusion0.png)
+    
+    每新来一帧数据，整个算法包括以下几个流程：
+
+    1. 跟踪 Tracking
+       每一个Object的6 DoF通过最小化一个能量函数来确定，这个能量函数由两部分组成：
+          a. 几何的ICP Error;
+          b. Photometric cost。
+       此外，作者仅对那些Non-static Model进行Track。
+       最后，作者比较了两种确定Object是否运动的方法：
+          a. Based on Motioin Incosistency
+          b. Treating objects which are being touched by a person as dynamic
+          
+    2. 分割 Segmentation
+       使用了Mask RCNN和一个基于Depth Discontinuities and surface normals 的分割算法。
+       前者有两个缺点：物体边界不精确、运行不实时。
+       后者可以弥补这两个缺点， 但可能会Oversegment objects。
+       
+    3. 融合 Fusion
+       就是把Object的几何结构与labels结合起来。
+
 ## K. DeLS-3D 全深度卷积 语言SLAM CNN+RNN 预测相机位姿态 + CNN+DECNN(卷积+反卷积)2d语义分割
 DeLS-3D: Deep Localization and Segmentation with a 2D Semantic
   
@@ -322,10 +374,6 @@ DeLS-3D: Deep Localization and Segmentation with a 2D Semantic
     需要注意的是，当标签地图加入框架时，需要经过编码，即每一个像素经One-hot操作得到一个32维的Feature Representation。
     然后得到的32维特征加入到RGB图像的第一层卷积输出中，且该层的Kernel数也是32个，从而平衡了两种数据的通道数(Channel Number)。
     
-    
-    
-    
-
 
 # 3. 端到端SLAM   结合深度增强学习 DRL
 
@@ -383,8 +431,3 @@ DeLS-3D: Deep Localization and Segmentation with a 2D Semantic
 ![](http://img2.jintiankansha.me/get?src=http://mmbiz.qpic.cn/mmbiz_png/O60Uib8kfuu8VkdRD7x1zAohE6JQZ9lbP3cKSlhUr9XlSMxWwyd0slkPVpnzJW1eYEcPVQTt4UpaXxBywbYWcoQ/0?wx_fmt=png)
   
   
-  
-  
-
-
-
