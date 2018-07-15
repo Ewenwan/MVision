@@ -26,7 +26,7 @@
         
 # 1. 用深度学习方法替换传统slam中的一个/几个模块：
 
-## a. CNN-SLAM: Real-time dense monocular SLAM with learned depth prediction
+## A. CNN-SLAM: Real-time dense monocular SLAM with learned depth prediction
 [论文](https://arxiv.org/pdf/1704.03489.pdf)
 ![](https://img-blog.csdn.net/20180105220413952)
 
@@ -41,6 +41,20 @@
     我们展示了使用深度预测来估计重建的绝对尺度，从而克服了单眼SLAM的主要局限性之一。
     最后，我们提出一个框架，从单个帧获得的语义标签有效地融合了密集的SLAM，从单个视图产生语义相干的场景重构。
     两个基准数据集的评估结果显示了我们的方法的鲁棒性和准确性。
+## B. DenseSLAM 使用CNN+DeCNN+RNN
+![](https://github.com/Ewenwan/texs/blob/master/PaperReader/SemanticSLAM/DenseSLAMNet1.png)
+    
+    它接受当前RGB图像 It,以及来自迁移级的隐藏状态 h(t-1),通过LSTM单元进行内部转移。
+    网络的输出是稠密地图 Zt, 以及相机的姿态 Rt, Tt.
+    
+网络结构:
+![](https://github.com/Ewenwan/texs/blob/master/PaperReader/SemanticSLAM/DenseSLAMNet2.png)
+    
+    网络结构的另一个参数是时间窗口的大小N=10.
+    
+    
+    
+    
 
 
 # 2. Vision Semantic SLAM  视觉分割SLAM   语义SLAM
@@ -253,7 +267,7 @@
 [代码](https://github.com/Ewenwan/co-fusion)
 
 
-## . MaskFusion ElasticFusion(RGBD-SLAM)　+ 语义分割mask-rcnn
+## J. MaskFusion ElasticFusion(RGBD-SLAM)　+ 语义分割mask-rcnn
 [论文 MaskFusion: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects ](https://arxiv.org/pdf/1804.09194.pdf)
 
     本文提出的MaskFusion算法可以解决这两个问题，首先，可以从Object-level理解环境，
@@ -275,9 +289,42 @@
     确实，前面的作者都只关注Static Scene， 现在看来，
     实际的SLAM中还需要解决Dynamic Scene(Moving Objects存在)的问题。}
     
+## K. DeLS-3D 全深度卷积 语言SLAM CNN+RNN 预测相机位姿态 + CNN+DECNN(卷积+反卷积)2d语义分割
+DeLS-3D: Deep Localization and Segmentation with a 2D Semantic
+  
+    在Localization中，传统的做法是基于特征匹配来做，但这样的坏处是，如果纹理信息较少，那么系统就不稳定，会出错。
+    一种改进办法是利用深度神经网络提取特征。实际道路中包含大量的相似场景以及重复结构，所以前者实用性较差。
     
+    相机的姿态信息可以帮助3D语义地图与2D标签地图之间的像素对应。反过来，场景语义又会帮助姿态估计。 
+     
+     
+总的工作流程:
+    
+![](https://github.com/Ewenwan/texs/blob/master/PaperReader/SemanticSLAM/DeLS1.png)
+  
+    从图中可以看出，RGB Images 以及 根据GPS/IMU获得的semantic label map被输入到Pose CNN，
+    然后输出的Pose信息输入到 Pose RNN来对Pose进一步提高，这里用RNN来获得前后帧的一致性！
+    然后在利用新得到的Pose来获取更精确的Semantic Label Map，
+    最后，这个label Map以及RGB图像输入到Segment CNN来进一步提高语义地图的精度。
+    这里标签地图被用于提高语义地图的空间精度以及时间一致性。
+    
+    网络的训练是基于非常精确地相机姿态以及语义分割，所以可以采用监督学习。
+    
+    Pose Network包含一个Pose CNN以及一个Pose GRU-RNN。
+    其中Pose CNN的输入是RGB图像I以及一个标签地图L。
+    输出是一个7维的向量，表示输入图像I与输入标签地图L之间的位姿关系，从而得到一个在3D Map中更精确的姿态.
 
+分割网络结构:
 
+![](https://github.com/Ewenwan/texs/blob/master/PaperReader/SemanticSLAM/DeLS2.png)
+    
+    首先基于RGB图像对该网络训练，然后加入标签地图数据进行微调(Fine Tune).
+    需要注意的是，当标签地图加入框架时，需要经过编码，即每一个像素经One-hot操作得到一个32维的Feature Representation。
+    然后得到的32维特征加入到RGB图像的第一层卷积输出中，且该层的Kernel数也是32个，从而平衡了两种数据的通道数(Channel Number)。
+    
+    
+    
+    
 
 
 # 3. 端到端SLAM   结合深度增强学习 DRL
