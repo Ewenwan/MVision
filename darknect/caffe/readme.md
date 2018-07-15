@@ -562,3 +562,91 @@ group.join_all();// 当执行join_all()的时候才是真正的并行了程序�
       caffe中的bn层其实只做了第一件事； 
       scale 层做了第二件事；
       scale层里为什么要设置bias_term=True，这个偏置就对应2）件事里的beta。
+      
+# Caffe深入分析(源码)
+[参考](https://www.cnblogs.com/liuzhongfeng/p/7289956.html)
+## Caffe的整体流程图
+![](https://images2017.cnblogs.com/blog/861394/201708/861394-20170805121930631-214511825.png)
+	caffe.cpp 程序入口：main()
+```c
+  ...
+  int main(int argc, char** argv) {
+        .....
+        return GetBrewFunction(caffe::string(argv[1]))();
+        ....
+  }
+```
+	g_brew_map实现过程，首先通过 typedef定义函数指针 typedef int (*BrewFunction)(); 
+	这个是用typedef定义函数指针方法。
+	这个程序定义一个BrewFunction函数指针类型，
+	在caffe.cpp 中 BrewFunction 作为GetBrewFunction()函数的返回类型，
+	可以是 train()，test()，device_query()，time() 这四个函数指针的其中一个。
+	在train()，test()，中可以调用solver类的函数，从而进入到net，进入到每一层，运行整个caffe程序。
+	然后对每个函数注册。
+```c	
+ RegisterBrewFunction(train)
+ RegisterBrewFunction(test)
+ RegisterBrewFunction(device_query)
+RegisterBrewFunction(time)
+```
+
+	train: 训练或者调整一个模型
+	test : 在测试集上测试一个模型
+	device_query : 打印GPU的调试信息
+	time: 压测一个模型的执行时间
+	
+	如果需要，可以增加其他的方式，然后通过RegisterBrewFunction()函数注册一下即可。
+```c
+// 接着调用train()函数，train函数中主要有三个方法ReadSolverParamsFromTextFileOrDie、CreateSolver、Solve。
+// Train / Finetune a model.
+int train() {
+  ......
+  caffe::SolverParameter solver_param;
+  caffe::ReadSolverParamsFromTextFileOrDie(FLAGS_solver, &solver_param);//从-solver参数文件,读取solver_param
+  // 解析-solver指定的solver.prototxt的文件内容到solver_param中
+  ......
+  //初始化网络========================================================
+  shared_ptr<caffe::Solver<float> > solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
+      // 从参数创建solver，同样采用string到函数指针的映射实现，用到了工厂模式
+      
+      // 新建一个Solver对象 -> Solver类的构造函数 -> 新建Net类实例 -> Net类构造函数 -> 新建各个layer的实例 -> 具体到设置每个Blob
+      
+      // 构建solver和net，该函数是初始化的入口，会通过执行Solver类的构造函数 在solver.cpp中 105行左右，
+      // 调用 void Solver<Dtype>::Init(const SolverParameter& param)，
+      // 该函数内有InitTrainNet()、InitTestNets()。
+      // 对于InitTrainNet函数,会执行 Net类的初始化：
+      //  shared_ptr<Net<Dtype> > net_;
+      //  net_.reset(new Net<Dtype>(net_param));
+      //  调用Net类的构造函数，该构造函数会执行Init()操作 net.cpp 中38行左右.
+      // 1. 过滤和校验参数 FIlterNet
+      // 2. 插入Split层 InsertSplits
+      // 3. 构建网络中的输入输出数据结构  bottom_vecs_   top_vecs_ 
+      // 4. For训练遍历每一层的参数
+            (创建层，创建层相关的blob，
+	     执行当前层的Setup( layers_[layer_id]->SetUp(bottom_vecs_[layer_id], top_vecs_[layer_id]);))
+	     创建数据关系
+      // 5. 应用更新 ApplyUpdate
+      // 6. 结束
+      
+// 网络初始化后 CreateSolver()执行完成后，接下来是具体训练过程，
+// 执行 Solve()函数： Step()--->结束 solver.cpp 276行=============
+
+  if (FLAGS_snapshot.size()) {//迭代snapshot次后保存模型一次
+    LOG(INFO) << "Resuming from " << FLAGS_snapshot;
+    solver->Restore(FLAGS_snapshot.c_str());
+  } else if (FLAGS_weights.size()) {//若采用finetuning，则拷贝weight到指定模型
+    CopyLayers(solver.get(), FLAGS_weights);
+  }
+
+  if (gpus.size() > 1) {
+    caffe::P2PSync<float> sync(solver, NULL, solver->param());
+    sync.Run(gpus);// 多gpu
+  } else {
+    LOG(INFO) << "Starting Optimization";
+    solver->Solve();// 始训练网络===============================================
+  }
+  LOG(INFO) << "Optimization Done.";
+  return 0;
+}
+```
+	
