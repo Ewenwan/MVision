@@ -404,6 +404,128 @@ gcc -o test_cblas_open test_cblas_dgemm.c -I /your_path/OpenBLAS/include/ -L/you
       最近就用到了ublas，thread，date_time这三个模块。这里做一些简要的介绍。
 [参考](https://yufeigan.github.io/2015/01/02/Caffe%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B05-BLAS%E4%B8%8Eboost-thread%E5%8A%A0%E9%80%9F/)
 
+## ublas boost的BLAS实现 矩阵运算
+      调用位置boost::numeric::ublas,虽然速度一般，
+      但用起来非常方便可以直接用 + - 运算符号操作，还可以直接用 << >> 等标准输入输出流。
+## date_time 计时
+      在我计算多线程运行时间的时候发现标准C++提供的std::clock_t，
+      对于多CPU跑线程的情况会把几个CPU的时间加在一起，
+      所以采用了 boost::posix_time::ptime 这种类型计数。
+      解决了计时不准确的问题。
+## thread 线程库 是一个跨平台的线程封装库
+      Boost提供的thread虽然功能据说不是非常强大，
+      但是由于使用C++的思想重新设计，使用起来相对比较方便。
+      网上文档非常多，比如：
+      
+[1. C++ Boost Thread 编程指南](http://www.cnblogs.com/chengmin/archive/2011/12/29/2306416.html)
+
+[2. Boost::Thread使用示例](https://blog.csdn.net/zhuxiaoyang2000/article/details/6588031)
+### 1 创建线程
+```c
+#include <boost/thread/thread.hpp>
+#include <iostream>
+ 
+void hello()
+{
+	std::cout<<"Hello world, I'm a thread!"<<std::endl;
+}
+ 
+int main()
+{
+	boost::thread thrd(&hello);// 传入需要线程执行的函数的指针
+	thrd.join();
+ 
+	system("pause");
+	return 0;
+}
+```
+### 2 避免不同线程同时访问共享区域 互斥体（mutex，mutual exclusion的缩写）   
+      当一个线程想要访问共享区时，首先要做的就是锁住（lock）互斥体。
+      如果其他的线程已经锁住了互斥体，那么就必须先等那个线程将互斥体解锁，
+      这样就保证了同一时刻只有一个线程能访问共享区域。
+      
+      Boost线程库支持两大类互斥体，包括简单互斥体（simple mutex)和递归互斥体（recursive mutex)。
+      如果同一个线程对互斥体上了两次锁，就会发生死锁（deadlock），也就是说所有的等待解锁的线程将一直等下去。
+      
+      有了递归互斥体，单个线程就可以对互斥体多次上锁，
+      当然也必须解锁同样次数来保证其他线程可以对这个互斥体上锁。
+      
+      
+      一个线程可以有三种方法来对一个互斥体加锁：
+          一直等到没有其他线程对互斥体加锁。
+          如果有其他互斥体已经对互斥体加锁就立即返回。
+          一直等到没有其他线程互斥体加锁，直到超时。
+          
+      Boost线程库提供了6中互斥体类型，下面是按照效率进行排序：
+            boost::mutex,
+            boost::try_mutex,
+            boost::timed_mutex,
+            boost::recursive_mutex,
+            boost::recursive_try_mutex,
+            boost::recursive_timed_mutex
+```c
+    #include <boost/thread/thread.hpp>
+    #include <boost/thread/mutex.hpp>
+    #include <iostream>
+     
+    boost::mutex io_mutex;// 互斥体
+     
+    struct count
+    {
+    	count(int id) : id(id) {}
+     
+    	void operator()()
+    	{
+    		for(int i = 0; i < 10; ++i)
+    		{
+    			boost::mutex::scoped_lock lock(io_mutex);// 对互斥体上锁
+    			std::cout<<id<<": "<<i<<std::endl;
+    		}
+    	}
+     
+    	int id;
+    };
+     
+    int main()
+    {
+    	boost::thread thrd1(count(1));
+    	boost::thread thrd2(count(2));
+    	thrd1.join();
+    	thrd2.join();
+     
+    	system("pause");
+    	return 0;
+    }
+```
+
+只让一个线程输出信息到屏幕：
+```c
+boost::mutex io_mutex;// 互斥体
+void foo(){
+    {
+        boost::mutex::scoped_lock lock(io_mutex);//上锁
+        std::cout << "something output!" << std::endl;
+    }
+    // something to do!
+}
+
+// 用这种方法多个函数在对统一个数据操作的时候就不会有冲突了。
+```
+## 线程的并行化 boost::thread_group
+```c
+boost::thread_group group;
+for (int i = 0; i < 15; ++i)
+    group.create_thread(aFunctionToExecute);
+group.join_all();// 当执行join_all()的时候才是真正的并行了程序。
+```
+## 成员函数没有实例但又要传参的方法
+
+      编译时候错误：error: reference to non-static member function must be called; did you mean to call it with no arguments?
+      查了Google发现是因为我定义的类中的成员函数用group.create_thread()中调用了没有实例化的成员函数解决方法是使用std::bind
+      
+      group.create_thread(boost::bind(&myfunction, this)); 
+
+
 # prototxt
 ## 文件的可视化
       1.使用在线工具netscope。
