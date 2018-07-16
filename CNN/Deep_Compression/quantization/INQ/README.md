@@ -1,4 +1,4 @@
-# INQ Incremental-Network-Quantization 
+# INQ Incremental-Network-Quantization 渐进式神经网络量化
 
 # 给定任意结构的全精度浮点神经网络模型，能将其转换成无损的低比特二进制模型
 
@@ -41,7 +41,7 @@ The authors adopted the proposed method to several model, including AlexNet, VGG
       method would be efficient with binary shift operation in hardware, 
       the computation in there experiments is still using floating operations.
       Thus they only show the results of model compression instead of speeding up computation.
-# 方法 Method
+# 量化策略 Method
 * 提出了渐进式神经网络量化的思想，引入了三种操作：参数分组，量化，重训练
 
       简单的说就是在训练得到一个网络模型后，
@@ -54,5 +54,34 @@ The authors adopted the proposed method to several model, including AlexNet, VGG
       一个建立低精度模型的基础，
       另一个通过retrain(重训练，微调)补偿精度损失；
       这样迭代最终得到渐进式的量化和精度提升。
+      通过巧妙耦合参数分组、量化和重训练操作，该技术抑制了模型量化造成的性能损失，从而在实际中适用于任意结构的神经网络模型。
+      
+      INQ渐进式网络量化策略：
 ![](http://zhidx.com/wp-content/uploads/2017/09/85fd56a6c52852178bcb2e3e79681ca%E5%89%AF%E6%9C%AC.png)
+      
+      （绿线代表当前已经被量化的网络连接；蓝线代表需要重新训练的网络连接）
+      
+# 具体量化方式
+    该技术还包含另外两个亮点。
+    其一，在模型量化过程中，所有参数被限制成二进制表示，并包含零值，极限量化结果即为三值网络或者二值网络。
+         这种量化使得最后的模型非常适合在硬件上部署和加速。
+         比如在FPGA上，复杂的全精度浮点乘法运算将被直接替换为简单的移位操作。
+    其二，现有神经网络量化压缩方法在处理二值网络或者三值网络时，为了让模型精度损失不至于太大，
+         往往将模型第一层和最后一层参数依然保留为全精度浮点型，
+         而我们的技术在对模型的所有参数进行量化的同时，实现了性能的全面领先 。
+         
+![](http://zhidx.com/wp-content/uploads/2017/09/6a56b64514919da3da833874edc60a8%E5%89%AF%E6%9C%AC.png)
+      
+            INQ渐进式网络量化示例
+
+            第一行：依次为参数分组、量化与重训练；
+
+            第二行：迭代过程
+
+            （绿色区域代表当前已经被量化的网络参数；浅紫区域代表需要重新训练的网络参数）
+
+
+      
+      
+      
       
