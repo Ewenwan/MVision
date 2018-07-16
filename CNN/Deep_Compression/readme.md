@@ -5,6 +5,12 @@ date: 2018-07-06
 description: "量化 剪枝 ncnn Ristretto"
 tag: 深度学习
 ---   
+# 背景
+    近几年来，深度学习技术在计算机视觉、语音识别和自然语言处理等诸多领域取得的了一系列重大突破。
+    然而，深度学习的发展依然面临诸多问题。
+    尤为突出的是，时下主流的深度神经网络,一般包含数千万甚至是过亿的学习参数，
+    而如此海量的参数给神经网络模型在存储、计算和功耗开销等方面带来了严峻的考验。
+
 
 # 性能提升方法
 [本文github链接](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/readme.md)
