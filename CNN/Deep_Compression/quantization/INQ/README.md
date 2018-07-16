@@ -1,7 +1,9 @@
 # INQ Incremental-Network-Quantization 
 # 英特尔中国研究院：INQ神经网络无损低比特量化技术 全精度网络输入，输出权值为0或2的整数次幂的网络
+
 [代码](https://github.com/Ewenwan/Incremental-Network-Quantization)
 
+[论文](https://arxiv.org/pdf/1702.03044.pdf)
 
 ### Experimental Results
 
