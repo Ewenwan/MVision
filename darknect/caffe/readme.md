@@ -30,7 +30,7 @@
       layer是模型和计算的基础，
       net整和并连接layer,
       solver则是模型的优化求解。
-## 数据Blob 是Caffe的基本数据结构, 4维的数组(Num, Channels, Height, Width) 
+## 一、数据Blob 是Caffe的基本数据结构, 4维的数组(Num, Channels, Height, Width) 
       设Blob数据维度为 number N x channel K x height H x width W，数据批次数量，通道数量，高宽尺寸
       Blob是row-major 行优先 保存的，因此在(n, k, h, w)位置的值，
       实际物理位置为((n * K + k) * H + h) * W + w，其中Number/N是batch size。
@@ -78,7 +78,7 @@ bar = blob.mutable_cpu_data(); // 数据从 GPU 复制到 CPU
 ```
 
 
-## 各种层实现 卷积 池化 
+## 二、各种层实现 卷积 池化 
       在Layer中 输入数据input data用bottom表示，
                 输出数据 output data用top表示。
       每一层定义了三种操作:
@@ -124,7 +124,7 @@ layers {
 ```
   
   
-## 网络Net 由各种层Layer组成的 无回路有向图DAG
+## 三、网络Net 由各种层Layer组成的 无回路有向图DAG
       Net是由一些列层组成的有向无环图DAG，
       一个典型的Net开始于data layer ----> 从磁盘中加载数据----> 终止于loss layer。
       (计算和重构目标函数。)
@@ -148,23 +148,22 @@ using caffe::Net;// 作为网络的整体骨架，决定了网络中的层次数
 ![](https://images2017.cnblogs.com/blog/861394/201712/861394-20171227153834847-1150683104.jpg)
 	
       类中的关键函数简单剖析:
-　　　　1). ForwardBackward：按顺序调用了Forward和Backward。
+	1). ForwardBackward：按顺序调用了Forward和Backward。
 
-　　　　2). ForwardFromTo(int start, int end)：执行从start层到end层的前向传递，采用简单的for循环调用, forward只要计算损失loss
+	2). ForwardFromTo(int start, int end)：执行从start层到end层的前向传递，采用简单的for循环调用, forward只要计算损失loss
 
-　　　　3). BackwardFromTo(int start, int end)：和前面的ForwardFromTo函数类似，调用从start层到end层的反向传递。
-           backward主要根据loss来计算梯度，caffe通过自动求导并反向组合每一层的梯度来计算整个网络的梯度。
+	3). BackwardFromTo(int start, int end)：和前面的ForwardFromTo函数类似，调用从start层到end层的反向传递。
+	   backward主要根据loss来计算梯度，caffe通过自动求导并反向组合每一层的梯度来计算整个网络的梯度。
 
-　　　　4).ToProto函数完成网络的序列化到文件，循环调用了每个层的ToProto函数。
+	4).ToProto函数完成网络的序列化到文件，循环调用了每个层的ToProto函数。
 
-　　   Net::Init()进行模型的初始化。
-     初始化主要实现两个操作：创建 blobs 和 layers 以搭建整个DAG网络，并且调用layers的SetUp()函数。
+	Net::Init()进行模型的初始化。
+	初始化主要实现两个操作：创建 blobs 和 layers 以搭建整个DAG网络，并且调用layers的SetUp()函数。
+
+
 	
-	
-	
-	
 
-## 求解器Solver 各种数值优化的方法
+## 四、求解器Solver 各种数值优化的方法
 	Solver通过协调Net的前向计算和反向梯度计算来进行参数更新，从而达到loss的目的。
 	目前Caffe的模型学习分为两个部分：
 	    1. 由Solver进行优化、更新参数；
@@ -297,6 +296,7 @@ Layer是所有层的基类，在Layer的基础上衍生出来的有5种Layers：
           3. backward（反向传导计算，根据output计算input的梯度）。
           forward和backward有GPU(大部分)和CPU两个版本的实现。
       还有其他一些特有的操作
+      
 # 依赖库介绍
 ## 1. glog,  google出的一个C++轻量级日志库
 [博文介绍](http://www.cnblogs.com/tianyajuanke/archive/2013/02/22/2921850.html)
@@ -425,11 +425,11 @@ void GlobalInit(int* pargc, char*** pargv) {
             help信息：使用google::SetUsageMessage设定，使用google::ProgramUsage访问
             注意：google::SetUsageMessage和google::SetVersionString必须在google::ParseCommandLineFlags之前执行
             
-## gtest Google的开源C++单元测试框架 
+## 3. gtest Google的开源C++单元测试框架 
       gtest Google的开源C++单元测试框架，caffe里面test代码中大量用到，网上教程也是一大堆。
 [参考](http://www.cnblogs.com/coderzh/archive/2009/04/06/1426755.html)
 
-## 关于CPU加速
+## 4. 关于CPU加速
       Caffe推荐的BLAS（Basic Linear Algebra Subprograms）有三个选择ATLAS，Intel MKL，OpenBLAS。
       其中ATLAS是caffe是默认选择开源免费，如果没有安装CUDA的不太推荐使用，因为CPU多线程的支持不太好；
       Intel MKL是商业库要收费，我没有试过但caffe的作者安装的是这个库，估计效果应该是最好的；
@@ -735,7 +735,7 @@ layer {
       
 # Caffe深入分析(源码)
 [参考](https://www.cnblogs.com/liuzhongfeng/p/7289956.html)
-## Caffe的整体流程图
+## 1. Caffe的整体流程图
 ![](https://images2017.cnblogs.com/blog/861394/201708/861394-20170805121930631-214511825.png)
 	caffe.cpp 程序入口：main()
 ```c
@@ -766,7 +766,7 @@ RegisterBrewFunction(time)
 	time: 压测一个模型的执行时间
 	
 	如果需要，可以增加其他的方式，然后通过RegisterBrewFunction()函数注册一下即可。
-## train()函数
+## 2. train()函数
 ```c
 // 接着调用train()函数，train函数中主要有三个方法ReadSolverParamsFromTextFileOrDie、CreateSolver、Solve。
 // Train / Finetune a model.
@@ -861,7 +861,7 @@ int train() {
 	
 	
 
-### 初始化网络
+### 3. 初始化网络
 
 ![](https://images2017.cnblogs.com/blog/861394/201708/861394-20170810170215683-1564876071.png)
 
@@ -876,7 +876,7 @@ int train() {
 ![](https://images2017.cnblogs.com/blog/861394/201708/861394-20170810170352980-1492701664.png)
 	
 
-## Solver<Dtype>::Solve() 的具体内容和代码：
+## 4. Solver<Dtype>::Solve() 的具体内容和代码：
  
 ```c
 // 恢复之前保存的 slver状态===================================================
@@ -907,7 +907,7 @@ int train() {
     TestAll();
   }
 ```
-## Step函数，具体内容和代码
+## 5. Step函数，具体内容和代码
 ```C
 // 将net_中的Bolb梯度参数置为零  ==========================
  net_->ClearParamDiffs();  
@@ -957,7 +957,7 @@ int train() {
       // ToProto函数完成网络的序列化到文件，循环调用了每个层的ToProto函数, 保存每一层的参数
     }
 ```
-## BP算法更新权重  SGDSolver::ApplyUpdate()
+## 6. BP算法更新权重  SGDSolver::ApplyUpdate()
 ```c
 template <typename Dtype>  
 void SGDSolver<Dtype>::ApplyUpdate()  
