@@ -547,6 +547,33 @@ SyncedHead head_;
 ```
 ![](https://xmfbit.github.io/img/caffe_syncedmem_transfer.png)
 
+## Caffe中的BatchNorm实现 减去均值除以方差的方法进行归一化
+[Caffe中的BatchNorm实现](https://xmfbit.github.io/2018/01/08/caffe-batch-norm/)
+
+	对于网络的输入层，我们可以采用减去均值除以方差的方法进行归一化，对于网络中间层，BN可以实现类似的功能。
+![](https://xmfbit.github.io/img/caffe_bn_what_is_bn.jpg)
+	
+	caffe 中分成两个部分，BatchNorm层(去均值除以方差归一化) 和 Scale层(平移+缩放)
+```
+layer {
+	bottom: "conv1"
+	top: "conv1"
+	name: "bn_conv1"
+	type: "BatchNorm"
+	batch_norm_param {
+		use_global_stats: true
+	}
+}
+layer {
+	bottom: "conv1"
+	top: "conv1"
+	name: "scale_conv1"
+	type: "Scale"
+	scale_param {
+		bias_term: true
+	}
+}
+```
 
 # prototxt
 ## 文件的可视化
