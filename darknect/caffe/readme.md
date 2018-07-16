@@ -645,6 +645,7 @@ RegisterBrewFunction(time)
 	time: 压测一个模型的执行时间
 	
 	如果需要，可以增加其他的方式，然后通过RegisterBrewFunction()函数注册一下即可。
+## train()函数
 ```c
 // 接着调用train()函数，train函数中主要有三个方法ReadSolverParamsFromTextFileOrDie、CreateSolver、Solve。
 // Train / Finetune a model.
@@ -667,11 +668,13 @@ int train() {
       //  shared_ptr<Net<Dtype> > net_;
       //  net_.reset(new Net<Dtype>(net_param));
       //  调用Net类的构造函数，该构造函数会执行Init()操作 net.cpp 中38行左右.
-      // 1. 过滤和校验参数 FIlterNet
-      // 2. 插入Split层 InsertSplits
+      
+      // 1. 过滤和校验参数 FIlterNet() 将模型参数文件（*.prototxt）中的不符合规则的层去掉(微调时，部分层不一致)============
+      // 2. 插入Split层 InsertSplits 作用是对于底层的一个输出blob对应多个上层的情况，则要在加入分裂层，形成新的网络。========
+            // 原因是多个层反传给该blob的梯度需要累加
       // 3. 构建网络中的输入输出数据结构  bottom_vecs_   top_vecs_ 
       // 4. For训练遍历每一层的参数
-            (创建层，创建层相关的blob，
+            (创建层 CreateLayer()，创建层相关的blob， AppendBottom()、AppendTop()
 	     执行当前层的Setup( layers_[layer_id]->SetUp(bottom_vecs_[layer_id], top_vecs_[layer_id]);))
 	     创建数据关系
       // 5. 应用更新 ApplyUpdate
@@ -682,15 +685,19 @@ int train() {
 
   if (FLAGS_snapshot.size()) {//迭代snapshot次后保存模型一次
     LOG(INFO) << "Resuming from " << FLAGS_snapshot;
-    solver->Restore(FLAGS_snapshot.c_str());
+    solver->Restore(FLAGS_snapshot.c_str());// 从snapshot的文件中恢复成网络，从而缩短了训练时间。
   } else if (FLAGS_weights.size()) {//若采用finetuning，则拷贝weight到指定模型
     CopyLayers(solver.get(), FLAGS_weights);
   }
-
+// 多gpu训练 数据同步
+// 因为GPU的个数>1,首先会执行P2PSync类的构造函数，然后执行run()函数
   if (gpus.size() > 1) {
     caffe::P2PSync<float> sync(solver, NULL, solver->param());
     sync.Run(gpus);// 多gpu  
-  } else {
+  } 
+// 单gpu训练 或者cpu训练 
+  else 
+  {
     LOG(INFO) << "Starting Optimization";
     solver->Solve();// 开始训练网络===============================================
   }
@@ -698,4 +705,168 @@ int train() {
   return 0;
 }
 ```
+
+* 多gpu数据交换同步
+
+ 参考 http://www.cnblogs.com/liuzhongfeng/p/7809689.html
+
+![](https://images2017.cnblogs.com/blog/861394/201711/861394-20171109152118763-892491156.jpg)
 	
+	在run()函数中，
+	首先会执行compute()函数，
+	该函数的作用是产生GPU Pairs，
+	GPU Pairs的含义是[parent:child]，
+	对于2个GPU而言，GPU Pairs为[-1:0],[0:1]，
+	默认根GPU的parent是其本身。
+	然后通过一个for循环构建GPU树，
+	对于2个GPU而言，GPU树如下图所示：
+![](https://images2017.cnblogs.com/blog/861394/201711/861394-20171109152401997-245319946.jpg)
+	
+	接下来调用一个for循环为每个GPU开启一个线程，值得注意的是for循环是从i=1开始的，
+	即为每个子GPU单独开启一个线程(这里为GPU1开启一个线程)，也就是调用 StartInternalThread() 函数.
+	该函数接着会执行 entry() 函数.
+	该函数又会去调用 InternalThreadEntry() 函数，该函数是正式进入迭代运算的入口.
+	solver_->Step(solver_->param().max_iter() - initial_iter_);
+	
+	
+
+### 初始化网络
+
+![](https://images2017.cnblogs.com/blog/861394/201708/861394-20170810170215683-1564876071.png)
+
+	从图中可以看出网络层的构建分为三个主要部分：解析网络文件、开始建立网络层、网络层需要参与计算的位置。
+
+	1. 过滤和校验参数 FIlterNet() 将模型参数文件（*.prototxt）中的不符合规则的层去掉(微调时，部分层不一致)============
+	2. 插入Split层 InsertSplits 作用是对于底层的一个输出blob对应多个上层的情况，则要在加入分裂层，形成新的网络。========
+	   原因是多个层反传给该blob的梯度需要累加, 
+	   例如：LeNet网络中的数据层的top label blob对应两个输入层，分别是accuracy层和loss层，那么需要在数据层在插入一层。
+	   如下图：
+
+![](https://images2017.cnblogs.com/blog/861394/201708/861394-20170810170352980-1492701664.png)
+	
+
+## Solver<Dtype>::Solve() 的具体内容和代码：
+ 
+```c
+// 恢复之前保存的 slver状态===================================================
+  if (resume_file) {
+    LOG(INFO) << "Restoring previous solver status from " << resume_file;
+    Restore(resume_file);
+  }
+// 更新步骤=================================================================
+  Step(param_.max_iter() - iter_);
+  
+// 保存weights=============================================================
+  if (param_.snapshot_after_train()
+      && (!param_.snapshot() || iter_ % param_.snapshot() != 0)) {
+    Snapshot();
+  }
+// 打印显示 loss信息=========================================================
+ if (param_.display() && iter_ % param_.display() == 0) {
+    int average_loss = this->param_.average_loss();
+    Dtype loss;
+    net_->Forward(&loss);
+
+    UpdateSmoothedLoss(loss, start_iter, average_loss);
+
+    LOG(INFO) << "Iteration " << iter_ << ", loss = " << smoothed_loss_;
+  }
+// 进行测试 分分类(Top5)和检测网络(mAP)========================================
+  if (param_.test_interval() && iter_ % param_.test_interval() == 0) {
+    TestAll();
+  }
+```
+## Step函数，具体内容和代码
+```C
+// 将net_中的Bolb梯度参数置为零  ==========================
+ net_->ClearParamDiffs();  
+// 测试网络===================================================
+    if (param_.test_interval() && iter_ % param_.test_interval() == 0
+        && (iter_ > 0 || param_.test_initialization())
+        && Caffe::root_solver()) {
+      TestAll();
+      if (requested_early_exit_) {
+        // Break out of the while loop because stop was requested while testing.
+        break;
+      }
+    }
+// 多gpu情况处理============================
+// 参考 http://www.cnblogs.com/liuzhongfeng/p/7809689.html
+  for (int i = 0; i < callbacks_.size(); ++i) {
+  // 首先根GPU(GPU0)有整个网络的网络参数，callbacks_.size()指的是GPU树的parent的个数(在这里是1)
+      callbacks_[i]->on_start();
+      // on_start()函数的作用就是把根GPU(GPU0)的网络参数分发到每一个子GPU(GPU1)，GPU1会先进入这个函数
+      // 等待从父GPU更新过来，P2PSync<Dtype> *parent = queue_.pop(); 取队列中的第一个gpu节点为根gpu
+    }
+    
+// 正向传导和反向传导，并计算loss =============================================
+    for (int i = 0; i < param_.iter_size(); ++i) {// batch 一个批次
+      loss += net_->ForwardBackward();// loss 求和
+      //  net.hpp  
+      //  Forward(&loss);//正向传播 -> ForwardFromTo()  -> 每个layer的Forward( layers_[i]->Forward() )
+     //   Backward();    //反向传播 -> BackwardFromTo() -> 每个layer的Backward( layers_[i]->Backward() )
+     // backward主要根据loss来计算梯度，caffe通过自动求导并反向组合每一层的梯度来计算整个网络的梯度。
+    }
+    loss /= param_.iter_size(); // loss 均值
+    
+// 数值滤波 平滑loss =============================================================
+ // 为了输出结果平滑，将临近的average_loss个loss数值进行平均，存储在成员变量smoothed_loss_中 
+  UpdateSmoothedLoss(loss, start_iter, average_loss);
+  
+// BP算法更新权重 ================================================================
+  ApplyUpdate(); // 调用SGDSolver::ApplyUpdate()成员函数进行权重更新
+// 保存weights文件===============================================================
+    if ((param_.snapshot()
+         && iter_ % param_.snapshot() == 0
+         && Caffe::root_solver()) ||
+         (request == SolverAction::SNAPSHOT)) {
+      Snapshot();// Snapshot的存储格式有两种，分别是BINARYPROTO格式和hdf5格式
+      // SnapshotToHDF5();
+      // -> Solver<Dtype>::SnapshotToBinaryProto() -> net_->ToProto() 
+      // ToProto函数完成网络的序列化到文件，循环调用了每个层的ToProto函数, 保存每一层的参数
+    }
+```
+## BP算法更新权重  SGDSolver::ApplyUpdate()
+```c
+template <typename Dtype>  
+void SGDSolver<Dtype>::ApplyUpdate()  
+{  
+    // 获取当前学习速率 ====================================================
+    Dtype rate = GetLearningRate(); 
+    // 显示学习率===========================================================
+    if (this->param_.display() && this->iter_ % this->param_.display() == 0)  
+    {  
+        LOG(INFO) << "Iteration " << this->iter_ << ", lr = " << rate;  
+    }  
+    // 梯度抑制=============================================================
+    // 在计算当前梯度的时候，如果该值超过了阈值 clip_gradients，则将梯度直接设置为该阈值  
+    // 此处阈值设为-1，即不起作用  
+    ClipGradients();  
+
+    // 逐层更新网络中的可学习层的参数 
+    for (int param_id = 0; param_id < this->net_->learnable_params().size();  
+       ++param_id)  
+    {  
+        // 归一化   ===============================================================
+        Normalize(param_id);// -> caffe_scal() -> cblas_dscal() 
+	
+	//  L1/ L2范数 正则化 ====================================================
+        // L1/ L2范数 正则化 添加衰减权重 (local_decay = weight_decay * net_params_weight_decay[param_id]) 
+        Regularize(param_id);   // -> caffe_axpy() -> cblas_daxpy()
+	
+        // 随机梯度下降法计算更新值 =================================================================
+	// SGDSolver<Dtype>::ComputeUpdateValue()
+	// RMSPropSolver<Dtype>::ComputeUpdateValue()
+	// NesterovSolver<Dtype>::ComputeUpdateValue()
+	// AdamSolver<Dtype>::ComputeUpdateValue()
+	// AdaGradSolver<Dtype>::ComputeUpdateValue()
+	// AdaDeltaSolver<Dtype>::ComputeUpdateValue() 
+        ComputeUpdateValue(param_id, rate);  //
+	  // caffe_cpu_axpby() ( -> cblas_daxpby() ) -> caffe_copy() ( -> memcpy(Y, X, sizeof(Dtype) * N); )
+    }  
+    // 更新权重  ===============================================================================
+    this->net_->Update();  // layer_names_[param_layer_indices_[param_owner].first];
+} 
+
+ApplyUpdate
+```
