@@ -3,10 +3,15 @@
 # 给定任意结构的全精度浮点神经网络模型，能将其转换成无损的低比特二进制模型
 
 # 英特尔中国研究院：INQ神经网络无损低比特量化技术 全精度网络输入，输出权值为0或2的整数次幂的网络
+![](https://xmfbit.github.io/img/paper-inq-quantize-set.png)
 
 [代码](https://github.com/Ewenwan/Incremental-Network-Quantization)
 
 [论文](https://arxiv.org/pdf/1702.03044.pdf)
+
+[参考1](http://zhidx.com/p/94098.html)
+
+[参考2](https://xmfbit.github.io/2018/01/25/inq-paper/)
 
 ### Experimental Results
 
@@ -39,3 +44,15 @@ The authors adopted the proposed method to several model, including AlexNet, VGG
 # 方法 Method
 * 提出了渐进式神经网络量化的思想，引入了三种操作：参数分组，量化，重训练
 
+      简单的说就是在训练得到一个网络模型后，
+      首先将这个全精度浮点网络模型中的每一层参数分为两组，
+      第一组中的参数直接被量化固定，
+      另一组参数通过重训练来补偿量化给模型造成的精度损失。
+      然后这三个操作依次迭代应用到刚才的第二组完成重训练之后的全精度浮点参数部分，直到模型全部量化为止。
+      
+      可以说参数分组分成的这两个部分是互补的作用，
+      一个建立低精度模型的基础，
+      另一个通过retrain(重训练，微调)补偿精度损失；
+      这样迭代最终得到渐进式的量化和精度提升。
+![](http://zhidx.com/wp-content/uploads/2017/09/85fd56a6c52852178bcb2e3e79681ca%E5%89%AF%E6%9C%AC.png)
+      
