@@ -20,7 +20,9 @@
 [caffe 模型搜集](https://github.com/SnailTyan/caffe-model-zoo)
 ![screenshot](https://user-images.githubusercontent.com/21311442/33640664-cbcbeff2-da6c-11e7-97c8-1ad8d7fdf4c0.png)
 
-[caffe详解](https://yufeigan.github.io/2014/12/09/Caffe%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B03-Layer%E7%9A%84%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/)
+[caffe详解1](https://yufeigan.github.io/2014/12/09/Caffe%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B03-Layer%E7%9A%84%E7%9B%B8%E5%85%B3%E5%AD%A6%E4%B9%A0/)
+
+[caffe详解2](https://www.cnblogs.com/liuzhongfeng/category/1049585.html)
 
 # 主要类对象
       caffe大致可以分为三层结构blob，layer，net。
