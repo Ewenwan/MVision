@@ -14,33 +14,66 @@ tag: 深度学习
 
 # 性能提升方法
 [本文github链接](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/readme.md)
-
-    1. 小模型 mobilenet , 更精细模型的设计，紧致网络设计
+ 
+## 1. 小模型 mobilenet , 更精细模型的设计，紧致网络设计 Light Network Structure
+    
        mobilenet squeezenet shufflenet 
        
-[MobileNet逐通道卷积 + 普通点卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet) 
+[1. MobileNet逐通道卷积 + 普通点卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/MobileNet) 
 
-[SqueezeNet 1∗1 和3∗3 卷积较少通道数量 ](https://github.com/Ewenwan/MVision/tree/master/CNN/SqueezeNet)
+[2.  1∗1 和3∗3 卷积较少通道数量 ](https://github.com/Ewenwan/MVision/tree/master/CNN/SqueezeNet)
 
-[ShuffleNet 分组点卷积+通道重排+逐通道卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/ShuffleNet)
+[3. ShuffleNet 分组点卷积+通道重排+逐通道卷积](https://github.com/Ewenwan/MVision/tree/master/CNN/ShuffleNet)
 
-    2. 模型压缩：参数稀疏、剪裁、量化、分解
-       本部分
+[4. PVANet: Lightweight Deep Neural Networks for Real-time Object Detection](https://github.com/sanghoon/pva-faster-rcnn) [Code](https://arxiv.org/abs/1611.08588)
+
+## 2. 模型压缩：参数稀疏、剪裁、量化、分解
+      
 [量化](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/readme.md)
 
 [剪枝](https://github.com/Ewenwan/MVision/tree/master/CNN/Deep_Compression/pruning)
 
-    3. 软件优化-高性能计算 
+1. [Learning both Weights and Connections for Efficient Neural Networks](https://arxiv.org/abs/1506.02626) [NIPS 2015]
+2. [Dynamic Network Surgery for Efficient DNNs](https://arxiv.org/abs/1608.04493) [NIPS2016]  [Code](https://github.com/yiwenguo/Dynamic-Network-Surgery)
+3. [Learning Structured Sparsity in Deep Neural Networks](https://arxiv.org/abs/1608.03665) [NIPS 2016]  [Code](https://github.com/wenwei202/caffe/tree/scnn)
+4. [Sparse Convolutional Neural Networks](http://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Liu_Sparse_Convolutional_Neural_2015_CVPR_paper.pdf) [CVPR 2015]
+5. [Pruning Filters for Efficient ConvNets](https://openreview.net/pdf?id=rJqFGTslg) [ICLR 2017]
+
+量化:
+
+1. [Incremental Network Quantization: Towards Lossless CNNs with Low-Precision Weights](https://arxiv.org/abs/1702.03044) [ICLR 2017]
+2. [https://arxiv.org/pdf/1706.02393.pdf]
+2. [Deep Compression: Compressing Deep Neural Networks with Pruning, Trained Quantization and Huffman Coding](https://arxiv.org/pdf/1510.00149v5.pdf) [ICLR 2016]
+3. [XNOR-Net: ImageNet Classification Using Binary Convolutional Neural Networks](https://arxiv.org/abs/1603.05279) [ECCV 2016]  [Code](https://github.com/allenai/XNOR-Net)
+4. [Quantized Neural Networks: Training Neural Networks with Low Precision Weights and Activations](https://www.arxiv.org/abs/1609.07061)
+5. [Trained Tenary Quantization](https://arxiv.org/abs/1612.01064) [ICLR2017]  [Code](https://github.com/czhu95/ternarynet)
+6. [DoReFa-Net: Training Low Bitwidth Convolutional Neural Networks with Low Bitwidth Gradients](https://arxiv.org/abs/1606.06160)  [Code](https://github.com/ppwwyyxx/tensorpack/tree/master/examples/DoReFa-Net)
+7. [Binaryconnect: Training deep neural networks with binary weights during propagations](https://arxiv.org/pdf/1511.00363.pdf) [NIPS 2015]
+8. [Binarize neural networks: Training deep neural networks with weights and activations constrained to +1 or -1](https://arxiv.org/abs/1602.02505) [NIPS 2016]
+9. [Google’s Neural Machine Translation System: Bridging the Gap between Human and Machine Translation](https://arxiv.org/abs/1609.08144)
+10. [8-Bit Approximations For Parallelism In Deep Learning](https://arxiv.org/abs/1511.04561) [ICLR 2016]
+11. [Quantized Convolutional Neural Networks for Mobile Devices]
+
+## 3. 软件优化-高性能计算 
        腾讯 ncnn 小米mace 百度MDL Google TensorFlow Lite
        
 [高性能计算](https://github.com/Ewenwan/MVision/tree/master/CNN/HighPerformanceComputing)
-           
-    4. 硬件优化-AI芯片
+
+1. [Fast Training of Convolutional Networks through FFTs](https://arxiv.org/abs/1312.5851) [ICLR 2013]  [Code](https://github.com/Maratyszcza/NNPACK)
+
+2. [Fast algorithms for convolutional neural networks]() [CVPR 2016]
+
+
+## 4. 硬件优化-AI芯片
        TPU
        FPGA上的应用
        赛灵思Xilinx
        暂时未涉及
 [利用 赛灵思Xilinx 器件的INT8优化开展深度学习](https://china.xilinx.com/support/documentation/white_papers/c_wp486-deep-learning-int8.pdf)
+
+[机器学习高性能硬件High-Performance Hardware for Machine Learning](https://media.nips.cc/Conferences/2015/tutorialslides/Dally-NIPS-Tutorial-2015.pdf)
+
+[iphone手机上深度学习应用 博客](http://machinethink.net/blog/)
 
 [Binarized Neural Network TF training code + C matrix / eval library 量化网络框架](https://github.com/Ewenwan/tinier-nn)
 
@@ -50,7 +83,7 @@ tag: 深度学习
     比如上面提到的一些 SqueezeNet，MobileNets，ShuffleNet 结合起来，会对准确率造成比较大的影响。
     原因可以归为参数压缩算法其实是一个找次优解的问题，当网络冗余度越小，解越不好找。
     所以，目前的高精度压缩算法只适合于传统的有很多冗余的网络。
-    
+
 # AI芯片
 [Efficient Processing of Deep Neural Networks: A Tutorial and Survey](http://www.rle.mit.edu/eems/wp-content/uploads/2017/11/2017_pieee_dnn.pdf)
 
