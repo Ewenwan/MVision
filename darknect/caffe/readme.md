@@ -33,7 +33,13 @@
       Blob是row-major 行优先 保存的，因此在(n, k, h, w)位置的值，
       实际物理位置为((n * K + k) * H + h) * W + w，其中Number/N是batch size。
       
-      lob同时保存了data和diff(梯度)，访问data或diff有两种方法:
+      Blob 数据成员 data_指向实际存储数据的内存或显存块，shape_存储了当前blob的维度信息，diff_这个保存了反向传递时候的梯度信息。
+      data_at这个函数可以读取的存储在此类中的数据，diff_at可以用来读取反向传回来的误差。
+      尽量使用data_at(const vector<int>& index)来查找数据。
+      Reshape函数可以修改blob的存储大小，count用来返回存储数据的数量。
+      BlobProto类负责了将Blob数据进行打包序列化到Caffe的模型中。
+      
+      Blob同时保存了data和diff(梯度)，访问data或diff有两种方法:
             1. const Dtype* cpu_data() const; //不修改值 指针指向常量 / gpu_data() 
             2. Dtype* mutable_cpu_data();     //修改值               / mutable_gpu_data()
       Blob会使用SyncedMem(分配内存和释放内存类) 自动决定什么时候去copy data以提高运行效率，
@@ -52,6 +58,23 @@ using caffe::Blob; // 作为数据传输的媒介，无论是网络权重参数�
 // vector<Blob<Dtype>*> &bottom;
 // vector<Blob<Dtype>*> *top
 ```
+### 一个实例，用以确定blob何时回复制数据：
+```C
+// 假定数据在 假定数据在 CPU上进行初始化，我们有一个blob 
+const Dtype* foo; 
+Dtype* bar; 
+foo = blob.gpu_data(); // 数据从 CPU 复制到 复制到 GPU
+foo = blob.cpu_data(); // 没有数据复制，两者都最新的内容 
+bar = blob.mutable_gpu_data(); // 没有数据复制
+// ... 一些操作 ... 
+bar = blob.mutable_gpu_data(); // 仍在 GPU，没有数据复制
+foo = blob.cpu_data(); // 由于GPU修改了数值，数据从 GPU 复制到 CPU
+foo = blob.gpu_data(); // 没有数据复制，两者都最新的内容
+bar = blob.mutable_cpu_data(); // 依旧没有数据复制
+bar = blob.mutable_gpu_data(); // 数据从 CPU 复制到 GPU
+bar = blob.mutable_cpu_data(); // 数据从 GPU 复制到 CPU
+```
+
 
 ## 各种层实现 卷积 池化 
       在Layer中 输入数据input data用bottom表示，
@@ -77,8 +100,33 @@ using caffe::Layer;// 作为网络的基础单元，神经网络中层与层间�
 // Layer类派生出来的层类通过这实现这两个虚函数，产生了各式各样功能的层类。
 // Forward是从根据bottom计算top的过程，Backward则相反（根据top计算bottom）。
 ```
+	layer主要定义了三种运算，setup，forward，backward
 
+	  在Layer内部，数据主要有两种传递方式，正向传导（Forward）和反向传导（Backward）。
+	  Forward和Backward有CPU和GPU（部分有）两种实现。
+	  Caffe中所有的Layer都要用这两种方法传递数据。
+	  Layer类派生出来的层类通过实现这两个虚函数，产生了各式各样功能的层类。
+	  Forward是从根据bottom计算top的过程，Backward则相反（根据top计算bottom）。
+	  注意这里为什么用了一个包含Blob的容器（vector），
+	  对于大多数Layer来说输入和输出都各连接只有一个Layer，然而对于某些Layer存在一对多的情况，
+	  比如LossLayer和某些连接层。
+	  在网路结构定义文件（*.proto）中每一层的参数bottom和top数目就决定了vector中元素数目。
+```asm
+layers {
+    bottom: "decode1neuron" // 该层底下连接的第一个Layer
+    bottom: "flatdata" // 该层底下连接的第二个Layer
+    top: "l2_error" // 该层顶上连接的一个Layer
+    name: "loss" // 该层的名字 type: EUCLIDEAN_LOSS //该层的类型
+    loss_weight: 0
+}
+```
+  
+  
 ## 网络Net 由各种层Layer组成的 无回路有向图DAG
+      Net是由一些列层组成的有向无环图DAG，
+      一个典型的Net开始于data layer ----> 从磁盘中加载数据----> 终止于loss layer。
+      (计算和重构目标函数。)
+      这个是我们使用Proto创建出来的深度网络对象，这个类负责了深度网络的前向和反向传递。     
       Layer之间的连接由一个文本文件描述。
       网络模型初始化Net::Init()会产生blob和layer并调用　Layer::SetUp。
       在此过程中Net会报告初始化进程(大量网络载入信息)。这里的初始化与设备无关。
@@ -94,7 +142,78 @@ using caffe::Net;// 作为网络的整体骨架，决定了网络中的层次数
 // 他们是对整个网络的前向和方向传导，各调用一次就可以计算出网络的loss了。
 ```
 
+     以下是Net类的初始化方法NetInit函数调用流程：
+![](https://images2017.cnblogs.com/blog/861394/201712/861394-20171227153834847-1150683104.jpg)
+	
+      类中的关键函数简单剖析:
+　　　　1). ForwardBackward：按顺序调用了Forward和Backward。
+
+　　　　2). ForwardFromTo(int start, int end)：执行从start层到end层的前向传递，采用简单的for循环调用, forward只要计算损失loss
+
+　　　　3). BackwardFromTo(int start, int end)：和前面的ForwardFromTo函数类似，调用从start层到end层的反向传递。
+           backward主要根据loss来计算梯度，caffe通过自动求导并反向组合每一层的梯度来计算整个网络的梯度。
+
+　　　　4).ToProto函数完成网络的序列化到文件，循环调用了每个层的ToProto函数。
+
+　　   Net::Init()进行模型的初始化。
+     初始化主要实现两个操作：创建 blobs 和 layers 以搭建整个DAG网络，并且调用layers的SetUp()函数。
+	
+	
+	
+	
+
 ## 求解器Solver 各种数值优化的方法
+	Solver通过协调Net的前向计算和反向梯度计算来进行参数更新，从而达到loss的目的。
+	目前Caffe的模型学习分为两个部分：
+	    1. 由Solver进行优化、更新参数；
+	    2. 由Net计算出loss和gradient。
+        solver具体的工作： 
+	     1、用于优化过程的记录，创建 训练网络 和 测试网络。
+	     2、用过 forward 和 backward 过程来迭代优化更新参数。
+	     3、周期性的用测试网络评估模型性能。TestAll()
+	     4、优化过程中记录模型和solver状态的快照。
+	一些参数的配置都在solver.prototxt格式的文件中：
+```sh
+1. ####训练样本###
+
+	训练数据集总共:121368 个图片
+	batch_szie:256
+	将所有样本处理完一次（称为一代，即epoch) 需要：121368/256 = 475 次迭代才能完成一次遍历数据集.
+	所以这里将 test_interval 设置为 475，即处理完一次所有的训练数据后，才去进行测试。
+	所以这个数要大于等于475.
+	如果想训练100代，则最大迭代次数为 47500；
+	
+2. ####测试样本###
+	同理，如果有1000个测试样本，
+	batch_size 为25，
+	那么需要40次才能完整的测试一次。 
+	所以 test_iter 为40；
+	这个数要大于等于40.
+3. ####学习率###
+	学习率变化规律我们设置为随着迭代次数的增加，慢慢变低。
+	总共迭代47500次，我们将变化5次，
+	所以stepsize 设置为 47500/5=9500，即每迭代9500次，我们就降低一次学习率。
+
+4. #### solver.prototxt 文件参数含义#############
+
+net: "examples/AAA/train_val.prototxt"  # 训练或者测试网络配置文件
+test_iter: 40       # 完成一次测试需要的迭代次数
+test_interval: 475  # 测试间隔
+base_lr: 0.01       # 基础学习率
+lr_policy: "step"   # 学习率变化规律
+gamma: 0.1          # 学习率变化指数
+stepsize: 9500      # 学习率变化间隔
+display: 20         # 屏幕显示间隔
+max_iter: 47500     # 最大迭代次数
+momentum: 0.9       # 权重加速更新动量
+weight_decay: 0.0005 # 权重更新衰减因子
+snapshot: 5000       # 保存模型间隔
+snapshot_prefix: "models/A1/caffenet_train" # 保存模型的前缀
+solver_mode: GPU # 是否使用GPU
+
+stepsize 不能太小，如果太小会导致学习率再后来越来越小，达不到充分收敛的效果。
+
+```
 ```c
 using caffe::Solver;// 作为网络的求解策略，涉及到求解优化问题的策略选择以及参数确定方面，修改这个模块的话一般都会是研究DL的优化求解的方向。
 // 包含一个Net的指针，主要是实现了训练模型参数所采用的优化算法，它所派生的类就可以对整个网络进行训练了。
@@ -657,7 +776,17 @@ int train() {
   ......
   //初始化网络========================================================
   shared_ptr<caffe::Solver<float> > solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
-      // 从参数创建solver，同样采用string到函数指针的映射实现，用到了工厂模式
+  
+      // 从参数创建solver，同样采用 string 到 函数指针 的 映射实现，用到了工厂模式
+      // CreateSolver() -> solver_factory.hpp中
+      // 首先需要知道的是solver是一个基类，继承自它的类有SGD等，下面的实现就可以根据param的type构造一个指向特定solver的指针，比如SGD
+      // const string& type = param.type();
+      // CreatorRegistry& registry = Registry();
+      // return registry[type](param);
+      // 此处工厂模式和一个关键的宏REGISTER_SOLVER_CLASS(SGD)发挥了重要作用.
+      // 注册相关的Solver函数 到 registry[] 字符串：函数指针 map键值对
+      
+      
       
       // 新建一个Solver对象 -> Solver类的构造函数 -> 新建Net类实例 -> Net类构造函数 -> 新建各个layer的实例 -> 具体到设置每个Blob
       
