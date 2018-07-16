@@ -1,0 +1,26 @@
+# Ristretto vgg16-ssd-voc
+# Fine-tuning of 8-bit dynamic fixed point network
+#测试次数
+test_iter: 2000
+# 测试间隔
+test_interval: 100
+base_lr: 0.000001
+display: 10
+max_iter: 2000
+iter_size: 32 #global batch size = batch_size * iter_size
+lr_policy: "fixed"
+momentum: 0.9
+momentum2: 0.999
+delta: 0.00000001
+weight_decay: 0.0002
+snapshot: 100
+# 保存地址
+snapshot_prefix: "../../../models/ssd-voc-300/ssd-voc-300-quantized-weights"
+solver_mode: GPU
+random_seed: 42
+net: "../../../models/ssd-voc-300/ssd_voc_300_quantized.prototxt"
+average_loss: 40
+test_initialization: true
+solver_type: ADAM
+# detection net  !!!!! need 
+eval_type: "detection"
