@@ -62,7 +62,174 @@
     YOLOv1 吸收了 SSD 的长处（加了 BN 层，扩大输入维度，使用了 Anchor，训练的时候数据增强），进化到了 YOLOv2； 
     吸收 DSSD 和 FPN 的长处，仿 ResNet 的 Darknet-53，仿 SqueezeNet 的纵横交叉网络，又进化到 YOLO 第三形态。 
     
+# 代码实现
+[](https://xmfbit.github.io/2018/04/01/paper-yolov3/)
+
+    在v3中，作者新建了一个名为yolo的layer，其参数如下：
+```asm
+[yolo]
+mask = 0,1,2
+## 9组anchor对应9个框框
+anchors = 10,13,  16,30,  33,23,  30,61,  62,45,  59,119,  116,90,  156,198,  373,326
+classes=20   ## VOC20类
+num=9
+jitter=.3
+ignore_thresh = .5
+truth_thresh = 1
+random=1
+``` 
+    打开yolo_layer.c文件，找到forward部分代码。
+    可以看到，首先，对输入进行activation。
+    注意，如论文所说，对类别进行预测的时候，
+    没有使用v2中的softmax或softmax tree，而是直接使用了logistic变换。
+```c
+for (b = 0; b < l.batch; ++b){
+    for(n = 0; n < l.n; ++n){
+        int index = entry_index(l, b, n*l.w*l.h, 0);
+        // 对 tx, ty(4个边框参数) 进行logistic变换
+        activate_array(l.output + index, 2*l.w*l.h, LOGISTIC);
+        index = entry_index(l, b, n*l.w*l.h, 4);
+        // 对confidence和C类 进行logistic变换
+        activate_array(l.output + index, (1+l.classes)*l.w*l.h, LOGISTIC);
+    }
+}
+```
+## 我们看一下如何计算梯度
+```c
+for (j = 0; j < l.h; ++j) {
+    for (i = 0; i < l.w; ++i) {
+        for (n = 0; n < l.n; ++n) {
+            // 对每个预测的 bounding box
+            // 找到与其IoU最大的 ground truth
+            int box_index = entry_index(l, b, n*l.w*l.h + j*l.w + i, 0);
+            box pred = get_yolo_box(l.output, l.biases, l.mask[n], box_index, i, j, l.w, l.h, net.w, net.h, l.w*l.h);
+            float best_iou = 0;
+            int best_t = 0;
+            for(t = 0; t < l.max_boxes; ++t){
+                box truth = float_to_box(net.truth + t*(4 + 1) + b*l.truths, 1);
+                if(!truth.x) break;
+                float iou = box_iou(pred, truth);
+                if (iou > best_iou) {
+                    best_iou = iou;
+                    best_t = t;
+                }
+            }
+            int obj_index = entry_index(l, b, n*l.w*l.h + j*l.w + i, 4);
+            avg_anyobj += l.output[obj_index];
+            // 计算梯度
+            // 如果大于ignore_thresh, 那么忽略
+            // 如果小于ignore_thresh，target = 0
+            // diff = -gradient = target - output
+            // 为什么是上式，见下面的数学分析
+            l.delta[obj_index] = 0 - l.output[obj_index];
+            if (best_iou > l.ignore_thresh) {
+                l.delta[obj_index] = 0;
+            }
+            // 这里仍然有疑问，为何使用 truth_thresh? 这个值是1
+            // 按道理，iou无论如何不可能大于1啊。。。
+            if (best_iou > l.truth_thresh) {
+                // confidence target = 1
+                l.delta[obj_index] = 1 - l.output[obj_index];
+                int class = net.truth[best_t*(4 + 1) + b*l.truths + 4];
+                if (l.map) class = l.map[class];
+                int class_index = entry_index(l, b, n*l.w*l.h + j*l.w + i, 4 + 1);
+                // 对class进行求导
+                delta_yolo_class(l.output, l.delta, class_index, class, l.classes, l.w*l.h, 0);
+                box truth = float_to_box(net.truth + best_t*(4 + 1) + b*l.truths, 1);
+                // 对box位置参数进行求导
+                delta_yolo_box(truth, l.output, l.biases, l.mask[n], box_index, i, j, l.w, l.h, net.w, net.h, l.delta, (2-truth.w*truth.h), l.w*l.h);
+            }
+        }
+    }
+}
+
+```
+## 下面，我们看下两个关键的子函数，delta_yolo_class和delta_yolo_box的实现。
+```c
+// class是类别的ground truth
+// classes是类别总数
+// index是feature map一维数组里面class prediction的起始索引
+void delta_yolo_class(float *output, float *delta, int index, 
+  int class, int classes, int stride, float *avg_cat) {
+    int n;
+    // 这里暂时不懂
+    if (delta[index]){
+        delta[index + stride*class] = 1 - output[index + stride*class];
+        if(avg_cat) *avg_cat += output[index + stride*class];
+        return;
+    }
+    for(n = 0; n < classes; ++n){
+        // 见上，diff = target - prediction
+        delta[index + stride*n] = ((n == class)?1 : 0) - output[index + stride*n];
+        if(n == class && avg_cat) *avg_cat += output[index + stride*n];
+    }
+}
+// box delta这里没什么可说的，就是square error的求导
+float delta_yolo_box(box truth, float *x, float *biases, int n, 
+  int index, int i, int j, int lw, int lh, int w, int h, 
+  float *delta, float scale, int stride) {
+    box pred = get_yolo_box(x, biases, n, index, i, j, lw, lh, w, h, stride);
+    float iou = box_iou(pred, truth);
+    float tx = (truth.x*lw - i);
+    float ty = (truth.y*lh - j);
+    float tw = log(truth.w*w / biases[2*n]);
+    float th = log(truth.h*h / biases[2*n + 1]);
+    delta[index + 0*stride] = scale * (tx - x[index + 0*stride]);
+    delta[index + 1*stride] = scale * (ty - x[index + 1*stride]);
+    delta[index + 2*stride] = scale * (tw - x[index + 2*stride]);
+    delta[index + 3*stride] = scale * (th - x[index + 3*stride]);
+    return iou;
+}
+```
+# 上面，我们遍历了每一个prediction的bounding box，下面我们还要遍历每个ground truth，根据IoU，为其分配一个最佳的匹配。
+
+```c
+// 遍历ground truth
+for(t = 0; t < l.max_boxes; ++t){
+    box truth = float_to_box(net.truth + t*(4 + 1) + b*l.truths, 1);
+    if(!truth.x) break;
+    // 找到iou最大的那个bounding box
+    float best_iou = 0;
+    int best_n = 0;
+    i = (truth.x * l.w);
+    j = (truth.y * l.h);
+    box truth_shift = truth;
+    truth_shift.x = truth_shift.y = 0;
+    for(n = 0; n < l.total; ++n){
+        box pred = {0};
+        pred.w = l.biases[2*n]/net.w;
+        pred.h = l.biases[2*n+1]/net.h;
+        float iou = box_iou(pred, truth_shift);
+        if (iou > best_iou){
+            best_iou = iou;
+            best_n = n;
+        }
+    }
     
+    int mask_n = int_index(l.mask, best_n, l.n);
+    if(mask_n >= 0){
+        int box_index = entry_index(l, b, mask_n*l.w*l.h + j*l.w + i, 0);
+        float iou = delta_yolo_box(truth, l.output, l.biases, best_n, 
+          box_index, i, j, l.w, l.h, net.w, net.h, l.delta, 
+          (2-truth.w*truth.h), l.w*l.h);
+        int obj_index = entry_index(l, b, mask_n*l.w*l.h + j*l.w + i, 4);
+        avg_obj += l.output[obj_index];
+        // 对应objectness target = 1
+        l.delta[obj_index] = 1 - l.output[obj_index];
+        int class = net.truth[t*(4 + 1) + b*l.truths + 4];
+        if (l.map) class = l.map[class];
+        int class_index = entry_index(l, b, mask_n*l.w*l.h + j*l.w + i, 4 + 1);
+        delta_yolo_class(l.output, l.delta, class_index, class, l.classes, l.w*l.h, &avg_cat);
+        ++count;
+        ++class_count;
+        if(iou > .5) recall += 1;
+        if(iou > .75) recall75 += 1;
+        avg_iou += iou;
+    }
+}
+
+```
+
     =============================================
     =============================================
   ## 1.安装 编译darknet
