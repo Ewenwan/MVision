@@ -1,4 +1,7 @@
 # INQ Incremental-Network-Quantization 
+
+# 给定任意结构的全精度浮点神经网络模型，能将其转换成无损的低比特二进制模型
+
 # 英特尔中国研究院：INQ神经网络无损低比特量化技术 全精度网络输入，输出权值为0或2的整数次幂的网络
 
 [代码](https://github.com/Ewenwan/Incremental-Network-Quantization)
@@ -33,3 +36,6 @@ The authors adopted the proposed method to several model, including AlexNet, VGG
       method would be efficient with binary shift operation in hardware, 
       the computation in there experiments is still using floating operations.
       Thus they only show the results of model compression instead of speeding up computation.
+# 方法 Method
+* 提出了渐进式神经网络量化的思想，引入了三种操作：参数分组，量化，重训练
+
