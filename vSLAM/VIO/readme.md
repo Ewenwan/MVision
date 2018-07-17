@@ -114,13 +114,13 @@
       相对于松耦合 , 
       紧耦合的另外一个优点是 IMU 的尺度度量信息可以用于辅助视觉中的尺度的估计 .
 
-# 基于滤波器的紧耦合 Filter-based Tightly Coupled method
+# 一、基于滤波器的紧耦合 Filter-based Tightly Coupled method
       紧耦合需要把图像feature进入到特征向量去，
       因此整个系统状态向量的维数会非常高，因此也就需要很高的计算量。
       比较经典的算法是MSCKF，ROVIO
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120211824921-442661944.png)
       
-## 紧耦合举例-msckf
+## 1. 紧耦合举例-msckf
       据说这也是谷歌tango里面的算法。
       在传统的EKF-SLAM框架中，特征点的信息会加入到特征向量和协方差矩阵里,
       这种方法的缺点是特征点的信息会给一个初始深度和初始协方差，
@@ -193,18 +193,30 @@ MSCKF算法流程框架:
 
 
 
-## ROVIO，紧耦合，图像patch的稀疏前端(?)，EKF后端
+## 2. ROVIO，紧耦合，图像patch的稀疏前端(?)，EKF后端
 [代码](https://github.com/Ewenwan/rovio)
 
+[参考](http://jinjaysnow.github.io/blog/2017-07/ROVIO%E8%A7%A3%E6%9E%90.html)
 
-# 基于滤波器的松耦合 Filter-based Tightly Coupled
+
+基于扩展卡尔曼滤波:**惯性测量用于滤波器的状态传递过程；视觉信息在滤波器更新阶段使用。**
+      
+多层次patch特征处理：
+
+![](http://jinjaysnow.github.io/images/rovio_feature.png)
+      
+
+
+
+
+# 二、基于滤波器的松耦合 Filter-based Tightly Coupled
       松耦合的方法则简单的多，避免把图像的feature加入状态向量，
       而是把图像当成一个black box,计算vo处理之后才和imu数据进行融合。
       Ethz的Stephen Weiss在这方面做了很多的研究，
       他的ssf和msf都是这方面比较优秀的开源算法，有兴趣的读者可以参考他的博士论文。
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120212016937-685009538.png)
 
-## 基于滤波器的松耦合举例-ssf
+## 1. 基于滤波器的松耦合举例-ssf
 [代码](https://github.com/Ewenwan/ethzasl_sensor_fusion)
       
       滤波器的状态向量 x 是24维，如下，相较于紧耦合的方法会精简很多。
@@ -212,12 +224,12 @@ MSCKF算法流程框架:
       Ssf_update则处理另外一个传感器的数据，主要完成测量的过程
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120212030437-1010714101.png)
 
-## 基于滤波器的松耦合举例-msf
+## 2. 基于滤波器的松耦合举例-msf
 [代码](https://github.com/Ewenwan/ethzasl_msf)
 
 ![](http://www.liuxiao.org/wp-content/uploads/2016/07/framesetup-300x144.png)
 
-# 基于优化的松耦合
+# 三、基于优化的松耦合
       随着研究的不断进步和计算平台性能的不断提升，
       optimization-based的方法在slam得到应用，
       很快也就在VIO中得到应用，紧耦合中比较经典的是okvis，松耦合的工作不多。
@@ -225,9 +237,9 @@ MSCKF算法流程框架:
       《Inertial Aided Dense & Semi-Dense Methods for Robust Direct Visual Odometry》提到了这个方法。
       简单来说就是把vo计算产生的位姿变换添加到imu的优化框架里面去。
       
-# 基于优化的 紧耦合 
+# 四、基于优化的 紧耦合 
       
-## 基于优化的紧耦合举例-okvis   多目+IMU   使用了ceres solver的优化库。
+## 1. 基于优化的紧耦合举例-okvis   多目+IMU   使用了ceres solver的优化库。
 [代码](https://github.com/Ewenwan/okvis)
 
 [OKVIS 笔记：位姿变换及其局部参数类](https://fzheng.me/2018/01/23/okvis-transformation/)
@@ -248,12 +260,12 @@ MSCKF算法流程框架:
       我们需要建立一个统一的损失函数进行联合优化.
 ![](https://pic4.zhimg.com/v2-c00d0a55d9ff7bf23a4ed5249fb1090b_r.png)
       
-## 基于优化的 紧耦合 orbslam2 + imu 紧耦合、ORB稀疏前端、图优化后端、带闭环检测和重定位
+## 2. 基于优化的 紧耦合 orbslam2 + imu 紧耦合、ORB稀疏前端、图优化后端、带闭环检测和重定位
 [代码](https://github.com/Ewenwan/LearnVIORB)
 
 [orb-slam1 + imu](https://github.com/Ewenwan/orb_slam_imu)
 
-## 基于优化的紧耦合  VINS-Mono   港科大的VIO
+## 3.基于优化的紧耦合  VINS-Mono   港科大的VIO
 
       前端基于KLT跟踪算法， 后端基于滑动窗口的优化(采用ceres库)， 基于DBoW的回环检测
       
@@ -263,8 +275,9 @@ MSCKF算法流程框架:
 
 ![](https://pic3.zhimg.com/80/v2-145f576a58d1123a9faa1d265af40522_hd.png)
 
+# 五、雷达结合IMU
 
-# 2Dlidar（3Dlidar）+IMU
+# # 2Dlidar（3Dlidar）+IMU
 
 [2Dlidar（3Dlidar）+IMU Google的SLAM cartographer 代码](https://github.com/Ewenwan/cartographer)
 
