@@ -206,9 +206,6 @@ MSCKF算法流程框架:
 ![](http://jinjaysnow.github.io/images/rovio_feature.png)
       
 
-
-
-
 # 二、基于滤波器的松耦合 Filter-based Tightly Coupled
       松耦合的方法则简单的多，避免把图像的feature加入状态向量，
       而是把图像当成一个black box,计算vo处理之后才和imu数据进行融合。
@@ -222,7 +219,7 @@ MSCKF算法流程框架:
       滤波器的状态向量 x 是24维，如下，相较于紧耦合的方法会精简很多。
       Ssf_core主要处理state的数据，里面有预测和更新两个过程。
       Ssf_update则处理另外一个传感器的数据，主要完成测量的过程
-![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120212030437-1010714101.png)
+![](http://image.bubuko.com/info/201701/20180110222408640808.png)
 
 ## 2. 基于滤波器的松耦合举例-msf
 [代码](https://github.com/Ewenwan/ethzasl_msf)
