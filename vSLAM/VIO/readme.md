@@ -266,10 +266,19 @@ MSCKF算法流程框架:
 [orb-slam1 + imu](https://github.com/Ewenwan/orb_slam_imu)
 
 ## 3.基于优化的紧耦合  VINS-Mono   港科大的VIO
-
-      前端基于KLT跟踪算法， 后端基于滑动窗口的优化(采用ceres库)， 基于DBoW的回环检测
+[香港科技大学的VINS_MONO初试](https://www.cnblogs.com/shhu1993/p/6938715.html)
       
+      
+      前端基于KLT跟踪算法， 后端基于滑动窗口的优化(采用ceres库)， 基于DBoW的回环检测
+![](https://images2015.cnblogs.com/blog/542140/201707/542140-20170708095920019-932150180.png)
+      
+      代码主要分为:
+            前端(feature tracker),
+            后端(sliding window, loop closure)，
+            还加了初始化(visual-imu aligment).
+
 [VINS-Mono  Linux](https://github.com/Ewenwan/VINS-Mono)
+
 
 [VINS-Mobile MacOS](https://github.com/Ewenwan/VINS-Mobile)
 
