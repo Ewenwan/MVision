@@ -27,6 +27,7 @@
       其位姿使用线性插值方法近似相机的运动轨迹 , 姿态使用旋转角度和旋转轴表示 , 
       旋转轴不变 ,对旋转角度线性插值 ,
       使用 MSCKF (Multi-stateconstrained Kalman filter) 建模卷帘快门相机的测量模型。
+![](https://img-blog.csdn.net/20161127225607039)
 
 # 多传感器融合
 
@@ -47,6 +48,8 @@
             这时候融合IMU+激光雷达（视觉）的方案刚好能够填补不足。
             
 # 惯性传感器（IMU）
+[从零开始的 IMU 状态模型推导](https://fzheng.me/2016/11/20/imu_model_eq/)
+
       能够测量传感器本体的角速度和加速度，被认为与相机传感器具有明显的互补性，
       而且十分有潜力在融合之后得到更完善的SLAM系统。
       
@@ -226,6 +229,14 @@ MSCKF算法流程框架:
       
 ## 基于优化的紧耦合举例-okvis   多目+IMU   使用了ceres solver的优化库。
 [代码](https://github.com/Ewenwan/okvis)
+
+[OKVIS 笔记：位姿变换及其局部参数类](https://fzheng.me/2018/01/23/okvis-transformation/)
+
+[OKVIS IMU 误差公式代码版本](https://blog.csdn.net/fuxingyin/article/details/53449209)
+
+[OKVIS 代码框架](https://blog.csdn.net/fuxingyin/article/details/53428523)
+
+[OKVIS 笔记](https://blog.csdn.net/fuxingyin/article/details/53368649)
 
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120212125265-76552078.png)
 
