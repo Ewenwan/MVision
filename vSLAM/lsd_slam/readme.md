@@ -13,7 +13,9 @@
 
 [lsd安装测试记录](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/install.md)
 
-[lsdslam代码笔记](https://www.cnblogs.com/shhu1993/p/7136033.html#034-depth-estimation)
+[lsdslam代码笔记 参考](https://www.cnblogs.com/shhu1993/p/7136033.html#034-depth-estimation)
+
+[代码笔记](https://github.com/Ewenwan/MVision/blob/master/vSLAM/lsd_slam/lsdslam%E4%BB%A3%E7%A0%81%E7%AC%94%E8%AE%B0.md)
 
 [LSD_slam & 激光雷达slam](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/04_SLAM.pdf)
 
