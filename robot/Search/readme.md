@@ -79,16 +79,24 @@
     最后推荐一本圣经《Planning Algorithms》伊利诺伊大学教授Lavalle于2006年写的这本书，可以网上看看英文原版的
     
      http://planning.cs.uiuc.edu/booka4.pdf
+# 0.1 深度优先寻路算法
 
-# 1. 迪杰斯特拉 规划路径
-# 2. A星算法   规划路径
-# 3. 动态规划  搜索路径
+# 0.2 广度优先寻路算法
+
+# 1. Dijstra 迪杰斯特拉  
+
+# 2. A* A星算法  
+
+# 3. Theta*
+
+
+# 4. 动态规划  搜索路径
  
-# 1. PRM（Probabilistic roadmaps）这个其实也是老方法了，1994年提出。
+# 5. PRM（Probabilistic roadmaps）这个其实也是老方法了，1994年提出。
 
         这里列出，是因为它代表了一大类基于采样的路径规划方法。PRM是一种多查询（multiple-query）方法：先通过采样，在位姿空间中建里roadmap，然后利用A*或类A*算法在roadmap上查询路径。所以，这种方法的核心不在于寻路，而在于如何采样并在此基础上建立roadmap。roadmap可以复用，这就是“multiple-query”的含义。有人将PRM改造成单查询（single-query）方法，即不必在整个位姿空间中采样（像多查询方法那样在整个位姿空间中采样是非常耗时的），因为单查询主要解决的是“一次性”问题：每次查询仅仅进行局部采样，原则是“够用就好”。因为采样不均导致有些路径明明存在却规划不到的现象时有存在，这类经典问题叫做narrow passage，针对这些问题，有很多PRM变体被提出，这里不赘述了。
 
-# 2. RRT（Rapidly-exploring random tree  RRT(快速随机搜索树) ）老方法，2000年左右提出. 
+# 6. RRT（Rapidly-exploring random tree  RRT(快速随机搜索树) ）老方法，2000年左右提出. 
         只不过这个旧瓶能装各种各样的新酒，所以列出来。RRT算法家族是恐怕目前是最经典的一类基于采样的单查询方法了。
         用RRT做路径规划的过程如下：分别以位姿空间中的起始点和目标点为根，同时生成两棵树，每次给它们一个随机增量，
         让它们相向生长，直到它们合并在一起。树的“长速”非常快，很快就能覆盖起始点和目标点之间的位姿空间，
@@ -101,10 +109,10 @@
         RPM 要先构建roadmap，因此可以多次使用的，graph中的node还可以相互连接的
 
         RRT是直接从start node延增出去的，每个node只有一个parent的。
+[octomap中3d-rrt路径规划 ROS](https://www.cnblogs.com/shhu1993/p/7062099.html)
         
         
-        
-# 3. PRM*和RRT*这两个方法相对较新，2011年提出 
+# 7. PRM*和RRT*这两个方法相对较新，2011年提出 
         从名字可以看出，它们分别基于PRM和RRT——这也是我首先列出PRM和RRT的原因——同时，
         它们分别是PRM和RRT的渐进最优（asymptotically optimal）形式。PRM*与PRM的主要区别是选择最近邻的方法不同。
         在建立roadmap时，每个采样点都要尝试和它邻域内的k个最近采样点建立连接，PRM的邻域半径r是固定的，
@@ -117,14 +125,14 @@
         这里的cost是指机器人从树的根节点运动到新采样点的代价，可以是距离代价，也可以是其他代价。
         假设新采样点为P1，连接到的邻域采样点为P2，如果发现从根节点到P1的cost与从P1到P2的cost之和比从根节点到P2的cost小，
         则将P1作为P2的新parent。同时将P2和它的原parent之间的边删除，将P1和P2之间的边加入树中。
-# 4. D*老方法，1994年提出。
+# 8. D*老方法，1994年提出。
         这个算法被用到了NASA的火星车上，所以非常值得一提。
         D*的含义是“Dynamic A*”，可见它和A*是有渊源的。D*的优势在于高效的重规划。
         一旦环境发生改变，从头规划一条新路径是很耗时的，
         D*则只进行局部重规划，所以之前规划出的部分路径可以复用。
         D*有个同宗兄弟叫做D* Lite，它不是D*的变体，但是它的效果和D*一样。
 
-# 5. 人工势场 Artifical potential fields
+# 9. 人工势场 Artifical potential fields
 [代码](https://github.com/Ewenwan/Artificial-Potential-Field)
 
         构造一个函数 = an attractive potential field + a repulsive potential field
@@ -146,7 +154,7 @@
         
         可能会陷入到local minimum 局部最小值
         
-# 6. nbvplanner 
+# 9. nbvplanner 
 [代码](https://github.com/Ewenwan/nbvplanner)
 
 
@@ -161,7 +169,7 @@
         
 # 2d/3d路径规划可视工具
     工具显示的第三个维度是概率的大小，可视化，针对的是moveit这个开源工具，没有试过别的可不可以
-
+[代码](https://github.com/Ewenwan/ompl_visual_tools)
 
 
 
