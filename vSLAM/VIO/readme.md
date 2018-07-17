@@ -189,18 +189,21 @@ MSCKF算法流程框架:
                   3.6.2 将deleteIdx中的视图对应的MSCKF中的状态去除掉.
                   3.6.3 绘制运动轨迹.
 
-
-
-
-
-## 2. ROVIO，紧耦合，图像patch的稀疏前端(?)，EKF后端
+## 2. ROVIO，基于稀疏图像块的EKF滤波实现的VIO
+      紧耦合，图像patch的稀疏前端(?)，EKF后端
 [代码](https://github.com/Ewenwan/rovio)
 
 [参考](http://jinjaysnow.github.io/blog/2017-07/ROVIO%E8%A7%A3%E6%9E%90.html)
 
 
 基于扩展卡尔曼滤波:**惯性测量用于滤波器的状态传递过程；视觉信息在滤波器更新阶段使用。**
-      
+
+    他的优点是：计算量小(EKF，稀疏的图像块)，但是对应不同的设备需要调参数，参数对精度很重要。
+    没有闭环.
+    没有mapping thread。
+    经常存在误差会残留到下一时刻。
+         
+     
 多层次patch特征处理：
 
 ![](http://jinjaysnow.github.io/images/rovio_feature.png)
