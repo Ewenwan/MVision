@@ -291,3 +291,17 @@ MSCKF算法流程框架:
 
 [2Dlidar（3Dlidar）+IMU Google的SLAM cartographer 代码](https://github.com/Ewenwan/cartographer)
 
+# 六、雷达结合相机
+[相机雷达位姿校准](https://github.com/Ewenwan/camera-laser-calibration)
+
+[雷达点云数据障碍物检测](https://github.com/Ewenwan/Laser-Obstacle-Detection)
+
+
+# 七. GPS + IMU 组合导航
+
+[GPS-INS-Integrated-Navigation](https://github.com/Ewenwan/GPS-INS-Integrated-Navigation)
+
+
+
+
+
