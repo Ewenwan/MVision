@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# finetune 微调
+# test
 
 MODELS="../../../models/ssd-voc-300/ssd_voc_300_quantized.prototxt"
 WEIGHTS="../../../models/ssd-voc-300/ssd-voc-300-quantized-weights_iter_2000.caffemodel"
