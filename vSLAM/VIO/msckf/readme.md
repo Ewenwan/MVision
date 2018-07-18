@@ -30,6 +30,8 @@
 [Robust Stereo Visual Inertial Odometry for Fast Autonomous Flight 双目MSCKF视觉惯性里程计 论文](https://arxiv.org/pdf/1712.00036.pdf)
 [ros节点代码](https://github.com/Ewenwan/msckf_vio)
 
+[MSCKF 中文注释版](https://github.com/NicoChou/MSCKF)
+
 MSCKF算法流程框架:
 
       1. 初始化
