@@ -2,7 +2,7 @@
 
 ![](https://pic2.zhimg.com/v2-18cb9f97ac7f759a128b789b681c534f_1200x500.jpg)
 
-[vio_data_simulation VIO数据测试仿真]https://github.com/Ewenwan/vio_data_simulation()
+[vio_data_simulation VIO数据测试仿真](https://github.com/Ewenwan/vio_data_simulation)
 
 [视觉惯性单目SLAM知识 ](https://blog.csdn.net/myarrow/article/details/54694472)
 
@@ -193,6 +193,8 @@ MSCKF算法流程框架:
 ## 2. ROVIO，基于稀疏图像块的EKF滤波实现的VIO
       紧耦合，图像patch的稀疏前端(?)，EKF后端
 [代码](https://github.com/Ewenwan/rovio)
+
+[Robust Visual Inertial Odometry Using a Direct EKF-Based Approach 论文](https://www.research-collection.ethz.ch/bitstream/handle/20.500.11850/155340/eth-48374-01.pdf?sequence=1&isAllowed=y)
 
 [参考](http://jinjaysnow.github.io/blog/2017-07/ROVIO%E8%A7%A3%E6%9E%90.html)
 
