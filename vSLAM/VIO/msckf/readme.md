@@ -1,4 +1,10 @@
 # MSCKF  多状态约束卡尔曼滤波器
+
+[论文 MSCKF 1.0 : A Multi-State Constraint Kalman Filter for Vision-aided Inertial Navigation ](http://intra.ece.ucr.edu/~mourikis/papers/MourikisRoumeliotis-ICRA07.pdf)
+
+[论文 MSCKF 2.0 : High-Precision, Consistent EKF-based Visual-Inertial Odometry](http://intra.ece.ucr.edu/~mourikis/papers/Li2013IJRR.pdf)
+
+
 # 紧耦合
       紧耦合方式使用 IMU 完成视觉 VO 中的运动估计 , 
       IMU 在图像帧间的积分的误差比较小 , IMU的数据可用于预测帧间运动 , 
@@ -26,11 +32,29 @@
 ![](https://images2015.cnblogs.com/blog/823608/201701/823608-20170120211841515-37024958.png)
       
       EKF-SLAM: 多个特征点同时约束一个相机位姿，进行KF更新
-      MSCKF   : 一个特征点同时约束多个相机位姿，进行KF更新
+      MSCKF   : 一个特征点同时约束多个相机位姿(多相机观测同时优化，窗口多帧优化)，进行KF更新
+
+      传统的 EKF-based SLAM 做 IMU 融合时，
+      一般是每个时刻的 系统状态向量(state vector) 包含当前的 位姿pose、速度velocity、以及 3D map points 坐标等（
+         IMU 融合时一般还会加入 IMU 的 bias（飘逸: 零飘和溫飘）），  
+      然后用 IMU 做 预测predict step，
+      再用 image frame 中观测 3D map points 的观测误差做 更新update step。
+
+      MSCKF 的 motivation改进 是，EKF的每次 更新(类似优化)update step 是基于 3D map points 在单帧 frame 里观测的，
+      如果能基于其在多帧中的观测效果应该会好（有点类似于 local bundle adjustment 的思想）。
+      所以 MSCKF 的改进如下：
+          预测阶段predict step 跟 EKF 一样，
+          而 更新阶段update step 推迟到某一个 3D map point 在多个 frame 中观测之后进行计算，
+          在 update 之前每接收到一个 frame，只是将 state vector 扩充并加入当前 frame 的 pose estimate。
+      这个思想基本类似于 local bundle adjustment（或者 sliding window smoothing），
+      在update step时，相当于基于多次观测同时优化 pose 和 3D map point。
+
 [Event-based Visual Inertial Odometry 单目MSCKF视觉惯性里程计 论文](http://openaccess.thecvf.com/content_cvpr_2017/papers/Zhu_Event-Based_Visual_Inertial_CVPR_2017_paper.pdf)
+
 [ros节点代码](https://github.com/Ewenwan/msckf_mono)
 
 [Robust Stereo Visual Inertial Odometry for Fast Autonomous Flight 双目MSCKF视觉惯性里程计 论文](https://arxiv.org/pdf/1712.00036.pdf)
+
 [ros节点代码](https://github.com/Ewenwan/msckf_vio)
 
 [MSCKF 中文注释版 matlab](https://github.com/Ewenwan/MSCKF)
