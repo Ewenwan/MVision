@@ -386,6 +386,27 @@ MSCKF算法流程框架:
 
 ![](https://pic3.zhimg.com/80/v2-145f576a58d1123a9faa1d265af40522_hd.png)
 
+## 4. gtsam 因子图优化+贝叶斯滤波 类是一个g2o框架 可以优化很多
+[代码](https://github.com/Ewenwan/gtsam)
+
+[论文 On-Manifold Preintegration for Real-Time Visual-Inertial Odometry](https://www.cc.gatech.edu/~dellaert/pubs/Forster16tro.pdf)
+
+[高翔 11张 使用 gtsam进行位姿图优化 ](https://github.com/Ewenwan/MVision/blob/master/vSLAM/ch11/pose_graph_gtsam.cpp)
+
+      IMU Preintegration (2015-2016)  
+
+      从OKVIS的算法思想中可以看出，在优化的目标函数中，
+      两个视频帧之间的多个imu采样数据被积分成一个constraint，这样可以减少求解optimization的次数。
+      然而OKVIS中的imu积分是基于前一个视频帧的estimated pose，这样在进行optimization迭代求解时，
+      当这个estimated pose发生变化时，需要重新进行imu积分。
+
+      为了加速计算，这自然而然可以想到imu preintegraion的方案，
+      也就是将imu积分得到一个不依赖于前一个视频帧estimated pose的constraint。
+
+      当然与之而来的还有如何将uncertainty也做类似的propagation（考虑imu的bias建模），
+      以及如何计算在optimization过程中需要的Jacobians。
+      在OKVIS的代码ImuError.cpp和GTSAM 4.0的代码ManifoldPreintegration.cpp中可以分别看到对应的代码。
+
 # 五、雷达结合IMU
 
 # # 2Dlidar（3Dlidar）+IMU
