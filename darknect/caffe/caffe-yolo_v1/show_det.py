@@ -3,6 +3,7 @@
 import numpy as np
 import cv2
 import os, sys
+# export PYTHONPATH=/home/wanyouwen/ewenwan/software/caffe_yolo/caffe-yolov1_oldVer/python
 sys.path.insert(0, '../../python/')
 import caffe
 GPU_ID = 1 # 0,1,2,3,4,5,6,7...
