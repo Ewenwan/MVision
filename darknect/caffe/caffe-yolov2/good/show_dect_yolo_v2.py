@@ -2,6 +2,7 @@
 import numpy as np
 import cv2
 import os, sys
+# export PYTHONPATH=/home/wanyouwen/ewenwan/software/caffe_yolo/caffe-yolov2_oldVer/python
 caffe_root = '../../../'  # caffe主目录下
 sys.path.insert(0, caffe_root + 'python')# python接口
 import caffe#需要 make pycaffe
