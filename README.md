@@ -4,6 +4,10 @@
 
 [技术刘 增强现实、图像识别、深度学习、机器人](http://liuxiao.org/category/robots/)
 
+[漫谈 SLAM 技术（上）](https://cloud.tencent.com/developer/article/1005894)
+
+[漫谈 SLAM 技术（下）](https://cloud.tencent.com/developer/article/1005893)
+
 [优秀的博客论文笔记](https://github.com/Ewenwan/antkillerfarm.github.com)
 
 [CSCI 1430: Introduction to Computer Vision 计算机视觉课程](http://cs.brown.edu/courses/csci1430/#schedule)
