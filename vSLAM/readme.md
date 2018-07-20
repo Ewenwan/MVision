@@ -4,12 +4,12 @@
 ![](http://images2015.cnblogs.com/blog/276683/201511/276683-20151113165745244-1534145926.png)
 
 
-
 **光流 双目 里程计 SLAM 区别**
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/flow_stereo_vo_slam.PNG)
 
 [视觉SLAM基础知识总结](https://blog.csdn.net/myarrow/article/details/53704339)
 
+[SLAM/VIO学习总结](https://zhuanlan.zhihu.com/p/34995102)
         
 [Visual SLAM Tutorial ](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/)
 
