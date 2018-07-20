@@ -2,6 +2,10 @@
 
 ![](https://pic2.zhimg.com/v2-18cb9f97ac7f759a128b789b681c534f_1200x500.jpg)
 
+[VINS技术路线与代码详解](https://blog.csdn.net/wangshuailpp/article/details/78461171)
+
+[VINS理论与代码详解0——理论基础白话篇](https://blog.csdn.net/wangshuailpp/article/details/80600706)
+
 [vio_data_simulation VIO数据测试仿真](https://github.com/Ewenwan/vio_data_simulation)
 
 [视觉惯性单目SLAM知识 ](https://blog.csdn.net/myarrow/article/details/54694472)
@@ -373,15 +377,19 @@ MSCKF算法流程框架:
 
       RK4 算法在 SLAM 中也有很好的应用，特别是 VIO 中的预积分部分，
       比如张腾将王京的 VI ORB SLAM2 代码改成 RK4 积分后，
-      精度也得到了一定的提升：
-      https://github.com/RomaTeng/ORB-VINS_RK4
-
+      精度也得到了一定的提升：https://github.com/RomaTeng/ORB-VINS_RK4
+      
+[ORB-VINS_RK4](https://github.com/Ewenwan/ORB-VINS_RK4)
+      
       当然 RK4 算法比起欧拉积分、中点积分计算量要大不少
       ，SLAM 中影响精度的地方非常多，紧靠 RK4 改进其对于精度的提升程度通常也不会特别大，
       不过对于速度要求不高而精度要求很高的场合还是值得尝试的。
 
+[使用 evo 工具评测 VI ORB SLAM2 在 EuRoC 上的结果](http://www.liuxiao.org/2017/11/%E4%BD%BF%E7%94%A8-evo-%E5%B7%A5%E5%85%B7%E8%AF%84%E6%B5%8B-vi-orb-slam2-%E5%9C%A8-euroc-%E4%B8%8A%E7%9A%84%E7%BB%93%E6%9E%9C/)
 
-[参考](https://www.imooc.com/article/35031)
+[ORB_SLAM2视觉惯性紧耦合定位算法详解](https://blog.csdn.net/wangshuailpp/article/details/80640663)
+
+[VISUAL INERTIAL ORB-SLAM代码详细说明](http://paopaorobot.org/2017/05/03/visual-inertial-orb-slam%E4%BB%A3%E7%A0%81%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E/)
 
 [orb-slam2 + imu 代码](https://github.com/Ewenwan/orb_slam_imu)
 
@@ -392,7 +400,84 @@ MSCKF算法流程框架:
             3.IMU初始化（视觉惯性联合初始化） 
             4.紧耦合优化模型 
 
+### 1.整体流程与基础知识总结 
+       1）整体框架 
+      对于整个ORB_SLAM2的框架大家有一定的了解，主要分为三个线程Tracking、LocalMapping和Loopclosing。
+      我对VIO这块的理解目前只局限于前两个线程，因此整体框架就包含前两个线程中的理解:
+![](https://img4.mukewang.com/5b1e2c2b0001b3fd09160308.jpg)
+      
+      2）基础知识总结 
+      叉乘，叉乘矩阵,叉积的定义式 
+![](https://img1.mukewang.com/5b1e2c2b00015c0806460136.jpg)
+      
+      叉积的一个最重要的性质，在后面的雅各比矩阵推导中起到至关重要的作用，需要谨记:
+![](https://img1.mukewang.com/5b1e2c2b00016f9e03970064.jpg)
+      
+      指数函数的一阶泰勒近似：
+![](https://img1.mukewang.com/5b1e2c2c0001f14f03060080.jpg)
+      
+      这个式子就是以前数学中指数一阶泰勒展开，很简单，
+      因为旋转涉及到李群和李代数的指数转换关系，
+      所以这个式子在后面的优化雅各比推导中很重要。 
+      
+      李群和李代数指数转换关系:
+![](https://img.mukewang.com/5b1e2c2c00016c8805510103.jpg)
 
+![](https://img.mukewang.com/5b1e2c2c0001478706270296.jpg)
+      
+      李群和李代数是指数映射关系，是三维向量（旋转向量）与三维旋转矩阵之间的转换，
+      上图中可以看到流型的李群上的切平面（李代数）可以由李群一阶近似（李群扰动表示李代数扰动）.
+![](https://img3.mukewang.com/5b1e2c2c0001d41608690099.jpg)
+      
+      上面的公式参考视觉SLAM十四讲中，原文预积分中给出的是李代数“向量”形式，
+      感觉不太好理解，所以还是用反对称矩阵来表示，其中Jr是李代数上的右雅各比 
+![](https://img4.mukewang.com/5b1e2c2c0001cac707160103.jpg)
+      
+      同样的李代数扰动可以表示李群扰动 
+      李群扰动 = 李代数扰动 后指数映射
+![](https://img.mukewang.com/5b1e2c2d0001280505850075.jpg)
+      
+### 2.基于流型的IMU预积分
+![](https://img-blog.csdn.net/20180611092550447?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdzaHVhaWxwcA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+![](https://img-blog.csdn.net/20180611092822230?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdzaHVhaWxwcA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+      
+### 3.IMU初始化（视觉惯性联合初始化） 
+      终于来到视觉惯性初始化阶段了，这段是视觉和惯性数据融合的第一步，是一段松耦合过程。
+      理论上是将准确的视觉数据（但缺少尺度）和快速的IMU数据（需要重力加速度又存在零偏误差）相结合。
+      具体介绍在VINS的博客中也同样说过，这部分关于最小二乘、尺度收敛等问题请参考我的博客：
+[视觉SLAM常见的QR分解SVD分解等矩阵分解方式求解满秩和亏秩最小二乘问题（最全的方法分析总结）](https://blog.csdn.net/wangshuailpp/article/details/80209863)
+
+      （1）陀螺仪偏置标定（零偏） 
+            这一部分比较简单，直接联立N-1个相机做旋转矩阵的最小二乘即可，然后通过高斯牛顿方法即可得到零偏bg。
+            需要注意一点，当求出零偏后将其代入预积分公式会重新计算一遍预积分值，使预积分数值更加准确.
+      （2）尺度恢复和重力加速度预估 
+            首先建立预估状态向量X=[s,gw]，其中s是尺度，gw是世界坐标系下的重力加速度也是第一个相机坐标系下的重力加速度。
+            ORB_SLAM2中世界坐标选取的是第一个相机对应的坐标（VINS则不同），这样做会存在一个问题，
+            因为第一个相机可能自身存在一定的旋转倾斜导致整个世界坐标看起来是歪着的，画轨迹的时候有一种倾斜的即视感，
+            所以我觉得还是尽量固定好z方向，使轨迹没有横滚和俯仰。
+            这里使用了三个关键帧联立视觉和IMU预积分数据构建一个AX=B的最小二乘超定方程，至少需要四个关键帧，
+            采用奇异值分解求最小二乘问题，速度较慢但精度高。
+      （3）加速度计偏置标定和尺度重力加速度优化 
+            上面计算过程没有考虑到加速度计偏置的影响，使得重力加速度和加速度计偏置难以区分，
+            很有可能会导致系统病态性问题，文中提出了重力加速度的大小G，假设其是一个不变值，优化重力加速度的方向。
+### 4.紧耦合优化模型 
+      视觉惯性紧耦合优化部分分为三个部分，分别是Tracking、LocalMapping和Loopclosing，
+      我只是学习了前两个部分，所以就简单的介绍下这两个内容 
+      
+      （1）Tracking线程中帧间紧耦合优化 
+            论文中说的也比较清楚，分为两中情况，分别是有地图更新和无地图更新。
+            Tracking线程中一开始是没有地图更新的，地图更新是在LocalMapping和LoopClosing中完成。
+            因此这两种方式是随机切换的。
+![](https://img-blog.csdn.net/20180611132142867?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdzaHVhaWxwcA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+      （2）LocalMapping线程 
+            整个BA优化的只优化固定的N帧，而且这N帧是共视程度最高的N个关键帧，在局部窗口中（Local Windows），
+            地图中所有的点都是这些N个关键帧产生，其他的关键帧是在固定窗口中（Fixed Window），
+            只提供与局部地图点的观测值，不进行优化。当然局部地图路标点也需要优化。
+            需要优化的关键帧包含有视觉重投影误差和IMU测量误差。
+            需要优化的特征点包含Local和Fixed Window的重投影误差。  
+![](https://img-blog.csdn.net/20180611132420368?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdzaHVhaWxwcA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 
 ## 7.基于优化的紧耦合  VINS-Mono   港科大的VIO
@@ -406,9 +491,29 @@ MSCKF算法流程框架:
             前端(feature tracker),
             后端(sliding window, loop closure)，
             还加了初始化(visual-imu aligment).
-
+      
+      VINS代码主要包含在两个文件中，
+      分别是feature_tracker  和 
+      vins_estimate，
+      1. feature_tracker 就像文件的名字一样，总体的作用是接收图像，使用KLT光流算法跟踪；
+      2. vins_estimate包含相机和IMU数据的前端预处理（也就是预积分过程）、
+         单目惯性联合初始化（在线的标定过程）、基于滑动窗口的BA联合优化、全局的图优化和回环检测等。
+         
+      要想真正的理解一个SLAM框架，必须真正搞懂其对应的算法模型，然后才能研究其代码逻辑，
+      最后做到相得益彰的效果，因此本次讲解主要是结合论文中的理论知识这和两个文件中的代码进行详细的探讨。
+      
+      整体的框架都比较熟悉，
+      如下图所示:
+            第一部分是Measuremen Preprocessing：观测值数据预处理，包含图像数据跟踪IMU数据预积分；
+            第二部分是Initialization：初始化，包含单纯的视觉初始化和视觉惯性联合初始化；
+            第三部分Local Visual-Inertia BA and Relocalization：
+               局部BA联合优化和重定位，包含一个基于滑动窗口的BA优化模型；
+            第四部分Global Pose Graph Optimization：全局图优化，只对全局的位姿进行优化；
+            第五部分Loop detection：回环检测。
+      
 [VINS-Mono  Linux](https://github.com/Ewenwan/VINS-Mono)
 
+[VINS理论与代码详解1——框架解析](https://blog.csdn.net/wangshuailpp/article/details/78719363)
 
 [VINS-Mobile MacOS](https://github.com/Ewenwan/VINS-Mobile)
 
