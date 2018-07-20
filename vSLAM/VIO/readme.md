@@ -365,7 +365,35 @@ MSCKF算法流程框架:
 ## 6. 基于优化的 紧耦合 orbslam2 + imu 紧耦合、ORB稀疏前端、图优化后端、带闭环检测和重定位
 [代码](https://github.com/Ewenwan/LearnVIORB)
 
-[orb-slam1 + imu](https://github.com/Ewenwan/orb_slam_imu)
+[论文Visual-Inertial Monocular SLAM with Map Reuse ](https://arxiv.org/pdf/1610.05949.pdf)
+
+[论文On-Manifold Preintegration for Real-Time Visual-Inertial Odometry](https://arxiv.org/pdf/1512.02363.pdf)
+
+[欧拉积分、中点积分 与 龙格－库塔积分（Runge-Kutta methods）RK4在VI ORB SLAM2 ](http://liuxiao.org/2018/05/%E6%AC%A7%E6%8B%89%E7%A7%AF%E5%88%86%E3%80%81%E4%B8%AD%E7%82%B9%E7%A7%AF%E5%88%86%E4%B8%8E%E9%BE%99%E6%A0%BC%EF%BC%8D%E5%BA%93%E5%A1%94%E7%A7%AF%E5%88%86/)
+
+      RK4 算法在 SLAM 中也有很好的应用，特别是 VIO 中的预积分部分，
+      比如张腾将王京的 VI ORB SLAM2 代码改成 RK4 积分后，
+      精度也得到了一定的提升：
+      https://github.com/RomaTeng/ORB-VINS_RK4
+
+      当然 RK4 算法比起欧拉积分、中点积分计算量要大不少
+      ，SLAM 中影响精度的地方非常多，紧靠 RK4 改进其对于精度的提升程度通常也不会特别大，
+      不过对于速度要求不高而精度要求很高的场合还是值得尝试的。
+
+
+[参考](https://www.imooc.com/article/35031)
+
+[orb-slam2 + imu 代码](https://github.com/Ewenwan/orb_slam_imu)
+
+      ORB_SLAM2的作者在2017年提出了具有地图重用功能的单目视觉惯性定位算法，
+      该算法的具体思路和港科大的VINS有着异曲同工之妙，整体过程可分为下面几个部分： 
+            1.整体流程与基础知识总结 
+            2.基于流型的IMU预积分 
+            3.IMU初始化（视觉惯性联合初始化） 
+            4.紧耦合优化模型 
+
+
+
 
 ## 7.基于优化的紧耦合  VINS-Mono   港科大的VIO
 [香港科技大学的VINS_MONO初试](https://www.cnblogs.com/shhu1993/p/6938715.html)
