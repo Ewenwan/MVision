@@ -470,6 +470,26 @@ MSCKF算法流程框架:
             Tracking线程中一开始是没有地图更新的，地图更新是在LocalMapping和LoopClosing中完成。
             因此这两种方式是随机切换的。
 ![](https://img-blog.csdn.net/20180611132142867?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdzaHVhaWxwcA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+            
+            红色虚框是固定的状态量（fix），不会进行优化但是会在优化的时候作为约束项优化其他状态量，
+            浅灰色实框是将要进行边缘化的状态量（marginalize），
+            蓝色实框是视觉重投影误差方程，
+            深灰色实框是无地图更新时候的先验数据（prior），
+            绿色实框是IMU测量误差方程。
+            
+            （a）是出现地图更新的状态，一开始j是当前帧，i是上一帧，
+                 通过视觉重投影误差和IMU测量误差优化当前帧的状态量（pj,vj,bj），
+                 上一帧的状态量和Map Points不会进行优化而是作为约束项优化当前状态量。
+            （b）是（a）优化后的结果（估计值和海塞矩阵H），同时将优化结果
+            （c）是无地图更新状态，当前帧变成了j+1，
+                 此时通过重投影误差和IMU测量误差优化当前帧和上一帧j的状态量（pj,vj,bj, pj+1,vj+1,bj+1），
+                 Map Points不会进行优化而是作为约束项优化j和j+1时刻的状态量，
+                 同时j时刻的优化结果作为先验数据优化，然后将j时刻的状态量边缘化掉。
+            （d）边缘化掉j时刻的j+1时刻优化量（估计值和海塞矩阵H）作为下一时刻优化的先验数据。
+            （e）和（c）的过程一模一样。
+            （f）和（d）的过程一模一样。
+
+            然后一直循环（c）（d）过程，直到LocalMapping和LoopClosing中发生地图更新会回到（a）处重复过程。
 
       （2）LocalMapping线程 
             整个BA优化的只优化固定的N帧，而且这N帧是共视程度最高的N个关键帧，在局部窗口中（Local Windows），
