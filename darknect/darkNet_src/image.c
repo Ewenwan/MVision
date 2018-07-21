@@ -283,22 +283,22 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
 {//classes是类别数 
     int i,j;
 
-    for(i = 0; i < num; ++i){
+    for(i = 0; i < num; ++i){ // 预测出的边框数量
         char labelstr[4096] = {0};
-        int class = -1;
-        for(j = 0; j < classes; ++j){
-            if (dets[i].prob[j] > thresh){
+        int class = -1;// 预设预测的类别标签 无
+        for(j = 0; j < classes; ++j){// 还边框预测的对应每种类别的概率
+            if (dets[i].prob[j] > thresh){// 概率大一阈值的化
                 if (class < 0) {
-                    strcat(labelstr, names[j]);
+                    strcat(labelstr, names[j]);// 生成 预测标签(单一标签)
                     class = j;
                 } else {
                     strcat(labelstr, ", ");
-                    strcat(labelstr, names[j]);
+                    strcat(labelstr, names[j]);// 可能对应多个标签(只要置信度大于阈值)
                 }
-                printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
+                printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);// 打印对应边框预测的对应类别，以及置信度
             }
         }
-        if(class >= 0){
+        if(class >= 0){// 该边框如果有对应的预测类别 则进行下面的操作
             int width = im.h * .006;
 
             /*
@@ -313,21 +313,22 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             float red = get_color(2,offset,classes);
             float green = get_color(1,offset,classes);
             float blue = get_color(0,offset,classes);
-            float rgb[3];
+            float rgb[3];// 生成 画的边框颜色
 
             //width = prob*20+2;
 
             rgb[0] = red;
             rgb[1] = green;
             rgb[2] = blue;
-            box b = dets[i].bbox;
+            box b = dets[i].bbox;// 对应边框 0~1之间
             //printf("%f %f %f %f\n", b.x, b.y, b.w, b.h);
 
-            int left  = (b.x-b.w/2.)*im.w;
-            int right = (b.x+b.w/2.)*im.w;
-            int top   = (b.y-b.h/2.)*im.h;
-            int bot   = (b.y+b.h/2.)*im.h;
-
+            int left  = (b.x-b.w/2.)*im.w;// 横坐标最左标
+            int right = (b.x+b.w/2.)*im.w;// 横坐标最右标
+            int top   = (b.y-b.h/2.)*im.h;// 纵坐标最上面
+            int bot   = (b.y+b.h/2.)*im.h;// 纵坐标最下面
+            
+            // 边框范围限制
             if(left < 0) left = 0;
             if(right > im.w-1) right = im.w-1;
             if(top < 0) top = 0;
@@ -336,20 +337,22 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             draw_box_width(im, left, top, right, bot, width, red, green, blue);
             if (alphabet) {
                 //image label = get_label(alphabet, labelstr, (im.h*.03));
+		    // 获取标签图片
 				#ifdef CHINESE
 					image label = get_label_cn(alphabet, class, (im.h*.03));
 				#else
 					image label = get_label(alphabet, names[class], (im.h*.03));
 				#endif
+		    // 在原图上显示 标签图片
                 draw_label(im, top + width, left, label, rgb);
-                free_image(label);
+                free_image(label);// 释放标签图片空间
             }
 /////////////////////////////////////////////////////////////////
-            if (dets[i].mask){
-                image mask = float_to_image(14, 14, 1, dets[i].mask);
-                image resized_mask = resize_image(mask, b.w*im.w, b.h*im.h);
-                image tmask = threshold_image(resized_mask, .5);
-                embed_image(tmask, im, left, top);
+            if (dets[i].mask){// 边框内部实例分割 掩码mask
+                image mask = float_to_image(14, 14, 1, dets[i].mask);// 转成图像
+                image resized_mask = resize_image(mask, b.w*im.w, b.h*im.h);// 适应检测的边框大小
+                image tmask = threshold_image(resized_mask, .5);// 变成二值图
+                embed_image(tmask, im, left, top);// 显示掩码
                 free_image(mask);
                 free_image(resized_mask);
                 free_image(tmask);
@@ -473,7 +476,7 @@ void censor_image(image im, int dx, int dy, int w, int h)
         }
     }
 }
-
+// 
 void embed_image(image source, image dest, int dx, int dy)
 {
     int x,y,k;
@@ -623,6 +626,22 @@ void show_image_cv(image p, const char *name, IplImage *disp)
 #endif
 
 // 未 编译opencv 的话 检测的结果 保存为图片
+/*
+void draw_detections() 中， 
+printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100); (298行) 是命令行显示每种预测的置信度得分，
+num 是预测出的边框数量，每个边框对每个类别 都会有一个预测概率 dets[i].prob[j]，
+如果大于阈值的话，标记该预测边框的预测类别，class = j; 
+后面的代码根据class标记，在图像上imag上直接添加预测的边框和掩码(是直接操作像素值), 
+后面通过 void show_image()进行显示。
+
+在函数 draw_detections()中保存一系列，检测边框尺寸位置信息和类别置信度信息(可用vector来保存)，
+在show_image()中使用 opencv的接口函数在图像上显示字符。
+CvFont font;
+cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.5f, 1.5f, 0, 2, CV_AA);//设置显示的字体
+strID="MyObject";// 显示的文字，这里需要把 float变成字符串
+// cvPoint(P1.x, P1.y-10) 确定文字显示的位置
+cvPutText(pImg,strID, cvPoint(P1.x, P1.y-10), &font, CV_RGB(255, 0, 0));//红色字体注释
+*/
 void show_image(image p, const char *name)
 {
 #ifdef OPENCV
