@@ -2,6 +2,8 @@
 
 ![](https://pic2.zhimg.com/v2-18cb9f97ac7f759a128b789b681c534f_1200x500.jpg)
 
+[视觉惯性SLAM专栏](https://blog.csdn.net/column/details/24148.html)
+
 [VINS技术路线与代码详解](https://blog.csdn.net/wangshuailpp/article/details/78461171)
 
 [VINS理论与代码详解0——理论基础白话篇](https://blog.csdn.net/wangshuailpp/article/details/80600706)
