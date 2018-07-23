@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import caffe
 import numpy as np
-
+# export PYTHONPATH=/home/wanyouwen/ewenwan/software/caffe_yolo/caffe-yolov2_oldVer/python
 caffe.set_device(0)  # if we have multiple GPUs, pick the first one
 caffe.set_mode_gpu()
-model_filename = 'yolov2_caffe.prototxt'
+model_filename = 'yolov2_coco.prototxt'
 yoloweight_filename = 'yolov2.weights'
 caffemodel_filename = 'yolov2.caffemodel'
 print 'model file is ', model_filename
@@ -22,7 +22,9 @@ for layer_name, param in net.params.iteritems():
         count += np.prod(param[i].data.shape)
         print str(param[i].data.shape) + '\t',
     print
+    
 print 'count=', str(count)
+
 params = net.params.keys()
 # read weights from file and assign to the network
 netWeightsInt = np.fromfile(yoloweight_filename, dtype=np.int32)
@@ -55,13 +57,16 @@ for pr in params:
             net.params[pr][1].data[...] = conv_bias
             conv_bias = None
         count += biasSize
+        print lidx
         # batch_norm
-        next_layer = net.layers[lidx + 1]
-        if next_layer.type == 'BatchNorm':
-            bn_dims = (3, net.params[pr][0].data.shape[0])
-            bnSize = np.prod(bn_dims)
-            batch_norm = np.reshape(netWeights[count:count + bnSize], bn_dims)
-            count += bnSize
+        # skip the last Convolution without batch_norm
+        if(lidx != 98):
+            next_layer = net.layers[lidx + 1]
+            if next_layer.type == 'BatchNorm':
+                bn_dims = (3, net.params[pr][0].data.shape[0])
+                bnSize = np.prod(bn_dims)
+                batch_norm = np.reshape(netWeights[count:count + bnSize], bn_dims)
+                count += bnSize
         # weights
         dims = net.params[pr][0].data.shape
         weightSize = np.prod(dims)
