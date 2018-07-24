@@ -88,11 +88,22 @@
 
 [Mahony 论文](http://chenbinpeng.com/2016/10/08/ECF/A%20Complementary%20Filter%20for%20Attitude%20Estimation%20of%20a%20Fixed-Wing%20UAV.pdf)
 
+[Google Cardboard的九轴融合算法 —— 基于李群的扩展卡尔曼滤波](http://www.cnblogs.com/ilekoaiq/p/8710812.html)
+
+[Madgwick算法详细解读 陀螺仪积分的结果和加速度计磁场计优化的结果加权，就可以得到高精度的融合结果 ](http://www.cnblogs.com/ilekoaiq/p/8849217.html)
+
+      <<Google Cardbord的九轴融合算法>> <<Madgwick算法>>，<<互补滤波算法>>
+      讨论的都是在SO3上的传感器融合，
+      即，输出的只是纯旋转的姿态。
+      只有旋转，而没有位移，也就是目前的一些普通的VR盒子的效果。 
+      
+      后面 imu+相机的融合是，在SE3上面的传感器融合，在既有旋转又有位移的情况下，该如何对多传感器进行融合。
+      
+      
 [IMU 数据融合](https://blog.csdn.net/haithink/article/details/79975679)
 
 [四元数AHRS姿态解算和IMU姿态解算分析](http://www.bspilot.com/?p=121)
-         
-         
+
 # 难点 
       复杂性主要来源于 IMU测量 加速度 和 角速度 这两个量的事实，所以不得不引入运动学计算。
       
@@ -330,6 +341,30 @@ MSCKF算法流程框架:
 
 ![](http://www.liuxiao.org/wp-content/uploads/2016/07/framesetup-300x144.png)
 
+[相机IMU融合四部曲（三）:MSF详细解读与使用 ](http://www.cnblogs.com/ilekoaiq/p/9311357.html)
+      
+      它的理论与 误差状态四元数 RT-SLAM   很接近，稍微有点不同，所以MSF开源程序就成了一个不错的选择
+[多传感器卡尔曼融合框架 Ethzasl MSF Framework 编译与使用](http://www.liuxiao.org/2016/07/ros-%E5%A4%9A%E4%BC%A0%E6%84%9F%E5%99%A8%E5%8D%A1%E5%B0%94%E6%9B%BC%E8%9E%8D%E5%90%88%E6%A1%86%E6%9E%B6-ethzasl-msf-framework-%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BD%BF%E7%94%A8/)  
+
+      最终对应于MSF_Core类的三个函数，即
+      ProcessIMU（处理并汇集IMU消息)、AddMeasurement（处理汇集位姿观测值）、ProcessExternallyPropagatedState（状态预测）。
+      而msf_updates::pose_measurement::PoseMeasurement<> 实现了状态的更新。
+
+## 5. D-LG-EKF 李群SE3上的 离散卡尔曼滤波 
+
+[D-LG-EKF 李群SE3上的 离散卡尔曼滤波 论文  Discrete Extended Kalman Filter on Lie groups ]( https://www.researchgate.net/publication/281353230_Discrete_Extended_Kalman_Filter_on_Lie_groups)
+
+[相机IMU融合四部曲（一）：D-LG-EKF详细解读 ](http://www.cnblogs.com/ilekoaiq/p/9302532.html)
+
+## 6. RT-SLAM  误差状态四元数   和msf类似
+[RT-SLAM  误差状态四元数 Quaternion kinematics for the error state Kalman,  RT-SLAM: A Generic and Real-Time Visual SLAM Implementation](http://www.cnblogs.com/ilekoaiq/p/9266036.html)
+      
+      它的基本思想和D-LG-EKF是一样的，都是对均值状态和扰动状态的进行处理。
+      但是，不同的是，在误差状态四元数里，是把偏移也放到状态里滤波的，
+      而Google Cardboard里的偏移是通过低通滤波滤出来的。 
+[rtslam 代码](https://github.com/damarquezg/rtslam)      
+
+
 # 三、基于优化的松耦合
       随着研究的不断进步和计算平台性能的不断提升，
       optimization-based的方法在slam得到应用，
@@ -340,7 +375,7 @@ MSCKF算法流程框架:
       
 # 四、基于优化的 紧耦合 
       
-## 5. 基于优化的紧耦合举例-okvis   多目+IMU   使用了ceres solver的优化库。
+## 7. 基于优化的紧耦合举例-okvis   多目+IMU   使用了ceres solver的优化库。
 [代码](https://github.com/Ewenwan/okvis)
 
 [论文Keyframe-Based Visual-Inertial Odometry Using Nonlinear Optimization ](https://spiral.imperial.ac.uk/bitstream/10044/1/23413/2/ijrr2014_revision_1.pdf)
@@ -388,7 +423,7 @@ MSCKF算法流程框架:
       优化不能针对太多frames一起，所以尽量把一些信息量少的frames给marginalization(滤出)掉，
       只留下一些keyframes之间的constraints。关于marginalization的机制也挺有趣。
       
-## 6. 基于优化的 紧耦合 orbslam2 + imu 紧耦合、ORB稀疏前端、图优化后端、带闭环检测和重定位
+## 8. 基于优化的 紧耦合 orbslam2 + imu 紧耦合、ORB稀疏前端、图优化后端、带闭环检测和重定位
 [代码](https://github.com/Ewenwan/LearnVIORB)
 
 [论文Visual-Inertial Monocular SLAM with Map Reuse ](https://arxiv.org/pdf/1610.05949.pdf)
@@ -946,6 +981,7 @@ void Estimator::optimization()
       当然与之而来的还有如何将uncertainty也做类似的propagation（考虑imu的bias建模），
       以及如何计算在optimization过程中需要的Jacobians。
       在OKVIS的代码ImuError.cpp和GTSAM 4.0的代码ManifoldPreintegration.cpp中可以分别看到对应的代码。
+
 
 # 五、雷达结合IMU
 
