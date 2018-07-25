@@ -1,8 +1,11 @@
 # caffe yolov2 实现
+
+[代码](https://github.com/Ewenwan/caffe-yolov2)
+
+
 ## 完全从0开始训练，效果不好
 
-## 可以使用 yolo_v2.weights 转到caffemodel下，基于这个参数进行训练，会好很多
-## 在good目录下
+## 可以使用 yolo_v2.weights 转到caffemodel下，基于这个参数进行训练，会好很多 在good目录下
 
 
 # BOX data   coco数据集生成
