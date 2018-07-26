@@ -1,4 +1,29 @@
-// 标注数据层=======================
+// 标注数据层==================================================
+// 转换检测数据AnnotatedDatum=================
+// 图像数据
+// datum = anno_datum->mutable_datum()
+//  datum->set_data();                      // 所有8位像素数据
+//  datum->set_channels(cv_img.channels()); // 通道数量
+//  datum->set_height(cv_img.rows);         // 行
+//  datum->set_width(cv_img.cols);          // 列
+//  datum->set_encoded(true);               // 编码?
+// 标签
+// anno_datum->mutable_annotation_group(g)->set_group_label(label)   标签
+//======================================================
+////////////////////////////////////////////////////////////////////////////////
+//  读取数据库文件到队列，从队列中取数据，生成处理后的 批数据 Batch
+// batch->data_                      为多个图像数据域
+// batch->label_.mutable_cpu_data(); 为标签  每8个为1个边框标签
+// top_label[idx++] = item_id;// batch id 0~3  / 0~8 / 0~15 图片id
+// top_label[idx++] = anno_group.group_label();// 类别标签 id
+// top_label[idx++] = anno.instance_id();      // 物体个数 实例id     
+// top_label[idx++] = bbox.xmin();             // 左上角  
+// top_label[idx++] = bbox.ymin();
+// top_label[idx++] = bbox.xmax();             // 右下角
+// top_label[idx++] = bbox.ymax();
+// top_label[idx++] = bbox.difficult();        // ? 数据难度??
+//////////////////////////////////////////////////////////////////////
+
 #ifdef USE_OPENCV
 #include <opencv2/core/core.hpp>
 #endif  // USE_OPENCV
