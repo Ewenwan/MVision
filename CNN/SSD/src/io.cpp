@@ -333,6 +333,8 @@ bool ReadFileToDatum(const string& filename, const int label,
 /////////////////////////////////////////////////////////////////
 // 解析 voc  xml 格式标注数据=======================================
 // Parse VOC/ILSVRC detection annotation.
+// anno_datum->mutable_annotation_group(g)->set_group_label(label)   标签
+//                                        ->add_annotation()->mutable_bbox()  边框数据
 bool ReadXMLToAnnotatedDatum(
 const string& labelfile, // xml标注文件路径
 const int img_height, // 原图像尺寸
