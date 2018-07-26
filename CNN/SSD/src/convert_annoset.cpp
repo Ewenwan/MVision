@@ -192,6 +192,16 @@ int main(int argc, char** argv) {
 								datum);   // 转换到的数据
     } 
 // 转换检测数据
+// 图像数据
+// datum = anno_datum->mutable_datum()
+//  datum->set_data();                      // 所有8位像素数据
+//  datum->set_channels(cv_img.channels()); // 通道数量
+//  datum->set_height(cv_img.rows);         // 行
+//  datum->set_width(cv_img.cols);          // 列
+//  datum->set_encoded(true);               // 编码?
+// 标签
+// anno_datum->mutable_annotation_group(g)->set_group_label(label)   标签
+//                                        ->add_annotation()->mutable_bbox()  边框数据
 	else if (anno_type == "detection") 
 	{
 	// 边框类别标注 文件路径
@@ -208,7 +218,7 @@ int main(int argc, char** argv) {
 		  enc,      // 编码格式
 		  type,     // AnnotatedDatum_AnnotationType_BBOX
 		  label_type,// 标签文件格式  txt/xml/json
-          name_to_label,// 标注文件 name标签 : class_id
+          name_to_label, // 标注文件 name标签 : class_id
 		  &anno_datum);  // 转换到的数据
 	   
       anno_datum.set_type(AnnotatedDatum_AnnotationType_BBOX);
