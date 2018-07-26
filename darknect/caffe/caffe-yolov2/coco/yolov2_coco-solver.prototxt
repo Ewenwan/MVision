@@ -1,0 +1,34 @@
+train_net: "./yolov2_coco-train.prototxt"
+test_net: "./yolov2_coco-test.prototxt"
+test_iter: 4952
+test_interval: 32000
+test_initialization: false
+display: 20
+average_loss: 100
+#lr_policy: "multifixed"
+#stagelr: 0.0001
+#stagelr: 0.00007
+#stagelr: 0.00004
+#stagelr: 0.00001
+#stageiter: 520
+#stageiter: 16000
+#stageiter: 24000
+#stageiter: 32000
+max_iter: 32000
+#######
+lr_policy: "multistep"
+base_lr: 0.0001
+stepvalue: 9000
+stepvalue: 26000
+stepvalue: 32000
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.05
+iter_size: 1
+type: "SGD"
+# 梯度限制
+#clip_gradients: 4
+########
+snapshot: 3000
+snapshot_prefix: "../../models/yolo-v2/coco/yolov2-coco"
+solver_mode: GPU
