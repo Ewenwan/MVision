@@ -9,6 +9,11 @@
 //  datum->set_encoded(true);               // 编码?
 // 标签
 // anno_datum->mutable_annotation_group(g)->set_group_label(label)   标签
+//                                        ->mutable_bbox()->set_xmin();  边框
+//                                                        ->set_ymin();
+//                                                        ->set_xmax();
+//                                                        ->set_ymax();
+//                                                        ->set_difficult();
 //======================================================
 ////////////////////////////////////////////////////////////////////////////////
 //  读取数据库文件到队列，从队列中取数据，生成处理后的 批数据 Batch
@@ -23,6 +28,8 @@
 // top_label[idx++] = bbox.ymax();
 // top_label[idx++] = bbox.difficult();        // ? 数据难度??
 //////////////////////////////////////////////////////////////////////
+
+  
 
 #ifdef USE_OPENCV
 #include <opencv2/core/core.hpp>
