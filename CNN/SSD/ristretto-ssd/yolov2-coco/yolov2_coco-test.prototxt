@@ -1,28 +1,38 @@
 name: "yolov2-coco-test"
-# ==============test data ======================
+#=============test data=============
 layer {
   name: "data"
-  type: "BoxData"
+  type: "AnnotatedBoxData"
   top: "data"
   top: "label"
   include {
-    phase: TEST  
+    phase: TEST
   }
   transform_param {
-    mirror: false
-    force_color: true
     mean_value: 104
     mean_value: 117
     mean_value: 123
+    force_color: true
+    resize_param {
+      prob: 1
+      resize_mode: WARP
+      height: 416
+      width: 416
+      interp_mode: LINEAR
+    }
   }
   data_param {
-    source: "../../data/coco/coco2017/coco/lmdb/yolov2/test2007_lmdb"
-    batch_size: 4
-    side: 13
+    source: "../../data/coco2017/coco/lmdb/coco_val2017_img_label_lmdb"
+    batch_size: 8
     backend: LMDB
   }
+  annotated_data_param {
+    batch_sampler {
+    }
+    label_map_file: "./labelmap_coco.prototxt"
+  }
 }
-# ============net begin ===============
+#============net begin==============================
 layer {
   name: "conv1"
   type: "Convolution"
@@ -1317,6 +1327,9 @@ layer {
   bottom: "label"
   # bottom: "data"
   top: "eval_det"
+  include {
+    phase: TEST
+  }
   eval_detection_param {
     side: 13
     num_class: 80
