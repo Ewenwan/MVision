@@ -15,5 +15,5 @@ region_loss_layer.cpp
 region_loss_layer.cu  未支持  
 
 ## 检测评估层
-detection_loss_layer.hpp  
-detection_loss_layer.cpp  
+eval_detection_layer.hpp
+eval_detection_layer.cpp 
