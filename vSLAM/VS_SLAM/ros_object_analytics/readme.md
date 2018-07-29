@@ -28,7 +28,7 @@
 
 ## 编译依赖　compiling dependencies
   ROS packages from [ros-kinetic-desktop-full](http://wiki.ros.org/kinetic/Installation/Ubuntu)
-  * roscpp
+  * roscpp 
   * nodelet
   * std_msgs
   * sensor_msgs
@@ -369,3 +369,127 @@
   ```
 ###### *ROS 2 Object Analytics: https://github.com/intel/ros2_object_analytics*
 ###### *Any security issue should be reported using process at https://01.org/security*
+
+
+## 程序
+```
+├── object_analytics           ========================工程汇总===============================
+│   ├── CMakeLists.txt
+│   └── package.xml
+├── object_analytics_launch    ========================工程启动脚本===========================
+│   ├── CMakeLists.txt
+│   ├── launch
+│   │   ├── analytics_movidius_ncs.launch   ==== 基于 NPU + mobilenet-ssd 的目标检测 启动脚本
+│   │   ├── analytics_opencl_caffe.launch   ==== 基于 GPU + YOLOV2 的目标检测 启动脚本
+│   │   └── includes
+│   │       ├── manager.launch              ==== 管理节点
+│   │       ├── merger.launch               ==== 2d分割 和 点云分割融合 3d定位器
+│   │       ├── nodelet.launch.xml          ==== 项目参数
+│   │       ├── segmenter.launch            ==== 点云分割处理器
+│   │       ├── splitter.launch             ==== RGBD传感器预处理分割器
+│   │       └── tracker.launch              ==== 目标跟踪器
+│   └── package.xml
+├── object_analytics_msgs     =========================自定义消息msg==========================
+│   ├── CMakeLists.txt
+│   ├── msg
+│   │   ├── ObjectInBox3D.msg               ==== 单个物体3d边框定位信息
+│   │   ├── ObjectsInBoxes3D.msg            ==== 多个物体3d边框定位信息 
+│   │   ├── TrackedObject.msg               ==== 单个物体跟踪信息
+│   │   └── TrackedObjects.msg              ==== 多个物体根系信息
+│   └── package.xml
+├── object_analytics_nodelet  ======================== 工程源文件节点功能实现==================
+│   ├── cfg                                      ==== 动态参数配置========
+│   │   ├── OrganizedMultiPlaneSegmentation.cfg  ==== 点云平面分割参数配置
+│   │   └── SegmentationAlgorithms.cfg           ==== 点云物体分割算法 欧式距离聚类分割 区域聚类分割算法
+│   ├── CMakeLists.txt
+│   ├── include                                  ==== 头文件 ========
+│   │    └── object_analytics_nodelet
+│   │       ├── const.h
+│   │       ├── merger                   ==== 2d分割 和 点云分割融合 3d定位器
+│   │       │   ├── merger.h
+│   │       │   └── merger_nodelet.h
+│   │       ├── model                    ==== 模型
+│   │       │   ├── object2d.h
+│   │       │   ├── object3d.h
+│   │       │   └── object_utils.h
+│   │       ├── segmenter                ==== 3d点云分割算法
+│   │       │   ├── algorithm_config.h
+│   │       │   ├── algorithm.h
+│   │       │   ├── algorithm_provider.h
+│   │       │   ├── algorithm_provider_impl.h
+│   │       │   ├── organized_multi_plane_segmenter.h  平面分割
+│   │       │   ├── segmenter.h
+│   │       │   └── segmenter_nodelet.h
+│   │       ├── splitter                ==== RGBD传感器预处理分割器
+│   │       │   ├── splitter.h
+│   │       │   └── splitter_nodelet.h
+│   │       └── tracker                 ==== 目标跟踪器
+│   │           ├── tracking.h
+│   │           ├── tracking_manager.h
+│   │           └── tracking_nodelet.h
+│   ├── mainpage.dox
+│   ├── object_analytics_nodelet_plugins.xml
+│   ├── package.xml
+│   ├── src
+│   │   ├── const.cpp
+│   │   ├── merger                   ==== 2d分割 和 点云分割融合 3d定位器
+│   │   │   ├── merger.cpp
+│   │   │   └── merger_nodelet.cpp
+│   │   ├── model                    ==== 模型
+│   │   │   ├── object2d.cpp
+│   │   │   ├── object3d.cpp
+│   │   │   └── object_utils.cpp
+│   │   ├── segmenter                ==== 3d点云分割算法
+│   │   │   ├── algorithm_provider_impl.cpp
+│   │   │   ├── organized_multi_plane_segmenter.cpp  =平面分割=
+│   │   │   ├── segmenter.cpp
+│   │   │   └── segmenter_nodelet.cpp
+│   │   ├── splitter                  ==== RGBD传感器预处理分割器
+│   │   │   ├── splitter.cpp
+│   │   │   └── splitter_nodelet.cpp
+│   │   └── tracker                   ==== 目标跟踪器
+│   │       ├── tracking.cpp
+│   │       ├── tracking_manager.cpp
+│   │       └── tracking_nodelet.cpp
+│   └── tests                        ======= 单元侧测试 =====
+│       ├── mock_segmenter_detector.cpp
+│       ├── mtest_tracking.cpp
+│       ├── mtest_tracking.test
+│       ├── nodetest_merger.test
+│       ├── nodetest_segmenter.test
+│       ├── nodetest_splitter.test
+│       ├── pc2_publisher.cpp
+│       ├── resource                 ====== 部分点云数据
+│       │   ├── copy.pcd
+│       │   ├── cup.pcd
+│       │   ├── object3d.pcd
+│       │   ├── project.pcd
+│       │   ├── segment.pcd
+│       │   └── split.pcd
+│       ├── unittest_merger.cpp
+│       ├── unittest_object2d.cpp
+│       ├── unittest_object3d.cpp
+│       ├── unittest_objectutils.cpp
+│       ├── unittest_segmenter.cpp
+│       ├── unittest_splitter.cpp
+│       ├── unittest_util.cpp
+│       └── unittest_util.h.in
+├── object_analytics_visualization   ===================  rviz可视化 ===========================
+│   ├── cfg
+│   │   └── object_analytics_visualization.rviz
+│   ├── CMakeLists.txt
+│   ├── launch
+│   │   ├── includes
+│   │   │   ├── localization.launch    ==== 定位可视化
+│   │   │   └── tracking.launch        ==== 跟踪可视化
+│   │   ├── rviz.launch
+│   │   └── viz_all.launch
+│   ├── mainpage.dox
+│   ├── package.xml
+│   └── scripts
+│       ├── image_publisher.py         ==== 发布图像
+│       └── marker_publisher.py        ==== 发布虚拟物体
+
+
+```
+
