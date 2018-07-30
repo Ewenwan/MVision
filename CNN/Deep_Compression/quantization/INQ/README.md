@@ -166,6 +166,9 @@ if(is_quantization)
         mask_vec[i]=0;// 标记，该量化后的权重参数，在sgd反向传播更新参数时，仅仅对未量化的参数进行更新
       }
   }
+  // 代码其实有点小问题，data_copy 使用完之后没有释放
+  // free data_copy
+ }
 ```
 
 ## 参数更新
