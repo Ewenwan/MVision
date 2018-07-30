@@ -140,6 +140,8 @@ void GetGTBox(int side,
     //LOG(INFO) << "label:" << label;
     for (int j = 0; j < 4; ++j) {
       gt_box.box_.push_back(label_data[box_index + j]);
+	  
+ // 打印调试信息  查看输入标签数据是否正确===============================
       //LOG(INFO) << "x,y,w,h:" << label_data[box_index + j];
     }
     if (gt_boxes->find(label) == gt_boxes->end()) 
@@ -307,17 +309,23 @@ void EvalDetectionLayer<Dtype>::Reshape(
   //int tmp_label_count = side_ * side_ * (1 + 1 + 1 + 4);
   int tmp_label_count = 30 * 5;// 
 
+ // LOG(INFO) << " label[0] : " << bottom[1]->count(0) << "================================";
+  
+  
   CHECK_EQ(input_count, tmp_input_count);// 确保网络输出 每张图片为 13*13*5*25 大小 
                                          // 13*13个格子，每个格子预测5种边框,每种边框预测 20类概率+4边框参数+1置信度
   CHECK_EQ(label_count, tmp_label_count);// 而标签输入   每张图片为 30*5       大小 30个物体边框，4个边框参数+1个类别标签
 
-   vector<int> top_shape(2, 1);// 两行一列
+   vector<int> top_shape(2, 1);// 两行一列 全1
   //vector<int> top_shape(3, 1);// 三行一列  添加一列 存储mAP
   top_shape[0] = bottom[0]->num();// 图片数量
   //top_shape[1] = num_class_ + side_ * side_ * num_object_ * 4; 
   // 20 + 13*13*5*4 标签 得分 TP FP 
-  top_shape[1] = num_class_ + side_ * side_ * num_object_ * 4 + 1; 
-  // 各个类别预测数量, 13*13*5*(label + score + tp + fp), 该图片mAP
+ // top_shape[1] = num_class_ + side_ * side_ * num_object_ * 4 + 1; 
+  // 各个类别预测数量,  20类检测数量 + 13*13*5*(label + score + tp + fp) + 该图片mAP
+  
+   top_shape[1] = side_ * side_ * num_object_ * 4 + 1; 
+  // 13*13*5*(label + score + tp + fp) + 该图片mAP
   
   //top_shape[2] = 1;// 添加一列 存储mAP
   top[0]->Reshape(top_shape);
@@ -363,12 +371,12 @@ void EvalDetectionLayer<Dtype>::Forward_cpu(
   //*******************************************************************************//  
   Dtype* top_data = top[0]->mutable_cpu_data();// 层输出 cpu数据
   caffe_set(top[0]->count(), Dtype(0), top_data);// 设置为0
-  
+  Dtype all_mAP = 0.0;// 总 batch 的 mAP
   for (int i = 0; i < bottom[0]->num(); ++i) 
  {   // N  图片数量
     int input_index = i * bottom[0]->count(1);// 网络输出标签 i * 13*13*125
     int true_index = i * bottom[1]->count(1);//  真实标签     i * 30*5
-    int top_index = i * top[0]->count(1);    //  输出数据     i * ( 20 + 13*13*5*4 + 1) 
+    int top_index = i * top[0]->count(1);    //  输出数据    //  i * ( 20 + 13*13*5*4 + 1) -> i * (13*13*5*4 + 1)
                                              //  前面20个为 真实标签 物体类别出现的次数
  
  // 获取真实边框 =========================================
@@ -382,12 +390,13 @@ void EvalDetectionLayer<Dtype>::Forward_cpu(
     for (std::map<int, vector<BoxData > >::iterator it = gt_boxes.begin(); it != gt_boxes.end(); ++it) 
 	{
       // 遍历 每一个 真实的标签
-      int label = it->first;// 标签 类别
+      //int label = it->first;// 标签 类别
       vector<BoxData>& g_boxes = it->second;// BoxData: label_ + score_ + box_ 
       for (int j = 0; j < g_boxes.size(); ++j) 
 	  {// 边框数量
          // 输出数据中的前 20个================================================
-          top_data[top_index + label] += 1;     // 真实标签 物体类别出现的次数
+// =======================================
+         // top_data[top_index + label] += 1;     // 真实标签 物体类别出现的次数
       }
     }
 // 获取预测边框 =============================================
@@ -395,18 +404,22 @@ void EvalDetectionLayer<Dtype>::Forward_cpu(
     // 获取预测边框 13*13*5 -> NMS抑制+置信度抑制 ->  pred_boxes(数量少很多)
     //GetPredBox(side_, num_object_, num_class_, input_data + input_index, &pred_boxes, sqrt_, constriant_, score_type_, nms_);
     GetPredBox(side_, num_object_, num_class_, swap_data + input_index, &pred_boxes, score_type_, nms_, biases_);
-    // 输出数据 后面 的 13*13*5*4 =============================
-    int index = top_index + num_class_ + 1;// 20 + 1 之后为 上面的 (label + score + tp + fp) 参数
+    
+	// 输出数据 后面 的 13*13*5*4 =============================
+    // int index = top_index + num_class_ + 1;// 20 + 1 之后为 上面的 (label + score + tp + fp) 参数
+//=============================
+    int index = top_index + 1;// 1个 map 之后为 上面的 (label + score + tp + fp) 参数
+	
     int pred_count(0);// 
     
-    float mAP = 0.0;
+    Dtype mAP = 0.0;
 	int pre_clas_num=0;
 	//float AP = 0.0;
 	// int tp
     // 遍历预测值的 每一类，与最合适的标签边框计算AP,在计算总类别的mAP============
     for (std::map<int, vector<BoxData> >::iterator it = pred_boxes.begin(); it != pred_boxes.end(); ++it) 
 	{
-      float AP = 0.0;// 该类AP
+      Dtype AP = 0.0;// 该类AP
 	  int tp=0;// 预测正确
 	  int fp=0;// 预测错误
 	  ++pre_clas_num;// 该图片预测的总类别数量
@@ -437,12 +450,12 @@ void EvalDetectionLayer<Dtype>::Forward_cpu(
 	  { // 遍历 每个 预测边框==============
         top_data[index + pred_count * 4 + 0] = p_boxes[k].label_;// 标签
         top_data[index + pred_count * 4 + 1] = p_boxes[k].score_;// 得分
-        float max_iou(-1);// 预测边框最接近的  真实边框 iou
+        Dtype max_iou(-1);// 预测边框最接近的  真实边框 iou
         int idx(-1);// 对应的 真实边框id
 		
 		// 遍历每个真实边框 找到 预测边框最接近的 真实边框===========
         for (int g = 0; g < g_boxes.size(); ++g) {
-          float iou = Calc_iou(p_boxes[k].box_, g_boxes[g].box_);// 计算交并比
+          Dtype iou = Calc_iou(p_boxes[k].box_, g_boxes[g].box_);// 计算交并比
           if (iou > max_iou) {
             max_iou = iou;// 记录 每个预测边框 最接近的  真实边框 的 IOU
             idx = g;// 对应的 真实边框id
@@ -476,7 +489,10 @@ void EvalDetectionLayer<Dtype>::Forward_cpu(
 	else mAP = 0.0;
     // 输出对应图片的mAP
     top_data[ index - 1 ] = mAP;
+	all_mAP += mAP;
   }
+  if(bottom[0]->num()) all_mAP /= (bottom[0]->num());
+  top_data[0] = all_mAP;
 }
 
 INSTANTIATE_CLASS(EvalDetectionLayer);
