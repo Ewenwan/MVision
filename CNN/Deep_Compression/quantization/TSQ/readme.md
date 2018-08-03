@@ -1,6 +1,9 @@
 # TSQ Two-Step Quantization 两步量化策略  激活编码 + 权重量化转换
 [Wang_Two-Step_Quantization_for_CVPR_2018](http://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_Two-Step_Quantization_for_CVPR_2018_paper.pdf)
 
+# 也属于 增量型量化 的方式
+
+
 # 简介
       在量化神经网络的硬件设计中，每一点都很重要。
       然而，极低的位表示通常会导致较大的精度下降。
