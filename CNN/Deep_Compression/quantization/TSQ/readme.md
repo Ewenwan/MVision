@@ -36,6 +36,8 @@
       ⽆太⼤差别，从某种程度上可以理解成⼀种distillation。
       
 # 其他 增量式量化
+[增量式量化参考](https://github.com/compression-friendlies/Paper-Collection-of-Efficient-ML/blob/13f9be280121c71d3ab801b0d2f209b5e7684164/%E5%A2%9E%E9%87%8F%E5%9E%8B%E9%87%8F%E5%8C%96%E6%80%BB%E7%BB%93.pdf)
+
       1. INQ            数量上逐步量化
             http://arxiv.org/abs/1702.03044
       2. Bottom-to-Top  分层 来增量型量化。   是否可以结合  分层分量来增量量化。
