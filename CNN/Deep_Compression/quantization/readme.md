@@ -6,6 +6,50 @@
 
 [论文合集](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/quantizedNN_paper.md)
 
+# 具体量化方法
+```python
+# 线性量化
+def linear_quantize(input, sf, bits):
+    assert bits >= 1, bits
+    # 一位
+    if bits == 1:
+        return torch.sign(input) - 1
+    
+    delta = math.pow(2.0, -sf)# 小数位 位宽 量化精度
+    bound = math.pow(2.0, bits-1)
+    min_val = - bound    # 上限制值
+    max_val = bound - 1  # 下限值
+    rounded = torch.floor(input / delta + 0.5)# 扩大后取整
+
+    clipped_value = torch.clamp(rounded, min_val, max_val) * delta# 再缩回
+    return clipped_value
+# 对数线性量化
+def log_linear_quantize(input, sf, bits):
+    assert bits >= 1, bits
+    if bits == 1:
+        return torch.sign(input), 0.0, 0.0
+
+    s = torch.sign(input)# 正负号
+    input0 = torch.log(torch.abs(input) + 1e-20)# 求对数 获取 比特位
+    v = linear_quantize(input0, sf, bits)# 对比特位进行线性量化
+    v = torch.exp(v) * s# 再指数 回 原数
+    return v
+# 双曲正切量化
+def tanh_quantize(input, bits):
+    assert bits >= 1, bits
+    if bits == 1:
+        return torch.sign(input)
+	
+    input = torch.tanh(input) # 双曲正切 映射 [-1, 1]
+    input_rescale = (input + 1.0) / 2 #  再 映射到 [0, 1]
+    n = math.pow(2.0, bits) - 1       # 固定比特位 放大系数
+    v = torch.floor(input_rescale * n + 0.5) / n # 放大后取整
+    v = 2 * v - 1 # [-1, 1]                      # 再放回原来的范围
+
+    v = 0.5 * torch.log((1 + v) / (1 - v))       # 反双曲正切 回原数 arctanh
+    return v
+```
+
 
 # NN的INT8计算
 
