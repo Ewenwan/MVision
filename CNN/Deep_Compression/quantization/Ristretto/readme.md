@@ -716,6 +716,7 @@ void BaseRistrettoLayer<Dtype>::Trim2FixedPoint_cpu(
 }
 
 /* 部分调整 借鉴inq，逐步量化，先从最大的部分开始量化
+// float quant_percent = 0.3; // 需要在前面 定义
 ////////////////////  固定点量化
 template <typename Dtype>
 void BaseRistrettoLayer<Dtype>::Trim2FixedPoint_cpu(
