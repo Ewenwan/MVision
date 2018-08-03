@@ -17,6 +17,8 @@
       对于第一步，我们提出了稀疏量化的编码学习方法。
       第二步可以表述为具有 低比特约束 的 非线性最小二乘回归问题，它可以以迭代的方式有效地求解。
       
-|Object     |        Name命名     |    Method方法|
-|low-bit weights 权重  | transformations 变换 |non-linear least square regression problem 非线性最小二乘方法|
-low-bit activations 激活| encodings 编码 |sparse suantization 稀疏-半波高斯量化 (HWGQ) |
+ 
+# |low-bit weights 权重   | transformations 变换 |non-linear least square regression problem 非线性最小二乘方法|
+
+# low-bit activations 激活| encodings 编码       |sparse suantization 稀疏-半波高斯量化 (HWGQ) |
+
