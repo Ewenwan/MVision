@@ -715,6 +715,56 @@ void BaseRistrettoLayer<Dtype>::Trim2FixedPoint_cpu(
   }
 }
 
+/* 部分调整 借鉴inq，逐步量化，先从最大的部分开始量化
+////////////////////  固定点量化
+template <typename Dtype>
+void BaseRistrettoLayer<Dtype>::Trim2FixedPoint_cpu(
+Dtype* data, const int cnt,
+const int bit_width, 
+const int rounding, 
+int fl) 
+
+ {
+	// 上下限计算
+    Dtype max_data = (pow(2, bit_width - 1) - 1) * pow(2, -fl);
+    Dtype min_data = -pow(2, bit_width - 1) * pow(2, -fl);
+    
+	// 获取 有序 数列
+    Dtype* data_copy=(Dtype*) malloc(cnt*sizeof(Dtype));
+    caffe_copy(cnt,data,data_copy);
+    caffe_abs(cnt,data_copy,data_copy);
+    std::sort(data_copy,data_copy+cnt); //data_copy order from small to large
+	
+   int partition=int(cnt*(1-quant_percent))-1;
+ 
+    for (int index = 0; index < cnt; ++index) 
+    {
+	   if(std::abs(data[index]) >= data_copy[partition])
+	    {
+			// Saturate data
+			data[index] = std::max(std::min(data[index], max_data), min_data);
+			// Round data
+			data[index] /= pow(2, -fl);
+			switch (rounding) 
+			{
+			case QuantizationParameter_Rounding_NEAREST:
+			  data[index] = round(data[index]);
+			  break;
+			case QuantizationParameter_Rounding_STOCHASTIC:
+			  data[index] = floor(data[index] + RandUniform_cpu());
+			  break;
+			default:
+			  break;
+			}
+			data[index] *= pow(2, -fl);
+		// mask_vec[i]=0;  // 标记量化标志
+	    }
+    }
+   free(data_copy);// 释放空间
+}
+*/
+
+
 
 
 // 迷你浮点量化======================================
