@@ -28,7 +28,14 @@
 
 []()
 
+### CTC(Connectionist Temporal Classifier)
+    一般译为联结主义时间分类器 ，
+    适合于输入特征和输出标签之间对齐关系不确定的时间序列问题，
+    CTC可以自动端到端地同时优化模型参数和对齐切分的边界。
+    
+[LSTM-CTC 博客详解](https://blog.csdn.net/laolu1573/article/details/78975419)
 
+[Theano implementation of LSTM and CTC to recognize simple english sentence image ](https://github.com/Ewenwan/cnn-lstm-ctc)
 
 ## 语义理解ALU 
 
