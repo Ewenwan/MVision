@@ -20,9 +20,26 @@
           只是⼜强⾏加⼊了 sparse 的处理，让整个激活值更加的稀疏，从结果上来看，⼀定程度的稀疏，反⽽能让效果更好。
       
       2、 第二步可以表述为具有 低比特约束 的 非线性最小二乘回归问题，它可以以迭代的方式有效地求解。
-      
+          ⼀层⼀层的对 权重weight进行 量化学习。
+          通过转换，最后是⽤⾮梯度下降⽅法，半闭式的解出了 离散化 weights。
+          
+          
  
 # |low-bit weights 权重   | transformations 变换 |non-linear least square regression problem 非线性最小二乘方法|
 
 # low-bit activations 激活| encodings 编码       |sparse suantization 稀疏-半波高斯量化 (HWGQ) |
+
+# 评论
+      按照这篇论⽂的提法，他是 decouple 了 activation 和 weights，但是这种说法其实
+      只是形式上的问题。
+      这篇⽂章对activation的处理并没有太⼤新意，对weights的处理，其实和之前的⽅法
+      ⽆太⼤差别，从某种程度上可以理解成⼀种distillation。
+      
+# 其他 增量式量化
+      1. INQ            数量上逐步量化
+            http://arxiv.org/abs/1702.03044
+      2. Bottom-to-Top  分层 来增量型量化。   是否可以结合  分层分量来增量量化。
+            http://arxiv.org/abs/1607.02241 
+      3. BinaryRelax
+             http://arxiv.org/abs/1801.06313
 
