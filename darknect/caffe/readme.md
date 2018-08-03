@@ -1001,3 +1001,58 @@ void SGDSolver<Dtype>::ApplyUpdate()
 
 ApplyUpdate
 ```
+# caffe+cuda编程
+
+
+## 核函数
+## 核函数的特点
+	cuda代码文件的后缀为”.cu”，由单独的编译器进行编译
+	核函数是cu文件中的一部分代码，是运行在显存中的程序代码，是实现并行计算的载体
+	核函数一般放在cu文件中的前面，函数定义之前需要添加__global__关键字，函数体中包含CUDA_KERNEL_LOOP循环体
+	CUDA_KERNEL_LOOP循环体有两个参数，第一个是迭代器，第二个是总迭代数
+	CUDA_KERNEL_LOOP循环体中的代码是并行执行的，是互不关联的可独立执行的程序
+## 示例代码
+```CPP
+template <typename Dtype>
+__global__ void kernel_statistic( // 函数定义之前需要添加__global__关键字
+const int num, 
+const Dtype* bottom_data, 
+Dtype* temp, 
+const int label_num, 
+const int nsim, 
+Dtype* counter) 
+{
+  CUDA_KERNEL_LOOP(index, num) // 包含CUDA_KERNEL_LOOP循环体
+  {
+    Dtype count_iter(0.0);
+    for (int j = index + 1; j < num; ++j) 
+    {
+      Dtype result_dot(0.0);
+      for (int k = 0; k < label_num; ++k) 
+      {
+        result_dot += bottom_data[index * label_num + k] * bottom_data[j * label_num + k];
+      }
+      temp[index * num * 2 + j * 2] = result_dot;
+      if (result_dot >= Dtype(1.0))
+        count_iter++;
+    }
+    counter[index] = count_iter;
+  }
+}
+```
+
+## 注意事项
+	核函数中不能出现__host__类型的函数，例如caffe中定义的caffe_gpu开头的函数、C++ 标准库中的函数
+	核函数中的数学计算由CUDA Math API完成
+	核函数一般不需要返回值
+	核函数的参数是所有CUDA_KERNEL_LOOP循环体公用的，对数据的修改应该是互不干扰的，
+	示例代码中counter数组存储了各循环体代码计数的结果，传出后再进行累加运算得到总的统计结果。
+[传送门 CUDA Math API](https://docs.nvidia.com/cuda/cuda-math-api/#axzz4Uhl0aA00)
+
+## Forward_gpu和Backward_gpu  注意事项
+	这两个函数需要在层的hpp文件中声明
+	cu文件编译生成后，cpp文件中的Forward_cpu函数和Backward_cpu函数将不会被调用
+	初始化层时，cpp文件中的LayerSetUp函数和Reshape函数也会被执行
+	对数组求和，可以用caffe_gpu_asum函数
+	数据在GPU和CPU之间的拷贝速度特别慢，在cu文件中慎用cpu_data函数和mutabel_cpu_data函数
+	GPU擅长处理大规模矩阵运算，核函数应简单简洁
