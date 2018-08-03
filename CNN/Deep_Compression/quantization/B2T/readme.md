@@ -1,5 +1,5 @@
 # BOTTOM-TO-TOP 逐层量化
-[论文](https://arxiv.org/pdf/1607.02241.pdf0
+[论文](https://arxiv.org/pdf/1607.02241.pdf)
 
     分层 来增量型量化。
     具体来说就是，
