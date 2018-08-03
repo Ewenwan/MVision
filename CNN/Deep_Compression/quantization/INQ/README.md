@@ -15,8 +15,16 @@
 	⼆值⽹络在训练的过程中，不稳定，
 	难收敛的原因在于，参数的变化，都太过剧烈了，
 	⽽在 real-value ⽹络训练过程中，他们的变化其实是⽐较温和的。
+	
+# 其他 增量式量化
+[增量式量化参考](https://github.com/compression-friendlies/Paper-Collection-of-Efficient-ML/blob/13f9be280121c71d3ab801b0d2f209b5e7684164/%E5%A2%9E%E9%87%8F%E5%9E%8B%E9%87%8F%E5%8C%96%E6%80%BB%E7%BB%93.pdf)
 
-
+      1. INQ            数量上逐步量化
+            http://arxiv.org/abs/1702.03044
+      2. Bottom-to-Top  分层 来增量型量化。   是否可以结合  分层分量来增量量化。
+            http://arxiv.org/abs/1607.02241 
+      3. BinaryRelax
+             http://arxiv.org/abs/1801.06313
 
 # 英特尔中国研究院：INQ神经网络无损低比特量化技术 全精度网络输入，输出权值为0或2的整数次幂的网络
 ![](https://xmfbit.github.io/img/paper-inq-quantize-set.png)
