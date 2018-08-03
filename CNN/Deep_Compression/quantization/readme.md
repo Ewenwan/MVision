@@ -7,6 +7,8 @@
 [论文合集](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/quantizedNN_paper.md)
 
 # 具体量化方法
+[参考](https://github.com/Ewenwan/pytorch-playground/blob/master/utee/quant.py)
+
 ```python
 # 线性量化
 def linear_quantize(input, sf, bits):
