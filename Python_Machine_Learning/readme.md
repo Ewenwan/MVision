@@ -6,6 +6,7 @@
 
 [机器学习实战 一整套教学 ](https://github.com/Ewenwan/MachineLearning)
 
+[机器学习资源 Machine learning Resources](https://github.com/Ewenwan/MachineLearning-1)
 
 [Machine Learning 课程](https://www.cs.cmu.edu/~aarti/Class/10701/lecs.html)
 
