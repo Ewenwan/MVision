@@ -44,4 +44,9 @@
             http://arxiv.org/abs/1607.02241 
       3. BinaryRelax
              http://arxiv.org/abs/1801.06313
-
+      4. Stochastic-Quantization  逐步 随机量化
+             https://arxiv.org/pdf/1708.01001.pdf
+[代码](https://github.com/Ewenwan/Stochastic-Quantization)
+      
+      
+      
