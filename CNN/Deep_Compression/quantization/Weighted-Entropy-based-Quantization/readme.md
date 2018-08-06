@@ -284,11 +284,11 @@ Zhou等人创造了DoReFa-Net，其对已量化的权重和有界的激活输出
 
 图2用我们的方法对量化后的CNN的网络进行精度测试。可以看到对CNN进行限制位宽的量化可以获得较高的精度。
 
-![](images/AlexNet.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/AlexNet.PNG)
 
-![](images/GoogLeNet.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/GoogLeNet.PNG)
 
-![](images/ResNet.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/ResNet.PNG)
 
 > 图2 Top-1和Top-5都是在微调模型后，进行量化的精度。虚线代表使用全精度算法网络的基线准确度。
 
@@ -307,7 +307,7 @@ ResNet，据我们所知，本文是第一篇对具有50层和101层的网络进
 
 图3比较了XNOR-Net和DoReFa-Net两种方式。
 
-![](images/XNOR-Net-and-DoReFa-Net.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/XNOR-Net-and-DoReFa-Net.PNG)
 
 > 图3 这里使用对AlexNet网络进行量化，并对精度进行比较。权重量化\(_Weighted Quantization_\)表示我们的方案，这里‘X’和'D'分别表示 XNOR-Net和DoReFa-Net。虚线表示使用全精度网络得到的精度基线。
 
@@ -352,7 +352,7 @@ ResNet，据我们所知，本文是第一篇对具有50层和101层的网络进
 
 因为量化误差是在深层积累的，所以深层模型是难以量化的，但是我们的方法成功量化了50层的物体检测模型，并且精度损失非常小。
 
-![](images/Figure_4.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/Figure_4.PNG)
 
 > 图4 R-FCNd的mAP结果。虚线为基准线，是使用全精度网络计算出的精度。
 
