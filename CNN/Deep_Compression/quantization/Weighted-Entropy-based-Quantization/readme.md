@@ -1,5 +1,8 @@
 # 基于加权熵对深度神经网络进行量化的方法
 
+[代码](https://github.com/Ewenwan/caffe-WQ)
+
+
 [原文链接](http://openaccess.thecvf.com/content_cvpr_2017/papers/Park_Weighted-Entropy-Based_Quantization_for_CVPR_2017_paper.pdf)
 
 [参考](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks)
