@@ -2,6 +2,8 @@
 
 [原文链接](http://openaccess.thecvf.com/content_cvpr_2017/papers/Park_Weighted-Entropy-Based_Quantization_for_CVPR_2017_paper.pdf)
 
+[参考](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks)
+
 作者：
 
 * Eunhyeok Park\(canusglow@gmail.com\)
@@ -58,13 +60,13 @@ Zhou等人创造了DoReFa-Net，其对已量化的权重和有界的激活输出
 
 图1描述了现存方法为给定权重分布分配级数。
 
-![](images/original_weight_distribution.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/original_weight_distribution.PNG)
 
-![](images/lineaer_quantization.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/lineaer_quantization.PNG)
 
-![](images/log_quantization.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/log_quantization.PNG)
 
-![](images/weighted_quantization.PNG)
+![](https://github.com/xiaoweiChen/Weighted-Entropy-based-Quantization-for-Deep-Neural-Networks/blob/master/images/weighted_quantization.PNG)
 
 > 图1 比较各种量化方法。其中权重值是从GoogLeNet的第二个$$3\times3$$ 卷积层获取。每种量化方式都将该分布量化到24级。我们使用$$2^{0.5}$$作为对数量化的底， 并对线性和对数量化进行优化，尽可能最小化L2归一化对整体激活输出的影响。
 
