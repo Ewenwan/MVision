@@ -119,8 +119,9 @@ B矩阵仿存，使用指针访问，
 
       7、Google量化方法 r=S(q-Z)  tflite  TensorFlow Lite
 [代码](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)
-
-[代码]()
+      
+      8、TensorRT ， NVIDIA TensorRT是一种高性能神经网络推理(Inference)引擎
+[代码](https://github.com/Ewenwan/TensorRT_Tutorial)
 
 [深度学习框架的并行优化方法小结](https://github.com/DragonFive/myblog/blob/master/source/_posts/mpi_parallel.md)
 
