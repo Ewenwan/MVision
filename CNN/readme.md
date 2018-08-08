@@ -42,6 +42,12 @@
 # 卷积神经网络
 [网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
 
+[神经网络代码实验 c++全代码](https://github.com/Ewenwan/NN_Test)
+
+[人脸识别代码实验 c++](https://github.com/Ewenwan/Face_Test)
+
+[OCR_Test（Optical Character Recognition，光学字符识别）实验代码](https://github.com/Ewenwan/OCR_Test)
+
 [各种卷积方式](https://github.com/vdumoulin/conv_arithmetic)
 
 [TensorFlow学习（九）：各种卷积网络](https://blog.csdn.net/xierhacker/article/details/53174594)
