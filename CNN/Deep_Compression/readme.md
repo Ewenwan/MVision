@@ -65,6 +65,7 @@ tag: 深度学习
 
 2. [Fast algorithms for convolutional neural networks]() [CVPR 2016]
 
+[英伟达 CUDA 和 TensorRT 代码实验](https://github.com/Ewenwan/CUDA_Test)
 
 ## 4. 硬件优化-AI芯片
        TPU
