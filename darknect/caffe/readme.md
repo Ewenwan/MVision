@@ -3,6 +3,10 @@
 # caffe使用
 [caffe 安装](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_%E5%AE%89%E8%A3%85.md)
 
+[caffe代码实验](https://github.com/Ewenwan/Caffe_Test)
+
+[CUDA 和 TensorRT 代码实验](https://github.com/Ewenwan/CUDA_Test)
+
 [Caffe代码解析](http://alanse7en.github.io/caffedai-ma-jie-xi-2/)
 
 [caffe网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
