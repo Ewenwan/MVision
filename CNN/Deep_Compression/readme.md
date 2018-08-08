@@ -28,7 +28,9 @@ tag: 深度学习
 [4. PVANet: Lightweight Deep Neural Networks for Real-time Object Detection](https://github.com/sanghoon/pva-faster-rcnn) [Code](https://arxiv.org/abs/1611.08588)
 
 ## 2. 模型压缩：参数稀疏、剪裁、量化、分解
-      
+
+[数据压缩课程 Data Compression ](http://www.ws.binghamton.edu/fowler/fowler%20personal%20page/EE523.htm)
+
 [量化](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/readme.md)
 
 [剪枝](https://github.com/Ewenwan/MVision/tree/master/CNN/Deep_Compression/pruning)
