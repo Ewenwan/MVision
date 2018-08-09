@@ -191,7 +191,7 @@ if(is_quantization)
       }
   }
   // 代码其实有点小问题，data_copy 使用完之后没有释放
-  // free data_copy
+  // free(data_copy);
  }
 ```
 
