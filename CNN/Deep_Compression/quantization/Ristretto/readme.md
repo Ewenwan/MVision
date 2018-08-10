@@ -891,6 +891,112 @@ template double BaseRistrettoLayer<float>::RandUniform_cpu();
 
 }  // namespace caffe
 
+```
+# net.cpp 中统计 各层 数据范围
+```c
+// 绝对最大值
+template <typename Dtype>
+Dtype Net<Dtype>::findMax(Blob<Dtype>* blob) {
+  const Dtype* data = blob->cpu_data();
+  int cnt = blob->count();
+  Dtype max_val = (Dtype)-10;
+  for (int i = 0; i < cnt; ++i) {
+    max_val = std::max(max_val, (Dtype)fabs(data[i]));
+  }
+  return max_val;
+}
+// 最小值==================================
+template <typename Dtype>
+Dtype Net<Dtype>::findMin(Blob<Dtype>* blob) {
+  const Dtype* data = blob->cpu_data();
+  int cnt = blob->count();
+  Dtype min_val = (Dtype)+10;// 初始化+10
+  for (int i = 0; i < cnt; ++i)
+  {
+    // min=====
+    min_val = std::min(min_val, (Dtype)(data[i]));
+  }
+  return min_val;
+}
+
+// 最大值===================================
+template <typename Dtype>
+Dtype Net<Dtype>::findMaxNoAbs(Blob<Dtype>* blob) {
+  const Dtype* data = blob->cpu_data();
+  int cnt = blob->count();
+  Dtype max_val = (Dtype)-10;// 初始化 -10
+  for (int i = 0; i < cnt; ++i) 
+  {
+    //max======= 
+    max_val = std::max(max_val, (Dtype)(data[i]));
+  }
+  return max_val;
+}
+
+// 排序 选择数量 百分比处的值
+template <typename Dtype>
+Dtype Net<Dtype>::findMax_percent(Blob<Dtype>* blob, float percent) 
+{
+  const Dtype* data = blob->cpu_data();
+  int cnt = blob->count();
+  
+  Dtype* data_copy_sort = (Dtype*) malloc(cnt*sizeof(Dtype));
+  
+  caffe_copy(cnt, data,data_copy_sort);         // 复制原始数据
+  caffe_abs(cnt, data_copy_sort,data_copy_sort);// 绝对值
+  
+  // 对权重进行排序，获取权重的有序序列 升序排列
+  std::sort(data_copy_sort,data_copy_sort + cnt); 
+  
+  // 计算分组间隔点
+  int partition=int(cnt*(1.0-percent))-1;// 量化最后面的30%(值大的部分)
+  
+  Dtype max_val = data_copy_sort[partition];// 指定百分比处的值
+  
+  free(data_copy_sort);
+  
+  return max_val;
+}
+
+template <typename Dtype>
+void Net<Dtype>::RangeInLayers(vector<string>* layer_name,
+      vector<Dtype>* max_in, vector<Dtype>* max_out, vector<Dtype>* max_param) {
+  // Initialize vector elements, if needed.
+  if(layer_name->size()==0) {
+    for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
+      if (strcmp(layers_[layer_id]->type(), "Convolution") == 0 ||
+          strcmp(layers_[layer_id]->type(), "InnerProduct") == 0) {
+        layer_name->push_back(this->layer_names()[layer_id]);
+        max_in->push_back(0);// 首次统计
+        max_out->push_back(0);
+        max_param->push_back(0);
+      }
+    }
+  }
+  // Find maximal values.
+  int index = 0;
+  Dtype max_val;
+  for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
+    if (strcmp(layers_[layer_id]->type(), "Convolution") == 0 ||
+          strcmp(layers_[layer_id]->type(), "InnerProduct") == 0) {
+			  
+      max_val = findMax(bottom_vecs_[layer_id][0]);
+	  //max_val = findMax_percent(bottom_vecs_[layer_id][0], 0.00);// 输入激活值 1%处的以外的值 直接 clip
+      max_in->at(index) = std::max(max_in->at(index), max_val);
+	  
+      max_val = findMax(top_vecs_[layer_id][0]);
+	  //max_val = findMax_percent(top_vecs_[layer_id][0], 0.00);// 输入激活值  1%处的以外的值 直接 clip
+      max_out->at(index) = std::max(max_out->at(index), max_val);
+      // Consider the weights only, ignore the bias
+	  
+      max_val = findMax(&(*layers_[layer_id]->blobs()[0]));
+	  //max_val = findMax_percent(&(*layers_[layer_id]->blobs()[0]), 0);// 参数权重 w 可以选择最大值
+      max_param->at(index) = std::max(max_param->at(index), max_val);
+      index++;
+    }
+  }
+}
+
 
 
 ```
