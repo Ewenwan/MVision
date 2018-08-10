@@ -244,6 +244,71 @@
        bottom: "conv1"
        top: "conv1"
       }
+```c++
+template <typename Dtype>
+__global__ void ReLUForward(const int n, const Dtype* in, Dtype* out,
+    Dtype negative_slope) {
+  CUDA_KERNEL_LOOP(index, n) {
+    out[index] = in[index] > 0 ? in[index] : in[index] * negative_slope;
+	// (a*x,x) 正常无上截断
+  }
+}
+//////////////////////////////////////////////
+////================================
+template <typename Dtype>
+__global__ void ReLUXForward(const int n, const Dtype* in, Dtype* out,
+    Dtype negative_slope, Dtype relux_cur_max) {
+  CUDA_KERNEL_LOOP(index, n) {
+    out[index] = in[index] > 0 ? in[index] : in[index] * negative_slope;
+    out[index] = out[index] < relux_cur_max ? out[index] : relux_cur_max;
+	// (a*x, x|cur_max) 上截断=========
+  }
+}
+
+template <typename Dtype>
+__global__ void ReLUXRForward(const int n, const Dtype* in, Dtype* out,
+    Dtype negative_slope, Dtype relux_cur_max, Dtype rate) {
+  CUDA_KERNEL_LOOP(index, n) 
+  {
+    if (in[index] < 0) {
+      out[index] = in[index] * negative_slope; // (a*x, x|cur_max, relux_cur_max+ det*ret)
+    } 
+	else if (in[index] < relux_cur_max) 
+	{
+      out[index] = in[index];
+    } 
+	else 
+	{
+      out[index] = relux_cur_max + (in[index] - relux_cur_max) * rate;// 一次调整斜率 收缩
+    }
+  }
+}
+
+template <typename Dtype>
+__global__ void ReLUYRForward(const int n, const Dtype* in, Dtype* out,
+    Dtype negative_slope, Dtype relux_cur_max, Dtype relux_last_max, Dtype rate) {
+  CUDA_KERNEL_LOOP(index, n) {
+    if (in[index] < 0) 
+	{
+      out[index] = in[index] * negative_slope;
+    } 
+	else if (in[index] < relux_cur_max) 
+	{
+      out[index] = in[index];
+    } 
+	else if (in[index] < relux_last_max) 
+	{
+      out[index] = relux_cur_max + (in[index] - relux_cur_max) * rate;//  一次调整斜率 收缩
+    } 
+	else 
+	{
+      out[index] = relux_cur_max + (relux_last_max - relux_cur_max) * rate;// 二次调整斜率 收缩
+    }
+  }
+}
+
+```
+      
 
 ### 2.3.2 Sigmoid    负指数导数激活
       标准   f(x) = 1/(1+exp(-x))  x = 0, f(x) = y = 0.5
