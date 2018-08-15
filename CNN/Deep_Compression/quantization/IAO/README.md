@@ -4,6 +4,8 @@
 
 [tensflow 代码](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/quantize)
 
+[量化细节](https://github.com/google/gemmlowp/blob/master/doc/quantization.md)
+
     这篇文章提出了一种量化神经网络到INT8的通用解决方案，包括量化后精度损失，怎么通过训练来挽救精度，干货满满,  
     同时还提供了源代码，包含优化过的inference代码。    
     paper中有些地方说的比较模糊，参考文献[1]讲的就比较清楚了，  
