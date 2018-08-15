@@ -145,7 +145,7 @@ QuantizationParams ChooseQuantizationParams(float min, float max) {
   return result;
 }
 ```
-## 3. 量化 0.0~510.0 量化到 0~255
+## 3. 量化 0.0-510.0 量化到  0-255
 ```c
 void Quantize(const QuantizationParams& qparams, const std::vector<float>& src,
               std::vector<std::uint8_t>* dst) 
@@ -161,7 +161,7 @@ void Quantize(const QuantizationParams& qparams, const std::vector<float>& src,
 }
 
 ```
-## 4. 反量化  0~255 反量化到 0.0~510.0 
+## 4. 反量化  0-255 反量化到 0.0-510.0 
 ```c
 void Dequantize(const QuantizationParams& qparams,
                 const std::vector<std::uint8_t>& src, std::vector<float>* dst) 
@@ -175,6 +175,32 @@ void Dequantize(const QuantizationParams& qparams,
 
 
 ```
+## 浮点数卷积运算
+```c
+void FloatMatrixMultiplication(
+    const gemmlowp::MatrixMap<const float, tLhsOrder>& lhs,
+    const gemmlowp::MatrixMap<const float, tRhsOrder>& rhs,
+    gemmlowp::MatrixMap<float, tResultOrder>* result) {
+  assert(lhs.cols() == rhs.rows());
+  assert(lhs.rows() == result->rows());
+  assert(rhs.cols() == result->cols());
+  for (int i = 0; i < lhs.rows(); i++) 
+  {// 每行
+    for (int k = 0; k < rhs.cols(); k++) 
+    {// 每列
+      (*result)(i, k) = 0;
+      for (int j = 0; j < lhs.cols(); j++)
+      {
+       //  (*result)(i, k) += lhs(i, j) * rhs(j, k);// 卷积块内 求和 使用浮点数
+       (*result)(i, k) += lhs_scale * rhs_scale * 
+                          (lhs_quantized_val(i, j) - lhs_zero_point) * 
+                          (rhs_quantized_val(j, k)-rhs_zero_point);
+       // 使用量化数表示浮点数之后运算
+      }
+    }
+  }
+}
 
+```
 
 
