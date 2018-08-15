@@ -121,22 +121,14 @@ QuantizationParams ChooseQuantizationParams(float min, float max) {
   const float qmin = 0;
   const float qmax = 255;
 
-  // 计算量化尺度， 每一个量化数据单位代表的浮点数大小 0.0~510.0 量化到 0~255 则每一个量化数代表 2
+  // 计算量化缩放尺度================================
+  // 每一个量化数据单位代表的浮点数大小 0.0~510.0 量化到 0~255 则每一个量化数代表 2
   const double scale = (max - min) / (qmax - qmin);
-
-  // Zero-point computation.
-  // First the initial floating-point computation. The zero-point can be
-  // determined from solving an affine equation for any known pair
-  // (real value, corresponding quantized value).
-  // We know two such pairs: (rmin, qmin) and (rmax, qmax).
-  // Let's use the first one here.
+  
+  // 计算 零点(偏移量)===========================
   const double initial_zero_point = qmin - min / scale;
 
-  // Now we need to nudge the zero point to be an integer
-  // (our zero points are integer, and this is motivated by the requirement
-  // to be able to represent the real value "0" exactly as a quantized value,
-  // which is required in multiple places, for example in Im2col with SAME
-  // padding).
+  // 对  零点(偏移量) 限幅 并取整=================
   std::uint8_t nudged_zero_point = 0;
   if (initial_zero_point < qmin) {
     nudged_zero_point = qmin;
@@ -148,33 +140,36 @@ QuantizationParams ChooseQuantizationParams(float min, float max) {
   }
 
   QuantizationParams result;
-  result.scale = scale;
-  result.zero_point = nudged_zero_point;
+  result.scale = scale;                   // 量化缩放尺度  float
+  result.zero_point = nudged_zero_point;  // 零点(偏移量)  uint8_t
   return result;
 }
 ```
-## 3. 量化 
+## 3. 量化 0.0~510.0 量化到 0~255
 ```c
 void Quantize(const QuantizationParams& qparams, const std::vector<float>& src,
-              std::vector<std::uint8_t>* dst) {
+              std::vector<std::uint8_t>* dst) 
+{
   assert(src.size() == dst->size());
-  for (std::size_t i = 0; i < src.size(); i++) {
-    const float real_val = src[i];
+  for (std::size_t i = 0; i < src.size(); i++) // 遍历每一个浮点数
+  {
+    const float real_val = src[i]; // 每一个浮点数
     const float transformed_val = qparams.zero_point + real_val / qparams.scale;
-    const float clamped_val = std::max(0.f, std::min(255.f, transformed_val));
-    (*dst)[i] = static_cast<std::uint8_t>(std::round(clamped_val));
+    const float clamped_val = std::max(0.f, std::min(255.f, transformed_val));// 限制幅度 0.0 ~ 255.0 之间
+    (*dst)[i] = static_cast<std::uint8_t>(std::round(clamped_val));// 取整
   }
 }
 
 ```
-## 4. 反量化
+## 4. 反量化  0~255 反量化到 0.0~510.0 
 ```c
 void Dequantize(const QuantizationParams& qparams,
-                const std::vector<std::uint8_t>& src, std::vector<float>* dst) {
+                const std::vector<std::uint8_t>& src, std::vector<float>* dst) 
+{
   assert(src.size() == dst->size());
-  for (std::size_t i = 0; i < src.size(); i++) {
+  for (std::size_t i = 0; i < src.size(); i++) {// 遍历每一个 uint8
     const std::uint8_t quantized_val = src[i];
-    (*dst)[i] = qparams.scale * (quantized_val - qparams.zero_point);
+    (*dst)[i] = qparams.scale * (quantized_val - qparams.zero_point);// 变换到浮点数
   }
 }
 
