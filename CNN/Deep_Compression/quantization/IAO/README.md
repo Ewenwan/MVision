@@ -94,12 +94,12 @@ Integer-Arithmetic-Only Inference](https://arxiv.org/pdf/1712.05877.pdf)
 template <gemmlowp::MapOrder tOrder>
 void FindMinMax(const gemmlowp::MatrixMap<float, tOrder>& m, float* min,
                 float* max) {
-  *min = *max = m(0, 0);
+  *min = *max = m(0, 0);// 初始化最大最小值 为矩阵(0,0)处的值
   for (int i = 0; i < m.rows(); i++) {
     for (int j = 0; j < m.cols(); j++) {
       const float val = m(i, j);
-      *min = std::min(*min, val);
-      *max = std::max(*max, val);
+      *min = std::min(*min, val);// 最小值
+      *max = std::max(*max, val);// 最小值
     }
   }
 }
@@ -108,24 +108,20 @@ void FindMinMax(const gemmlowp::MatrixMap<float, tOrder>& m, float* min,
 ## 2. 计算量化参数 尺度scale 偏移量zero
 ```c
 struct QuantizationParams {
-  float scale;
-  std::uint8_t zero_point;
+  float scale;            // 缩放尺度
+  std::uint8_t zero_point;// 零点(偏移量)
 };
-
-// Given the min and max values of a float array, return
-// reasonable quantization parameters to use for this array.
+// 根据 最大值和最小值计算量化参数
 QuantizationParams ChooseQuantizationParams(float min, float max) {
-  // We extend the [min, max] interval to ensure that it contains 0.
-  // Otherwise, we would not meet the requirement that 0 be an exactly
-  // representable value.
-  min = std::min(min, 0.f);
-  max = std::max(max, 0.f);
+  min = std::min(min, 0.f);// 确保最小值 <= 0
+  max = std::max(max, 0.f);// 确保最大值 >= 0
 
   // the min and max quantized values, as floating-point values
+  // uint8 量化的数据范围
   const float qmin = 0;
   const float qmax = 255;
 
-  // First determine the scale.
+  // 计算量化尺度， 每一个量化数据单位代表的浮点数大小 0.0~510.0 量化到 0~255 则每一个量化数代表 2
   const double scale = (max - min) / (qmax - qmin);
 
   // Zero-point computation.
