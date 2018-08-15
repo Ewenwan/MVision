@@ -292,6 +292,13 @@ void QuantizeMultiplierSmallerThanOne(float real_multiplier, // 实际小数 乘
   *right_shift = s;
 }
 
+// 调用===================================
+  const float real_multiplier = lhs_scale * rhs_scale / result_scale;
+  
+  int right_shift;// 除去 左移31位，原数的扩大倍数记录
+  
+  std::int32_t quantized_multiplier = QuantizeMultiplierSmallerThanOne(real_multiplier, &quantized_multiplier, &right_shift);
+
 ```
 
 ## 浮点数 Relu激活  FloatRelu()
