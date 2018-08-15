@@ -208,6 +208,8 @@ void FloatMatrixMultiplication(
 
 ```
 ## 量化卷积运算   QuantizedMatMul()
+[具体 使用 gemmlowp  低精度乘法计算框架 ](https://github.com/Ewenwan/gemmlowp)
+
 ```c
 // ========================================
   for (int i = 0; i < lhs.rows(); i++) 
@@ -253,11 +255,45 @@ int32_accumulator += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized
       }
 // 循环之后 
 (*result_quantized_value)(i,k) = int32_accumulator * lhs_scale * rhs_scale / result_scale + result_zero_point;
-// 得到 量化数
+// 这里三个尺度参数 lhs_scale 、 rhs_scale 、 result_scale 差不多都是在 0~1.0 范围内的小数。
+// 把这部分的 浮点运算也转换一下，变成 32位整数编制
     }
   }
 
 ```
+## 小于1的小数 转换成 32位的整数
+```c
+void QuantizeMultiplierSmallerThanOne(float real_multiplier, // 实际小数 乘数
+                                      std::int32_t* quantized_multiplier,
+                                      int* right_shift) 
+{
+// 确保在 0.0~1.0 之间==================                              
+  assert(real_multiplier > 0.f);
+  assert(real_multiplier < 1.f);
+// 改变范围 到 0.5~1 之间===============
+  int s = 0;// 扩大倍数 记录， 之后右移相同的数量，就会还原
+  while (real_multiplier < 0.5f) {
+    real_multiplier *= 2.0f;
+    s++;// 扩大倍数 记录， 之后右移相同的数量，就会还原
+  }
+  
+// 转换浮点数乘子 [1/2, 1) 到 32位固定点整数
+  std::int64_t q = static_cast<std::int64_t>(std::round(real_multiplier * (1ll << 31))); 
+  // 1左移31位，后面的是两个ll 长整形，相当于扩大 2^31次方 =========
+  assert(q <= (1ll << 31));
+// 如果原数 real_multiplier 比较趋近于1，将其减半，同时扩大倍数记录-1
+  if (q == (1ll << 31)) {
+    q /= 2;// 将其减半
+    s--;// 同时扩大倍数记录-1
+  }
+  assert(s >= 0);
+  assert(q <= std::numeric_limits<std::int32_t>::max());
+  *quantized_multiplier = static_cast<std::int32_t>(q);
+  *right_shift = s;
+}
+
+```
+
 ## 浮点数 Relu激活  FloatRelu()
 
 
