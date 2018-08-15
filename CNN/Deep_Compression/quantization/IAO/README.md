@@ -175,7 +175,7 @@ void Dequantize(const QuantizationParams& qparams,
 
 
 ```
-## 浮点数卷积运算
+## 浮点数卷积运算 FloatMatMul()
 ```c
 void FloatMatrixMultiplication(
     const gemmlowp::MatrixMap<const float, tLhsOrder>& lhs,
@@ -207,7 +207,7 @@ void FloatMatrixMultiplication(
 }
 
 ```
-## 量化卷积运算
+## 量化卷积运算   QuantizedMatMul()
 ```c
 // ========================================
   for (int i = 0; i < lhs.rows(); i++) 
@@ -258,6 +258,10 @@ int32_accumulator += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized
   }
 
 ```
+## 浮点数 Relu激活  FloatRelu()
+
+
+## 量化数 Relu激活  QuantizedRelu()
 
 
 
