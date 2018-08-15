@@ -6,6 +6,8 @@
 
 [量化细节](https://github.com/google/gemmlowp/blob/master/doc/quantization.md)
 
+[量化示例代码](https://github.com/google/gemmlowp/blob/master/doc/quantization_example.cc)
+
     这篇文章提出了一种量化神经网络到INT8的通用解决方案，包括量化后精度损失，怎么通过训练来挽救精度，干货满满,  
     同时还提供了源代码，包含优化过的inference代码。    
     paper中有些地方说的比较模糊，参考文献[1]讲的就比较清楚了，  
@@ -85,42 +87,10 @@ max 和 min 为矩阵中最大最小元素的值
 2. [Quantization and Training of Neural Networks for Efficient
 Integer-Arithmetic-Only Inference](https://arxiv.org/pdf/1712.05877.pdf)
 
-### Graph illustration
+# 量化代码
 
-#### simple graph for single layer
 
-- origin
 
-![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/simple_origin.png)
 
-- quantized
 
-![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/simple_quantize.png)
 
-#### layer with bypass
-
-- origin
-
-![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/bypass_origin.png)
-
-- quantized
-
-![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/bypass_quantize.png)
-
-#### convolutional layer with batch normalization
-
-- training
-
-![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training.png)
-
-- inference
-
-![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_inference.png)
-
-- training with fold
-
-![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training_fold.png)
-
-- training with fold quantized
-
-![simple_graph_origin](https://github.com/Ewenwan/iceory.gitbook.io/tree/master/Network%20Quantization/fig/integer_arithmetic_only/conv_bn_training_fold_quantize.png)
