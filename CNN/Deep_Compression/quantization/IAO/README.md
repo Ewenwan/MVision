@@ -191,16 +191,71 @@ void FloatMatrixMultiplication(
       (*result)(i, k) = 0;
       for (int j = 0; j < lhs.cols(); j++)
       {
+      // lhs_quantized_val  = Quantize(lhs);// 上层feature map 输入
+      // rhs_quantized_val  = Quantize(rhs);// 本层卷积核
        //  (*result)(i, k) += lhs(i, j) * rhs(j, k);// 卷积块内 求和 使用浮点数
        (*result)(i, k) += lhs_scale * rhs_scale * 
                           (lhs_quantized_val(i, j) - lhs_zero_point) * 
                           (rhs_quantized_val(j, k)-rhs_zero_point);
-       // 使用量化数表示浮点数之后运算
+       // 使用量化数表示浮点数之后运算 得到浮点数结果
+       // 而浮点数结果 也需要进行量化
+       // result_real_value = result_scale *(result_quantized_value - result_zero_point)
+       // result_quantized_value = result_zero_point + result_real_value / result_scale
       }
     }
   }
 }
 
 ```
+## 量化卷积运算
+```c
+// ========================================
+  for (int i = 0; i < lhs.rows(); i++) 
+  {// 每行
+    for (int k = 0; k < rhs.cols(); k++) 
+    {// 每列
+      (*result)(i, k) = 0;
+      for (int j = 0; j < lhs.cols(); j++)
+      {
+          // lhs_quantized_val  = Quantize(lhs);// 上层feature map 输入
+          // rhs_quantized_val  = Quantize(rhs);// 本层卷积核
+           //  (*result)(i, k) += lhs(i, j) * rhs(j, k);// 卷积块内 求和 使用浮点数
+           //(*result)(i, k) += lhs_scale * rhs_scale * 
+           //                   (lhs_quantized_val(i, j) - lhs_zero_point) * 
+           //                   (rhs_quantized_val(j, k)-rhs_zero_point);
+// (*result)(i, k) += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized_val(j, k)-rhs_zero_point); // uint8计算
+// === 循环之后 (*result)(i, k) *= lhs_scale * rhs_scale // 得到浮点数
+           
+           // 使用量化数表示浮点数之后运算 得到浮点数结果
+           // 而浮点数结果 也需要进行量化
+           // result_real_value = result_scale *(result_quantized_value - result_zero_point)
+           // result_quantized_value = result_zero_point + result_real_value / result_scale
+
+(*result_quantized_value)(i,k) += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized_val(j, k)-rhs_zero_point); // uint8计算 
+      }
+// 循环之后 
+(*result_quantized_value)(i,k) = (*result_quantized_value)(i,k) * lhs_scale * rhs_scale / result_scale + result_zero_point
+// 得到 量化数
+    }
+  }
+
+//// 总结版本===================================
+  for (int i = 0; i < lhs.rows(); i++) 
+  {// 每行
+    for (int k = 0; k < rhs.cols(); k++) 
+    {// 每列
+      (*result)(i, k) = 0;
+      for (int j = 0; j < lhs.cols(); j++)
+      {
+(*result_quantized_value)(i,k) += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized_val(j, k) - rhs_zero_point); // uint8计算 
+      }
+// 循环之后 
+(*result_quantized_value)(i,k) = (*result_quantized_value)(i,k) * lhs_scale * rhs_scale / result_scale + result_zero_point
+// 得到 量化数
+    }
+  }
+
+```
+
 
 
