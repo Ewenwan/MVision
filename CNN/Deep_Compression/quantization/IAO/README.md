@@ -234,7 +234,7 @@ void FloatMatrixMultiplication(
 (*result_quantized_value)(i,k) += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized_val(j, k)-rhs_zero_point); // uint8计算 
       }
 // 循环之后 
-(*result_quantized_value)(i,k) = (*result_quantized_value)(i,k) * lhs_scale * rhs_scale / result_scale + result_zero_point
+(*result_quantized_value)(i,k) = (*result_quantized_value)(i,k) * lhs_scale * rhs_scale / result_scale + result_zero_point;
 // 得到 量化数
     }
   }
@@ -244,13 +244,15 @@ void FloatMatrixMultiplication(
   {// 每行
     for (int k = 0; k < rhs.cols(); k++) 
     {// 每列
-      (*result)(i, k) = 0;
+     // (*result_quantized_value)(i, k) = 0;
+     int32_accumulator = 0;
       for (int j = 0; j < lhs.cols(); j++)
       {
-(*result_quantized_value)(i,k) += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized_val(j, k) - rhs_zero_point); // uint8计算 
+//(*result_quantized_value)(i,k) += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized_val(j, k) - rhs_zero_point); // uint8计算 
+int32_accumulator += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized_val(j, k) - rhs_zero_point);
       }
 // 循环之后 
-(*result_quantized_value)(i,k) = (*result_quantized_value)(i,k) * lhs_scale * rhs_scale / result_scale + result_zero_point
+(*result_quantized_value)(i,k) = int32_accumulator * lhs_scale * rhs_scale / result_scale + result_zero_point;
 // 得到 量化数
     }
   }
