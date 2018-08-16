@@ -24,6 +24,19 @@
     > - 在MobileNet这种本身就很紧凑的网络上做实验以证明其有效性  
     
 ## 谷歌IAO算法实现细节
+	对量化的实现是通过把常见操作转换为等价的八位版本达到的。
+	涉及的操作包括卷积，矩阵乘法，激活函数，池化操作，以及拼接。
+	转换脚本先把每个已知的操作替换为等价的量化版本。
+	然后在操作的前后加上含有转换函数的子图，将input从浮点数转换成8 bit，
+	再把output从8 bit转回浮点数。下面是 ReLu 的例子：
+	
+浮点版本 relu层:
+![](http://fjdu.github.io/pictures/2016-07-07-quantization0.png)
+
+量化版本 relu层：
+![](http://fjdu.github.io/pictures/2016-07-07-quantization1.png)
+
+
 ```c
 a. 记录各层 激活输入、卷积核参数、激活输出的参数范围 max min,而量化范围为0~255 uint_8
 
@@ -59,7 +72,23 @@ e.  之后再将整数结果转换成 浮点结果 用于后续计算
     q - 量化后的uint8类型数值  
     Z - 量化前r = 0时，量化后q的数值  
     S - 为了能把量化后的q还原到r, 引入了一个缩放系数  
-
+    
+    例如一直input的最大值是30.0，最小值是-10.0，则量化后的值为
+    Quantized | Float
+    --------- | -----
+    0         | -10.0
+    255       | 30.0
+    128       | 10.0
+    
+    如何把float类型的乘法用int8替代，paper中的公式写的很明白，  
+    输入： r1 = S1 * (q1 - Z1)
+          r2 = S2 * (q2 - Z2)
+    乘法： out = r1 * r2 = S1 * (q1 - Z1) * S2 * (q2 - Z2)  
+          q_out = out / S3 + Z3 
+                =  S1 * S2 / S3 * (q1 - Z1) * (q2 - Z2)  + Z3
+                = M * (q1 - Z1) * (q2 - Z2)  + Z3   公式(4)
+          乘子 M = S1 * S2 / S3
+          
     如何把float类型的乘法用int8替代，paper中的公式写的很明白，  
     这我们重点说一下paper中公式(5)，是怎么转化为int8来计算的    
 ![formula5](https://github.com/Ewenwan/camel007.github.io/blob/master/img/2018-06-10/formula5.jpg)  
@@ -349,6 +378,14 @@ void QuantizeMultiplierSmallerThanOne(float real_multiplier, // 实际小数 乘
     循环执行 1~12 步骤
 ```
 
+
+### 当遇到连续的被量化的操作时
+	有一个优化是当连续出现多个被量化了的操作时，没有必要在每个操作前做反序列化/序列化，
+	因为上一个操作的反序列化和下一个操作的序列化是会被互相抵消的。
+	例如下图：
+	
+反量化和量化会抵消，左边是量化展开的，右边是去除冗余量化的
+![](http://fjdu.github.io/pictures/2016-07-07-quantization2.png)
 ## 浮点数 Relu激活  FloatRelu()
 
 
