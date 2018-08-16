@@ -22,7 +22,32 @@
     > - 提出了一种通用的量化方案，同时量化weight和activation  
     > - 提出了弥补量化后精度损失的训练方案  
     > - 在MobileNet这种本身就很紧凑的网络上做实验以证明其有效性  
+    
+## 谷歌IAO算法实现细节
+```c
+a. 记录各层 激活输入、卷积核参数、激活输出的参数范围 max min,而量化范围为0~255 uint_8
 
+b. 计算量化参数，缩放尺度S  和  零点(偏移量) Z
+   float S     = (max-min）/ (255-0);
+   uint8_t Z = round(0 – min/S) ;
+
+c. 量化输入in_ 和 卷积参数 w_
+   in_quan = in_/S_in + Z_in;
+    w_quan = w_/S_w  + Z_w;
+
+d. 浮点矩阵乘法 变成 量化卷积乘法
+    out_ = sum( in_(i) * w_(i) );// 浮点矩阵乘法
+         = (S_in * S_W) * sum(  (in_quan-Z_in) * (w_quan – Z_w) );
+    ==> out_quan = out_/S_out  + Z_out;
+    ==>          = 
+       (S_in * S_W/ S_out) * sum(  (in_quan-Z_in) * (w_quan – Z_w) ) + Z_out
+       式中   (S_in * S_W/ S_out) 仍为浮点数，所以也需要转换成整数
+       浮点乘子 real_multiplier = S_in * S_W / S_out;
+       量化乘子 quantized_multiplier = round(real_multiplier * (1 << 31)); 扩大2^31次方变成32位整数
+
+e.  之后再将整数结果转换成 浮点结果 用于后续计算
+     out_ =(out_quan  -Z_out) * S_out;
+```
 ## 2. Quantization Inference  
 
 ### Inference  
@@ -299,6 +324,29 @@ void QuantizeMultiplierSmallerThanOne(float real_multiplier, // 实际小数 乘
   
   std::int32_t quantized_multiplier = QuantizeMultiplierSmallerThanOne(real_multiplier, &quantized_multiplier, &right_shift);
 
+```
+## 量化卷积计算步骤
+```c
+1. 输入 量化的特征图 lhs_quantized_val, uint8类型, 偏移量 lhs_zero_point, int32类型;
+2. 输入 量化的卷积核 rhs_quantized_val, uint8类型, 偏移量 rhs_zero_point, int32类型;
+3. 转换 unit8 到 int32类型;
+4. 每一块卷积求和(int32乘法求和有溢出风险，可换成固定点小数树乘法);
+   int32_accumulator += (lhs_quantized_val(i, j) - lhs_zero_point) * (rhs_quantized_val(j, k) - rhs_zero_point);
+5. 输入 量化的乘子 quantized_multiplier, int32类型 和 右移次数记录 right_shift, int类型;
+6. 计算乘法，得到int32类型的结果 (int32乘法有溢出风险，可换成固定点小数树乘法);
+   quantized_multiplier * int32_accumulator
+   
+7. 再左移动 right_shift 位还原，得到 int32的结果;
+8. 最后再加上 结果的偏移量 result_zero_point;
+   (7和8的顺序和 官方说的先后顺序颠倒);
+9. 将int32类型结果 限幅到[0, 255], 再强制转换到 uint8类型;
+10. 之后再 反量化到浮点数，更新统计输出值分布信息 max, min;
+11. 再量化回 uint8;
+11. 之后 经过 量化激活层;
+12. 最后 反量化到 浮点数，本层网络输出;
+
+13. 进入下一层
+    循环执行 1~12 步骤
 ```
 
 ## 浮点数 Relu激活  FloatRelu()
