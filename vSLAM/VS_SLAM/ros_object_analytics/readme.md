@@ -128,6 +128,32 @@
 
   检测信息(2d边框)object_analytics/detection ([object_msgs::ObjectsInBoxes](https://github.com/intel/object_msgs/tree/master/msg))
 ## 消息类型
+object_msgs::Object
+
+      string object_name  # 物体名称 object name
+      float32 probability # 检测概率 probability of detected object
+      
+object_msgs::Objects    
+
+      std_msgs/Header header    # 消息时间戳
+      Object[] objects_vector   # 物体数组 
+      float32 inference_time_ms # 单位: millisecond, 目标检测器运行的时间
+
+object_msgs::ObjectInBox
+      
+      Object object                     # 目标检测到的物体
+      sensor_msgs/RegionOfInterest roi  # 检测框
+            uint32 x_offset // 框的左上角点
+            uint32 y_offset
+            uint32 height   // 框高度
+            uint32 width    // 框宽度
+            bool do_rectify
+
+object_msgs::ObjectInBoxs
+
+      std_msgs/Header header        # 时间戳
+      ObjectInBox[] objects_vector  # 物体边框数组
+      float32 inference_time_ms     # 检测的时间
 
 object_analytics_msgs::ObjectInBoxes3D
 
@@ -144,13 +170,20 @@ object_analytics_msgs::ObjectInBoxes3D
       geometry_msgs/Point32 max    # x, y and z axis parellel to the axises correspondingly in camera coordinates
 
 object_analytics_msgs::ObjectsInBoxes3D
+
       std_msgs/Header header            # timestamp 时间戳
       ObjectInBox3D[] objects_in_boxes  # ObjectInBox3D 数组
       
 object_analytics_msgs::TrackedObject
 
+      # 物体 id + 2d边框 .
+      int32 id                            # object identifier
+      sensor_msgs/RegionOfInterest roi    # region of interest
+      
 object_analytics_msgs::TrackedObjects
 
+      std_msgs/Header header              # timestamp  时间戳
+      TrackedObject[] tracked_objects     # TrackedObject 目标追踪数组 
 
 ## object_analytics 节点分析
       1. RGBD传感器预处理分割器 splitter  
