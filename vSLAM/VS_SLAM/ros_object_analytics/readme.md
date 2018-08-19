@@ -127,6 +127,29 @@
   跟踪信息 object_analytics/tracking ([object_analytics_msgs::TrackedObjects](https://github.com/intel/ros_object_analytics/tree/master/object_analytics_msgs/msg))
 
   检测信息(2d边框)object_analytics/detection ([object_msgs::ObjectsInBoxes](https://github.com/intel/object_msgs/tree/master/msg))
+## 消息类型
+
+object_analytics_msgs::ObjectInBoxes3D
+
+      sensor_msgs/RegionOfInterest roi      # region of interest
+            uint32 x_offset // 框的左上角点
+            uint32 y_offset
+            uint32 height   // 框高度
+            uint32 width    // 框宽度
+            bool do_rectify
+      geometry_msgs/Point32 min    # min and max locate the diagonal of a bounding-box of the detected object whose
+            float32 x // 3d点
+            float32 y
+            float32 z
+      geometry_msgs/Point32 max    # x, y and z axis parellel to the axises correspondingly in camera coordinates
+
+object_analytics_msgs::ObjectsInBoxes3D
+      std_msgs/Header header            # timestamp 时间戳
+      ObjectInBox3D[] objects_in_boxes  # ObjectInBox3D 数组
+      
+object_analytics_msgs::TrackedObject
+
+object_analytics_msgs::TrackedObjects
 
 
 ## object_analytics 节点分析
