@@ -39,6 +39,8 @@
         
         8. 高性能计算 HighPerformanceComputing
 
+![](https://img-blog.csdn.net/20160818141025738)
+
 # 卷积神经网络
 [网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
 
