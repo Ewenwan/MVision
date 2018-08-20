@@ -242,6 +242,21 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZPixel,                // xyz + pixel x
                                   )
 ```
 
+## 点云 索引 得到其对应的像素坐标
+```c
+// XYZRGBA 点+颜色 点云  拷贝到 XYZ+像素点坐标 点云
+void ObjectUtils::copyPointCloud(const PointCloudT::ConstPtr& original, const std::vector<int>& indices,
+                                 pcl::PointCloud<PointXYZPixel>::Ptr& dest)
+{
+  pcl::copyPointCloud(*original, indices, *dest);// 拷贝 3d点坐标
+  uint32_t width = original->width;              // 相当于图像宽度
+  for (uint32_t i = 0; i < indices.size(); i++)
+  {
+    dest->points[i].pixel_x = indices[i] % width;// 列坐标
+    dest->points[i].pixel_y = indices[i] / width;// 行坐标
+  }
+}
+```
 
 ## object_analytics 节点分析
       1. RGBD传感器预处理分割器 splitter  
