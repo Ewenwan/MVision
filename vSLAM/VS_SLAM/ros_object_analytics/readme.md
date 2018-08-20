@@ -149,13 +149,25 @@ object_msgs::ObjectInBox
             uint32 width    // 框宽度
             bool do_rectify
 
-object_msgs::ObjectInBoxs
+object_msgs::ObjectInBoxes
 
       std_msgs/Header header        # 时间戳
       ObjectInBox[] objects_vector  # 物体边框数组
       float32 inference_time_ms     # 检测的时间
+      
+object_analytics_nodelet::model::Object2D
 
-object_analytics_msgs::ObjectInBoxes3D
+      const sensor_msgs::RegionOfInterest roi_;// 物体边框
+            uint32 x_offset // 框的左上角点
+            uint32 y_offset
+            uint32 height   // 框高度
+            uint32 width    // 框宽度
+            bool do_rectify
+      const object_msgs::Object object_;       // 物体名称 + 概率
+            string object_name  # 物体名称 object name
+            float32 probability # 检测概率 probability of detected object
+      
+object_analytics_msgs::ObjectInBox3D
 
       sensor_msgs/RegionOfInterest roi      # region of interest
             uint32 x_offset // 框的左上角点
@@ -173,7 +185,33 @@ object_analytics_msgs::ObjectsInBoxes3D
 
       std_msgs/Header header            # timestamp 时间戳
       ObjectInBox3D[] objects_in_boxes  # ObjectInBox3D 数组
+
+object_analytics_nodelet::model::Object3D
+
+      sensor_msgs::RegionOfInterest roi_;
+            uint32 x_offset // 框的左上角点
+            uint32 y_offset
+            uint32 height   // 框高度
+            uint32 width    // 框宽度
+            bool do_rectify
+      geometry_msgs::Point32 min_;
+            float32 x // 3d点
+            float32 y
+            float32 z
+      geometry_msgs::Point32 max_;
+            float32 x // 3d点
+            float32 y
+            float32 z
+            
+using Relation = std::pair<Object2D, Object3D>; // 2d框 和 3d点云团 配对pair关系
+
+using RelationVector = std::vector<Relation>;   // 配对关系 数组
       
+using Object2DVector = std::vector<Object2D>;   // 2d框数组 
+
+using Object3DVector = std::vector<Object3D>;   // 3d点云团数组 
+
+
 object_analytics_msgs::TrackedObject
 
       # 物体 id + 2d边框 .
@@ -184,6 +222,26 @@ object_analytics_msgs::TrackedObjects
 
       std_msgs/Header header              # timestamp  时间戳
       TrackedObject[] tracked_objects     # TrackedObject 目标追踪数组 
+## PCL定义新点类型 
+```c
+// PCL新定义点类型   3d点坐标 + 2d的像素坐标值 3d-2d点对
+struct PointXYZPixel
+{
+  PCL_ADD_POINT4D;// 
+  uint32_t pixel_x;// 像素值
+  uint32_t pixel_y;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;  // NOLINT
+// 注册点类型
+POINT_CLOUD_REGISTER_POINT_STRUCT(PointXYZPixel,                // xyz + pixel x, y as fields
+                                  (float, x, x)                 // field x
+                                  (float, y, y)                 // field y
+                                  (float, z, z)                 // field z
+                                  (uint32_t, pixel_x, pixel_x)  // field pixel x
+                                  (uint32_t, pixel_y, pixel_y)  // field pixel y
+                                  )
+```
+
 
 ## object_analytics 节点分析
       1. RGBD传感器预处理分割器 splitter  
