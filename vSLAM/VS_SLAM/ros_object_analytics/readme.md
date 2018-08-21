@@ -257,6 +257,13 @@ void ObjectUtils::copyPointCloud(const PointCloudT::ConstPtr& original, const st
   }
 }
 ```
+## 获取最大最小值 std::minmax_element()
+```c
+  auto cmp_x = [](PointXYZPixel const& l, PointXYZPixel const& r) { return l.x < r.x; };// 按x值域大小 的 比较函数
+  auto minmax_x = std::minmax_element(point_cloud->begin(), point_cloud->end(), cmp_x);//std库 获取最大最小值
+  x_min = *(minmax_x.first);       // 最小值
+  x_max = *(minmax_x.second);// 最大值
+```
 
 ## object_analytics 节点分析
       1. RGBD传感器预处理分割器 splitter  
