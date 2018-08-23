@@ -167,19 +167,21 @@ somtmax 指数映射回归分类
          ---------------正则化层-------------------
          conv4_3_norm               Normalize    scale_filler  value: 20
                                   
-         conv4_3_norm_mbox_loc      Convolution  输入 conv4_3_norm 512*38*38
+         conv4_3_norm_mbox_loc      Convolution  输入 conv4_3_norm 512*38*38     边框坐标======
                                      3*3*512*16  16通道输出   --->  16*38*38
-         conv4_3_norm_mbox_loc_perm Permute      0  2  3  1
-         conv4_3_norm_mbox_loc_flat Flatten      axis: 1 
+         conv4_3_norm_mbox_loc_perm Permute      0  2  3  1   交换caffe blob中的数据维======
+                                            N C H W ----> N H W C
+                                            0 1 2 3 ----> 0 2 3 1
+         conv4_3_norm_mbox_loc_flat Flatten      axis: 1      摊平成一维======
          
          
-         conv4_3_norm_mbox_conf       Convolution    输入 conv4_3_norm 512*38*38
+         conv4_3_norm_mbox_conf       Convolution    输入 conv4_3_norm 512*38*38  置信度=====
                                                      3*3*512*84  84通道输出   --->  84*38*38
          conv4_3_norm_mbox_conf_perm  Permute        0  2  3  1
          conv4_3_norm_mbox_conf_flat  Flatten        axis: 1 
          
          
-         conv4_3_norm_mbox_priorbox   PriorBox      输入 conv4_3_norm 512*38*38
+         conv4_3_norm_mbox_priorbox   PriorBox      输入 conv4_3_norm 512*38*38    预设框===
                                                     输入 data
                         min_size: 30.0
                         max_size: 60.0
