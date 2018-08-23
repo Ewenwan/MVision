@@ -997,6 +997,35 @@ void Net<Dtype>::RangeInLayers(vector<string>* layer_name,
   }
 }
 
-
+```
+## 量纲计算 
+```c
+// 计算最大值整数位需要的量纲长度 
+  for (int i = 0; i < layer_names_.size(); ++i) {
+    il_in_.push_back((int)ceil(log2(max_in_[i])));
+    il_out_.push_back((int)ceil(log2(max_out_[i])));
+    il_params_.push_back((int)ceil(log2(max_params_[i])+1));
+  }
+  // Debug
+  for (int k = 0; k < layer_names_.size(); ++k) {
+    LOG(INFO) << "Layer " << layer_names_[k] <<
+        ", integer length input=" << il_in_[k] <<
+        ", integer length output=" << il_out_[k] <<
+        ", integer length parameters=" << il_params_[k];
+  }
+  
+  // 总量纲长度 bw_conv  减去整数位量纲长度 得到 小数位量纲长度
+        param_layer->set_type("ConvolutionRistretto");
+        param_layer->mutable_quantization_param()->set_fl_params(bw_conv -
+            GetIntegerLengthParams(param->layer(i).name()));
+        param_layer->mutable_quantization_param()->set_bw_params(bw_conv);
+	
+        param_layer->mutable_quantization_param()->set_fl_layer_in(bw_in -
+            GetIntegerLengthIn(param->layer(i).name()));
+        param_layer->mutable_quantization_param()->set_bw_layer_in(bw_in);
+	
+        param_layer->mutable_quantization_param()->set_fl_layer_out(bw_out -
+            GetIntegerLengthOut(param->layer(i).name()));
+        param_layer->mutable_quantization_param()->set_bw_layer_out(bw_out);
 
 ```
