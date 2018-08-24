@@ -5,7 +5,7 @@
 
 [tf代码](https://github.com/MG2033/ShuffleNet)
 
-[caffe代码](https://github.com/farmingyard/ShuffleNet)
+[caffe代码](https://github.com/Ewenwan/ShuffleNet-1)
 
 [shufflenet-ssd](https://github.com/linchaozhang/shufflenet-ssd)
 
