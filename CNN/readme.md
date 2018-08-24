@@ -42,6 +42,8 @@
 ![](https://img-blog.csdn.net/20160818141025738)
 
 # 卷积神经网络
+[facebook目标检测平台 基于caffe2](https://github.com/Ewenwan/Detectron)
+
 [网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
 
 [神经网络代码实验 c++全代码](https://github.com/Ewenwan/NN_Test)
