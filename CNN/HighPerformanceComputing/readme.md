@@ -827,6 +827,9 @@ make -j
             Segmentation fault
 
 # ssdsuqeezenet 
+[prototxt & caffemodel ](https://github.com/chuanqi305/SqueezeNet-SSD)
+
+
 ```c
 // Tencent is pleased to support the open source community by making ncnn available.
 //
