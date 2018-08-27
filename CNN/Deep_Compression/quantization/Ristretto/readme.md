@@ -1029,3 +1029,144 @@ void Net<Dtype>::RangeInLayers(vector<string>* layer_name,
         param_layer->mutable_quantization_param()->set_bw_layer_out(bw_out);
 
 ```
+# 统计每一层 的 每个卷积核的参数范围
+```c
+template <typename Dtype>
+vector<Dtype> Net<Dtype>::FindMax(Blob<Dtype>* blob, bool is_single) {
+  const Dtype* data = blob->cpu_data(); // 当前层 数据起始指针
+  int cnt = blob->count();              // 当前层 数据数量
+  vector<Dtype> max_vals;               // 当前层每个卷积核（通道的最大值）
+  Dtype max_val = (Dtype)(-10);         // 初始化 最大值
+
+  int index = 0;
+  // 4维 卷积核==================================================================
+  if(blob->shape().size() == 4) // output_channel * input_channel * kernel_height * kernel_width
+  {
+    // 值记录当前层 中所有卷积核 参数中的最大值==============
+    if(is_single) 
+    {
+      max_vals = vector<Dtype>(1, Dtype(-10));
+      for (int i = 0; i < cnt; ++i) // 遍历
+      {
+        max_val = std::max(max_val, (Dtype)fabs(data[i]));// 最大值
+      }
+      max_vals.at(0) = max_val;// 层最大值放在第一个位置
+    } 
+    
+    // 记录当前层中每一个 卷积核中的最大值==================
+    else 
+    { // 卷积核维度 ：output_channel * input_channel * kernel_height * kernel_width
+      int height  = blob->shape(2);  // 卷积核高度==
+      int width   = blob->shape(3);  // 卷积核宽度==
+      int channel = blob->shape(0);  // 卷积核数量 输出通道数==
+      int deep    = blob->shape(1);  // 卷积核深度(厚度) 相当于立方体体积==
+      max_vals = vector<Dtype>(channel, Dtype(-10));// 初始化每个卷积核的最大值
+      int step = deep * height * width;// 每个卷积核的参数数量 = 深度*宽*高
+      for (int i = 0; i < cnt; ++i) 
+      {// 总的排布顺序 是 按 每个卷积核进行循序 存放=====
+        if((i + 1) % step == 0) // 出现下一个卷积核的领域=====
+	{
+          max_vals.at(index) = std::max(max_val, (Dtype)fabs(data[i]));// 当前卷积核的最大值
+          ++index;// 迭代下一个卷积核
+        }
+	else
+	{
+          max_val = std::max(max_val, (Dtype)fabs(data[i]));// 记录当前区域中的最大值
+        }
+      }
+    }
+  }
+  // blob 不是4维============= 输入输出================================
+  else 
+  {
+    if(is_single) // 真个输入输出参数中的最大值============
+    {
+      max_vals = vector<Dtype>(1, Dtype(-10));
+      for (int i = 0; i < cnt; ++i)
+      {
+        max_val = std::max(max_val, (Dtype)fabs(data[i]));//最大值====
+      }
+      max_vals.at(0) = max_val;// 宏观最大值，放在第一个地方
+    } 
+    
+    else // 求取每一个 输出通道中输入值的最大值=============
+    { // output_channel * input_channel 
+      int channel = blob->shape(0); // 总输出通道数量 === 本层卷积核的数量===本层输出通道数量==
+      max_vals = vector<Dtype>(channel, Dtype(-10));// 初始化每个通道的输入最大值
+      int step = blob->shape(1);// 每个通道的长度
+      for (int i = 0; i < cnt; ++i) 
+      {
+        if((i + 1) % step == 0) // 出现下一个通道
+	{
+          max_vals.at(index) = std::max(max_val, (Dtype)fabs(data[i]));
+          ++index; // 迭代 下一个通道
+        } 
+	else 
+	{
+          max_val = std::max(max_val, (Dtype)fabs(data[i]));// 本通道中领域元素中 的最大值
+        }
+      }
+    }
+  }
+  
+  return max_vals;
+}
+
+template <typename Dtype>
+void Net<Dtype>::RangeInLayers(vector<string>* layer_name,
+      vector<Dtype>* max_in, vector<Dtype>* max_out, vector<vector<Dtype>>* max_param, string scaling) {
+  // Initialize vector elements, if needed.
+  if(layer_name->size()==0) // 第一次循环需要初始化=======
+  {
+    for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) // 遍历所有层======
+    {
+      if (strcmp(layers_[layer_id]->type(), "Convolution") == 0) // 是卷积层的，才进行统计====
+      {
+        layer_name->push_back(this->layer_names()[layer_id]);// 卷积层名字===
+        max_in->push_back(0);     // 层输入最大值===
+        max_out->push_back(0);    // 层输出最大值===
+        if (scaling == "single") 
+	{
+          max_param->push_back(vector<Dtype>(1, 0));// 本层卷积核 的最大值====
+        }
+        else {
+	// 卷积核维度 ：output_channel * input_channel * kernel_height * kernel_width
+          int param_shape = (&(*layers_[layer_id]->blobs()[0]))->shape(0);// 每一层的 卷积核数量：输出通道数
+          max_param->push_back(vector<Dtype>(param_shape, 0));// 每一层的每一个卷积核都需要统计最大值
+        }
+      }
+    }
+  }
+  
+  // Find maximal values.
+  int index = 0;
+  vector<Dtype> max_vals;// 最大值
+  for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) // 遍历所有层======
+  {
+    if (strcmp(layers_[layer_id]->type(), "Convolution") == 0) // 是卷积层的，才进行统计====
+    {
+      max_vals = FindMax(bottom_vecs_[layer_id][0]);
+      max_in->at(index) = std::max(max_in->at(index), max_vals.at(0)); // 输入最大值===
+
+      max_vals = FindMax(top_vecs_[layer_id][0]);
+      max_out->at(index) = std::max(max_out->at(index), max_vals.at(0));// 输出最大值====
+
+      // Consider the weights only, ignore the bias
+      if (scaling == "single") // 每一层 卷积weight的最大值===
+      {
+        max_vals = FindMax(&(*layers_[layer_id]->blobs()[0]));
+        max_param->at(index).at(0) = std::max(max_param->at(index).at(0), max_vals.at(0));
+      } 
+      else 
+      {
+        max_vals = FindMax(&(*layers_[layer_id]->blobs()[0]), false);// 当前训练中，每层 每个卷积核的最大值
+        for(int i = 0; i < max_vals.size(); ++i)
+	  // 获取所有训练中每一卷积层index 的 每个 卷积核i 的最大值=======
+          max_param->at(index).at(i) = std::max(max_param->at(index).at(i), max_vals.at(i));
+      }
+      index++;// 卷积 层 id 
+    }
+  }
+}
+
+```
