@@ -1076,7 +1076,9 @@ vector<Dtype> Net<Dtype>::FindMax(Blob<Dtype>* blob, bool is_single) {
       }
     }
   }
+  
   // blob 不是4维============= 输入输出================================
+// 处理 CHW 格式的数据
   else 
   {
     if(is_single) // 真个输入输出参数中的最大值============
