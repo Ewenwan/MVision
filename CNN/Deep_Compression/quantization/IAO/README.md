@@ -393,3 +393,205 @@ void QuantizeMultiplierSmallerThanOne(float real_multiplier, // 实际小数 乘
 
 
 
+# caffe中的代码
+```c
+void Quantization::ChooseIAOQuantizationParams(float min, float max, uint8_t* zero_point, float* scale) 
+{
+  min = std::min(min, 0.f);// 确保最小值 <= 0
+  max = std::max(max, 0.f);// 确保最大值 >= 0
+
+  // the min and max quantized values, as floating-point values
+  // uint8 量化的数据范围
+  const float qmin = 0;
+  const float qmax = 255;
+
+  // 计算量化缩放尺度================================
+  // 每一个量化数据单位代表的浮点数大小 0.0~510.0 量化到 0~255 则每一个量化数代表 2
+  const double scale_t = (max - min) / (qmax - qmin);
+  
+  // 计算 零点(偏移量)===========================
+  const double initial_zero_point = qmin - min / scale_t;
+
+  // 对  零点(偏移量) 限幅 并取整=================
+  uint8_t nudged_zero_point = 0;
+  if (initial_zero_point < qmin) 
+  {
+    nudged_zero_point = qmin;
+  } 
+  else if (initial_zero_point > qmax) 
+  {
+    nudged_zero_point = qmax;
+  } 
+  else 
+  {
+    nudged_zero_point = static_cast<uint8_t>(round(initial_zero_point));
+  }
+  
+  *zero_point = nudged_zero_point;
+  *scale = scale_t;
+}
+
+
+
+// 谷歌iao 整形 uint8 量化方法===========================
+void Quantization::Quantize2IntegerArithmeticOnly()
+{
+ 
+ //=====计算每一层的量化参数==========================
+  for (int i = 0; i < layer_names_.size(); ++i) 
+  {
+  //  il_in_.push_back((int)ceil(log2(abs_max_in_[i])+1));
+  //  il_out_.push_back((int)ceil(log2(abs_max_out_[i])+1));
+  //  il_params_.push_back((int)ceil(log2(abs_max_params_[i])+1));
+  
+  // 尺度==========================
+   scale_in_.push_back(0);
+   scale_params_.push_back(0); 
+   scale_out_.push_back(0);
+   
+  // 偏移量 零点===================
+   zero_point_in_.push_back(0),
+   zero_point_params_.push_back(0), 
+   zero_point_out_.push_back(0);
+   
+   ChooseIAOQuantizationParams(min_in_[i],  max_na_in_[i],  &zero_point_in_[i],  &scale_in_[i]);
+   ChooseIAOQuantizationParams(min_out_[i], max_na_out_[i], &zero_point_out_[i], &scale_out_[i]);
+   ChooseIAOQuantizationParams(min_params_[i], max_na_params_[i], &zero_point_params_[i], &scale_params_[i]);
+  }
+  
+  // Debug
+  for (int k = 0; k < layer_names_.size(); ++k) 
+  {
+    LOG(INFO) << "Layer " << layer_names_[k] <<
+        ", zero point input=" << (int)zero_point_in_[k] << " scale input = " << scale_in_[k] << 
+        ", zero point output=" << (int)zero_point_out_[k] << " scale output = " << scale_out_[k] << 
+        ", zero point parameters=" << (int)zero_point_params_[k]<< " scale parameters = " << scale_params_[k];
+  }
+
+// 修改网络 并测试
+  NetParameter param;  // 网络参数
+  float accuracy;      // 网络精度
+  Net<float>* net_test;
+  caffe::ReadNetParamsFromTextFileOrDie(model_, &param);
+  param.mutable_state()->set_phase(caffe::TEST);
+  
+  EditNetDescriptionIAO(&param, "Convolution_and_InnerProduct","Parameters_and_Activations");
+///*
+  net_test = new Net<float>(param);
+
+  net_test->CopyTrainedLayersFrom(weights_);
+  
+  RunForwardBatches(NULL, iterations_, net_test, &accuracy, this->net_type_); // 需要 特定的的iao层来支持网络前传
+  delete net_test;
+//*/
+  param.release_state();
+  
+  WriteProtoToTextFile(param, model_quantized_);
+
+  // Write summary of dynamic fixed point analysis to log
+  LOG(INFO) << "------------------------------";
+  LOG(INFO) << "Network accuracy analysis for";
+  LOG(INFO) << "Convolutional (CONV) and fully";
+  LOG(INFO) << "connected (FC) layers.";
+  LOG(INFO) << "Baseline 32bit float: " << test_score_baseline_;
+  
+ LOG(INFO) << "Integer Arithmetic Only uint8 net: ";
+  LOG(INFO) << "Accuracy: " << accuracy;
+//  LOG(INFO) << "Please fine-tune.";
+}
+
+void Quantization::EditNetDescriptionIAO(NetParameter* param, const string layers_2_quantize, const string net_part)
+// 需要量化的层 layers_2_quantize ： "Convolution_and_InnerProduct"  卷积层、全链接层
+// 量化层的那些部件       net_part： "Parameters_and_Activations"    卷积核参数w，激活输入输出
+{
+ for (int i = 0; i < param->layer_size(); ++i) // 遍历每一层===========================
+  {
+  // 尺度==========================
+ //  scale_in_.push_back(0);
+ //  scale_params_.push_back(0); 
+ //  scale_out_.push_back(0);
+   
+  // 偏移量 零点===================
+ //  zero_point_in_.push_back(0),
+ //  zero_point_params_.push_back(0), 
+  // zero_point_out_.push_back(0);
+   
+// 卷积层========================================
+
+  caffe::QuantizationParameter_Precision precision =
+        caffe::QuantizationParameter_Precision_INTEGER_ARITHMETRIC_ONLY;
+  
+    if (layers_2_quantize.find("Convolution") != string::npos && param->layer(i).type().find("Convolution") != string::npos) 
+    {
+      // 卷积核参数w 部分
+      if (net_part.find("Parameters") != string::npos) 
+      {
+        LayerParameter* param_layer = param->mutable_layer(i);
+        param_layer->set_type("ConvolutionRistretto");
+        param_layer->mutable_quantization_param()->set_scale_params( scale_params_[ConvlayerInLayers(param->layer(i).name())] );
+        param_layer->mutable_quantization_param()->set_zero_point_params( zero_point_params_[ConvlayerInLayers(param->layer(i).name())] );
+		
+		 param_layer->mutable_quantization_param()->set_precision(precision);
+      }
+      // 激活输入输出
+      if (net_part.find("Activations") != string::npos) 
+      {
+        LayerParameter* param_layer = param->mutable_layer(i);
+        
+        param_layer->set_type("ConvolutionRistretto");
+        
+        param_layer->mutable_quantization_param()->set_scale_in( scale_in_[ConvlayerInLayers(param->layer(i).name())] );
+        param_layer->mutable_quantization_param()->set_zero_point_in(zero_point_in_[ConvlayerInLayers(param->layer(i).name())]);
+        
+        param_layer->mutable_quantization_param()->set_scale_out( scale_out_[ConvlayerInLayers(param->layer(i).name())] );
+        param_layer->mutable_quantization_param()->set_zero_point_out( zero_point_out_[ConvlayerInLayers(param->layer(i).name())] );
+
+		param_layer->mutable_quantization_param()->set_precision(precision);
+      }
+    }
+
+// 全连接层=========================================
+    if (layers_2_quantize.find("InnerProduct") != string::npos && (param->layer(i).type().find("InnerProduct") != string::npos ||
+        param->layer(i).type().find("FcRistretto") != string::npos)) 
+    {
+      // 卷积核参数w 部分
+      if (net_part.find("Parameters") != string::npos) 
+	  {
+        LayerParameter* param_layer = param->mutable_layer(i);
+        param_layer->set_type("FcRistretto");
+        param_layer->mutable_quantization_param()->set_scale_params( scale_params_[ConvlayerInLayers(param->layer(i).name())] );
+        param_layer->mutable_quantization_param()->set_zero_point_params( zero_point_params_[ConvlayerInLayers(param->layer(i).name())] );
+		
+		param_layer->mutable_quantization_param()->set_precision(precision);
+		
+      }
+      // 激活输入输出
+      if (net_part.find("Activations") != string::npos) 
+      {
+        LayerParameter* param_layer = param->mutable_layer(i);
+        
+        param_layer->set_type("FcRistretto");
+        
+        param_layer->mutable_quantization_param()->set_scale_in( scale_in_[ConvlayerInLayers(param->layer(i).name())] );
+        param_layer->mutable_quantization_param()->set_zero_point_in( zero_point_in_[ConvlayerInLayers(param->layer(i).name())]);
+        
+        param_layer->mutable_quantization_param()->set_scale_out( scale_out_[ConvlayerInLayers(param->layer(i).name())] );
+        param_layer->mutable_quantization_param()->set_zero_point_out( zero_point_out_[ConvlayerInLayers(param->layer(i).name())] );
+
+		param_layer->mutable_quantization_param()->set_precision(precision);
+		
+      }
+    }
+  }
+}
+// IAO 总网络id 在 卷积/全链接层 量化参数表中的id
+int Quantization::ConvlayerInLayers(const string layer_name) {
+  int pos = find(layer_names_.begin(), layer_names_.end(), layer_name)
+      - layer_names_.begin();
+  return pos;
+}
+
+
+```
+
+
