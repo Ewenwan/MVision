@@ -331,8 +331,10 @@ convolutional_layer make_convolutional_layer(int batch, int h, int w, int c, int
 #endif
     l.workspace_size = get_workspace_size(l);
     l.activation = activation;//激活函数的类型
-// 打印 网络 的配置  卷积核数量  尺寸  步长  输入特征图             输出特征图尺寸 通道数量   计算量 FLOPS（即“每秒浮点运算次数”，“每秒峰值速度”）    卷积核尺寸 k_h*k_w*i_c*o_c * 输出特征图大小 / 10亿
+// 打印 网络 的配置  卷积核数量  尺寸  步长  输入特征图     输出特征图尺寸 通道数量   计算量 FLOPS（即“每秒浮点运算次数”，“每秒峰值速度”）    卷积核尺寸 k_h*k_w*i_c*o_c * 输出特征图大小 / 10亿
     float flops = (2.0 * l.n * l.size*l.size*l.c/l.groups * l.out_h*l.out_w)/1000000000.;
+// 乘法和加法 相当于两次计算，所以乘以2
+// 计算量 = 卷积核数量*卷积核宽*卷积核高*输入通道数量/分组 * 特征图宽*特征图高
 	static float flops_all = 0.0;
 	flops_all += flops;
     fprintf(stderr, "conv  %5d %2d x%2d /%2d  %4d x%4d x%4d   --->  %4d x%4d x%4d  %5.3f GFLOPs  all: %5.3f GFLOPs\n", n, size, size, stride, w, h, c, l.out_w, l.out_h, l.out_c, flops, flops_all);
