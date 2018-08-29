@@ -89,16 +89,16 @@
 ```asm
 0. conv1  7*7*3*96 7*7卷积 3通道输入 96通道输出 滑动步长2  relu激活                                 
 1. 最大值池化 maxpool1 3*3池化核尺寸 滑动步长2           
-2. fire2 squeeze层 16个输出通道， expand层  64个输出通道
-3. fire3 squeeze层 16个输出通道， expand层  64个输出通道
-4. fire4 squeeze层 32个输出通道， expand层  128个输出通道
+2. fire2 squeeze层 16个输出通道， expand层  64个输出通道  concat --> 128
+3. fire3 squeeze层 16个输出通道， expand层  64个输出通道  concat --> 128
+4. fire4 squeeze层 32个输出通道， expand层  128个输出通道 concat --> 256
 5. maxpool4 最大值池化 maxpool1 3*3池化核尺寸 滑动步长2
-6. fire5 squeeze层 32个输出通道， expand层  128个输出通道
-7. fire6 squeeze层 48个输出通道， expand层  192个输出通道
-8. fire7 squeeze层 48个输出通道， expand层  196个输出通道
-9. fire8 squeeze层 64个输出通道， expand层  256个输出通道
+6. fire5 squeeze层 32个输出通道， expand层  128个输出通道 concat --> 256
+7. fire6 squeeze层 48个输出通道， expand层  192个输出通道 concat --> 384
+8. fire7 squeeze层 48个输出通道， expand层  192个输出通道 concat --> 384
+9. fire8 squeeze层 64个输出通道， expand层  256个输出通道 concat --> 512
 10. maxpool8 最大值池化 maxpool1 3*3池化核尺寸 滑动步长2
-11. fire9 squeeze层 64个输出通道， expand层  256个输出通道
+11. fire9 squeeze层 64个输出通道， expand层  256个输出通道concat --> 512
 12. 随机失活层 dropout 神经元以0.5的概率不输出
 13. conv10 类似于全连接层 1*1的点卷积 将输出通道 固定为 1000类输出 + relu激活
 14. avgpool10 13*13的均值池化核尺寸 13*13*1000 ---> 1*1*1000
