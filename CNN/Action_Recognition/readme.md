@@ -9,6 +9,10 @@
 
 [CVPR 2014 Tutorial on Emerging Topics in Human Activity Recognition](http://michaelryoo.com/cvpr2014tutorial/)
 
+[1Deep Learning for Video Classification and Captioning](https://arxiv.org/pdf/1609.06782.pdf)
+
+[卷积方式探索 3d 2.5d 混合卷积](https://arxiv.org/pdf/1708.05038.pdf)
+
 # 行为检测 Action Detection                            类似图像目标检测
     但在现实应用中更容易遇到的情况是序列尚未在时域分割（Untrimmed），
     因此需要同时对行为动作进行时域定位（分割）和类型判定，这类任务一般称为行为检测。
