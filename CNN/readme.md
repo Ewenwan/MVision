@@ -42,6 +42,8 @@
 ![](https://img-blog.csdn.net/20160818141025738)
 
 # 卷积神经网络
+[nanonets.com 来帮助使用很少的数据和没有计算机硬件的情况下构建机器学习模型 ](https://nanonets.com/#demo)
+
 [facebook目标检测平台 基于caffe2](https://github.com/Ewenwan/Detectron)
 
 [网络模型结构在线可视化](http://ethereon.github.io/netscope/#/editor)
