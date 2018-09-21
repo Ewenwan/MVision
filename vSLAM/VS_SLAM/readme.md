@@ -58,6 +58,7 @@
 
 [多目标跟踪分割](https://github.com/Ewenwan/MultiSeg)
 
+![](https://github.com/umd-fire-coml/MultiSeg/raw/master/MultiSegDiagram.png)
 
 # 2. Vision Semantic SLAM  视觉分割SLAM   语义SLAM
 [语义SLAM参考](https://github.com/Ewenwan/texs/blob/master/PaperReader/SemanticSLAM/SemanticSLAM.md)
