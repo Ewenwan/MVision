@@ -25,6 +25,7 @@ static inline size_t alignSize(size_t sz, int n)
     return (sz + n-1) & -n;
 }
 
+// 32位整数 量化到　16位整数================================
 // convert float to half precision floating point
 static unsigned short float2half(float value)
 {
@@ -38,9 +39,9 @@ static unsigned short float2half(float value)
     tmp.f = value;
 
     // 1 : 8 : 23
-    unsigned short sign = (tmp.u & 0x80000000) >> 31;
-    unsigned short exponent = (tmp.u & 0x7F800000) >> 23;
-    unsigned int significand = tmp.u & 0x7FFFFF;
+    unsigned short sign = (tmp.u & 0x80000000) >> 31;// 符号位
+    unsigned short exponent = (tmp.u & 0x7F800000) >> 23;// 指数位
+    unsigned int significand = tmp.u & 0x7FFFFF;// 小数位
 
 //     fprintf(stderr, "%d %d %d\n", sign, exponent, significand);
 
@@ -89,6 +90,7 @@ static unsigned short float2half(float value)
     return fp16;
 }
 
+// 乘以缩放系数后的浮点数　取整到　最近整数
 // round to nearest
 static signed char float2int8(float value)
 {
@@ -181,7 +183,7 @@ static int quantize_weight(float *data, size_t data_length, std::vector<unsigned
     {
         float f = data[i];
 
-        unsigned short fp16 = float2half(f);
+        unsigned short fp16 = float2half(f);// 转换成 半精度浮点数===============
 
         float16_weights[i] = fp16;
     }
@@ -200,7 +202,7 @@ static int quantize_weight(float *data, size_t data_length, std::vector<float> s
     {
         float f = data[i];
 
-        signed char int8 = float2int8(f * scales[ i / length_per_group ]);
+        signed char int8 = float2int8(f * scales[ i / length_per_group ]);// 量化到 int8
 
         int8_weights[i] = int8;
     }
@@ -232,24 +234,25 @@ static bool quantize_weight(float *data, size_t data_length, int quantize_level,
         if (max_value < data[i]) max_value = data[i];
         if (min_value > data[i]) min_value = data[i];
     }
-    float strides = (max_value - min_value) / quantize_level;
+    float strides = (max_value - min_value) / quantize_level;// 量化精度
 
     // 2. Generate quantize table
     for (int i = 0; i < quantize_level; ++i)
     {
-        quantize_table.push_back(min_value + i * strides);
+        quantize_table.push_back(min_value + i * strides);// 量化表格
     }
 
     // 3. Align data to the quantized value
     for (size_t i = 0; i < data_length; ++i)
     {
-        size_t table_index = int((data[i] - min_value) / strides);
+        size_t table_index = int((data[i] - min_value) / strides);// 表id
         table_index = std::min<float>(table_index, quantize_level - 1);
 
         float low_value  = quantize_table[table_index];
         float high_value = low_value + strides;
 
         // find a nearest value between low and high value.
+	// 那一个量化的误差小，就选那一个
         float targetValue = data[i] - low_value < high_value - data[i] ? low_value : high_value;
 
         table_index = int((targetValue - min_value) / strides);
