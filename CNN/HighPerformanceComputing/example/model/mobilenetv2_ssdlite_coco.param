@@ -1,0 +1,238 @@
+7767517
+236 269
+Input            input            0 1 data 0=300 1=300 2=3
+Split            splitncnn_0      1 7 data data_splitncnn_0 data_splitncnn_1 data_splitncnn_2 data_splitncnn_3 data_splitncnn_4 data_splitncnn_5 data_splitncnn_6
+Convolution      Conv             1 1 data_splitncnn_6 Conv 0=32 1=3 2=1 3=2 4=1 5=1 6=864
+ReLU             Conv/relu        1 1 Conv Conv_Conv/relu
+ConvolutionDepthWise conv/depthwise   1 1 Conv_Conv/relu conv/depthwise 0=32 1=3 2=1 3=1 4=1 5=1 6=288 7=32
+ReLU             conv/depthwise/relu 1 1 conv/depthwise conv/depthwise_conv/depthwise/relu
+Convolution      conv/project     1 1 conv/depthwise_conv/depthwise/relu conv/project 0=16 1=1 2=1 3=1 4=0 5=1 6=512
+Convolution      conv_1/expand    1 1 conv/project conv_1/expand 0=96 1=1 2=1 3=1 4=0 5=1 6=1536
+ReLU             conv_1/expand/relu 1 1 conv_1/expand conv_1/expand_conv_1/expand/relu
+ConvolutionDepthWise conv_1/depthwise 1 1 conv_1/expand_conv_1/expand/relu conv_1/depthwise 0=96 1=3 2=1 3=2 4=1 5=1 6=864 7=96
+ReLU             conv_1/depthwise/relu 1 1 conv_1/depthwise conv_1/depthwise_conv_1/depthwise/relu
+Convolution      conv_1/project   1 1 conv_1/depthwise_conv_1/depthwise/relu conv_1/project 0=24 1=1 2=1 3=1 4=0 5=1 6=2304
+Split            splitncnn_1      1 2 conv_1/project conv_1/project_splitncnn_0 conv_1/project_splitncnn_1
+Convolution      conv_2/expand    1 1 conv_1/project_splitncnn_1 conv_2/expand 0=144 1=1 2=1 3=1 4=0 5=1 6=3456
+ReLU             conv_2/expand/relu 1 1 conv_2/expand conv_2/expand_conv_2/expand/relu
+ConvolutionDepthWise conv_2/depthwise 1 1 conv_2/expand_conv_2/expand/relu conv_2/depthwise 0=144 1=3 2=1 3=1 4=1 5=1 6=1296 7=144
+ReLU             conv_2/depthwise/relu 1 1 conv_2/depthwise conv_2/depthwise_conv_2/depthwise/relu
+Convolution      conv_2/project   1 1 conv_2/depthwise_conv_2/depthwise/relu conv_2/project 0=24 1=1 2=1 3=1 4=0 5=1 6=3456
+Eltwise          conv_2/sum       2 1 conv_1/project_splitncnn_0 conv_2/project conv_2 0=1 -23301=0
+Convolution      conv_3/expand    1 1 conv_2 conv_3/expand 0=144 1=1 2=1 3=1 4=0 5=1 6=3456
+ReLU             conv_3/expand/relu 1 1 conv_3/expand conv_3/expand_conv_3/expand/relu
+ConvolutionDepthWise conv_3/depthwise 1 1 conv_3/expand_conv_3/expand/relu conv_3/depthwise 0=144 1=3 2=1 3=2 4=1 5=1 6=1296 7=144
+ReLU             conv_3/depthwise/relu 1 1 conv_3/depthwise conv_3/depthwise_conv_3/depthwise/relu
+Convolution      conv_3/project   1 1 conv_3/depthwise_conv_3/depthwise/relu conv_3/project 0=32 1=1 2=1 3=1 4=0 5=1 6=4608
+Split            splitncnn_2      1 2 conv_3/project conv_3/project_splitncnn_0 conv_3/project_splitncnn_1
+Convolution      conv_4/expand    1 1 conv_3/project_splitncnn_1 conv_4/expand 0=192 1=1 2=1 3=1 4=0 5=1 6=6144
+ReLU             conv_4/expand/relu 1 1 conv_4/expand conv_4/expand_conv_4/expand/relu
+ConvolutionDepthWise conv_4/depthwise 1 1 conv_4/expand_conv_4/expand/relu conv_4/depthwise 0=192 1=3 2=1 3=1 4=1 5=1 6=1728 7=192
+ReLU             conv_4/depthwise/relu 1 1 conv_4/depthwise conv_4/depthwise_conv_4/depthwise/relu
+Convolution      conv_4/project   1 1 conv_4/depthwise_conv_4/depthwise/relu conv_4/project 0=32 1=1 2=1 3=1 4=0 5=1 6=6144
+Eltwise          conv_4/sum       2 1 conv_3/project_splitncnn_0 conv_4/project conv_4 0=1 -23301=0
+Split            splitncnn_3      1 2 conv_4 conv_4_splitncnn_0 conv_4_splitncnn_1
+Convolution      conv_5/expand    1 1 conv_4_splitncnn_1 conv_5/expand 0=192 1=1 2=1 3=1 4=0 5=1 6=6144
+ReLU             conv_5/expand/relu 1 1 conv_5/expand conv_5/expand_conv_5/expand/relu
+ConvolutionDepthWise conv_5/depthwise 1 1 conv_5/expand_conv_5/expand/relu conv_5/depthwise 0=192 1=3 2=1 3=1 4=1 5=1 6=1728 7=192
+ReLU             conv_5/depthwise/relu 1 1 conv_5/depthwise conv_5/depthwise_conv_5/depthwise/relu
+Convolution      conv_5/project   1 1 conv_5/depthwise_conv_5/depthwise/relu conv_5/project 0=32 1=1 2=1 3=1 4=0 5=1 6=6144
+Eltwise          conv_5/sum       2 1 conv_4_splitncnn_0 conv_5/project conv_5 0=1 -23301=0
+Convolution      conv_6/expand    1 1 conv_5 conv_6/expand 0=192 1=1 2=1 3=1 4=0 5=1 6=6144
+ReLU             conv_6/expand/relu 1 1 conv_6/expand conv_6/expand_conv_6/expand/relu
+ConvolutionDepthWise conv_6/depthwise 1 1 conv_6/expand_conv_6/expand/relu conv_6/depthwise 0=192 1=3 2=1 3=2 4=1 5=1 6=1728 7=192
+ReLU             conv_6/depthwise/relu 1 1 conv_6/depthwise conv_6/depthwise_conv_6/depthwise/relu
+Convolution      conv_6/project   1 1 conv_6/depthwise_conv_6/depthwise/relu conv_6/project 0=64 1=1 2=1 3=1 4=0 5=1 6=12288
+Split            splitncnn_4      1 2 conv_6/project conv_6/project_splitncnn_0 conv_6/project_splitncnn_1
+Convolution      conv_7/expand    1 1 conv_6/project_splitncnn_1 conv_7/expand 0=384 1=1 2=1 3=1 4=0 5=1 6=24576
+ReLU             conv_7/expand/relu 1 1 conv_7/expand conv_7/expand_conv_7/expand/relu
+ConvolutionDepthWise conv_7/depthwise 1 1 conv_7/expand_conv_7/expand/relu conv_7/depthwise 0=384 1=3 2=1 3=1 4=1 5=1 6=3456 7=384
+ReLU             conv_7/depthwise/relu 1 1 conv_7/depthwise conv_7/depthwise_conv_7/depthwise/relu
+Convolution      conv_7/project   1 1 conv_7/depthwise_conv_7/depthwise/relu conv_7/project 0=64 1=1 2=1 3=1 4=0 5=1 6=24576
+Eltwise          conv_7/sum       2 1 conv_6/project_splitncnn_0 conv_7/project conv_7 0=1 -23301=0
+Split            splitncnn_5      1 2 conv_7 conv_7_splitncnn_0 conv_7_splitncnn_1
+Convolution      conv_8/expand    1 1 conv_7_splitncnn_1 conv_8/expand 0=384 1=1 2=1 3=1 4=0 5=1 6=24576
+ReLU             conv_8/expand/relu 1 1 conv_8/expand conv_8/expand_conv_8/expand/relu
+ConvolutionDepthWise conv_8/depthwise 1 1 conv_8/expand_conv_8/expand/relu conv_8/depthwise 0=384 1=3 2=1 3=1 4=1 5=1 6=3456 7=384
+ReLU             conv_8/depthwise/relu 1 1 conv_8/depthwise conv_8/depthwise_conv_8/depthwise/relu
+Convolution      conv_8/project   1 1 conv_8/depthwise_conv_8/depthwise/relu conv_8/project 0=64 1=1 2=1 3=1 4=0 5=1 6=24576
+Eltwise          conv_8/sum       2 1 conv_7_splitncnn_0 conv_8/project conv_8 0=1 -23301=0
+Split            splitncnn_6      1 2 conv_8 conv_8_splitncnn_0 conv_8_splitncnn_1
+Convolution      conv_9/expand    1 1 conv_8_splitncnn_1 conv_9/expand 0=384 1=1 2=1 3=1 4=0 5=1 6=24576
+ReLU             conv_9/expand/relu 1 1 conv_9/expand conv_9/expand_conv_9/expand/relu
+ConvolutionDepthWise conv_9/depthwise 1 1 conv_9/expand_conv_9/expand/relu conv_9/depthwise 0=384 1=3 2=1 3=1 4=1 5=1 6=3456 7=384
+ReLU             conv_9/depthwise/relu 1 1 conv_9/depthwise conv_9/depthwise_conv_9/depthwise/relu
+Convolution      conv_9/project   1 1 conv_9/depthwise_conv_9/depthwise/relu conv_9/project 0=64 1=1 2=1 3=1 4=0 5=1 6=24576
+Eltwise          conv_9/sum       2 1 conv_8_splitncnn_0 conv_9/project conv_9 0=1 -23301=0
+Convolution      conv_10/expand   1 1 conv_9 conv_10/expand 0=384 1=1 2=1 3=1 4=0 5=1 6=24576
+ReLU             conv_10/expand/relu 1 1 conv_10/expand conv_10/expand_conv_10/expand/relu
+ConvolutionDepthWise conv_10/depthwise 1 1 conv_10/expand_conv_10/expand/relu conv_10/depthwise 0=384 1=3 2=1 3=1 4=1 5=1 6=3456 7=384
+ReLU             conv_10/depthwise/relu 1 1 conv_10/depthwise conv_10/depthwise_conv_10/depthwise/relu
+Convolution      conv_10/project  1 1 conv_10/depthwise_conv_10/depthwise/relu conv_10/project 0=96 1=1 2=1 3=1 4=0 5=1 6=36864
+Split            splitncnn_7      1 2 conv_10/project conv_10/project_splitncnn_0 conv_10/project_splitncnn_1
+Convolution      conv_11/expand   1 1 conv_10/project_splitncnn_1 conv_11/expand 0=576 1=1 2=1 3=1 4=0 5=1 6=55296
+ReLU             conv_11/expand/relu 1 1 conv_11/expand conv_11/expand_conv_11/expand/relu
+ConvolutionDepthWise conv_11/depthwise 1 1 conv_11/expand_conv_11/expand/relu conv_11/depthwise 0=576 1=3 2=1 3=1 4=1 5=1 6=5184 7=576
+ReLU             conv_11/depthwise/relu 1 1 conv_11/depthwise conv_11/depthwise_conv_11/depthwise/relu
+Convolution      conv_11/project  1 1 conv_11/depthwise_conv_11/depthwise/relu conv_11/project 0=96 1=1 2=1 3=1 4=0 5=1 6=55296
+Eltwise          conv_11/sum      2 1 conv_10/project_splitncnn_0 conv_11/project conv_11 0=1 -23301=0
+Split            splitncnn_8      1 2 conv_11 conv_11_splitncnn_0 conv_11_splitncnn_1
+Convolution      conv_12/expand   1 1 conv_11_splitncnn_1 conv_12/expand 0=576 1=1 2=1 3=1 4=0 5=1 6=55296
+ReLU             conv_12/expand/relu 1 1 conv_12/expand conv_12/expand_conv_12/expand/relu
+ConvolutionDepthWise conv_12/depthwise 1 1 conv_12/expand_conv_12/expand/relu conv_12/depthwise 0=576 1=3 2=1 3=1 4=1 5=1 6=5184 7=576
+ReLU             conv_12/depthwise/relu 1 1 conv_12/depthwise conv_12/depthwise_conv_12/depthwise/relu
+Convolution      conv_12/project  1 1 conv_12/depthwise_conv_12/depthwise/relu conv_12/project 0=96 1=1 2=1 3=1 4=0 5=1 6=55296
+Eltwise          conv_12/sum      2 1 conv_11_splitncnn_0 conv_12/project conv_12 0=1 -23301=0
+Convolution      conv_13/expand   1 1 conv_12 conv_13/expand 0=576 1=1 2=1 3=1 4=0 5=1 6=55296
+ReLU             conv_13/expand/relu 1 1 conv_13/expand conv_13/expand_conv_13/expand/relu
+Split            splitncnn_9      1 4 conv_13/expand_conv_13/expand/relu conv_13/expand_conv_13/expand/relu_splitncnn_0 conv_13/expand_conv_13/expand/relu_splitncnn_1 conv_13/expand_conv_13/expand/relu_splitncnn_2 conv_13/expand_conv_13/expand/relu_splitncnn_3
+ConvolutionDepthWise conv_13/depthwise 1 1 conv_13/expand_conv_13/expand/relu_splitncnn_3 conv_13/depthwise 0=576 1=3 2=1 3=2 4=1 5=1 6=5184 7=576
+ReLU             conv_13/depthwise/relu 1 1 conv_13/depthwise conv_13/depthwise_conv_13/depthwise/relu
+Convolution      conv_13/project  1 1 conv_13/depthwise_conv_13/depthwise/relu conv_13/project 0=160 1=1 2=1 3=1 4=0 5=1 6=92160
+Split            splitncnn_10     1 2 conv_13/project conv_13/project_splitncnn_0 conv_13/project_splitncnn_1
+Convolution      conv_14/expand   1 1 conv_13/project_splitncnn_1 conv_14/expand 0=960 1=1 2=1 3=1 4=0 5=1 6=153600
+ReLU             conv_14/expand/relu 1 1 conv_14/expand conv_14/expand_conv_14/expand/relu
+ConvolutionDepthWise conv_14/depthwise 1 1 conv_14/expand_conv_14/expand/relu conv_14/depthwise 0=960 1=3 2=1 3=1 4=1 5=1 6=8640 7=960
+ReLU             conv_14/depthwise/relu 1 1 conv_14/depthwise conv_14/depthwise_conv_14/depthwise/relu
+Convolution      conv_14/project  1 1 conv_14/depthwise_conv_14/depthwise/relu conv_14/project 0=160 1=1 2=1 3=1 4=0 5=1 6=153600
+Eltwise          conv_14/sum      2 1 conv_13/project_splitncnn_0 conv_14/project conv_14 0=1 -23301=0
+Split            splitncnn_11     1 2 conv_14 conv_14_splitncnn_0 conv_14_splitncnn_1
+Convolution      conv_15/expand   1 1 conv_14_splitncnn_1 conv_15/expand 0=960 1=1 2=1 3=1 4=0 5=1 6=153600
+ReLU             conv_15/expand/relu 1 1 conv_15/expand conv_15/expand_conv_15/expand/relu
+ConvolutionDepthWise conv_15/depthwise 1 1 conv_15/expand_conv_15/expand/relu conv_15/depthwise 0=960 1=3 2=1 3=1 4=1 5=1 6=8640 7=960
+ReLU             conv_15/depthwise/relu 1 1 conv_15/depthwise conv_15/depthwise_conv_15/depthwise/relu
+Convolution      conv_15/project  1 1 conv_15/depthwise_conv_15/depthwise/relu conv_15/project 0=160 1=1 2=1 3=1 4=0 5=1 6=153600
+Eltwise          conv_15/sum      2 1 conv_14_splitncnn_0 conv_15/project conv_15 0=1 -23301=0
+Convolution      conv_16/expand   1 1 conv_15 conv_16/expand 0=960 1=1 2=1 3=1 4=0 5=1 6=153600
+ReLU             conv_16/expand/relu 1 1 conv_16/expand conv_16/expand_conv_16/expand/relu
+ConvolutionDepthWise conv_16/depthwise 1 1 conv_16/expand_conv_16/expand/relu conv_16/depthwise 0=960 1=3 2=1 3=1 4=1 5=1 6=8640 7=960
+ReLU             conv_16/depthwise/relu 1 1 conv_16/depthwise conv_16/depthwise_conv_16/depthwise/relu
+Convolution      conv_16/project  1 1 conv_16/depthwise_conv_16/depthwise/relu conv_16/project 0=320 1=1 2=1 3=1 4=0 5=1 6=307200
+Convolution      Conv_1           1 1 conv_16/project Conv_1 0=1280 1=1 2=1 3=1 4=0 5=1 6=409600
+ReLU             Conv_1/relu      1 1 Conv_1 Conv_1_Conv_1/relu
+Split            splitncnn_12     1 4 Conv_1_Conv_1/relu Conv_1_Conv_1/relu_splitncnn_0 Conv_1_Conv_1/relu_splitncnn_1 Conv_1_Conv_1/relu_splitncnn_2 Conv_1_Conv_1/relu_splitncnn_3
+Convolution      layer_19_1_2     1 1 Conv_1_Conv_1/relu_splitncnn_3 layer_19_1_2 0=256 1=1 2=1 3=1 4=0 5=1 6=327680
+ReLU             layer_19_1_2/relu 1 1 layer_19_1_2 layer_19_1_2_layer_19_1_2/relu
+ConvolutionDepthWise layer_19_2_2/depthwise 1 1 layer_19_1_2_layer_19_1_2/relu layer_19_2_2/depthwise 0=256 1=3 2=1 3=2 4=1 5=1 6=2304 7=256
+ReLU             layer_19_2_2/depthwise/relu 1 1 layer_19_2_2/depthwise layer_19_2_2/depthwise_layer_19_2_2/depthwise/relu
+Convolution      layer_19_2_2     1 1 layer_19_2_2/depthwise_layer_19_2_2/depthwise/relu layer_19_2_2 0=512 1=1 2=1 3=1 4=0 5=1 6=131072
+ReLU             layer_19_2_2/relu 1 1 layer_19_2_2 layer_19_2_2_layer_19_2_2/relu
+Split            splitncnn_13     1 4 layer_19_2_2_layer_19_2_2/relu layer_19_2_2_layer_19_2_2/relu_splitncnn_0 layer_19_2_2_layer_19_2_2/relu_splitncnn_1 layer_19_2_2_layer_19_2_2/relu_splitncnn_2 layer_19_2_2_layer_19_2_2/relu_splitncnn_3
+Convolution      layer_19_1_3     1 1 layer_19_2_2_layer_19_2_2/relu_splitncnn_3 layer_19_1_3 0=128 1=1 2=1 3=1 4=0 5=1 6=65536
+ReLU             layer_19_1_3/relu 1 1 layer_19_1_3 layer_19_1_3_layer_19_1_3/relu
+ConvolutionDepthWise layer_19_2_3/depthwise 1 1 layer_19_1_3_layer_19_1_3/relu layer_19_2_3/depthwise 0=128 1=3 2=1 3=2 4=1 5=1 6=1152 7=128
+ReLU             layer_19_2_3/depthwise/relu 1 1 layer_19_2_3/depthwise layer_19_2_3/depthwise_layer_19_2_3/depthwise/relu
+Convolution      layer_19_2_3     1 1 layer_19_2_3/depthwise_layer_19_2_3/depthwise/relu layer_19_2_3 0=256 1=1 2=1 3=1 4=0 5=1 6=32768
+ReLU             layer_19_2_3/relu 1 1 layer_19_2_3 layer_19_2_3_layer_19_2_3/relu
+Split            splitncnn_14     1 4 layer_19_2_3_layer_19_2_3/relu layer_19_2_3_layer_19_2_3/relu_splitncnn_0 layer_19_2_3_layer_19_2_3/relu_splitncnn_1 layer_19_2_3_layer_19_2_3/relu_splitncnn_2 layer_19_2_3_layer_19_2_3/relu_splitncnn_3
+Convolution      layer_19_1_4     1 1 layer_19_2_3_layer_19_2_3/relu_splitncnn_3 layer_19_1_4 0=128 1=1 2=1 3=1 4=0 5=1 6=32768
+ReLU             layer_19_1_4/relu 1 1 layer_19_1_4 layer_19_1_4_layer_19_1_4/relu
+ConvolutionDepthWise layer_19_2_4/depthwise 1 1 layer_19_1_4_layer_19_1_4/relu layer_19_2_4/depthwise 0=128 1=3 2=1 3=2 4=1 5=1 6=1152 7=128
+ReLU             layer_19_2_4/depthwise/relu 1 1 layer_19_2_4/depthwise layer_19_2_4/depthwise_layer_19_2_4/depthwise/relu
+Convolution      layer_19_2_4     1 1 layer_19_2_4/depthwise_layer_19_2_4/depthwise/relu layer_19_2_4 0=256 1=1 2=1 3=1 4=0 5=1 6=32768
+ReLU             layer_19_2_4/relu 1 1 layer_19_2_4 layer_19_2_4_layer_19_2_4/relu
+Split            splitncnn_15     1 4 layer_19_2_4_layer_19_2_4/relu layer_19_2_4_layer_19_2_4/relu_splitncnn_0 layer_19_2_4_layer_19_2_4/relu_splitncnn_1 layer_19_2_4_layer_19_2_4/relu_splitncnn_2 layer_19_2_4_layer_19_2_4/relu_splitncnn_3
+Convolution      layer_19_1_5     1 1 layer_19_2_4_layer_19_2_4/relu_splitncnn_3 layer_19_1_5 0=64 1=1 2=1 3=1 4=0 5=1 6=16384
+ReLU             layer_19_1_5/relu 1 1 layer_19_1_5 layer_19_1_5_layer_19_1_5/relu
+ConvolutionDepthWise layer_19_2_5/depthwise 1 1 layer_19_1_5_layer_19_1_5/relu layer_19_2_5/depthwise 0=64 1=3 2=1 3=2 4=1 5=1 6=576 7=64
+ReLU             layer_19_2_5/depthwise/relu 1 1 layer_19_2_5/depthwise layer_19_2_5/depthwise_layer_19_2_5/depthwise/relu
+Convolution      layer_19_2_5     1 1 layer_19_2_5/depthwise_layer_19_2_5/depthwise/relu layer_19_2_5 0=128 1=1 2=1 3=1 4=0 5=1 6=8192
+ReLU             layer_19_2_5/relu 1 1 layer_19_2_5 layer_19_2_5_layer_19_2_5/relu
+Split            splitncnn_16     1 3 layer_19_2_5_layer_19_2_5/relu layer_19_2_5_layer_19_2_5/relu_splitncnn_0 layer_19_2_5_layer_19_2_5/relu_splitncnn_1 layer_19_2_5_layer_19_2_5/relu_splitncnn_2
+ConvolutionDepthWise conv_13/expand_mbox_loc/depthwise 1 1 conv_13/expand_conv_13/expand/relu_splitncnn_2 conv_13/expand_mbox_loc/depthwise 0=576 1=3 2=1 3=1 4=1 5=0 6=5184 7=576
+BatchNorm        conv_13/expand_mbox_loc/depthwise/bn 1 1 conv_13/expand_mbox_loc/depthwise conv_13/expand_mbox_loc/depthwise_conv_13/expand_mbox_loc/depthwise/bn 0=576
+Scale            conv_13/expand_mbox_loc/depthwise/scale 1 1 conv_13/expand_mbox_loc/depthwise_conv_13/expand_mbox_loc/depthwise/bn conv_13/expand_mbox_loc/depthwise_conv_13/expand_mbox_loc/depthwise/scale 0=576 1=1
+ReLU             conv_13/expand_mbox_loc/depthwise/relu 1 1 conv_13/expand_mbox_loc/depthwise_conv_13/expand_mbox_loc/depthwise/scale conv_13/expand_mbox_loc/depthwise_conv_13/expand_mbox_loc/depthwise/relu
+Convolution      conv_13/expand_mbox_loc 1 1 conv_13/expand_mbox_loc/depthwise_conv_13/expand_mbox_loc/depthwise/relu conv_13/expand_mbox_loc 0=12 1=1 2=1 3=1 4=0 5=1 6=6912
+Permute          conv_13/expand_mbox_loc_perm 1 1 conv_13/expand_mbox_loc conv_13/expand_mbox_loc_perm 0=3
+Flatten          conv_13/expand_mbox_loc_flat 1 1 conv_13/expand_mbox_loc_perm conv_13/expand_mbox_loc_flat
+ConvolutionDepthWise conv_13/expand_mbox_conf/depthwise 1 1 conv_13/expand_conv_13/expand/relu_splitncnn_1 conv_13/expand_mbox_conf/depthwise 0=576 1=3 2=1 3=1 4=1 5=0 6=5184 7=576
+BatchNorm        conv_13/expand_mbox_conf/depthwise/bn 1 1 conv_13/expand_mbox_conf/depthwise conv_13/expand_mbox_conf/depthwise_conv_13/expand_mbox_conf/depthwise/bn 0=576
+Scale            conv_13/expand_mbox_conf/depthwise/scale 1 1 conv_13/expand_mbox_conf/depthwise_conv_13/expand_mbox_conf/depthwise/bn conv_13/expand_mbox_conf/depthwise_conv_13/expand_mbox_conf/depthwise/scale 0=576 1=1
+ReLU             conv_13/expand_mbox_conf/depthwise/relu 1 1 conv_13/expand_mbox_conf/depthwise_conv_13/expand_mbox_conf/depthwise/scale conv_13/expand_mbox_conf/depthwise_conv_13/expand_mbox_conf/depthwise/relu
+Convolution      conv_13/expand_mbox_conf 1 1 conv_13/expand_mbox_conf/depthwise_conv_13/expand_mbox_conf/depthwise/relu conv_13/expand_mbox_conf 0=273 1=1 2=1 3=1 4=0 5=1 6=157248
+Permute          conv_13/expand_mbox_conf_perm 1 1 conv_13/expand_mbox_conf conv_13/expand_mbox_conf_perm 0=3
+Flatten          conv_13/expand_mbox_conf_flat 1 1 conv_13/expand_mbox_conf_perm conv_13/expand_mbox_conf_flat
+PriorBox         conv_13/expand_mbox_priorbox 2 1 conv_13/expand_conv_13/expand/relu_splitncnn_0 data_splitncnn_5 conv_13/expand_mbox_priorbox -23300=1,60.000000 -23301=0 -23302=1,2.000000 3=0.100000 4=0.100000 5=0.200000 6=0.200000 7=1 8=0 9=-233 10=-233 11=-233.000000 12=-233.000000 13=0.500000
+ConvolutionDepthWise Conv_1_mbox_loc/depthwise 1 1 Conv_1_Conv_1/relu_splitncnn_2 Conv_1_mbox_loc/depthwise 0=1280 1=3 2=1 3=1 4=1 5=0 6=11520 7=1280
+BatchNorm        Conv_1_mbox_loc/depthwise/bn 1 1 Conv_1_mbox_loc/depthwise Conv_1_mbox_loc/depthwise_Conv_1_mbox_loc/depthwise/bn 0=1280
+Scale            Conv_1_mbox_loc/depthwise/scale 1 1 Conv_1_mbox_loc/depthwise_Conv_1_mbox_loc/depthwise/bn Conv_1_mbox_loc/depthwise_Conv_1_mbox_loc/depthwise/scale 0=1280 1=1
+ReLU             Conv_1_mbox_loc/depthwise/relu 1 1 Conv_1_mbox_loc/depthwise_Conv_1_mbox_loc/depthwise/scale Conv_1_mbox_loc/depthwise_Conv_1_mbox_loc/depthwise/relu
+Convolution      Conv_1_mbox_loc  1 1 Conv_1_mbox_loc/depthwise_Conv_1_mbox_loc/depthwise/relu Conv_1_mbox_loc 0=24 1=1 2=1 3=1 4=0 5=1 6=30720
+Permute          Conv_1_mbox_loc_perm 1 1 Conv_1_mbox_loc Conv_1_mbox_loc_perm 0=3
+Flatten          Conv_1_mbox_loc_flat 1 1 Conv_1_mbox_loc_perm Conv_1_mbox_loc_flat
+ConvolutionDepthWise Conv_1_mbox_conf/depthwise 1 1 Conv_1_Conv_1/relu_splitncnn_1 Conv_1_mbox_conf/depthwise 0=1280 1=3 2=1 3=1 4=1 5=0 6=11520 7=1280
+BatchNorm        Conv_1_mbox_conf/depthwise/bn 1 1 Conv_1_mbox_conf/depthwise Conv_1_mbox_conf/depthwise_Conv_1_mbox_conf/depthwise/bn 0=1280
+Scale            Conv_1_mbox_conf/depthwise/scale 1 1 Conv_1_mbox_conf/depthwise_Conv_1_mbox_conf/depthwise/bn Conv_1_mbox_conf/depthwise_Conv_1_mbox_conf/depthwise/scale 0=1280 1=1
+ReLU             Conv_1_mbox_conf/depthwise/relu 1 1 Conv_1_mbox_conf/depthwise_Conv_1_mbox_conf/depthwise/scale Conv_1_mbox_conf/depthwise_Conv_1_mbox_conf/depthwise/relu
+Convolution      Conv_1_mbox_conf 1 1 Conv_1_mbox_conf/depthwise_Conv_1_mbox_conf/depthwise/relu Conv_1_mbox_conf 0=546 1=1 2=1 3=1 4=0 5=1 6=698880
+Permute          Conv_1_mbox_conf_perm 1 1 Conv_1_mbox_conf Conv_1_mbox_conf_perm 0=3
+Flatten          Conv_1_mbox_conf_flat 1 1 Conv_1_mbox_conf_perm Conv_1_mbox_conf_flat
+PriorBox         Conv_1_mbox_priorbox 2 1 Conv_1_Conv_1/relu_splitncnn_0 data_splitncnn_4 Conv_1_mbox_priorbox -23300=1,105.000000 -23301=1,150.000000 -23302=2,2.000000,3.000000 3=0.100000 4=0.100000 5=0.200000 6=0.200000 7=1 8=0 9=-233 10=-233 11=-233.000000 12=-233.000000 13=0.500000
+ConvolutionDepthWise layer_19_2_2_mbox_loc/depthwise 1 1 layer_19_2_2_layer_19_2_2/relu_splitncnn_2 layer_19_2_2_mbox_loc/depthwise 0=512 1=3 2=1 3=1 4=1 5=0 6=4608 7=512
+BatchNorm        layer_19_2_2_mbox_loc/depthwise/bn 1 1 layer_19_2_2_mbox_loc/depthwise layer_19_2_2_mbox_loc/depthwise_layer_19_2_2_mbox_loc/depthwise/bn 0=512
+Scale            layer_19_2_2_mbox_loc/depthwise/scale 1 1 layer_19_2_2_mbox_loc/depthwise_layer_19_2_2_mbox_loc/depthwise/bn layer_19_2_2_mbox_loc/depthwise_layer_19_2_2_mbox_loc/depthwise/scale 0=512 1=1
+ReLU             layer_19_2_2_mbox_loc/depthwise/relu 1 1 layer_19_2_2_mbox_loc/depthwise_layer_19_2_2_mbox_loc/depthwise/scale layer_19_2_2_mbox_loc/depthwise_layer_19_2_2_mbox_loc/depthwise/relu
+Convolution      layer_19_2_2_mbox_loc 1 1 layer_19_2_2_mbox_loc/depthwise_layer_19_2_2_mbox_loc/depthwise/relu layer_19_2_2_mbox_loc 0=24 1=1 2=1 3=1 4=0 5=1 6=12288
+Permute          layer_19_2_2_mbox_loc_perm 1 1 layer_19_2_2_mbox_loc layer_19_2_2_mbox_loc_perm 0=3
+Flatten          layer_19_2_2_mbox_loc_flat 1 1 layer_19_2_2_mbox_loc_perm layer_19_2_2_mbox_loc_flat
+ConvolutionDepthWise layer_19_2_2_mbox_conf/depthwise 1 1 layer_19_2_2_layer_19_2_2/relu_splitncnn_1 layer_19_2_2_mbox_conf/depthwise 0=512 1=3 2=1 3=1 4=1 5=0 6=4608 7=512
+BatchNorm        layer_19_2_2_mbox_conf/depthwise/bn 1 1 layer_19_2_2_mbox_conf/depthwise layer_19_2_2_mbox_conf/depthwise_layer_19_2_2_mbox_conf/depthwise/bn 0=512
+Scale            layer_19_2_2_mbox_conf/depthwise/scale 1 1 layer_19_2_2_mbox_conf/depthwise_layer_19_2_2_mbox_conf/depthwise/bn layer_19_2_2_mbox_conf/depthwise_layer_19_2_2_mbox_conf/depthwise/scale 0=512 1=1
+ReLU             layer_19_2_2_mbox_conf/depthwise/relu 1 1 layer_19_2_2_mbox_conf/depthwise_layer_19_2_2_mbox_conf/depthwise/scale layer_19_2_2_mbox_conf/depthwise_layer_19_2_2_mbox_conf/depthwise/relu
+Convolution      layer_19_2_2_mbox_conf 1 1 layer_19_2_2_mbox_conf/depthwise_layer_19_2_2_mbox_conf/depthwise/relu layer_19_2_2_mbox_conf 0=546 1=1 2=1 3=1 4=0 5=1 6=279552
+Permute          layer_19_2_2_mbox_conf_perm 1 1 layer_19_2_2_mbox_conf layer_19_2_2_mbox_conf_perm 0=3
+Flatten          layer_19_2_2_mbox_conf_flat 1 1 layer_19_2_2_mbox_conf_perm layer_19_2_2_mbox_conf_flat
+PriorBox         layer_19_2_2_mbox_priorbox 2 1 layer_19_2_2_layer_19_2_2/relu_splitncnn_0 data_splitncnn_3 layer_19_2_2_mbox_priorbox -23300=1,150.000000 -23301=1,195.000000 -23302=2,2.000000,3.000000 3=0.100000 4=0.100000 5=0.200000 6=0.200000 7=1 8=0 9=-233 10=-233 11=-233.000000 12=-233.000000 13=0.500000
+ConvolutionDepthWise layer_19_2_3_mbox_loc/depthwise 1 1 layer_19_2_3_layer_19_2_3/relu_splitncnn_2 layer_19_2_3_mbox_loc/depthwise 0=256 1=3 2=1 3=1 4=1 5=0 6=2304 7=256
+BatchNorm        layer_19_2_3_mbox_loc/depthwise/bn 1 1 layer_19_2_3_mbox_loc/depthwise layer_19_2_3_mbox_loc/depthwise_layer_19_2_3_mbox_loc/depthwise/bn 0=256
+Scale            layer_19_2_3_mbox_loc/depthwise/scale 1 1 layer_19_2_3_mbox_loc/depthwise_layer_19_2_3_mbox_loc/depthwise/bn layer_19_2_3_mbox_loc/depthwise_layer_19_2_3_mbox_loc/depthwise/scale 0=256 1=1
+ReLU             layer_19_2_3_mbox_loc/depthwise/relu 1 1 layer_19_2_3_mbox_loc/depthwise_layer_19_2_3_mbox_loc/depthwise/scale layer_19_2_3_mbox_loc/depthwise_layer_19_2_3_mbox_loc/depthwise/relu
+Convolution      layer_19_2_3_mbox_loc 1 1 layer_19_2_3_mbox_loc/depthwise_layer_19_2_3_mbox_loc/depthwise/relu layer_19_2_3_mbox_loc 0=24 1=1 2=1 3=1 4=0 5=1 6=6144
+Permute          layer_19_2_3_mbox_loc_perm 1 1 layer_19_2_3_mbox_loc layer_19_2_3_mbox_loc_perm 0=3
+Flatten          layer_19_2_3_mbox_loc_flat 1 1 layer_19_2_3_mbox_loc_perm layer_19_2_3_mbox_loc_flat
+ConvolutionDepthWise layer_19_2_3_mbox_conf/depthwise 1 1 layer_19_2_3_layer_19_2_3/relu_splitncnn_1 layer_19_2_3_mbox_conf/depthwise 0=256 1=3 2=1 3=1 4=1 5=0 6=2304 7=256
+BatchNorm        layer_19_2_3_mbox_conf/depthwise/bn 1 1 layer_19_2_3_mbox_conf/depthwise layer_19_2_3_mbox_conf/depthwise_layer_19_2_3_mbox_conf/depthwise/bn 0=256
+Scale            layer_19_2_3_mbox_conf/depthwise/scale 1 1 layer_19_2_3_mbox_conf/depthwise_layer_19_2_3_mbox_conf/depthwise/bn layer_19_2_3_mbox_conf/depthwise_layer_19_2_3_mbox_conf/depthwise/scale 0=256 1=1
+ReLU             layer_19_2_3_mbox_conf/depthwise/relu 1 1 layer_19_2_3_mbox_conf/depthwise_layer_19_2_3_mbox_conf/depthwise/scale layer_19_2_3_mbox_conf/depthwise_layer_19_2_3_mbox_conf/depthwise/relu
+Convolution      layer_19_2_3_mbox_conf 1 1 layer_19_2_3_mbox_conf/depthwise_layer_19_2_3_mbox_conf/depthwise/relu layer_19_2_3_mbox_conf 0=546 1=1 2=1 3=1 4=0 5=1 6=139776
+Permute          layer_19_2_3_mbox_conf_perm 1 1 layer_19_2_3_mbox_conf layer_19_2_3_mbox_conf_perm 0=3
+Flatten          layer_19_2_3_mbox_conf_flat 1 1 layer_19_2_3_mbox_conf_perm layer_19_2_3_mbox_conf_flat
+PriorBox         layer_19_2_3_mbox_priorbox 2 1 layer_19_2_3_layer_19_2_3/relu_splitncnn_0 data_splitncnn_2 layer_19_2_3_mbox_priorbox -23300=1,195.000000 -23301=1,240.000000 -23302=2,2.000000,3.000000 3=0.100000 4=0.100000 5=0.200000 6=0.200000 7=1 8=0 9=-233 10=-233 11=-233.000000 12=-233.000000 13=0.500000
+ConvolutionDepthWise layer_19_2_4_mbox_loc/depthwise 1 1 layer_19_2_4_layer_19_2_4/relu_splitncnn_2 layer_19_2_4_mbox_loc/depthwise 0=256 1=3 2=1 3=1 4=1 5=0 6=2304 7=256
+BatchNorm        layer_19_2_4_mbox_loc/depthwise/bn 1 1 layer_19_2_4_mbox_loc/depthwise layer_19_2_4_mbox_loc/depthwise_layer_19_2_4_mbox_loc/depthwise/bn 0=256
+Scale            layer_19_2_4_mbox_loc/depthwise/scale 1 1 layer_19_2_4_mbox_loc/depthwise_layer_19_2_4_mbox_loc/depthwise/bn layer_19_2_4_mbox_loc/depthwise_layer_19_2_4_mbox_loc/depthwise/scale 0=256 1=1
+ReLU             layer_19_2_4_mbox_loc/depthwise/relu 1 1 layer_19_2_4_mbox_loc/depthwise_layer_19_2_4_mbox_loc/depthwise/scale layer_19_2_4_mbox_loc/depthwise_layer_19_2_4_mbox_loc/depthwise/relu
+Convolution      layer_19_2_4_mbox_loc 1 1 layer_19_2_4_mbox_loc/depthwise_layer_19_2_4_mbox_loc/depthwise/relu layer_19_2_4_mbox_loc 0=24 1=1 2=1 3=1 4=0 5=1 6=6144
+Permute          layer_19_2_4_mbox_loc_perm 1 1 layer_19_2_4_mbox_loc layer_19_2_4_mbox_loc_perm 0=3
+Flatten          layer_19_2_4_mbox_loc_flat 1 1 layer_19_2_4_mbox_loc_perm layer_19_2_4_mbox_loc_flat
+ConvolutionDepthWise layer_19_2_4_mbox_conf/depthwise 1 1 layer_19_2_4_layer_19_2_4/relu_splitncnn_1 layer_19_2_4_mbox_conf/depthwise 0=256 1=3 2=1 3=1 4=1 5=0 6=2304 7=256
+BatchNorm        layer_19_2_4_mbox_conf/depthwise/bn 1 1 layer_19_2_4_mbox_conf/depthwise layer_19_2_4_mbox_conf/depthwise_layer_19_2_4_mbox_conf/depthwise/bn 0=256
+Scale            layer_19_2_4_mbox_conf/depthwise/scale 1 1 layer_19_2_4_mbox_conf/depthwise_layer_19_2_4_mbox_conf/depthwise/bn layer_19_2_4_mbox_conf/depthwise_layer_19_2_4_mbox_conf/depthwise/scale 0=256 1=1
+ReLU             layer_19_2_4_mbox_conf/depthwise/relu 1 1 layer_19_2_4_mbox_conf/depthwise_layer_19_2_4_mbox_conf/depthwise/scale layer_19_2_4_mbox_conf/depthwise_layer_19_2_4_mbox_conf/depthwise/relu
+Convolution      layer_19_2_4_mbox_conf 1 1 layer_19_2_4_mbox_conf/depthwise_layer_19_2_4_mbox_conf/depthwise/relu layer_19_2_4_mbox_conf 0=546 1=1 2=1 3=1 4=0 5=1 6=139776
+Permute          layer_19_2_4_mbox_conf_perm 1 1 layer_19_2_4_mbox_conf layer_19_2_4_mbox_conf_perm 0=3
+Flatten          layer_19_2_4_mbox_conf_flat 1 1 layer_19_2_4_mbox_conf_perm layer_19_2_4_mbox_conf_flat
+PriorBox         layer_19_2_4_mbox_priorbox 2 1 layer_19_2_4_layer_19_2_4/relu_splitncnn_0 data_splitncnn_1 layer_19_2_4_mbox_priorbox -23300=1,240.000000 -23301=1,285.000000 -23302=2,2.000000,3.000000 3=0.100000 4=0.100000 5=0.200000 6=0.200000 7=1 8=0 9=-233 10=-233 11=-233.000000 12=-233.000000 13=0.500000
+ConvolutionDepthWise layer_19_2_5_mbox_loc/depthwise 1 1 layer_19_2_5_layer_19_2_5/relu_splitncnn_2 layer_19_2_5_mbox_loc/depthwise 0=128 1=3 2=1 3=1 4=1 5=0 6=1152 7=128
+BatchNorm        layer_19_2_5_mbox_loc/depthwise/bn 1 1 layer_19_2_5_mbox_loc/depthwise layer_19_2_5_mbox_loc/depthwise_layer_19_2_5_mbox_loc/depthwise/bn 0=128
+Scale            layer_19_2_5_mbox_loc/depthwise/scale 1 1 layer_19_2_5_mbox_loc/depthwise_layer_19_2_5_mbox_loc/depthwise/bn layer_19_2_5_mbox_loc/depthwise_layer_19_2_5_mbox_loc/depthwise/scale 0=128 1=1
+ReLU             layer_19_2_5_mbox_loc/depthwise/relu 1 1 layer_19_2_5_mbox_loc/depthwise_layer_19_2_5_mbox_loc/depthwise/scale layer_19_2_5_mbox_loc/depthwise_layer_19_2_5_mbox_loc/depthwise/relu
+Convolution      layer_19_2_5_mbox_loc 1 1 layer_19_2_5_mbox_loc/depthwise_layer_19_2_5_mbox_loc/depthwise/relu layer_19_2_5_mbox_loc 0=24 1=1 2=1 3=1 4=0 5=1 6=3072
+Permute          layer_19_2_5_mbox_loc_perm 1 1 layer_19_2_5_mbox_loc layer_19_2_5_mbox_loc_perm 0=3
+Flatten          layer_19_2_5_mbox_loc_flat 1 1 layer_19_2_5_mbox_loc_perm layer_19_2_5_mbox_loc_flat
+ConvolutionDepthWise layer_19_2_5_mbox_conf/depthwise 1 1 layer_19_2_5_layer_19_2_5/relu_splitncnn_1 layer_19_2_5_mbox_conf/depthwise 0=128 1=3 2=1 3=1 4=1 5=0 6=1152 7=128
+BatchNorm        layer_19_2_5_mbox_conf/depthwise/bn 1 1 layer_19_2_5_mbox_conf/depthwise layer_19_2_5_mbox_conf/depthwise_layer_19_2_5_mbox_conf/depthwise/bn 0=128
+Scale            layer_19_2_5_mbox_conf/depthwise/scale 1 1 layer_19_2_5_mbox_conf/depthwise_layer_19_2_5_mbox_conf/depthwise/bn layer_19_2_5_mbox_conf/depthwise_layer_19_2_5_mbox_conf/depthwise/scale 0=128 1=1
+ReLU             layer_19_2_5_mbox_conf/depthwise/relu 1 1 layer_19_2_5_mbox_conf/depthwise_layer_19_2_5_mbox_conf/depthwise/scale layer_19_2_5_mbox_conf/depthwise_layer_19_2_5_mbox_conf/depthwise/relu
+Convolution      layer_19_2_5_mbox_conf 1 1 layer_19_2_5_mbox_conf/depthwise_layer_19_2_5_mbox_conf/depthwise/relu layer_19_2_5_mbox_conf 0=546 1=1 2=1 3=1 4=0 5=1 6=69888
+Permute          layer_19_2_5_mbox_conf_perm 1 1 layer_19_2_5_mbox_conf layer_19_2_5_mbox_conf_perm 0=3
+Flatten          layer_19_2_5_mbox_conf_flat 1 1 layer_19_2_5_mbox_conf_perm layer_19_2_5_mbox_conf_flat
+PriorBox         layer_19_2_5_mbox_priorbox 2 1 layer_19_2_5_layer_19_2_5/relu_splitncnn_0 data_splitncnn_0 layer_19_2_5_mbox_priorbox -23300=1,285.000000 -23301=1,300.000000 -23302=2,2.000000,3.000000 3=0.100000 4=0.100000 5=0.200000 6=0.200000 7=1 8=0 9=-233 10=-233 11=-233.000000 12=-233.000000 13=0.500000
+Concat           mbox_loc         6 1 conv_13/expand_mbox_loc_flat Conv_1_mbox_loc_flat layer_19_2_2_mbox_loc_flat layer_19_2_3_mbox_loc_flat layer_19_2_4_mbox_loc_flat layer_19_2_5_mbox_loc_flat mbox_loc 0=0
+Concat           mbox_conf        6 1 conv_13/expand_mbox_conf_flat Conv_1_mbox_conf_flat layer_19_2_2_mbox_conf_flat layer_19_2_3_mbox_conf_flat layer_19_2_4_mbox_conf_flat layer_19_2_5_mbox_conf_flat mbox_conf 0=0
+Concat           mbox_priorbox    6 1 conv_13/expand_mbox_priorbox Conv_1_mbox_priorbox layer_19_2_2_mbox_priorbox layer_19_2_3_mbox_priorbox layer_19_2_4_mbox_priorbox layer_19_2_5_mbox_priorbox mbox_priorbox 0=1
+Reshape          mbox_conf_reshape 1 1 mbox_conf mbox_conf_reshape 0=91 1=-1 2=0 3=0
+Sigmoid          mbox_conf_sigmoid 1 1 mbox_conf_reshape mbox_conf_sigmoid
+Flatten          mbox_conf_flatten 1 1 mbox_conf_sigmoid mbox_conf_flatten
+DetectionOutput  detection_out    3 1 mbox_loc mbox_conf_flatten mbox_priorbox detection_out 0=91 1=0.450000 2=100 3=100 4=0.350000
