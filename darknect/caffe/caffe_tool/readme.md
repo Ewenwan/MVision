@@ -27,5 +27,8 @@
       模型优化:BatchNorm合并到卷积中， dump the weights of conv layer and batchnorm layer.
          
       load_caffe_weights.py ：
-       load the dumped weights to deploy.caffemodel.
+      load the dumped weights to deploy.caffemodel.
    
+##  caffe  coco模型 转 voc模型
+      coco2voc.py
+
