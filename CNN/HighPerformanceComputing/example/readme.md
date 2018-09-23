@@ -32,7 +32,13 @@
         dog = 0.29287 at 501.58 50.59 257.39 x 291.96
         dog = 0.28615 at 486.13 47.62 311.03 x 542.53
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/img/squeezenet-ssd-voc-dog-det.png)
-
+    
+    3. mobilenetv2ssdlite
+        ./mobilenetv2ssdlite dog.jpeg 
+        detection time: 187 ms
+        dog = 0.97443 at 476.85 64.94 295.40 x 533.33
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/img/mobilenetv2-ssdlite-voc-doe-det.png)    
+        
 
 
 # 一 、 ncnn使用
