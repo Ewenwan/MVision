@@ -1,4 +1,7 @@
 # -*- coding:utf-8 -*-
+# 需要安装 tensorflow
+# pip3 install tensorflow==1.4.0
+# pip3 install tensorflow-gpu==1.4.0
 import tensorflow as tf
 #import cv2
 import numpy as np
