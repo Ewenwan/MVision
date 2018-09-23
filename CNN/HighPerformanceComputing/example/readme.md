@@ -8,13 +8,31 @@
 
 # 2. 目标检测网络
 
-    mobilenet-ssd
-    squeezenet-ssd
-
-    yolov2-caffe 还没实验
+    mobilenet-ssd-voc
+    mobilenetv2-ssdlite-voc
+    mobilenetv2-ssdlite-coco
+    squeezenet-ssd-voc
+    
+    yolov2
 
 
 ![](http://oz3lw4cji.bkt.clouddn.com/0b7c0d0fb225db788d66d3e2a0468fca.png)
+
+# 检测效果
+    1. mobilenet-ssd-voc
+        ./mobilenetssd dog.jpeg 
+        detection time: 320 ms
+        dog = 0.99912 at 470.92 44.57 295.02 x 550.56
+        
+![]()
+     
+    2. queezenet-ssd-voc
+        ./squeezenetssd dog.jpeg 
+        detection time: 379 ms
+        dog = 0.29287 at 501.58 50.59 257.39 x 291.96
+        dog = 0.28615 at 486.13 47.62 311.03 x 542.53
+![]()
+
 
 
 # 一 、 ncnn使用
