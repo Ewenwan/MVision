@@ -41,6 +41,10 @@
 
 ![](https://img-blog.csdn.net/20160818141025738)
 
+
+# 深度学习目标检测 
+![](https://raw.githubusercontent.com/hoya012/deep_learning_object_detection/master/assets/deep_learning_object_detection_history.PNG)
+
 # 卷积神经网络
 [nanonets.com 来帮助使用很少的数据和没有计算机硬件的情况下构建机器学习模型 ](https://nanonets.com/#demo)
 
