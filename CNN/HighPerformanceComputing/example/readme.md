@@ -31,7 +31,7 @@
         detection time: 379 ms
         dog = 0.29287 at 501.58 50.59 257.39 x 291.96
         dog = 0.28615 at 486.13 47.62 311.03 x 542.53
-![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/img/mobilenet-ssd-voc-dog_det.png)
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/img/squeezenet-ssd-voc-dog-det.png)
 
 
 
