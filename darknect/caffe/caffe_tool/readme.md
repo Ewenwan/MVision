@@ -13,6 +13,12 @@
       但是ｂｎ层虽然在深度学习模型训练时起到了一定的积极作用，
       但是在预测时因为凭空多了一些层，影响了整体的计算速度并占用了更多内存或者显存空间。
       所以我们设想如果能将ｂｎ层合并到相邻的卷积层或者全连接层之后就好了.
+      
+      
+      源网络 prototxt去除 BN和 scale
+      
+      每一层的 BN和scale参数 被用来修改 每一层的权重W 和 偏置b
+      
 
 ## temsorflow 模型转 caffe
 [temsorflow 模型](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md)
