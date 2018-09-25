@@ -39,6 +39,23 @@
 
       所有权重数据连接起来, 每个权重占 32bit
 
+      权重数据 weight buffer
+
+      [flag] (optional 可选)
+      [raw data]
+      [padding] (optional 可选)
+
+          flag : unsigned int, little-endian, indicating the weight storage type, 
+                 0 => float32, 
+                 0x01306B47 => float16, 
+                 otherwise => quantized int8, 
+                      may be omitted if the layer implementation forced the storage type explicitly。
+          raw data : raw weight data, little-endian, 
+                     float32 data or float16 data or quantized table 
+                     and indexes depending on the storage type flag。
+          padding : padding space for 32bit alignment, may be omitted if already aligned。
+
+
 
 ## 2. 轻模式
       开启轻模式省内存 set_light_mode(true)
