@@ -74,3 +74,120 @@
       
       举个例子：全局静态的net实例，初始化一次后，就能不停地生成extractor使用.
       
+## 4. 新建 一个新的层
+      在 ncnn/src/layer/ 下新建两个文件 mylayer.h mylayer.cpp
+      
+> 步骤1： 新建空的类==================
+```c
+      // 1.文件1 mylayer.h
+      #include "layer.h"
+      using namespace ncnn;
+      
+      // a new layer type called MyLayer
+      class MyLayer : public Layer // 公有继承自 Layer 类
+      {
+      };
+      
+      // 2.文件2 mylayer.cpp
+      #include "mylayer.h"
+      DEFINE_LAYER_CREATOR(MyLayer) // 注册 新定义的层
+```
+      
+> 步骤2： 定义层参数parameters 和 权重 weights
+```c
+// mylayer.h
+#include "layer.h"
+using namespace ncnn;
+
+class MyLayer : public Layer
+{
+
+private: // 私有参数
+      int channels; // 通道数量
+      float gamma;  // 参数
+      Mat weight;   // 权重
+}；
+
+
+// mylayer.cpp
+#include "mylayer.h"
+DEFINE_LAYER_CREATOR(MyLayer) // 注册 新定义的层
+
+```
+
+>  步骤3： 实现载入 参数和权重的函数function()
+```c
+// mylayer.h========================================
+#include "layer.h"
+using namespace ncnn;
+
+class MyLayer : public Layer
+{
+public:  // 公有方法
+      // 头文件中声明为 虚函数
+      virtual int load_param(const ParamDic& pd);// 虚函数，可以被子类覆盖
+      virtual int load_model(const ModelBin& mb);   // 
+
+private: // 私有参数
+      int channels;   // 参数1 通道数量
+      float eps;      // 参数2 精度
+      Mat gamma_data; // 权重
+}；
+
+
+// mylayer.cpp======================================
+#include "mylayer.h"
+DEFINE_LAYER_CREATOR(MyLayer)
+
+// 实现 load_param() 载入网络层参数====
+int MyLayer::load_param(const ParamDict& pd)
+{
+      // 使用pd.get(key,default_val); 从param文件中（key=val）获取参数
+      channels = pd.get(0, 0);      // 解析 0=<int value>, 默认为0
+      eps      = pd.get(1, 0.001f); // 解析 1=<float value>, 默认为0.001f
+      
+      return 0; // 载入成功返回0
+}
+
+// 实现 load_model() 载入模型权重===
+int MyLayer::load_model(const ModelBin& mb)
+{
+      // 读取二进制数据的长度为 channels * sizeof(float)
+      // 0 自动判断数据类型， float32 float16 int8
+      // 1 按 float32读取  2 按float16读取 3 按int8读取
+      gamma_data = mb.load(channels, 1);// 按 float32读取 
+      if(gamma_data.empty())
+            return -100; // 错误返回非0数，-100表示 out-of-memory 
+      return 0; //  载入成功返回0
+}
+
+
+```
+
+> 步骤4： 定义类构造函数，确定层 前向传播行为
+```c
+
+
+```
+
+> 步骤5： 
+```c
+
+
+```
+
+> 步骤6： 
+
+```c
+
+
+```
+
+步骤7： 
+```c
+
+
+```
+      
+     
+      
