@@ -288,7 +288,7 @@ public:  // 公有方法
       
       // 网络运行===new code
       virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;// 单输入单输出
-      virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;         // 
+      virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;         // 单入单出本地修改 
 
 private: // 私有参数
       int channels;   // 参数1 通道数量
@@ -351,6 +351,82 @@ int MyLayer::load_model(const ModelBin& mb)
     // }      
       return 0; //  载入成功返回0
 }
+
+
+// 单入单出 前向传播网络 不可修改 非const
+int MyLayer::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+{
+      // 检查实际输入的blob的 维度是否和 所给的网络参数 一致
+      if(bottom_blob.c != channels)
+            return -1; // 返回非0，表示错误
+      
+      // 实现运算 x = (x + eps) * gamma_per_channel
+      
+      int w = bottom_blob.w;
+      int h = bottom_blob.h;
+      size_t elemsize = bottom_blob.elemsize;// 输入blob参数数量， 用来申请内存
+      int size = w * h;// 单channel中参数数量
+      
+      // 输出需要新建，不可直接在输入blob上修改
+      top_blob.create(w, h, channels, elemsize, opt.blob_allocator);
+      if(top_blob.empty())
+            return -100; // 返回-100, 表示内存溢出，申请空间出错
+      
+      // 使用openmp 并行计算
+      #pragam omp parallel for num_threads(opt.num_threads);
+      for (int q=0; q<channels; q++)// 遍历每个通道channel
+      {
+            const float* in_ptr = bottom_blob.channel(q);// 输入数据 const不可变
+            float* out_ptr = top_blob.channel(q);// 输出数据
+            const float gamma = gamma_data[q];   // 运算参数 每个channel有一个
+            
+            // 遍历一个map的数据
+            for (int i=0; i<size; i++)
+            {
+                  out_ptr[i] = (in_ptr[i] + eps)*gamma;// 运算结果，保存在输出blob中
+            }
+      
+      }
+      
+      return 0；// 无错误 返回0
+}
+
+
+// 单入单出 前向传播网络  可在输入blob上修改
+int MyLayer::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+      // 检查实际输入的blob的 维度是否和 所给的网络参数 一致
+      if(bottom_blob.c != channels)
+            return -1; // 返回非0，表示错误
+      
+      // 实现运算 x = (x + eps) * gamma_per_channel
+      
+      int w = bottom_blob.w;
+      int h = bottom_blob.h;
+      int size = w * h;// 单channel中参数数量
+      
+      // 输出不需要新建，可直接在输入blob上修改
+
+      // 使用openmp 并行计算
+      #pragam omp parallel for num_threads(opt.num_threads);
+      for (int q=0; q<channels; q++)// 遍历每个通道channel
+      {
+            float* in_out_ptr = bottom_top_blob.channel(q);// 输入数据 需要可变
+            const float gamma = gamma_data[q];   // 运算参数 每个channel有一个
+            // 遍历一个map的数据
+            for (int i=0; i<size; i++)
+            {
+                  in_out_ptr[i] = (in_out_ptr[i] + eps)*gamma;// 直接在输入数据上修改
+            }
+      
+      }
+      
+      return 0；// 无错误 返回0
+}
+
+
+
+
 ```
 
 > 步骤7： 
