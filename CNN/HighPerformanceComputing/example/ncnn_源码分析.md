@@ -160,13 +160,27 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	因为在gemm_v1中，matB和matC的访存以列为方向，会出现很多cache不命中的情况。
 	而在gemm_v2中则只有matB发生较多cache不命中，而这是gemm计算无法避免的。
 
-	在ncnn中，以卷积计算conv3x3_s1为例，每次从matA同时访问4行（一般一次3x3卷积只需要访问3行），
+	在ncnn中，没有将输入和输出展开成两个大矩阵，会比较耗费内存；
+	就是按照卷积的方式，每次只读取，运算的部分内容。
+	以卷积计算conv3x3_s1为例，
+	每次从matA同时访问4行（一般一次3x3卷积只需要访问3行），
 	由于step是1，所以可以同时生成2行的convolution结果。
 	可以看到有2行数据直接共用了，缓存利用率得到极大提高。
 	
 ![](http://hongbomin.com/2017/09/02/ncnn-analysis/gemm_row0_col0.png)
 
 ![](http://hongbomin.com/2017/09/02/ncnn-analysis/gemm_row1_col0.png)
+
+## 6. 单指令多数据指令SIMD 优化
+	SIMD即单指令多数据指令，
+	目前在x86平台下有MMX/SSE/AVX系列指令，
+	arm平台下有NEON指令。
+	一般SIMD指令通过intrinsics或者汇编实现。
+[SSE参考]()
+
+[neno参考](http://hongbomin.com/2016/05/13/arm_neon_introduction/)
+	
+	
 
 
 ## 4. src目录分析
