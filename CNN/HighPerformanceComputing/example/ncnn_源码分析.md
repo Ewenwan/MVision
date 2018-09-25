@@ -429,9 +429,25 @@ int MyLayer::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
 ```
 
-> 步骤7： 
+> 步骤7： 集和进ncnn库
 ```c
+// 1. 修改  caffe2ncnn.cpp \ mxnet2ncnn.cpp net.cpp/net.h(???) 模型转换
+// 2. app应用中添加，新层注册宏
+// example param file content
+// Input            input   0 1 input
+// Convolution      conv2d  1 1 input conv2d 0=32 1=1 2=1 3=1 4=0 5=0 6=768
+// MyLayer          mylayer 1 1 conv2d mylayer0
+// Pooling          maxpool 1 1 mylayer0 maxpool 0=0 1=3 2=2 3=-233 4=0
 
+// app 应用
+ncnn::Net net;
+
+// register custom layer before load param and model
+// the layer creator function signature is always XYZ_layer_creator, which defined in DEFINE_LAYER_CREATOR macro
+net.register_custom_layer("MyLayer", MyLayer_layer_creator);// 注册新层
+
+net.load_param("model.param");
+net.load_model("model.bin");
 
 ```
       
