@@ -1,3 +1,12 @@
+# ncnn 框架分析
+[本文github链接](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/ncnn_%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.md)
+
+[在ncnn中建立新层](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/ncnn_%E6%96%B0%E5%BB%BA%E5%B1%82.md)
+
+[参考1](http://hongbomin.com/2017/09/02/ncnn-analysis/)
+
+[参考2](https://github.com/Tencent/ncnn/wiki)
+
 # 1. param 和 bin 文件分析
 ## param
       7767517   # 文件头 魔数
@@ -146,6 +155,18 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	}
 }
 ```
+
+	gemm_v1比gemm_v2速度会慢很多，尤其是数据量比较大的时候。
+	因为在gemm_v1中，matB和matC的访存以列为方向，会出现很多cache不命中的情况。
+	而在gemm_v2中则只有matB发生较多cache不命中，而这是gemm计算无法避免的。
+
+	在ncnn中，以卷积计算conv3x3_s1为例，每次从matA同时访问4行（一般一次3x3卷积只需要访问3行），
+	由于step是1，所以可以同时生成2行的convolution结果。
+	可以看到有2行数据直接共用了，缓存利用率得到极大提高。
+	
+![](http://hongbomin.com/2017/09/02/ncnn-analysis/gemm_row0_col0.png)
+
+
 
 ## 4. src目录分析
     /src目录：
