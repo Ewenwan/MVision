@@ -8,3 +8,5 @@
 [Intel Caffe int8 推理校准工具 博客 ](https://blog.csdn.net/yiran103/article/details/81912690)
 
 [Caffe int8 推理校准工具 统计各层输入数据参数 和 卷积参数 绝对最大值 计算量化尺度](https://github.com/Ewenwan/caffe-int8-convert-tools)
+
+[英伟达 TensorRT 8bits int8推理](http://on-demand.gputechconf.com/gtc/2017/presentation/s7310-8-bit-inference-with-tensorrt.pdf)
