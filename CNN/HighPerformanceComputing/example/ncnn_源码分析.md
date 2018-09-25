@@ -171,6 +171,8 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 
 ![](http://hongbomin.com/2017/09/02/ncnn-analysis/gemm_row1_col0.png)
 
+[快速矩阵乘法 参考](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/%E5%BF%AB%E9%80%9F%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95.md)
+
 ## 6. 单指令多数据指令SIMD 优化
 	SIMD即单指令多数据指令，
 	目前在x86平台下有MMX/SSE/AVX系列指令，
