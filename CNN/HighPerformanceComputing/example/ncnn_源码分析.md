@@ -80,3 +80,36 @@
     ./src/layer下是所有的layer定义代码
     ./src/layer/arm是arm下的计算加速的layer
     ./src/layer/x86是x86下的计算加速的layer。
+
+## 5. openmp多核加速
+```c
+// 使用OpenMP加速只需要在串行代码中添加编译指令以及少量API即可。
+
+// 如下是一个向量相加的函数（串行）：
+
+void add(const int* a, const int* b, int* c, const int len)
+{
+  for(int i=0; i<len; i++)
+  {
+    c[i] = a[i] + b[i];
+  }
+}
+
+改成OpenMP多核加速（并行）：
+
+#pragma omp parallel for 
+// #pragma omp parallel for  num_threads(opt.num_threads);
+void add(const int* a, const int* b, int* c, const int len)
+{
+  for(int i=0; i<len; i++)
+  {
+    c[i] = a[i] + b[i];
+  }
+}
+
+// 理想情况下，加速比大约能达到0.75*cores。
+```
+
+
+
+
