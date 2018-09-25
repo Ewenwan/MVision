@@ -166,6 +166,7 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	
 ![](http://hongbomin.com/2017/09/02/ncnn-analysis/gemm_row0_col0.png)
 
+![](http://hongbomin.com/2017/09/02/ncnn-analysis/gemm_row1_col0.png)
 
 
 ## 4. src目录分析
