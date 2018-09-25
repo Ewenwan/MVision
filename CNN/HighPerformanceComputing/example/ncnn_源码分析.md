@@ -74,14 +74,7 @@
       
       举个例子：全局静态的net实例，初始化一次后，就能不停地生成extractor使用.
 
-## 4. src目录分析
-    /src目录：
-    目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
-    ./src/layer下是所有的layer定义代码
-    ./src/layer/arm是arm下的计算加速的layer
-    ./src/layer/x86是x86下的计算加速的layer。
-
-## 5. openmp多核加速
+## 4. openmp多核加速
 ```c
 // 使用OpenMP加速只需要在串行代码中添加编译指令以及少量API即可。
 
@@ -109,7 +102,55 @@ void add(const int* a, const int* b, int* c, const int len)
 
 // 理想情况下，加速比大约能达到0.75*cores。
 ```
+## 5. 缓存，仿存，cache
+缓存对于高速计算是非常重要的一环，通过合理的安排内存读写，能非常有效的加速计算。   
+数据存储一般是行优先存储，而cpu仿存，是会一次多读取当前内存后的连续几个地址中的数据。  
 
+如下面代码的gemm计算:   
+![](http://hongbomin.com/2017/09/02/ncnn-analysis/gemm.png)
 
+版本1：  
+```c
+static void gemm_v1(float* matA, float* matB, float* matC, const int M, const int N, const int K, const int strideA, const int strideB, const int strideC)
+{
+	for (int i = 0; i < N; i++)// 外层循环 为 列大小，会造成过多的仿存浪费!!!!
+	{
+		for (int j = 0; j < M; j++)
+		{
+			float sum = 0.0f;
+			for (int k = 0; k < K; k++)
+			{
+				sum += matA[j*strideA + k] * matB[k*strideB + i];// 矩阵B 是列 访问
+			}
+			matC[j*strideC + i] = sum;// 矩阵C也是列 访问(j先变换，列方向)
+		}
+	}
+}
+```
 
+版本2：  
+```c
+static void gemm_v2(float* matA, float* matB, float* matC, const int M, const int N, const int K, const int strideA, const int strideB, const int strideC)
+{
+	for (int i = 0; i < M; i++)// 外层循环 为 行主导，仿存效果好
+	{
+		for (int j = 0; j < N; j++)
+		{
+			float sum = 0.0f;
+			for (int k = 0; k < K; k++)
+			{
+				sum += matA[i*strideA + k] * matB[k*strideB + j];// 只有矩阵B是列访问顺序
+			}
+			matC[i*strideC + j] = sum;
+		}
+	}
+}
+```
+
+## 4. src目录分析
+    /src目录：
+    目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
+    ./src/layer下是所有的layer定义代码
+    ./src/layer/arm是arm下的计算加速的layer
+    ./src/layer/x86是x86下的计算加速的layer。
 
