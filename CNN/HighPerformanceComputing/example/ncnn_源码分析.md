@@ -183,7 +183,7 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	
 
 
-## 4. src目录分析
+## 7. src目录分析
     /src目录：
     目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
     ./src/layer下是所有的layer定义代码
