@@ -19,4 +19,8 @@
                                                                   C_OUT * C_in * W_h * W_w = 64*3*3*3 = 1728
       池化层    Pooling      0=0       1=3       2=2        3=0       4=0
                           0池化方式:最大值、均值、随机     1池化核大小 kernel_size();     2池化核步长 stride(); 
-                          3池化核填充 pad();   4是否为全局池化 global_pooling()
+                          3池化核填充 pad();   4是否为全局池化 global_pooling();
+      激活层    ReLU       0=0.000000     下限阈值 negative_slope();
+               ReLU6      0=0.000000     1=6.000000 上下限
+      
+      
