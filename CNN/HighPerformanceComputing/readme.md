@@ -40,6 +40,8 @@
 [MEC: Memory-efficient Convolution for Deep Neural Network 论文](http://cn.arxiv.org/pdf/1706.06873v1)
 
 
+[快速矩阵乘法 分块矩阵乘法 Strassen算法 Coppersmith-Winograd算法](http://hongbomin.com/2016/07/19/fast-matrix-multiplication/)
+
 [博客解析](https://blog.csdn.net/shuzfan/article/details/77427979)
     
 ## openblas GEMM 矩阵乘法优化
