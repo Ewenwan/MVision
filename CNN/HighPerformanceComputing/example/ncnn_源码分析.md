@@ -166,24 +166,118 @@ int MyLayer::load_model(const ModelBin& mb)
 
 > 步骤4： 定义类构造函数，确定层 前向传播行为
 ```c
+// mylayer.h========================================
+#include "layer.h"
+using namespace ncnn;
+
+class MyLayer : public Layer
+{
+public:  // 公有方法
+      // 定义构造函数 ====new code
+      MyLayer():
+      // 头文件中声明为 虚函数
+      virtual int load_param(const ParamDic& pd);// 虚函数，可以被子类覆盖
+      virtual int load_model(const ModelBin& mb);   // 
+
+private: // 私有参数
+      int channels;   // 参数1 通道数量
+      float eps;      // 参数2 精度
+      Mat gamma_data; // 权重
+}；
+
+
+// mylayer.cpp======================================
+#include "mylayer.h"
+DEFINE_LAYER_CREATOR(MyLayer)
+
+// 实现构造函数 new code=====
+MyLayer::MyLayer()
+{
+      // 是否为 1输入1输出层
+      // 1输入1输出层： Convolution, Pooling, ReLU, Softmax ...
+      // 反例       ： Eltwise, Split, Concat, Slice ...
+      one_blob_only = true;
+
+      // 是否可以在 输入blob 上直接修改 后输出
+      // 支持在原位置上修改： Relu、BN、scale、Sigmod...
+      // 不支持： Convolution、Pooling ...
+      support_inplace = true;
+}
+
+
+// 实现 load_param() 载入网络层参数====
+int MyLayer::load_param(const ParamDict& pd)
+{
+      // 使用pd.get(key,default_val); 从param文件中（key=val）获取参数
+      channels = pd.get(0, 0);      // 解析 0=<int value>, 默认为0
+      eps      = pd.get(1, 0.001f); // 解析 1=<float value>, 默认为0.001f
+      
+    // 可以通过 载入的参数 来修改层的行为====
+    // if (eps == 0.001f)
+    // {
+    //     one_blob_only = false;
+    //     support_inplace = false;
+    // }
+      
+      return 0; // 载入成功返回0
+}
+
+// 实现 load_model() 载入模型权重===
+int MyLayer::load_model(const ModelBin& mb)
+{
+      // 读取二进制数据的长度为 channels * sizeof(float)
+      // 0 自动判断数据类型， float32 float16 int8
+      // 1 按 float32读取  2 按float16读取 3 按int8读取
+      gamma_data = mb.load(channels, 1);// 按 float32读取 
+      if(gamma_data.empty())
+            return -100; // 错误返回非0数，-100表示 out-of-memory 
+            
+    // 可以通过 载入的权重 来修改层的行为====
+    // if (gamma_data[0] == 0.f)
+    // {
+    //     one_blob_only = false;
+    //     support_inplace = false;
+    // }
+      
+            
+      return 0; //  载入成功返回0
+}
 
 
 ```
 
-> 步骤5： 
+> 步骤5： 根据行为 选择合适的 forward()函数接口
+```c
+Layer类定义了四种 forward()函数：
+// 1 ：多输入多输出，const 不可直接对输入进行修改
+virtual int forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const;
+
+// 2 : 单输入单输出，const 不可直接对输入进行修改
+virtual int forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const;
+
+// 3 ：多输入多输出，可直接对输入进行修改
+virtual int forward_inplace(std::vector<Mat>& bottom_top_blobs, const Option& opt) const;
+
+// 4 ：单输入单输出，可直接对输入进行修改
+virtual int forward_inplace(Mat& bottom_top_blob, const Option& opt) const;
+
+// one_blob_only   support_inplace   函数类别： 1       2      3      4
+// false               false                 must  
+// false               true                 optional        must 
+// true                false                         must 
+// true                true                         optional       must
+
+
+```
+
+> 步骤6： 实现对应的 forward() 函数
+
 ```c
 
 
 ```
 
-> 步骤6： 
-
-```c
-
-
-```
-
-步骤7： 
+> 步骤7： 
 ```c
 
 
