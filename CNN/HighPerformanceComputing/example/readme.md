@@ -1,4 +1,24 @@
-# 示例程序
+# ncnn 使用 
+[源码仓库](https://github.com/Tencent/ncnn)
+
+安装编译：
+
+    git clone https://github.com/Tencent/ncnn.git
+    cd ncnn 
+    gedit CMakeLists.txt
+    拉到最后
+        add_subdirectory(examples)  # 取消两行注释
+        add_subdirectory(benchmark)
+        add_subdirectory(src)
+        if(NOT ANDROID AND NOT IOS)
+        add_subdirectory(tools)
+        endif()
+    mkdir build
+    cd build
+    cmake ..
+    make 
+
+
 
 # 1. 图像分类网络
 
