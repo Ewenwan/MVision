@@ -289,6 +289,9 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	ARM CPU最开始只有普通的寄存器，可以进行基本数据类型的基本运算。
 	自ARMv5开始引入了VFP（Vector Floating Point）指令，该指令用于向量化加速浮点运算。
 	自ARMv7开始正式引入NEON指令，NEON性能远超VFP，因此VFP指令被废弃。
+	
+	
+### neon 和 sse综合示例程序
 ```c
 
 // 1. 在容器中填充随机数===========
@@ -334,7 +337,7 @@ static bool is_equals_vector(const std::vector<float>& vec_a, const std::vector<
  	return true;
 }
 
-// 3. 正常的vector相乘(需要关闭编译器的自动向量优化)
+// 3. 正常的vector相乘(需要关闭编译器的自动向量优化)====================
 static void normal_vector_mul(const std::vector<float>& vec_a, 
                               const std::vector<float>& vec_b, 
 			      std::vector<float>& vec_result)
@@ -349,7 +352,7 @@ static void normal_vector_mul(const std::vector<float>& vec_a,
 }
 
 
-// 4. neon优化的vector相乘
+// 4. neon优化的vector相乘======================================
 static void neon_vector_mul(const std::vector<float>& vec_a, 
                               const std::vector<float>& vec_b, 
 			      std::vector<float>& vec_result)
@@ -375,7 +378,31 @@ static void neon_vector_mul(const std::vector<float>& vec_a,
 
 // 这段代码中使用了3条NEON指令：vld1q_f32，vmulq_f32，vst1q_f32
 
+// 5.  sse 优化程序=========================================
+static void sse_vector_mul(const std::vector<float>& vec_a, 
+                           const std::vector<float>& vec_b, 
+			   std::vector<float>& vec_result)
+{
+	// 检查 数组维度
+	assert(vec_a.size() == vec_b.size());
+	assert(vec_a.size() == vec_result.size());
+	
+	// sse 寄存器操作
+        int i=0;
+        for(; i<vec_result.size()-3; i+=4)
+	{
+		// 1. load 数据从内存载入暂存器
+		__m128  a = _mm_loadu_ps(&vec_a[i]);
+	        __m128  b = _mm_loadu_ps(&vec_b[i]);
+		__m128  res;
 
+	        float* dst_ptr = &vec_result[i]; // 结果矩阵 指针
+                // 2. 进行计算
+		res = _mm_mul_ps(a, b); // 32为寄存器 浮点数乘法
+	        // 3. 将计算结果 从暂存器 保存到 内存  res ----> dst_ptr
+		_mm_storeu_ps(dst_ptr, res);
+	}
+}
 ```
 
 ### arm neon 寄存器介绍
