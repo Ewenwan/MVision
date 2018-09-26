@@ -182,6 +182,43 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 
 [neno参考](http://hongbomin.com/2016/05/13/arm_neon_introduction/)
 	
+
+### ARM 下 NENO编程
+	ARM CPU最开始只有普通的寄存器，可以进行基本数据类型的基本运算。
+	自ARMv5开始引入了VFP（Vector Floating Point）指令，该指令用于向量化加速浮点运算。
+	自ARMv7开始正式引入NEON指令，NEON性能远超VFP，因此VFP指令被废弃。
+```c
+
+// 1. 在容器中填充随机数===========
+
+// 生成器generator：能够产生离散的等可能分布数值
+// 分布器distributions: 能够把generator产生的均匀分布值映射到其他常见分布，
+//                     如均匀分布uniform，正态分布normal，二项分布binomial，泊松分布poisson
+static void fill_random_value(std::vector<float>& vec_data)
+{        
+        // 浮点数均匀分布 分布器    uniform_int_distribution(整数均匀分布)
+	std::uniform_real_distribution<float> distribution(
+		std::numeric_limits<float>::min(),
+		std::numeric_limits<float>::max());
+        // 随机数 生成器
+	std::default_random_engine generator;
+        // std::default_random_engine generator(time(NULL));// 配合随机数种子
+	
+        // 为 vec_data 生成随机数，传入首尾迭代器和一个 lambda匿名函数
+	// [变量截取](参数表){函数提体}； [&](){}, 中括号内的& 表示函数可使用函数外部的变量。
+	std::generate(vec_data.begin(), vec_data.end(), [&]() { return distribution(generator); });
+}
+// 下面是各种变量截取的选项：
+//   [] 不截取任何变量
+//   [&} 截取外部作用域中所有变量，并作为引用在函数体中使用
+//   [=] 截取外部作用域中所有变量，并拷贝一份在函数体中使用
+//   [=, &foo]   截取外部作用域中所有变量，并拷贝一份在函数体中使用，但是对foo变量使用引用
+//   [bar]       截取bar变量并且拷贝一份在函数体重使用，同时不截取其他变量
+//   [this]      截取当前类中的this指针。如果已经使用了&或者=就默认添加此选项。
+
+
+// 2. 判断两vector是否相等====================================
+```
 	
 
 
