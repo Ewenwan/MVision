@@ -218,6 +218,59 @@ static void fill_random_value(std::vector<float>& vec_data)
 
 
 // 2. 判断两vector是否相等====================================
+static bool is_equals_vector(const std::vector<float>& vec_a, const std::vector<float>& vec_b)
+{
+	// 首先判断 大小是否一致
+	if (vec_a.size() != vec_b.size())
+		return false;
+        for (size_t i=0; i<vec_a.size(); i++)
+	{
+		if(vec_a[i] != vec_b[i]) // 浮点数可以这样 判断不相等？？
+			return false;
+	}
+	// 每个元素均相等
+ 	return true;
+}
+
+// 3. 正常的vector相乘(需要关闭编译器的自动向量优化)
+static void normal_vector_mul(const std::vector<float>& vec_a, 
+                              const std::vector<float>& vec_b, 
+			      std::vector<float>& vec_result)
+{
+	// 检查 数组维度
+	assert(vec_a.size() == vec_b.size());
+	assert(vec_a.size() == vec_result.size());
+	
+	// 循环遍历相乘  编译器可能会自动 进行向量化优化  添加标志进行关闭 -ftree-vectorize
+	for (size_t i=0; i<vec_result.size(); i++)
+		vec_result[i] = vec_a[i] * vec_b[i];
+}
+
+
+// 4. neon优化的vector相乘
+static void neon_vector_mul((const std::vector<float>& vec_a, 
+                              const std::vector<float>& vec_b, 
+			      std::vector<float>& vec_result)
+{
+	// 检查 数组维度
+	assert(vec_a.size() == vec_b.size());
+	assert(vec_a.size() == vec_result.size());
+	
+	// noon 寄存器操作
+	int i = 0;
+	const auto data_a = vld1q_f32(&vec_a[i]);// 放入寄存器
+	const auto data_b = vld1q_f32(&vec_b[i]);// 放入寄存器
+	
+	float* dst_ptr = &vec_result[i]; // 结果矩阵 指针
+	
+	const auto data_res = vmulq_f32(data_a, data_b); // 32为寄存器 浮点数乘法
+	
+	vst1q_32(dst_ptr, data_res);// 将 寄存器乘法结果 复制到 结果数组中
+}
+
+// 这段代码中使用了3条NEON指令：vld1q_f32，vmulq_f32，vst1q_f32
+
+
 ```
 	
 
