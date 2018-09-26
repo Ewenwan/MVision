@@ -248,7 +248,7 @@ static void normal_vector_mul(const std::vector<float>& vec_a,
 
 
 // 4. neon优化的vector相乘
-static void neon_vector_mul((const std::vector<float>& vec_a, 
+static void neon_vector_mul(const std::vector<float>& vec_a, 
                               const std::vector<float>& vec_b, 
 			      std::vector<float>& vec_result)
 {
