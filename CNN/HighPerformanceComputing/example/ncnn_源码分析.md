@@ -290,8 +290,18 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	自ARMv5开始引入了VFP（Vector Floating Point）指令，该指令用于向量化加速浮点运算。
 	自ARMv7开始正式引入NEON指令，NEON性能远超VFP，因此VFP指令被废弃。
 	
-	
+ARMV7架构包含：
+
+    16个通用寄存器（32bit）， R0-R15
+    16个NEON寄存器（128bit），Q0-Q15（同时也可以被视为32个64bit的寄存器，D0-D31）
+    16个VFP寄存器（32bit），  S0-S15
+    NEON和VFP的区别在于VFP是加速浮点计算的硬件不具备数据并行能力，同时VFP更尽兴双精度浮点数（double）的计算，NEON只有单精度浮点计算能力。
+
+
 ### neon 和 sse综合示例程序
+
+[项目工程]()
+
 ```c
 
 // 1. 在容器中填充随机数===========
@@ -404,16 +414,6 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 	}
 }
 ```
-
-### arm neon 寄存器介绍
-ARMV7架构包含：
-
-    16个通用寄存器（32bit）， R0-R15
-    16个NEON寄存器（128bit），Q0-Q15（同时也可以被视为32个64bit的寄存器，D0-D31）
-    16个VFP寄存器（32bit），  S0-S15
-    NEON和VFP的区别在于VFP是加速浮点计算的硬件不具备数据并行能力，同时VFP更尽兴双精度浮点数（double）的计算，NEON只有单精度浮点计算能力。
-
-
 ## 7. src目录分析
     /src目录：
     目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
