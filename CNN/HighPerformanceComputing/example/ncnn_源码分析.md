@@ -3,6 +3,8 @@
 
 [在ncnn中建立新层](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/ncnn_%E6%96%B0%E5%BB%BA%E5%B1%82.md)
 
+[ncnn 下载编译使用](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/readme.md)
+
 [参考1](http://hongbomin.com/2017/09/02/ncnn-analysis/)
 
 [参考2](https://github.com/Tencent/ncnn/wiki)
