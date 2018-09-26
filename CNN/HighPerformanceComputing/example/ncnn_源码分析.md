@@ -290,17 +290,18 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	自ARMv5开始引入了VFP（Vector Floating Point）指令，该指令用于向量化加速浮点运算。
 	自ARMv7开始正式引入NEON指令，NEON性能远超VFP，因此VFP指令被废弃。
 	
-ARMV7架构包含：
+> ARMV7架构包含：
 
-    16个通用寄存器（32bit）， R0-R15
+    16个通用寄存器（32bit）， R0-R15， R13为栈顶指针 Stack pointer, R14为Link registr, R15为程序计数器 Program Counter
     16个NEON寄存器（128bit），Q0-Q15（同时也可以被视为32个64bit的寄存器，D0-D31）
     16个VFP寄存器（32bit），  S0-S15
     NEON和VFP的区别在于VFP是加速浮点计算的硬件不具备数据并行能力，同时VFP更尽兴双精度浮点数（double）的计算，NEON只有单精度浮点计算能力。
 
+[NEON指令和数据类型介绍](http://hongbomin.com/2016/05/13/arm_neon_instrinsic/)
 
 ### neon 和 sse综合示例程序
 
-[项目工程]()
+[项目工程](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/optimination/arm_neon_sse_introduction.cpp)
 
 ```c
 
