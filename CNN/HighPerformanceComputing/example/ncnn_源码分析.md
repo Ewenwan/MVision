@@ -180,6 +180,8 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	一般SIMD指令通过intrinsics或者汇编实现。
 [SSE参考](https://blog.csdn.net/gengshenghong/article/details/7010615)
 
+[SSE指令参考](https://wenku.baidu.com/view/33776d1c59eef8c75fbfb310.html)
+
 [neno参考](http://hongbomin.com/2016/05/13/arm_neon_introduction/)
 ### x86下 SSE编程 
 	使用SSE指令，首先要了解这一类用于进行初始化加载数据以及将暂存器的数据保存到内存相关的指令，
@@ -228,11 +230,24 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	可见SSE指令的强大之处。那么在了解了上面的数据加载和数据保存的指令之后，使用这些算术指令就很容易了，下面以加法为例。
 	
 	SSE中浮点加法的指令有：
-
-	__m128 _mm_add_ss (__m128 a, __m128 b)
-	__m128 _mm_add_ps (__m128 a, __m128 b)
-	其中，_mm_add_ss表示scalar执行模式，_mm_add_ps表示packed执行模式。
+		__m128 _mm_add_ss (__m128 a, __m128 b)； // a =(a0,a1,a2,a3)  b = (b0,b1,b2,b3) 结果=(a0+b0,a1,a2,a3)
+		__m128 _mm_add_ps (__m128 a, __m128 b)； // 结果=(a0+b0, a1+b1, a2+b2, a3+b3)
+		其中，_mm_add_ss表示scalar执行模式，_mm_add_ps表示packed执行模式。
 	
+	减法指令:
+	 	__m128 _mm_sub_ss (__m128 a, __m128 b); // 结果=(a0-b0,a1,a2,a3)
+	        __m128 _mm_sub_ps (__m128 a, __m128 b); // 结果=(a0-b0, a1-b1, a2-b2, a3-b3)
+        乘法指令：
+	        __m128 _mm_mul_ss (__m128 a, __m128 b); 
+		__m128 _mm_mul_ps (__m128 a, __m128 b);// 结果=(a0*b0, a1*b1, a2*b2, a3*b3)
+        除法指令:
+	        __m128 _mm_div_ss (__m128 a, __m128 b); 
+		__m128 _mm_div_ps (__m128 a, __m128 b);// 结果=(a0/b0, a1/b1, a2/b2, a3/b3)    
+	 加减混合运算：
+	        __m128 _mm_addsub_ps (__m128 a, __m128 b);  // 结果=(a0-b0, a1+b1, a2-b3, a3+b3)
+	 开平方 sqrt  去倒数 rcp 平方根的倒数 rsqrt 最小值min 最大值max
+	 
+		
 	般而言，使用SSE指令写代码，
 	步骤为：1. 使用load/set函数将数据从内存加载到SSE暂存器；
 	       2. 使用相关SSE指令完成计算等；
@@ -267,10 +282,6 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	printf("1: %lf\n", result[1]);
 	printf("2: %lf\n", result[2]);
 	printf("3: %lf\n", result[3]);
-
----------------------
-
-本文来自 gengshenghong 的CSDN 博客 ，全文地址请点击：https://blog.csdn.net/gengshenghong/article/details/7010615?utm_source=copy 
 
 ```
 
@@ -349,14 +360,17 @@ static void neon_vector_mul(const std::vector<float>& vec_a,
 	
 	// noon 寄存器操作
 	int i = 0;
-	const auto data_a = vld1q_f32(&vec_a[i]);// 放入寄存器
-	const auto data_b = vld1q_f32(&vec_b[i]);// 放入寄存器
-	
-	float* dst_ptr = &vec_result[i]; // 结果矩阵 指针
-	
-	const auto data_res = vmulq_f32(data_a, data_b); // 32为寄存器 浮点数乘法
-	
-	vst1q_32(dst_ptr, data_res);// 将 寄存器乘法结果 复制到 结果数组中
+	for (; i < (int)vec_result.size() - 3 ; i+=4)// 一次运算四个
+	{
+		const auto data_a = vld1q_f32(&vec_a[i]);// 放入寄存器
+		const auto data_b = vld1q_f32(&vec_b[i]);// 放入寄存器
+
+		float* dst_ptr = &vec_result[i]; // 结果矩阵 指针
+
+		const auto data_res = vmulq_f32(data_a, data_b); // 32为寄存器 浮点数乘法
+
+		vst1q_32(dst_ptr, data_res);// 将 寄存器乘法结果 复制到 结果数组中
+	}
 }
 
 // 这段代码中使用了3条NEON指令：vld1q_f32，vmulq_f32，vst1q_f32
