@@ -31,13 +31,13 @@ Mat imread(const std::string& path, int flags)
     // ④ 最大灰度值 或 颜色值.
     // 其中图像宽度、高度和最大值这三项是ASCII码十进制数.
 /*
-文件描述子 	类型 	编码
-P1 	                位图 	ASCII
-P2 	                灰度图 	ASCII
-P3 	                像素图 	ASCII
-P4 	                位图 	二进制
-P5 	                灰度图 	二进制
-P6 	                像素图 	二进制
+文件描述子 	类型 	  编码
+P1 	        位图 	  ASCII
+P2 	        灰度图  ASCII
+P3 	        像素图  ASCII
+P4 	        位图 	  二进制
+P5 	        灰度图  二进制
+P6 	        像素图  二进制
  
  */
     FILE* fp = fopen(path.c_str(), "rb");// 二进制 读
