@@ -419,8 +419,12 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 ```
 ## 7. src目录分析
     /src目录：
-    目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
-    ./src/layer下是所有的layer定义代码
-    ./src/layer/arm是arm下的计算加速的layer
-    ./src/layer/x86是x86下的计算加速的layer。
+	    目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
+	    	platform.h.in 平台检测
+		paramdict.cpp paramdict.h 层参数解析
+		opencv.cpp opencv.h       
+	    ./src/layer下是所有的layer定义代码
+	    ./src/layer/arm是arm下的计算加速的layer
+	    ./src/layer/x86是x86下的计算加速的layer。
+	    
 
