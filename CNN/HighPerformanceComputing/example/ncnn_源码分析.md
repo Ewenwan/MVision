@@ -443,12 +443,62 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 	
 > ARMV7架构包含：
 
-    16个通用寄存器（32bit）， R0-R15， R13为栈顶指针 Stack pointer, R14为Link registr, R15为程序计数器 Program Counter
-    16个NEON寄存器（128bit），Q0-Q15（同时也可以被视为32个64bit的寄存器，D0-D31）
-    16个VFP寄存器（32bit），  S0-S15
+    16个通用寄存器（32bit）， R0-R15， 
+                 R13为栈顶指针 Stack pointer, 
+		 R14为Link registr（链接寄存器）, 用于存储调用子例程时的返回地址
+		 R15为 程序计数器 Program Counter
+    16个 NEON寄存器（128bit），Q0-Q15（同时也可以被视为32个64bit的寄存器，D0-D31） 
+                 ARMV8（64位cpu） NEON寄存器 用 v来表示 v1.8b v2.8h  v3.4s v4.2d
+		 后缀为8b/16b/4h/8h/2s/4s/2d）
+    16个 VFP寄存器（32bit），  S0-S15
     NEON和VFP的区别在于VFP是加速浮点计算的硬件不具备数据并行能力，同时VFP更尽兴双精度浮点数（double）的计算，NEON只有单精度浮点计算能力。
 
 [NEON指令和数据类型介绍](http://hongbomin.com/2016/05/13/arm_neon_instrinsic/)
+
+[AI 移动端框架常用指令·汇总](https://www.jianshu.com/p/5f75fa02c5d0)
+
+[arm32 函数调用约定](http://infocenter.arm.com/help/topic/com.arm.doc.ihi0042f/IHI0042F_aapcs.pdf)
+
+[arm64函数调用约定](http://infocenter.arm.com/help/topic/com.arm.doc.ihi0055b/IHI0055B_aapcs64.pdf)
+
+[ios函数调用约定](https://developer.apple.com/library/archive/documentation/Xcode/Conceptual/iPhoneOSABIReference/Articles/ARM64FunctionCallingConventions.html#//apple_ref/doc/uid/TP40013702-SW1)
+
+	armV7指令集主要是针对32bit的，armV8指令集则是针对最新的64bit架构；
+
+	首先总体来说，v7指令集在操作Q寄存器时，指令喜欢带个V表示，我这是在操作NEON寄存器，
+	而v8的ISA64指令集就把这个给取消了，
+	我只出指令，具体的什么操作细节，你操作数去细化指明。
+	
+	
+	1.3 预取(就是放入cache中把...)
+		v7：从%3处预取192个byte；
+		  "pld        [%3, #192]          \n"
+
+		v8： pld1kepp这个参数是可以改的，改为预取到L2中，
+		     不keep，而是流式缓存，也就是不会真放进cache中，具体的可以去看芯片手册。
+		     从%1处预取 128 字节
+		 "prfm   pldl1keep, [%1, #128]       \n"
+        1.4 内存加载(从内存加载到 寄存器)
+		v7:
+		   带了前缀v的就是v7 32bit指令的标志；
+		   ld1表示是顺序读取，还可以取ld2就是跳一个读取，ld3、ld4就是跳3、4个位置读取，这在RGB分解的时候贼方便；
+		   后缀是f32表示单精度浮点，还可以是s32、s16表示有符号的32、16位整型值。
+		   这里Q寄存器是用q表示，q5对应d10、d11可以分开单独访问（注：v8就没这么方便了。）
+		   大括号里面最多只有两个Q寄存器。
+		   
+		     "vld1.f32   {q10}, [%3]!        \n"
+                     "vld1.s16 {q0, q1}, [%2]!       \n" 
+
+		   
+		v8:
+		  ARMV8（64位cpu） NEON寄存器 用 v来表示 v1.8b v2.8h  v3.4s v4.2d
+		  后缀为8b/16b/4h/8h/2s/4s/2d）
+		  大括号内最多支持4个V寄存器；
+		  
+		  "ld1    {v0.4s, v1.4s, v2.4s, v3.4s}, [%2], #64 \n"
+		  "ld1    {v0.8h, v1.8h}, [%2], #32     \n"
+		  "ld1    {v0.4h, v1.4h}, [%2], #32     \n"
+
 
 ### neon 和 sse综合示例程序
 
@@ -830,5 +880,116 @@ flatten：将中间某几维合并，其实可以用reshape代替。
     # 输出数据为：32*3*14*56
 
 
-  
+## 1. 绝对值层
+### 普通c++版本 
+```c
+// 绝对值层特性: 单输入，单输出，可直接对输入进行修改
+int AbsVal::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w;   // 矩阵宽度
+    int h = bottom_top_blob.h;    // 矩阵高度
+    int channels = bottom_top_blob.c;// 通道数
+    int size = w * h;// 一个通道的元素数量
+
+    #pragma omp parallel for num_threads(opt.num_threads)  // openmp 并行
+    for (int q=0; q<channels; q++)// 每个 通道
+    {
+        float* ptr = bottom_top_blob.channel(q);// 当前通道数据的起始指针
+
+        for (int i=0; i<size; i++)// 遍历每个值
+        {
+            if (ptr[i] < 0)
+                ptr[i] = -ptr[i];// 小于零取相反数，大于零保持原样
+            // ptr[i] = ptr[i] > 0 ? ptr[i] : -ptr[i];
+        }
+    }
+
+    return 0;
+}
+```
+### ARM neon优化版本
+```c
+//  arm 内联汇编
+// asm(
+// 代码列表
+// : 输出运算符列表        "r" 表示同用寄存器  "m" 表示内存地址 "I" 立即数 
+// : 输入运算符列表        "=r" 修饰符 = 表示只写，无修饰符表示只读，+修饰符表示可读可写，&修饰符表示只作为输出
+// : 被更改资源列表
+// );
+// __asm__　__volatile__(); 
+// __volatile__或volatile 是可选的，假如用了它，则是向GCC 声明不答应对该内联汇编优化，
+// 否则当 使用了优化选项(-O)进行编译时，GCC 将会根据自己的判定决定是否将这个内联汇编表达式中的指令优化掉。
+
+// 换行符和制表符的使用可以使得指令列表看起来变得美观。
+int AbsVal_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w;   // 矩阵宽度
+    int h = bottom_top_blob.h;    // 矩阵高度
+    int channels = bottom_top_blob.c;// 通道数
+    int size = w * h;// 一个通道的元素数量
+
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q);
+
+#if __ARM_NEON
+        int nn = size >> 2; // 128位的寄存器，一次可以操作 4个float
+        int remain = size - (nn << 2);// 4*32 =128字节对其后 剩余的 float32个数
+#else
+        int remain = size;
+#endif // __ARM_NEON
+
+#if __ARM_NEON
+#if __aarch64__
+// ARMv8-A 是首款64 位架构的ARM 处理器，是移动手机端使用的CPU
+        if (nn > 0)
+        {
+        asm volatile(
+            "0:                               \n"   // 0: 作为标志，局部标签
+            "prfm       pldl1keep, [%1, #128] \n"
+            "ld1        {v0.4s}, [%1]         \n"   //  载入 ptr 指针对应的值，连续4个
+            "fabs       v0.4s, v0.4s          \n"   //  ptr 指针对应的值 连续4个，使用fabs函数 进行绝对值操作
+            "subs       %w0, %w0, #1          \n"   //  %0 引用 参数 nn 操作次数每次 -1  #1表示1
+            "st1        {v0.4s}, [%1], #16    \n"   //  %1 引用 参数 ptr 指针 向前移动 4*4=16字节
+            "bne        0b                    \n"   // 如果非0，则向后跳转到 0标志处执行
+            : "=r"(nn),     // %0 操作次数
+              "=r"(ptr)     // %1
+            : "0"(nn),      // %0 引用 参数 nn
+              "1"(ptr)       // %1 引用 参数 ptr
+            : "cc", "memory", "v0" /* 可能变化的部分 memory内存可能变化*/
+        );
+        }
+#else
+// 32位 架构处理器=========
+        if (nn > 0)
+        {
+        asm volatile(
+            "0:                             \n"   // 0: 作为标志，局部标签
+            "vld1.f32   {d0-d1}, [%1]       \n"   // 载入 ptr处的值
+            "vabs.f32   q0, q0              \n"   // abs 绝对值运算
+            "subs       %0, #1              \n"   //  %0 引用 参数 nn 操作次数每次 -1  #1表示1
+            "vst1.f32   {d0-d1}, [%1]!      \n"   // %1 引用 参数 ptr 指针 向前移动 4*4=16字节
+            "bne        0b                  \n"   // 如果非0，则向后跳转到 0标志处执行
+            : "=r"(nn),     // %0
+              "=r"(ptr)     // %1
+            : "0"(nn),
+              "1"(ptr)
+            : "cc", "memory", "q0"                 /* 可能变化的部分 memory内存可能变化*/
+        );
+        }
+#endif // __aarch64__
+#endif // __ARM_NEON
+        for (; remain>0; remain--)
+        {
+            *ptr = *ptr > 0 ? *ptr : -*ptr;
+
+            ptr++;
+        }
+    }
+
+    return 0;
+}
+
+```
 
