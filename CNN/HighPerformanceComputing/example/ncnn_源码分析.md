@@ -570,6 +570,8 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
     /src目录：
 	    目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
 	    	platform.h.in 平台检测
+		benchmark.cpp benchmark.h 测试各个模型的执行速度
+                allocator.cpp allocator.h 内存对齐
 		paramdict.cpp paramdict.h 层参数解析 读取二进制格式、字符串格式、密文格式的参数文件
 		opencv.cpp opencv.h       opencv 风格的数据结构 的 最小实现
 		                          大小结构体 Size 
