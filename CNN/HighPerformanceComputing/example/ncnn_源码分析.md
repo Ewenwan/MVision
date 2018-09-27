@@ -576,7 +576,13 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 					  矩阵框结构体 Rect_ 交集 并集运算符重载
 					  点结构体     Point_
 					  矩阵结构体   Mat     深拷贝 浅拷贝 获取指定矩形框中的roi 读取图像 写图像 双线性插值算法改变大小
-	        
+	        mat.cpp mat.h             3维矩阵数据结构
+		                          substract_mean_normalize(); 去均值并归一化
+					  half2float();               float16 的 data 转换成 float32 的 data
+					  copy_make_border();         矩阵周围填充
+					  resize_bilinear_image();    双线性插值
+		modelbin.cpp modelbin.h   从文件中载入模型权重、从内存中载入、从数组中载入
+		
 		
 	    ./src/layer下是所有的layer定义代码
 	    ./src/layer/arm是arm下的计算加速的layer
