@@ -572,7 +572,11 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 	    	platform.h.in 平台检测
 		paramdict.cpp paramdict.h 层参数解析 读取二进制格式、字符串格式、密文格式的参数文件
 		opencv.cpp opencv.h       opencv 风格的数据结构 的 最小实现
-		                          大小结构体 Size 矩阵框结构体 Rect_ 交集 并集运算符重载
+		                          大小结构体 Size 
+					  矩阵框结构体 Rect_ 交集 并集运算符重载
+					  点结构体     Point_
+					  矩阵结构体   Mat     深拷贝 浅拷贝 获取指定矩形框中的roi 读取图像 写图像 双线性插值算法改变大小
+	        
 		
 	    ./src/layer下是所有的layer定义代码
 	    ./src/layer/arm是arm下的计算加速的layer
