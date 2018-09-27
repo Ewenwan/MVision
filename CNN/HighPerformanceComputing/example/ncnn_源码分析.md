@@ -571,7 +571,9 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 	    目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
 	    	platform.h.in 平台检测
 		paramdict.cpp paramdict.h 层参数解析 读取二进制格式、字符串格式、密文格式的参数文件
-		opencv.cpp opencv.h       
+		opencv.cpp opencv.h       opencv 风格的数据结构 的 最小实现
+		                          大小结构体 Size 矩阵框结构体 Rect_ 交集 并集运算符重载
+		
 	    ./src/layer下是所有的layer定义代码
 	    ./src/layer/arm是arm下的计算加速的layer
 	    ./src/layer/x86是x86下的计算加速的layer。
