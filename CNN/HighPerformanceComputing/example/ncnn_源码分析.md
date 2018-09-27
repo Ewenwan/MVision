@@ -495,9 +495,9 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 		  后缀为8b/16b/4h/8h/2s/4s/2d）
 		  大括号内最多支持4个V寄存器；
 		  
-		  "ld1    {v0.4s, v1.4s, v2.4s, v3.4s}, [%2], #64 \n"
+		  "ld1    {v0.4s, v1.4s, v2.4s, v3.4s}, [%2], #64 \n"   // 4s表示float32
 		  "ld1    {v0.8h, v1.8h}, [%2], #32     \n"
-		  "ld1    {v0.4h, v1.4h}, [%2], #32     \n"
+		  "ld1    {v0.4h, v1.4h}, [%2], #32     \n"             // 4h 表示int16
 
 
 ### neon 和 sse综合示例程序
@@ -940,6 +940,30 @@ int AbsVal_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         int remain = size;
 #endif // __ARM_NEON
 
+/*
+从内存中载入:
+v7:
+   带了前缀v的就是v7 32bit指令的标志；
+   ld1表示是顺序读取，还可以取ld2就是跳一个读取，ld3、ld4就是跳3、4个位置读取，这在RGB分解的时候贼方便；
+   后缀是f32表示单精度浮点，还可以是s32、s16表示有符号的32、16位整型值。
+   这里Q寄存器是用q表示，q5对应d10、d11可以分开单独访问（注：v8就没这么方便了。）
+   大括号里面最多只有两个Q寄存器。
+
+     "vld1.f32   {q10}, [%3]!        \n"
+     "vld1.s16 {q0, q1}, [%2]!       \n" 
+
+
+v8:
+  ARMV8（64位cpu） NEON寄存器 用 v来表示 v1.8b v2.8h  v3.4s v4.2d
+  后缀为8b/16b/4h/8h/2s/4s/2d）
+  大括号内最多支持4个V寄存器；
+
+  "ld1    {v0.4s, v1.4s, v2.4s, v3.4s}, [%2], #64 \n"   // 4s表示float32
+  "ld1    {v0.8h, v1.8h}, [%2], #32     \n"
+  "ld1    {v0.4h, v1.4h}, [%2], #32     \n"             // 4h 表示int16
+
+*/
+
 #if __ARM_NEON
 #if __aarch64__
 // ARMv8-A 是首款64 位架构的ARM 处理器，是移动手机端使用的CPU
@@ -947,9 +971,9 @@ int AbsVal_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         {
         asm volatile(
             "0:                               \n"   // 0: 作为标志，局部标签
-            "prfm       pldl1keep, [%1, #128] \n"
+            "prfm       pldl1keep, [%1, #128] \n"   //  预取 128个字节 4*32 = 128
             "ld1        {v0.4s}, [%1]         \n"   //  载入 ptr 指针对应的值，连续4个
-            "fabs       v0.4s, v0.4s          \n"   //  ptr 指针对应的值 连续4个，使用fabs函数 进行绝对值操作
+            "fabs       v0.4s, v0.4s          \n"   //  ptr 指针对应的值 连续4个，使用fabs函数 进行绝对值操作 4s表示浮点数
             "subs       %w0, %w0, #1          \n"   //  %0 引用 参数 nn 操作次数每次 -1  #1表示1
             "st1        {v0.4s}, [%1], #16    \n"   //  %1 引用 参数 ptr 指针 向前移动 4*4=16字节
             "bne        0b                    \n"   // 如果非0，则向后跳转到 0标志处执行
@@ -966,7 +990,7 @@ int AbsVal_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         {
         asm volatile(
             "0:                             \n"   // 0: 作为标志，局部标签
-            "vld1.f32   {d0-d1}, [%1]       \n"   // 载入 ptr处的值
+            "vld1.f32   {d0-d1}, [%1]       \n"   // 载入 ptr处的值  q0寄存器 = d0 = d1
             "vabs.f32   q0, q0              \n"   // abs 绝对值运算
             "subs       %0, #1              \n"   //  %0 引用 参数 nn 操作次数每次 -1  #1表示1
             "vst1.f32   {d0-d1}, [%1]!      \n"   // %1 引用 参数 ptr 指针 向前移动 4*4=16字节
