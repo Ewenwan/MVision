@@ -585,10 +585,20 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 		layer.cpp layer.h         层接口，四种前向传播接口函数
 		Blob数据是花架子
 		
-		net.cpp net.h 
-		
+		net.cpp net.h             ncnn框架接口：
+		                          注册 用户定义的新层 Net::register_custom_layer();
+		                          网络载入 模型参数   Net::load_param();
+					  载入     模型权重   Net::load_model();
+					  网络blob 输入       Net::input();
+					  网络前向传          Net::forward_layer();    被Extractor::extract() 执行
+					  创建网络模型提取器   Net::create_extractor();
+		                          模型提取器提取某一层输出 Extractor::extract();
+					  
 	    ./src/layer下是所有的layer定义代码
 	    ./src/layer/arm是arm下的计算加速的layer
 	    ./src/layer/x86是x86下的计算加速的layer。
+	    
+	    
+	    
 	    
 
