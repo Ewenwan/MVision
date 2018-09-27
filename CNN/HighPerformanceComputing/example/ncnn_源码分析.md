@@ -37,9 +37,158 @@
       综合示例：
       0=1 1=2.5 -23303=2,2.0,3.0
       
-      数组关键字 : -23300 减去 0 ~ 19  例如 -23303 表示3个元素的数组
+      数组关键字 : -23300 
+      -(-23303) - 23300 = 3 表示该参数在参数数组中的index
+      后面的第一个参数表示数组元素数量，2表示包含两个元素
 [各层详细表格](https://github.com/Tencent/ncnn/wiki/operation-param-weight-table)
-      
+```c
+// 参数读取 程序
+
+// 读取字符串格式的 参数文件
+int ParamDict::load_param(FILE* fp)
+{
+    clear();
+
+//     0=100 1=1.250000 -23303=5,0.1,0.2,0.4,0.8,1.0
+
+    // parse each key=value pair
+    int id = 0;
+    while (fscanf(fp, "%d=", &id) == 1)// 读取 等号前面的 key=========
+    {
+        bool is_array = id <= -23300;
+        if (is_array)
+        {
+            id = -id - 23300;// 数组 关键字 -23300  得到该参数在参数数组中的 index
+        }
+        
+// 是以 -23300 开头表示的数组===========
+        if (is_array)
+        {
+            int len = 0;
+            int nscan = fscanf(fp, "%d", &len);// 后面的第一个参数表示数组元素数量，5表示包含两个元素
+            if (nscan != 1)
+            {
+                fprintf(stderr, "ParamDict read array length fail\n");
+                return -1;
+            }
+
+            params[id].v.create(len);
+
+            for (int j = 0; j < len; j++)
+            {
+                char vstr[16];
+                nscan = fscanf(fp, ",%15[^,\n ]", vstr);//按格式解析字符串============
+                if (nscan != 1)
+                {
+                    fprintf(stderr, "ParamDict read array element fail\n");
+                    return -1;
+                }
+
+                bool is_float = vstr_is_float(vstr);// 检查该字段是否为 浮点数的字符串
+
+                if (is_float)
+                {
+                    float* ptr = params[id].v;
+                    nscan = sscanf(vstr, "%f", &ptr[j]);// 转换成浮点数后存入参数字典中
+                }
+                else
+                {
+                    int* ptr = params[id].v;
+                    nscan = sscanf(vstr, "%d", &ptr[j]);// 转换成 整数后 存入字典中
+                }
+                if (nscan != 1)
+                {
+                    fprintf(stderr, "ParamDict parse array element fail\n");
+                    return -1;
+                }
+            }
+        }
+// 普通关键字=========================
+        else
+        {
+            char vstr[16];
+            int nscan = fscanf(fp, "%15s", vstr);// 获取等号后面的 字符串
+            if (nscan != 1)
+            {
+                fprintf(stderr, "ParamDict read value fail\n");
+                return -1;
+            }
+
+            bool is_float = vstr_is_float(vstr);// 判断是否为浮点数
+
+            if (is_float)
+                nscan = sscanf(vstr, "%f", &params[id].f); // 读入为浮点数
+            else
+                nscan = sscanf(vstr, "%d", &params[id].i);// 读入为整数
+            if (nscan != 1)
+            {
+                fprintf(stderr, "ParamDict parse value fail\n");
+                return -1;
+            }
+        }
+
+        params[id].loaded = 1;// 设置该 参数以及载入
+    }
+
+    return 0;
+}
+
+// 读取 二进制格式的 参数文件===================
+int ParamDict::load_param_bin(FILE* fp)
+{
+    clear();
+
+//     binary 0
+//     binary 100
+//     binary 1
+//     binary 1.250000
+//     binary 3 | array_bit
+//     binary 5
+//     binary 0.1
+//     binary 0.2
+//     binary 0.4
+//     binary 0.8
+//     binary 1.0
+//     binary -233(EOP)
+
+    int id = 0;
+    fread(&id, sizeof(int), 1, fp);// 读入一个整数长度的 index
+
+    while (id != -233)// 结尾
+    {
+        bool is_array = id <= -23300;
+        if (is_array)
+        {
+            id = -id - 23300;// 数组关键字对应的 index
+        }
+// 是数组数据=======
+        if (is_array)
+        {
+            int len = 0;
+            fread(&len, sizeof(int), 1, fp);// 数组元素数量
+
+            params[id].v.create(len);
+
+            float* ptr = params[id].v;
+            fread(ptr, sizeof(float), len, fp);// 按浮点数长度*数组长度 读取每一个数组元素====
+        }
+// 是普通数据=======
+        else
+        {
+            fread(&params[id].f, sizeof(float), 1, fp);// 按浮点数长度读取 该普通字段对应的元素
+        }
+
+        params[id].loaded = 1;
+
+        fread(&id, sizeof(int), 1, fp);// 读取 下一个 index
+    }
+
+    return 0;
+}
+
+```
+
+
 ## bin
 
         +---------+---------+---------+---------+---------+---------+
@@ -421,7 +570,7 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
     /src目录：
 	    目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
 	    	platform.h.in 平台检测
-		paramdict.cpp paramdict.h 层参数解析
+		paramdict.cpp paramdict.h 层参数解析 读取二进制格式、字符串格式、密文格式的参数文件
 		opencv.cpp opencv.h       
 	    ./src/layer下是所有的layer定义代码
 	    ./src/layer/arm是arm下的计算加速的layer
