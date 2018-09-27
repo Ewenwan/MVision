@@ -322,7 +322,12 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
 
 ![](http://hongbomin.com/2017/09/02/ncnn-analysis/gemm_row1_col0.png)
 
-[快速矩阵乘法 参考](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/%E5%BF%AB%E9%80%9F%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95.md)
+[卷积 im2col 快速矩阵乘法 参考](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/%E5%BF%AB%E9%80%9F%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95.md)
+
+多通道矩阵内存排布:
+
+![](https://upload-images.jianshu.io/upload_images/4749583-1ea621214cf3eec7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/720)
+
 
 ## 6. 单指令多数据指令SIMD 优化
 	SIMD即单指令多数据指令，
