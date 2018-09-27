@@ -2,7 +2,7 @@
 //
 // Copyright (C) 2017 THL A29 Limited, a Tencent company. All rights reserved.
 // 修改：万有文
-// 从io文件、内存、数组 中载入模型权重数据=========
+// 从io文件、内存、数组 中载入模型权重数据==========
 
 #ifndef NCNN_MODELBIN_H
 #define NCNN_MODELBIN_H
