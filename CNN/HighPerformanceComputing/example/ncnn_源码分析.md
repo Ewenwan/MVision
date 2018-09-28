@@ -1172,7 +1172,99 @@ int BatchNorm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 作为新的一类 BatchNorm_arm 继承了普通类 BatchNorm， 覆盖了 forward_inplace() 函数   
 class BatchNorm_arm : public BatchNorm{}    
 ```c
+int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int dims = bottom_top_blob.dims;
+    
+    // 只有在 维度为3的时候才进行优化，否则执行普通版本的 forward_inplace()
+    if (dims != 3)
+        return BatchNorm::forward_inplace(bottom_top_blob, opt);
 
+    // a = bias - slope * mean / sqrt(var)
+    // b = slope / sqrt(var)
+    
+    // value = b * value + a
+
+    int w = bottom_top_blob.w;
+    int h = bottom_top_blob.h;
+    int size = w * h;// 每个通道数据总量====
+
+    const float* a_data_ptr = a_data; // 合并后的 平移量
+    const float* b_data_ptr = b_data;// 合并后的 缩放尺度
+    #pragma omp parallel for num_threads(opt.num_threads)// 并行
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q);// 每个通道数据起始指针
+
+        float a = a_data_ptr[q];// 该通道 数据 平移量 偏置系数
+        float b = b_data_ptr[q];// 该通道 数据 缩放尺度 系数
+
+#if __ARM_NEON
+        int nn = size >> 2;// 每次操作4个float，需要的总次数
+        int remain = size - (nn << 2);// 剩余不够4个的数量 
+#else
+        int remain = size;
+#endif // __ARM_NEON
+
+#if __ARM_NEON
+#if __aarch64__
+        if (nn > 0)
+        {
+        asm volatile(
+            "dup        v1.4s, %w4             \n"          // v1 存储a
+            "dup        v2.4s, %w5             \n"          // v2 存储b    v3存储数据指针 v0存储 v3指向的值
+            "0:                                \n"
+            "prfm       pldl1keep, [%1, #128]  \n"  // 从%1 ptr 处预读取 128字节 4*32 4个浮点数
+            "ld1        {v0.4s}, [%1]          \n"            //  载入 ptr 指针对应的值到 v0，连续4个float
+            "orr        v3.16b, v1.16b, v1.16b \n"    // v1 ----> v3,  v3 =a
+            "fmla       v3.4s, v0.4s, v2.4s    \n"       // v3 += v0×b
+            "subs       %w0, %w0, #1           \n"     //  %0 为nn 执行次数 -1   #1   为1
+            "st1        {v3.4s}, [%1], #16     \n"        //  v3寄存器存储 指针，指针移动 #16 16字节  4个float数的宽度
+            "bne        0b                     \n"                // 
+            : "=r"(nn),     // %0
+              "=r"(ptr)     // %1
+            : "0"(nn),      // 输入参数================ %0 为nn 执行次数
+              "1"(ptr),      // %1 为 ptr 当前通道 数据起始指针======= 
+              "r"(a),         // %4 存入寄存器 只读, 不变, 参数 偏置
+              "r"(b)          // %5 参数 缩放归一化系数
+            : "cc", "memory", "v0", "v1", "v2", "v3"
+        );
+        }
+#else
+        if (nn > 0)
+        {
+        asm volatile(
+            "vdup.f32   q1, %4              \n"
+            "vdup.f32   q2, %5              \n"
+            "0:                             \n"
+            "pld        [%1, #128]          \n"
+            "vld1.f32   {d0-d1}, [%1 :128]  \n"
+            "vorr.32    q3, q1, q1          \n"
+            "vmla.f32   q3, q0, q2          \n"
+            "subs       %0, #1              \n"
+            "vst1.f32   {d6-d7}, [%1 :128]! \n"
+            "bne        0b                  \n"
+            : "=r"(nn),     // %0
+              "=r"(ptr)     // %1
+            : "0"(nn),
+              "1"(ptr),
+              "r"(a),       // %4
+              "r"(b)        // %5
+            : "cc", "memory", "q0", "q1", "q2", "q3"
+        );
+        }
+#endif // __aarch64__
+#endif // __ARM_NEON
+        for (; remain>0; remain--) // 剩余不够 4个的 直接c语言执行
+        {
+            *ptr = b * *ptr + a;
+
+            ptr++;
+        }
+    }
+
+    return 0;
+}
 
 ```
 
