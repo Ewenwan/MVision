@@ -1,5 +1,6 @@
 /*this creates a yaml or xml list of files from the command line args
  * 由图片文件夹生成 图片文件路径 yaml文件
+ * 示例用法 ./imagelist_creator wimagelist.yaml ../t/*JPG
  */
 
 #include "opencv2/core/core.hpp"
