@@ -1,7 +1,7 @@
 //李飞，科大先研院
 //sume.cn@aliyun.com
 //just for fun
-
+// 万有文，修改
 #include <stdio.h>
 #include <vector>
 #include <time.h>
@@ -115,7 +115,7 @@ int main()
 
         // kill worst particles and replace with mutations of the best
         double *maxLoc = max_element(score, score+NUM_PARTICLES);  
-        double *minLoc = min_element(score, score+NUM_PARTICLES); 
+        double *minLoc = min_element(score, score+NUM_PARTICLES); // 得分越小，匹配越好
         printf("max: %f, min: %f\n", *maxLoc, *minLoc);
 
         {
@@ -123,23 +123,24 @@ int main()
             int yy = 0;
             do
             {
-                xx = particles[minLoc-score].x + rand_pn(20);
+                xx = particles[minLoc-score].x + rand_pn(20);// 用好的点 产生新的点
                 yy = particles[minLoc-score].y + rand_pn(20);
             } while(map.at<unsigned char>(yy,xx) != 255);
 
-            particles[maxLoc-score].x = xx;
+            particles[maxLoc-score].x = xx;// 差的点被替换掉
             particles[maxLoc-score].y = yy;
         }
-
+        
+        // 保存每一步的地图=========
         {
             Mat mat_disp = map.clone();
             for (int i = 0; i < NUM_PARTICLES; ++i)
             {
-                circle(mat_disp, Point(particles[i].x+offset, particles[i].y), 2, Scalar(0));
+                circle(mat_disp, Point(particles[i].x+offset, particles[i].y), 2, Scalar(0));// 画点
             }
             char str[30];
-            sprintf(str, "disp%d.png", x);
-            imwrite(str, mat_disp);       
+            sprintf(str, "disp%d.png", x);// 产生字符串，图片名称
+            imwrite(str, mat_disp);       // 保存地图
         }
     }
 }
