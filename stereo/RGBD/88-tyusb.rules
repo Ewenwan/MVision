@@ -1,0 +1,5 @@
+SUBSYSTEM=="usb",
+ATTRS{idProdut}=="1003",
+ATTRS{idVendor}=="04b4",
+GROUP="ewenwan",
+MODE="0666"
