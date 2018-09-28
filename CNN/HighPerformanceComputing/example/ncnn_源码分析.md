@@ -1021,4 +1021,62 @@ v8:
 }
 
 ```
+## 2. 值大小前topk层  argmax layer
+### 普通c++版本 
+```c
+// 层参数包含两个参数，第一个是是否需要包含值对应在源blob中的位置，第二个是需要前多少个最大的数
+int ArgMax::load_param(const ParamDict& pd)
+{
+    out_max_val = pd.get(0, 0);// 是否 需要存储位置
+    topk = pd.get(1, 1);       //在 前topk个最大的数========
 
+    return 0;
+}
+
+int ArgMax::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
+{
+    int size = bottom_blob.total();// 输入blob参数总数量
+// 创建一个新的输出blob==============
+    if (out_max_val)
+        top_blob.create(topk, 2, 4u, opt.blob_allocator);// topk个值 + topk个值对应的位置
+    else
+        top_blob.create(topk, 1, 4u, opt.blob_allocator);// 只存  topk个值，不存位置
+    if (top_blob.empty())
+        return -100;
+
+    const float* ptr = bottom_blob;
+// partial sort 部分排序(快排可以实现)===================
+    // partial sort topk with index
+    // optional value
+    std::vector< std::pair<float, int> > vec;
+    vec.resize(size);
+    for (int i=0; i<size; i++)
+    {
+        vec[i] = std::make_pair(ptr[i], i);// 源 输入blob 的参数的 值：位置id 键值对
+    }
+    std::partial_sort(vec.begin(), vec.begin() + topk, vec.end(),
+                        std::greater< std::pair<float, int> >());// 按第一列排序，获取前 topk个
+			
+// 保存前面最大的topk个参数===============================
+    float* outptr = top_blob;
+    if (out_max_val)
+    {
+        float* valptr = outptr + topk;// 前面topk的位置存 值，后面存对应值在源输入blob中的位置ID
+        for (int i=0; i<topk; i++)
+        {
+            outptr[i] = vec[i].first; // 存值
+            valptr[i] = vec[i].second;// 存位置
+        }
+    }
+    else
+    {
+        for (int i=0; i<topk; i++)
+        {
+            outptr[i] = vec[i].second;// 只存值
+        }
+    }
+
+    return 0;
+}
+
+```
