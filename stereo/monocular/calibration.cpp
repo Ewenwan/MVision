@@ -1,4 +1,7 @@
-//我的 pc 摄像头 calibration  -w=6 -h=8 -s=2.43 -o=camera.yml -op -oe
+//我的 pc 摄像头 ./Monocular_Calibr  -w=6 -h=8 -s=2.43 -o=camera.yml -op -oe
+//./Monocular_Calibr -w=8 -h=10 -s=200 -o=camera.yml -op -oe
+// 离线校正
+//./Monocular_Calibr -w=8 -h=10 -s=200 -o=wcamera.yml -op -oe wimagelist.yaml
 #include "opencv2/core.hpp"
 #include <opencv2/core/utility.hpp>
 #include "opencv2/imgproc.hpp"
@@ -22,6 +25,7 @@ const char * usage =
 " \n"
 " example command line for calibration from a list of stored images:\n"//从图片文件夹中标定
 "   imagelist_creator image_list.xml *.png\n"//先生成 图片文件路径 yaml文件
+
 "   calibration -w=4 -h=5 -s=0.025 -o=camera.yml -op -oe image_list.xml\n"//从图片文件夹中标定
 " where image_list.xml is the standard OpenCV XML/YAML\n"
 " use imagelist_creator to create the xml or yaml list\n"
