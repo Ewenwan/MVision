@@ -939,8 +939,8 @@ int AbsVal_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
         float* ptr = bottom_top_blob.channel(q);
 
 #if __ARM_NEON
-        int nn = size >> 2; // 128位的寄存器，一次可以操作 4个float
-        int remain = size - (nn << 2);// 4*32 =128字节对其后 剩余的 float32个数
+        int nn = size >> 2; // 128位的寄存器，一次可以操作 4个float,剩余不够4个的，最后面直接c语言执行
+        int remain = size - (nn << 2);// 4*32 =128字节对其后 剩余的 float32个数, 剩余不够4个的数量 
 #else
         int remain = size;
 #endif // __ARM_NEON
@@ -1009,7 +1009,7 @@ v8:
         }
 #endif // __aarch64__
 #endif // __ARM_NEON
-        for (; remain>0; remain--)
+        for (; remain>0; remain--) // 剩余不够4个的直接c语言执行
         {
             *ptr = *ptr > 0 ? *ptr : -*ptr;
 
@@ -1168,6 +1168,9 @@ int BatchNorm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 }
 ```
 ### ARM neon优化版本
+
+作为新的一类 BatchNorm_arm 继承了普通类 BatchNorm， 覆盖了 forward_inplace() 函数   
+class BatchNorm_arm : public BatchNorm{}    
 ```c
 
 
