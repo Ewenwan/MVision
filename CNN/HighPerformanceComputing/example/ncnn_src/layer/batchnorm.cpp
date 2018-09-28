@@ -1,8 +1,8 @@
 // Tencent is pleased to support the open source community by making ncnn available.
 //
 // Copyright (C) 2017 THL A29 Limited, a Tencent company. All rights reserved.
-// 
-// 去均值 归一化 合在一起=============
+// 批规范化=====
+// 去均值 归一化 缩放 平移 合在一起=============
 // 各个通道均值 mean_data = sum(xi)/m;
 // 各个通道方差 var_data  = sum((xi - mean_data)^2)/m;
 // xi‘ = ( xi - mean_data )/(sqrt(var_data + eps));  // 去均值，除以方差，归一化
