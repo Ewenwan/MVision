@@ -4,13 +4,13 @@
 # Camera Parameters. Adjust them!
 #--------------------------------------------------------------------------------------------
 
-# Camera calibration and distortion parameters (OpenCV) 
-Camera.fx: 559.913197
+# Camera calibration and distortion parameters (OpenCV)   根据相机标定
+Camera.fx: 559.913197   # 内参数
 Camera.fy: 559.913197
 Camera.cx: 287.632638
 Camera.cy: 263.635751
 
-Camera.k1: -0.449324
+Camera.k1: -0.449324    # 畸变参数
 Camera.k2: 0.360142
 Camera.p1: -0.000852
 Camera.p2: 0.0011130
@@ -22,7 +22,7 @@ Camera.height: 480
 # Camera frames per second 
 Camera.fps: 15.0
 
-# IR projector baseline times fx (aprox.)
+# IR projector baseline times fx (aprox.)  # 红外双目 基线b × 焦距f
 Camera.bf: 40.0
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
@@ -31,9 +31,12 @@ Camera.RGB: 1
 # Close/Far threshold. Baseline times.
 ThDepth: 40.0
 
-# Deptmap values factor 
+# Deptmap values factor   # 这个很好理解，depth深度图的值为真实3d点深度 * DepthMapFactor
 DepthMapFactor: 5000.0
 
+# b指基线baseline（单位：米），f是焦距fx（x轴和y轴差距不大），bf=b*f，
+# 和ThDepth一起决定了深度点的范围：bf * ThDepth / fx即大致为b * ThDepth。
+# xtion的IR基线（其实也可以不这么叫）bf为40，ThDepth为50，fx为558.34，则有效深度为3.58米（官方为3.5米）。
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
 #--------------------------------------------------------------------------------------------
