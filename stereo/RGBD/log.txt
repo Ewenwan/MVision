@@ -1,0 +1,18 @@
+./Monocular_Calibr -w=8 -h=10 -s=200 -o=ty_rgb_camera_param.yaml ty_rgb_img_list.yaml 
+>>> 
+RMS error reported by calibrateCamera: 0.474575
+Calibration succeeded. avg reprojection error = 0.47
+
+
+
+./Monocular_Calibr -w=8 -h=10 -2=200 -o=ty_rgb_cam_640_480_param.yaml  -op -oe ty_rgb_img640_480_list.yaml 
+>>>>>>
+RMS error reported by calibrateCamera: 1.43284
+Calibration succeeded. avg reprojection error = 1.43
+
+
+
+./Monocular_Calibr -w=8 -h=10 -2=200 -o=ty_rgb_cam_640_480_param2.yaml  -op -oe ty_rgb_img640_480_list2.yaml 
+>>>>>
+RMS error reported by calibrateCamera: 0.289992
+Calibration succeeded. avg reprojection error = 0.29
