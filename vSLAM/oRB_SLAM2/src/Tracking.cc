@@ -220,18 +220,20 @@ namespace ORB_SLAM2
 	    if(sensor==System::STEREO || sensor==System::RGBD)
 	    {
 	       // 判断一个3D点远/近的阈值 mbf * 35 / fx
+               //  b * f * ThDepth /fx = b * ThDepth === 为相机的最大测量范围
 		mThDepth = mbf*(float)fSettings["ThDepth"]/fx;//深度 阈值
 		cout << endl << "深度图阈值 Depth Threshold (Close/Far Points): " << mThDepth << endl;
 	    }	    
 	    // 深度相机
 	    if(sensor==System::RGBD)
 	    {
-	        // 深度相机disparity 视差 转化为 深度 depth时的因子
+	        // 深度相机 深度数据缩放  因子 
 		mDepthMapFactor = fSettings["DepthMapFactor"];//地图深度 因子
 		if(fabs(mDepthMapFactor)<1e-5)
 		    mDepthMapFactor=1;
 		else
-		    mDepthMapFactor = 1.0f/mDepthMapFactor;
+		    mDepthMapFactor = 1.0f/mDepthMapFactor;// 毫米 变成 米 深度数据缩放  因子 
+		    // depth深度图的值为真实3d点深度 * DepthMapFactor
 	    }
 
 	}
