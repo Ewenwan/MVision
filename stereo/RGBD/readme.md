@@ -33,3 +33,34 @@
             LoopDetect
             ...
             )
+
+# 相机标定结果：
+[参考](https://blog.csdn.net/qingsong1001/article/details/81779236)
+
+    %YAML:1.0
+    calibration_time: "2018年09月29日 星期六 10时59分35秒"
+    nframes: 40            # 进行 标定的图像数量
+    image_width: 640       #  图像的像素 尺寸
+    image_height: 480
+    board_width: 8         # 水平方向corners数量 
+    board_height: 10       # 垂直方向corners数量
+    square_size: 1.        # 默认方格的大小
+    aspectRatio: 1.
+    flags: 2               #calibrateCamera函数进行标定时调整的方式
+    camera_matrix: !!opencv-matrix  # 内参数
+       rows: 3
+       cols: 3
+       dt: d
+       data: [ 5.5991319678858906e+02, 0., 2.8763263841844133e+02, 0.,
+           5.5991319678858906e+02, 2.6363575121251381e+02, 0., 0., 1. ]   # fx 0 cx 0 fy cy 0 0 1
+
+    distortion_coefficients: !!opencv-matrix    # 畸变参数
+       rows: 5
+       cols: 1
+       dt: d
+       data: [ -4.4932428999903368e-01, 3.6014186521811137e-01,
+           -8.5242709410947044e-04, 1.1130236682130820e-03,
+           -2.3177353174684856e-01 ]                                      # k_1,k_2,p_1,p_2,k_3,[k_4,...]
+
+
+       
