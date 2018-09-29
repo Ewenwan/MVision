@@ -3,6 +3,7 @@
 * 图漾 rgbd orbslam2 示例
 */
 
+
 #include<iostream>
 #include<algorithm>
 #include<fstream>
@@ -68,7 +69,7 @@ int main(int argc, char **argv)
     int init_flag = ty_RGBD_init();
     if(init_flag == -1) 
     {
-	      LOGD("=== camera init failed===");
+	LOGD("=== camera init failed===");
         return -1;
     }
 
@@ -285,7 +286,7 @@ void frameHandler(TY_FRAME_DATA* frame, void* userdata) {
     //if(!irl.empty()){ cv::imshow("LeftIR", irl); }
     //if(!irr.empty()){ cv::imshow("RightIR", irr); }
     // cv::namedWindow("Color", CV_WINDOW_NORMAL);//CV_WINDOW_NORMAL就是0
-    if(!color_img.empty()){ cv::imshow("Color", color_img); }
+    // if(!color_img.empty()){ cv::imshow("Color", color_img); }
 
     if((!depth_img.empty()) && (!color_img.empty()))
     {
@@ -451,3 +452,5 @@ int ty_RGBD_init(void)
     }
     return 0;
 }
+
+
