@@ -23,20 +23,21 @@ Camera.height: 480
 Camera.fps: 15.0
 
 # IR projector baseline times fx (aprox.)  # 红外双目 基线b × 焦距f
-Camera.bf: 40.0
+Camera.bf: 28.0    # 50mm = 0.05m   0.05 * 559.913197  = 27.9956
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
 
 # Close/Far threshold. Baseline times.
-ThDepth: 40.0
+ThDepth: 120.0
 
 # Deptmap values factor   # 这个很好理解，depth深度图的值为真实3d点深度 * DepthMapFactor
-DepthMapFactor: 5000.0
+DepthMapFactor: 1000.0
 
 # b指基线baseline（单位：米），f是焦距fx（x轴和y轴差距不大），bf=b*f，
-# 和ThDepth一起决定了深度点的范围：bf * ThDepth / fx即大致为b * ThDepth。
+# 和ThDepth一起决定了深度点的范围：bf * ThDepth / fx 即大致为b * ThDepth。
 # xtion的IR基线（其实也可以不这么叫）bf为40，ThDepth为50，fx为558.34，则有效深度为3.58米（官方为3.5米）。
+# 图漾  6m， 6m / 0.05 = 120
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
 #--------------------------------------------------------------------------------------------
