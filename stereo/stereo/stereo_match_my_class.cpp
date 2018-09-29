@@ -1,4 +1,6 @@
 /*
+双目匹配　使用自己定义的类
+./my_stereo 
  */
 #include <opencv2/opencv.hpp> 
 #include <string>
@@ -27,7 +29,7 @@ int main(int argc, char** argv)
     //设置分辨率   1280*480  分成两张 640*480  × 2 左右相机
     CapAll.set(CV_CAP_PROP_FRAME_WIDTH,1280);  
     CapAll.set(CV_CAP_PROP_FRAME_HEIGHT, 480);  
-    pcl::visualization::CloudViewer viewer("pcd　viewer");// 显示窗口的名字
+    // pcl::visualization::CloudViewer viewer("pcd　viewer");// 显示窗口的名字
     
     while(CapAll.read(src_img)) 
 	{  
@@ -35,14 +37,13 @@ int main(int argc, char** argv)
 		//imread(file,0) 灰度图  imread(file,1) 彩色图  默认彩色图
 		imgR= src_img(cv::Range(0, 480), cv::Range(640, 1280));  
 		//imgL = iP.unsharpMasking(imgL, "gauss", 3, 1.9, -1);
-		imgL = iP.unsharpMasking(imgL, "median", 5, 0.2, 0.8);
-		imgR = iP.unsharpMasking(imgR, "median", 5, 0.2, 0.8);
-	 	StereoM.bmMatch(imgL, imgR, disp);
-	        StereoM.elasMatch(imgL, imgR, disp);
-		//StereoM.sgbmMatch(imgL, imgR, disp);
+		//imgL = iP.unsharpMasking(imgL, "median", 5, 0.2, 0.8);
+		//imgR = iP.unsharpMasking(imgR, "median", 5, 0.2, 0.8);
+	 	StereoM.bmMatch(imgL, imgR, disp);// 速度最快
+		//StereoM.sgbmMatch(imgL, imgR, disp);// 性能尚可
 		//StereoM.hhMatch(imgL, imgR, disp);
 		//StereoM.wayMatch(imgL, imgR, disp);//效果太差
-		// SM.sgbmMatch(imgL, imgR, disp);
+                //StereoM.elasMatch(imgL, imgR, disp);// 速度太慢=!!! 计算的视差有问题====
 		StereoM.getDisparityImage(disp, dispImg, true);
                 disp.convertTo(disp8, CV_8U);
                 // 计算出的视差都是CV_16S格式的，使用32位float格式可以得到真实的视差值，所以我们需要除以16
@@ -54,14 +55,14 @@ int main(int argc, char** argv)
 		//imshow("视差", disp8);
 		namedWindow("视差彩色图", 1);
 		imshow("视差彩色图", dispImg);
-                PointCloud::Ptr pointCloud_PCL2( new PointCloud ); 
-		PointCloud& my_color_pc = *pointCloud_PCL2;
+//                PointCloud::Ptr pointCloud_PCL2( new PointCloud ); 
+//		PointCloud& my_color_pc = *pointCloud_PCL2;
 //		StereoM.getPCL(disp, imgL, my_color_pc);
-                StereoM.my_getpc(disp32, imgL, my_color_pc);
-		viewer.showCloud(pointCloud_PCL2);
+ //               StereoM.my_getpc(disp32, imgL, my_color_pc);
+//		viewer.showCloud(pointCloud_PCL2);
 		//printf("press any key to continue...");
 		fflush(stdout);
-		char c = waitKey();
+		char c = waitKey(1);
 		//printf("\n");
 		//      } 
 		if( c == 27 || c == 'q' || c == 'Q' )//按ESC/q/Q退出  
