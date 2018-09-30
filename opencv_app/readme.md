@@ -123,7 +123,7 @@
           $ make -j3
 	  sudo make install
     
-      
+      [3.2安装参考 好好](https://github.com/CoderEugene/opencv3.2_CMake/tree/5175fc1b0a78e79831993ed4f5021bc2b0a656db)
       
 ## 问题1 
       安装OpenCv 3.1的过程中要下载ippicv_linux_20151201，由于网络的原因，这个文件经常会下载失败。
