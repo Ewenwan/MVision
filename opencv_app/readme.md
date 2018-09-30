@@ -113,6 +113,18 @@
       编译依赖 sudo apt-get install build-essential
       必须     sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
       可选     sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+      
+      
+       安装附加模块 opencv_contrib
+          git clone https://github.com/opencv/opencv_contrib.git
+          和 opencv 一起安装
+          $ cd <opencv 编译文件夹
+          $ cmake -DOPENCV_EXTRA_MODULES_PATH=<opencv_contrib 目录>/modules <opencv_source_directory(例如上一级 ..)>
+          $ make -j3
+	  sudo make install
+    
+      
+      
 ## 问题1 
       安装OpenCv 3.1的过程中要下载ippicv_linux_20151201，由于网络的原因，这个文件经常会下载失败。
       下载　  ippicv_linux_20151201
