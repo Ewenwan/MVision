@@ -27,9 +27,13 @@
     a. 缺少 boost/make_unique.hpp 文件
        下载 https://www.boost.org/doc/libs/develop/boost/smart_ptr/make_unique.hpp
        安装到 usr/include/boost/ make_unique.hpp
-    b. 缺少 opencv2/tracking.hpp  文件   这是opencv3.2以上才有的
-       更新opencv 到 3.2以上
-    
+    b. 缺少 opencv2/tracking.hpp  文件  在 opencv_contrib 中
+       安装 opencv_contrib
+          git clone https://github.com/opencv/opencv_contrib.git
+          和 opencv 一起安装
+          $ cd <opencv 编译文件夹
+          $ cmake -DOPENCV_EXTRA_MODULES_PATH=<opencv_contrib 目录>/modules <opencv_source_directory(例如上一级 ..)>
+          $ make -j3
     
     
     
