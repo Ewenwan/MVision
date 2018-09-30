@@ -51,7 +51,7 @@
        安装到 usr/include/boost/ make_unique.hpp
     b. 缺少 opencv2/tracking.hpp  文件  在 opencv_contrib 中
        安装 opencv_contrib
-          opencv-3.2 + opencv_contrib-3.2
+          opencv-3.2 + opencv_contrib-3.2  安转参考 https://github.com/Ewenwan/opencv3.2_CMake
           $ 下载 opencv-3.2
           $ https://github.com/opencv/opencv/archive/3.2.0.zip 
           $ 解压
