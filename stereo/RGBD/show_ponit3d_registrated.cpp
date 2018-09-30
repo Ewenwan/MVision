@@ -1,4 +1,5 @@
-#include "../common/common.hpp"
+// 显示点云 校准的彩色图 校准的深度图
+#include "../common/common.hpp"// 图漾api 库头文件
 
 static char buffer[1024*1024*20];
 static int  n;
