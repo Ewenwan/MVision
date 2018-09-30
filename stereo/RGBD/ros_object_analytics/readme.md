@@ -52,6 +52,11 @@
           $ cd build
           $ cmake -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ..
           $ make -j3
+          
+          错误信息：
+          /opencv_contrib_master/modules/rgbd/include/opencv2/rgbd/depth.hpp
+             add  #include <stdexcept>// runtime_error was not declared
+          
           sudo make install 
     
     
