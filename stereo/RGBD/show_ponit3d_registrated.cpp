@@ -1,137 +1,40 @@
-// 显示点云 校准的彩色图 校准的深度图
-#include "../common/common.hpp"// 图漾api 库头文件
+#include "../common/common.hpp"
 
 static char buffer[1024*1024*20];
 static int  n;
 static volatile bool exit_main;
 static volatile bool save_frame;
 
+// 计时模块
+#include <sys/time.h>
+#include <unistd.h>
+
+// 计算帧率
+long time_last=0, time_now=0;
+
 // 用户数据
 struct CallbackData {
     int             index;    // index
     TY_DEV_HANDLE   hDevice;  // 设备
     DepthRender*    render;   // 深度值 渲染器 例如得到彩色深度图
-    DepthViewer* depthViewer;// 深度 信息 可视化器  可世界显示彩色深度图 + 中心点距离信息
+    DepthViewer* depthViewer; // 深度 信息 可视化器  可世界显示彩色深度图 + 中心点距离信息
     PointCloudViewer* pcviewer;// 点云可视化器 pcl提供
     
     TY_CAMERA_DISTORTION color_dist;// 畸变数据
     TY_CAMERA_INTRINSIC color_intri;// 内参数
 };
 
-void handleFrame(TY_FRAME_DATA* frame, void* userdata)
+void handleFrame(TY_FRAME_DATA* frame, void* userdata);// 处理帧
+void eventCallback(TY_EVENT_INFO *event_info, void *userdata);// 处理事件
+
+// ============================================
+// 添加 计时
+long getTimeUsec()
 {
-    CallbackData* pData = (CallbackData*) userdata;
-    // LOGD("=== Get frame %d", ++pData->index); // 帧+1
-
-    cv::Mat depth, irl, irr, color, point3D;
-    parseFrame(*frame, &depth, &irl, &irr, &color, &point3D);
-    //if(!depth.empty())
-    //{
-    //    cv::Mat colorDepth = pData->render->Compute(depth);
-    //    cv::imshow("ColorDepth", colorDepth); // 未配准的 深度图
-    //}
-    if(!irl.empty()){ cv::imshow("LeftIR", irl); }
-    if(!irr.empty()){ cv::imshow("RightIR", irr); }
-
-// 矫正彩色图像=======
-    if(!color.empty())
-    {
-        cv::Mat undistort_result(color.size(), CV_8UC3);
-        TY_IMAGE_DATA dst;        // 目标图像
-        dst.width = color.cols;   // 宽度 列数
-        dst.height = color.rows;  // 高度 行数
-        dst.size = undistort_result.size().area() * 3;// 3通道 
-        dst.buffer = undistort_result.data;
-        dst.pixelFormat = TY_PIXEL_FORMAT_RGB; // RGB 格式
-        TY_IMAGE_DATA src;        // 源图像=================
-        src.width = color.cols;
-        src.height = color.rows;
-        src.size = color.size().area() * 3;
-        src.pixelFormat = TY_PIXEL_FORMAT_RGB;
-        src.buffer = color.data; 
-        //undistort camera image 
-        //TYUndistortImage accept TY_IMAGE_DATA from TY_FRAME_DATA , pixel format RGB888 or MONO8
-        //you can also use opencv API cv::undistort to do this job.
-        ASSERT_OK(TYUndistortImage(&pData->color_intri, &pData->color_dist, NULL, &src, &dst));
-        color = undistort_result;// 畸变矫正后的图像==========================
-
-        cv::Mat resizedColor;// 彩色图缩放到 和 深度图一样大
-        cv::resize(color, resizedColor, depth.size(), 0, 0, CV_INTER_LINEAR);
-        cv::imshow("color", resizedColor);
-    }
-
-// 彩色图和深度图配准=============
-    // do Registration
-    cv::Mat newDepth;
-    if(!point3D.empty() && !color.empty()) 
-    {
-        ASSERT_OK( TYRegisterWorldToColor2(pData->hDevice, (TY_VECT_3F*)point3D.data, 0, 
-                   point3D.cols * point3D.rows, color.cols, color.rows, (uint16_t*)buffer, sizeof(buffer)
-                    ));
-        newDepth = cv::Mat(color.rows, color.cols, CV_16U, (uint16_t*)buffer);
-        cv::Mat resized_color;
-        cv::Mat temp;
-        //you may want to use median filter to fill holes in projected depth image or do something else here
-        cv::medianBlur(newDepth,temp,5);// 对3d点云反投影到 彩色图上 获取的带有 孔洞的 深度图 进行均值滤波======
-        newDepth = temp;
-        //resize to the same size for display
-        cv::resize(newDepth, newDepth, depth.size(), 0, 0, 0);// 深度图
-        cv::resize(color, resized_color, depth.size());// 彩色图
-
-        cv::Mat depthColor = pData->render->Compute(newDepth);// 矫正后的 彩色深度图
-        cv::imshow("Registrated ColorDepth", depthColor);// 显示 
-        // pData->depthViewer->show("Registrated ColorDepth view", newDepth);// depthViewer 显示 彩色点云数据 包含中心点的距离
-
-        depthColor = depthColor / 2 + resized_color / 2; // c彩色深度图 和 彩色图合并在一起
-        cv::imshow("projected depth", depthColor);// 显示 
-    }
-///*
-    if(!point3D.empty()){
-        pData->pcviewer->show(point3D, "Point3D"); // 显示点云数据
-        // LOGD("point3d w:%d, h:%d, num: %lu", p3d.rows, p3d.cols, p3d.total()); // 宽480 高640 
-        if(pData->pcviewer->isStopped("Point3D")){// 点云界面被关闭===
-            exit_main = true; // 退出
-            return;
-        }
-    }
-//*/
-    if(save_frame){
-        LOGD(">>>>>>>>>> write images");
-        imwrite("depth.png", newDepth);
-        imwrite("color.png", color);
-        save_frame = false;
-    }
-
-    int key = cv::waitKey(1);
-    switch(key){
-        case -1:
-            break;
-        case 'q': 
-        case 1048576 + 'q':
-            exit_main = true;
-            break;
-        case 's': 
-        case 1048576 + 's':
-            save_frame = true;
-            break;
-        default:
-            LOGD("Pressed key %d", key);
-    }
-
-   // LOGD("=== Callback: Re-enqueue buffer(%p, %d)", frame->userBuffer, frame->bufferSize);
-    ASSERT_OK( TYEnqueueBuffer(pData->hDevice, frame->userBuffer, frame->bufferSize) );
-}
-
-void eventCallback(TY_EVENT_INFO *event_info, void *userdata)
-{
-    if (event_info->eventId == TY_EVENT_DEVICE_OFFLINE) {
-        LOGD("=== Event Callback: Device Offline!");
-        // Note: 
-        //     Please set TY_BOOL_KEEP_ALIVE_ONOFF feature to false if you need to debug with breakpoint!
-    }
-    else if (event_info->eventId == TY_EVENT_LICENSE_ERROR) {
-        LOGD("=== Event Callback: License Error!");
-    }
+    
+    struct timeval t;
+    gettimeofday(&t,0);
+    return (long)((long)t.tv_sec*1000*1000 + t.tv_usec);
 }
 
 
@@ -321,4 +224,138 @@ int main(int argc, char* argv[])
 
     LOGD("=== Main done!");
     return 0;
+}
+
+
+
+// 处理帧=================================================
+void handleFrame(TY_FRAME_DATA* frame, void* userdata)
+{
+    CallbackData* pData = (CallbackData*) userdata;
+    // LOGD("=== Get frame %d", ++pData->index); // 帧+1
+    time_now = getTimeUsec();// 微妙
+    int fps = 1000000/(time_now - time_last);// 帧率
+	// if (ret > 0)
+        // printf("fps: %d\n", ret);
+
+    cv::Mat depth, irl, irr, color, point3D;
+    parseFrame(*frame, &depth, &irl, &irr, &color, &point3D);
+    //if(!depth.empty())
+    //{
+    //    cv::Mat colorDepth = pData->render->Compute(depth);
+    //    cv::imshow("ColorDepth", colorDepth); // 未配准的 深度图
+    //}
+    if(!irl.empty()){ cv::imshow("LeftIR", irl); }
+    if(!irr.empty()){ cv::imshow("RightIR", irr); }
+
+// 矫正彩色图像=======
+    if(!color.empty())
+    {
+        cv::Mat undistort_result(color.size(), CV_8UC3);
+        TY_IMAGE_DATA dst;        // 目标图像
+        dst.width = color.cols;   // 宽度 列数
+        dst.height = color.rows;  // 高度 行数
+        dst.size = undistort_result.size().area() * 3;// 3通道 
+        dst.buffer = undistort_result.data;
+        dst.pixelFormat = TY_PIXEL_FORMAT_RGB; // RGB 格式
+        TY_IMAGE_DATA src;        // 源图像=================
+        src.width = color.cols;
+        src.height = color.rows;
+        src.size = color.size().area() * 3;
+        src.pixelFormat = TY_PIXEL_FORMAT_RGB;
+        src.buffer = color.data; 
+        //undistort camera image 
+        //TYUndistortImage accept TY_IMAGE_DATA from TY_FRAME_DATA , pixel format RGB888 or MONO8
+        //you can also use opencv API cv::undistort to do this job.
+        ASSERT_OK(TYUndistortImage(&pData->color_intri, &pData->color_dist, NULL, &src, &dst));
+        color = undistort_result;// 畸变矫正后的图像==========================
+
+        cv::Mat resizedColor;// 彩色图缩放到 和 深度图一样大
+        cv::resize(color, resizedColor, depth.size(), 0, 0, CV_INTER_LINEAR);
+        cv::imshow("color", resizedColor);
+    }
+
+// 彩色图和深度图配准=============
+    // do Registration
+    cv::Mat newDepth;
+    if(!point3D.empty() && !color.empty()) 
+    {
+        ASSERT_OK( TYRegisterWorldToColor2(pData->hDevice, (TY_VECT_3F*)point3D.data, 0, 
+                   point3D.cols * point3D.rows, color.cols, color.rows, (uint16_t*)buffer, sizeof(buffer)
+                    ));
+        newDepth = cv::Mat(color.rows, color.cols, CV_16U, (uint16_t*)buffer);
+        cv::Mat resized_color;
+        cv::Mat temp;
+        //you may want to use median filter to fill holes in projected depth image or do something else here
+        cv::medianBlur(newDepth,temp,5);// 对3d点云反投影到 彩色图上 获取的带有 孔洞的 深度图 进行均值滤波======
+        newDepth = temp;
+        //resize to the same size for display
+        cv::resize(newDepth, newDepth, depth.size(), 0, 0, 0);// 深度图
+        cv::resize(color, resized_color, depth.size());// 彩色图
+
+        //pData->depthViewer->show("Registrated ColorDepth view", newDepth);// depthViewer 显示 彩色点云数据 包含中心点的距离 有点慢
+        //LOGD("newDepth w:%d, h:%d, num: %lu", newDepth.rows, newDepth.cols, newDepth.total()); // 宽480 高640 
+
+        char text[256];
+        sprintf(text, "depth at center: %d, fps: %d ", newDepth.at<uint16_t>(newDepth.rows/2, newDepth.cols/2), fps);// 显示的字符
+        //LOGD("%s", text);
+
+        cv::Mat depthColor = pData->render->Compute(newDepth);// 矫正后的 彩色深度图
+        cv::putText(depthColor, text, cv::Point(20, 20), cv::FONT_HERSHEY_SIMPLEX, 0.6, cv::Scalar(255, 0, 0)); // bgr
+        cv::imshow("Registrated ColorDepth", depthColor);// 显示 
+
+        depthColor = depthColor / 2 + resized_color / 2; // c彩色深度图 和 彩色图合并在一起
+        cv::imshow("projected depth", depthColor);// 显示 
+    }
+///*
+    if(!point3D.empty()){
+        pData->pcviewer->show(point3D, "Point3D"); // 显示点云数据
+        // LOGD("point3d w:%d, h:%d, num: %lu", p3d.rows, p3d.cols, p3d.total()); // 宽480 高640 
+        if(pData->pcviewer->isStopped("Point3D")){// 点云界面被关闭===
+            exit_main = true; // 退出
+            return;
+        }
+    }
+//*/
+    if(save_frame){
+        LOGD(">>>>>>>>>> write images");
+        imwrite("depth.png", newDepth);
+        imwrite("color.png", color);
+        save_frame = false;
+    }
+
+    int key = cv::waitKey(1);
+    switch(key){
+        case -1:
+            break;
+        case 'q': 
+        case 1048576 + 'q':
+            exit_main = true;
+            break;
+        case 's': 
+        case 1048576 + 's':
+            save_frame = true;
+            break;
+        default:
+            LOGD("Pressed key %d", key);
+    }
+
+   // LOGD("=== Callback: Re-enqueue buffer(%p, %d)", frame->userBuffer, frame->bufferSize);
+    ASSERT_OK( TYEnqueueBuffer(pData->hDevice, frame->userBuffer, frame->bufferSize) );
+    
+    time_last = time_now;
+}
+
+
+// 处理事件====================================================
+void eventCallback(TY_EVENT_INFO *event_info, void *userdata)
+{
+    if (event_info->eventId == TY_EVENT_DEVICE_OFFLINE) {
+        LOGD("=== Event Callback: Device Offline!");
+        // Note: 
+        //     Please set TY_BOOL_KEEP_ALIVE_ONOFF feature to false if you need to debug with breakpoint!
+    }
+    else if (event_info->eventId == TY_EVENT_LICENSE_ERROR) {
+        LOGD("=== Event Callback: License Error!");
+    }
 }
