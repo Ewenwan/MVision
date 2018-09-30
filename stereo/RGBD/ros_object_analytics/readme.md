@@ -19,7 +19,7 @@
         merger      object_analytics_nodelet::merger
         model       object_analytics_nodelet::model
         segmenter   object_analytics_nodelet::segmenter
-        splitter    object_analytics_nodelet::splitter
+        splitter    object_analytics_nodelet::splitter     1. RGBD传感器预处理分割器 
         tracker     object_analytics_nodelet::tracker
         
 ## 3. 编译错误信息
@@ -29,11 +29,15 @@
        安装到 usr/include/boost/ make_unique.hpp
     b. 缺少 opencv2/tracking.hpp  文件  在 opencv_contrib 中
        安装 opencv_contrib
-          git clone https://github.com/opencv/opencv_contrib.git
+          $ git clone https://github.com/opencv/opencv.git
+          $ cd opencv
+          $ git clone https://github.com/opencv/opencv_contrib.git
           和 opencv 一起安装
-          $ cd <opencv 编译文件夹
-          $ cmake -DOPENCV_EXTRA_MODULES_PATH=<opencv_contrib 目录>/modules <opencv_source_directory(例如上一级 ..)>
+          $ mkdir build
+          $ cd build
+          $ cmake -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ..
           $ make -j3
+          sudo make install 
     
     
     
