@@ -15,10 +15,23 @@
     git clone https://github.com/intel/ros_object_analytics.git
     
     分析：
+    const std::string Const::kTopicRegisteredPC2 = "/camera/depth_registered/points";
+    const std::string Const::kTopicPC2 = "pointcloud";
+    const std::string Const::kTopicRgb = "rgb";
+    const std::string Const::kTopicSegmentation = "segmentation";
+    const std::string Const::kTopicDetection = "detection";
+    const std::string Const::kTopicLocalization = "localization";
+    const std::string Const::kTopicTracking = "tracking";
+    
     ros_object_analytics/object_analytics_nodelet/src/
         merger      object_analytics_nodelet::merger
         model       object_analytics_nodelet::model
         segmenter   object_analytics_nodelet::segmenter
+                                      2. 点云分割处理器
+                                        // 订阅 点云话题消息
+                                        sub_ = nh.subscribe(Const::kTopicPC2, 1, &SegmenterNodelet::cbSegment, this);
+                                        pub_ = nh.advertise<object_analytics_msgs::ObjectsInBoxes3D>(Const::kTopicSegmentation, 1);
+                                        ObjectsInBoxes3D ： x，y，z坐标最大最小值，投影到rgb图像平面上的 ROI框
         splitter    object_analytics_nodelet::splitter    
                                       1. RGBD传感器预处理分割器 
                                       // 订阅  rgbd传感器消息
@@ -38,26 +51,22 @@
        安装到 usr/include/boost/ make_unique.hpp
     b. 缺少 opencv2/tracking.hpp  文件  在 opencv_contrib 中
        安装 opencv_contrib
-          $ git clone https://github.com/opencv/opencv.git
-          $ 需要 3.4版本
-            git branch -a 先查看当前远端分支情况
-            git  checkout origin/xxx  选择远端xxx分支
-            git branch xxx  创建本地xxx分支
-            git checkout xxx  选择新创建的分支就可以了。
+          opencv-3.2 + opencv_contrib-3.2
+          $ 下载 opencv-3.2
+          $ https://github.com/opencv/opencv/archive/3.2.0.zip 
+          $ 解压
           $ cd opencv
-          $ git clone https://github.com/opencv/opencv_contrib.git   3.4版本
-          $ 可能需要删除一些 cuda开头的module 和 opencv-3.4本身的module重名了=========
+          $ 下载 opencv_contrib-3.2
+          $ https://codeload.github.com/opencv/opencv_contrib/zip/3.2.0   
+          $ 可能需要删除一些 cuda开头的module 和 opencv-3.2本身的module重名了=========
           和 opencv 一起安装
           $ mkdir build
           $ cd build
           $ cmake -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ..
           $ make -j3
           
-          错误信息：
-          /opencv_contrib_master/modules/rgbd/include/opencv2/rgbd/depth.hpp
-             add  #include <stdexcept>// runtime_error was not declared
           
-          sudo make install 
+          https://github.com/protocolbuffers/protobuf/releases/download/v3.1.0/protobuf-cpp-3.1.0.tar.gz
     
     
     
