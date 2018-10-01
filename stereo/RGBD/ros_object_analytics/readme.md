@@ -166,5 +166,30 @@
             
             下在未成功的文件 可以从这里下载 https://github.com/Ewenwan/opencv3.2_CMake
     
-    
-    
+##  4. 需要修改的地方
+     A.  RGBD传感器预处理分割器  splitter 
+         这里需要使用 图漾RGBD API 获取校正后的rgbd 图像 和 和rgb图像陪准的点云 
+         const std::string Const::kTopicPC2 = "pointcloud"; // 点云话题  发布数据类型:  sensor_msgs::PointCloud2  与pcl点云个是不一致
+                    Header header   # 时间戳 
+                    uint32 height   # 点云的2d 有序结构(来在与图像)， 若无序， height = 1
+                    uint32 width
+                    PointField[] fields  # 存储的数据结构
+                    bool    is_bigendian # 大端模式??
+                    uint32  point_step   # 一个点 的 字节宽度
+                    uint32  row_step     # 一行的  字节宽度
+                    uint8[] data         # Actual point data, size is (row_step*height)
+                    bool is_dense        # 是否为稠密点云，稠密点云，无不合格的数据
+         const std::string Const::kTopicRgb = "rgb";        // rgb话题   发布数据类型:  sensor_msgs::Image
+     
+     B. 原来的 目标检测节点 需要替换
+        a. openCL + YOLO_V2 
+        b. NCS + MobileNetSSD
+        c. ncnn + mobileNetv2SsdLite 使用 ncnn框架实现 目标检测功能，这里的检测频率不需要过快，后面有Tracker节点会对目标检测结果进行跟踪
+            这里有两个参数， 一个是目标就爱你测框得置信度  和  检测结果的 抽取宽度， 好像都会被传递到 Tracker 节点
+            其实这里可以直接在 Detection 节点 直接抽取。
+        这里 Tracker 节点可能也需要修改 =======
+        
+        
+## 5. 修改记录
+
+
