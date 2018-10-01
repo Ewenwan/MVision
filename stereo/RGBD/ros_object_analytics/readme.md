@@ -66,12 +66,61 @@
                         sub_rgb_ = nh.subscribe(Const::kTopicRgb, 6, &TrackingNodelet::rgb_cb, this);
                         // 订阅 2d目标检测结构 话题
                         sub_obj_ = nh.subscribe(Const::kTopicDetection, 6, &TrackingNodelet::obj_cb, this);
-                        // 
+                        // 发布 2d目标跟踪结果
                         pub_tracking_ = nh.advertise<object_analytics_msgs::TrackedObjects>(Const::kTopicTracking, 10);             
-        
-        
+                            // object_analytics_msgs::TrackedObjects  目标类别id + roi框 数组
+                        
+                        /ros_object_analytics/object_analytics_nodelet/src/tracker/tracking.cpp 49行
+                        tracker 对象创建可能会出现编译错误，老版本创建tracker对象时需要传入类型，新版本之间指定 特点类型的tracker
+                        tracker_ = cv::TrackerMIL::create();// 新版本 >>>> tracker_ = cv::Tracker::create("MIL");
+                        
         model       object_analytics_nodelet::model
+                     5. 模型类
+                        11. object_analytics_nodelet::model::Object2D    
+                            const sensor_msgs::RegionOfInterest roi_;// 物体边框
+                            const object_msgs::Object object_;       // 物体名称 + 概率
+                            
+                        22. object_analytics_nodelet::model::Object3D  
+                            sensor_msgs::RegionOfInterest roi_;      // 2点云团对应的图像的 roi
+                            geometry_msgs::Point32 min_;             // 三个坐标轴 最小的三个量(用于3d(长方体))
+                            geometry_msgs::Point32 max_;             // 三个坐标轴 最大的三个量
+                            
+                        33. object_analytics_nodelet::model::ObjectUtils
+                            PointXYZPixel PCL新定义点类型   3d点坐标+2d的像素坐标值 3d-2d点对    
+                            ObjectUtils::copyPointCloud(); // 指定index3d点 pcl::PointXYZRGBA >>>> PointXYZPixel
+                                      pcl::copyPointCloud(*original, indices, *dest);// 拷贝 3d点坐标
+                                      uint32_t width = original->width;// 相当于图像宽度 640 × 480
+                                      for (uint32_t i = 0; i < indices.size(); i++)// 所有指定3d点 indices为 3d点序列id
+                                      {
+                                        dest->points[i].pixel_x = indices[i] % width;// 像素 列坐标
+                                        dest->points[i].pixel_y = indices[i] / width;// 像素 行坐标
+                                      }
+                            ObjectUtils::getProjectedROI( PointXYZPixel ); // 获取点云对应2d像素坐标集合的 包围框 ROI
+                            点云团 x、y、z 值得最大值和最小值
+                            ObjectUtils::getMatch(): // 计算 两个边框得相似度 = 交并比 * 边框中心距离 / 平均长宽计算的面积
+                            ObjectUtils::findMaxIntersectionRelationships(); // 输入 2d 目标检测框，3d 点云对应得2d框
+                                                                             // 为每一个2d框 找一个最相似的 3d点云2d框(对应点云团)
+                                      a. 遍历 每一个2d物体对应的2d框
+                                           b. 遍历   每一个3d物体对应的2d框
+                                                c. 调用 getMatch()，计算两边框d相似度
+                                                d. 记录最大相似读，对应的 3d物体对应的2d框
+                                                e. 记录 pair<Object2D, Object3D> 配对关系
+                                                
+    object_analytics_visualization 可视化节点
 
+      6. 3d定位可视化　visualization3d　localization
+         输入: 2d检测结果 "detection_topic" default="/object_analytics/detection" 
+         输入: 3d检测结果 "localization_topic" default="/object_analytics/localization" 
+         输入: 2d跟踪结果 "tracking_topic" default="/object_analytics/tracking" 
+         输出: rviz可视化话题　"output_topic" default="localization_rviz" 
+
+      7. 2d跟踪可视化　visualization2d 
+         输入: 2d检测结果 "detection_topic" default="/object_analytics/detection" 
+         输入: 2d跟踪结果 "tracking_topic" default="/object_analytics/tracking" 
+         输入: 2d图像     "image_topic" default="/object_analytics/rgb" 
+         输出: rviz可视化话题　""output_topic" default="tracking_rviz"    
+
+                            
 ## 3. 编译错误信息
     
     a. 缺少 boost/make_unique.hpp 文件
@@ -93,8 +142,29 @@
           $ cmake -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ..
           $ make -j3
           
-          
           https://github.com/protocolbuffers/protobuf/releases/download/v3.1.0/protobuf-cpp-3.1.0.tar.gz
+          
+          
+          以上可能都有问题  安装opencv-3.1.0 + opencv_contrib-3.1.0
+           opencv-3.1.0 下载         hhttps://github.com/opencv/opencv/tree/3.1.0
+           opencv_contrib-3.1.0 下载 https://github.com/opencv/opencv_contrib/tree/3.1.0 放到opencv-3.1.0/下 并改名为 opencv_contrib
+            安装依赖项:
+            sudo apt-get install build-essential libgtk2.0-dev libvtk5-dev libjpeg-dev libtiff4-dev libjasper-dev libopenexr-dev libtbb-dev 
+
+            编译依赖 sudo apt-get install build-essential
+            必须     sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev     
+            可选     sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+
+            安装 lapacke : sudo apt-get install liblapacke-dev checkinstall
+            编译: 
+            cd opencv-3.1.0
+            mkdir build
+            cd build 
+            cmake -D OPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules/ ..
+            make -j2
+            sudo make install
+            
+            下在未成功的文件 可以从这里下载 https://github.com/Ewenwan/opencv3.2_CMake
     
     
     
