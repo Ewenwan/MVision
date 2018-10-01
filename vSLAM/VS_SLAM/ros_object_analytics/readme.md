@@ -109,12 +109,13 @@
   * **input_points** Specify arg "input_points" for the name of the topic publishing the [sensor_msgs::PointCloud2](http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html) messages by RGB-D camera. 
   Default is "/camera/depth_registered/points" (topic compliant with [ROS OpenNI launch](http://wiki.ros.org/openni_launch))
   
-  * **aging_th** 跟踪队列长度　Specifiy tracking aging threshold, number of frames since last detection to deactivate the tracking. Default is 16.
+  * **aging_th** 检测次数间隔　Default is 16，因为检测一次之后, 会使用 tracker 来对矩框进行跟踪，检测频率过快，会对检测产生影响
   
   * **probability_th** 跟踪置信度　Specify the probability threshold for tracking object. Default is "0.5".
   ```bash
   roslaunch object_analytics_launch analytics_movidius_ncs.launch aging_th:=30 probability_th:="0.3"
   ```
+  
 ## 节点订阅的　传感器发布的话题
   RGB图像　object_analytics/rgb ([sensor_msgs::Image](http://docs.ros.org/api/sensor_msgs/html/msg/Image.html))
 
@@ -127,6 +128,7 @@
   跟踪信息 object_analytics/tracking ([object_analytics_msgs::TrackedObjects](https://github.com/intel/ros_object_analytics/tree/master/object_analytics_msgs/msg))
 
   检测信息(2d边框)object_analytics/detection ([object_msgs::ObjectsInBoxes](https://github.com/intel/object_msgs/tree/master/msg))
+  
 ## 消息类型
 object_msgs::Object
 
