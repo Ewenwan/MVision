@@ -1,12 +1,12 @@
 ##  点云分割处理器 segmenter
 
-   segmenter   object_analytics_nodelet::segmenter
-                                    2. 点云分割处理器 segmenter
-                                      // 订阅 点云话题消息
-                                      sub_ = nh.subscribe(Const::kTopicPC2, 1, &SegmenterNodelet::cbSegment, this);
-                                      // 发布 点云物体数组
-                                      pub_ = nh.advertise<object_analytics_msgs::ObjectsInBoxes3D>(Const::kTopicSegmentation, 1);
-                                      ObjectsInBoxes3D ： x，y，z坐标最大最小值，投影到rgb图像平面上的 ROI框
+      segmenter   object_analytics_nodelet::segmenter
+                                       2. 点云分割处理器 segmenter
+                                         // 订阅 点云话题消息
+                                         sub_ = nh.subscribe(Const::kTopicPC2, 1, &SegmenterNodelet::cbSegment, this);
+                                         // 发布 点云物体数组
+                                         pub_ = nh.advertise<object_analytics_msgs::ObjectsInBoxes3D>(Const::kTopicSegmentation, 1);
+                                         ObjectsInBoxes3D ： x，y，z坐标最大最小值，投影到rgb图像平面上的 ROI框
 ##   点云分割处理器 segmenter
      object_analytics_launch/launch/includes/segmenter.launch
      输入: pointcloud   3d点
