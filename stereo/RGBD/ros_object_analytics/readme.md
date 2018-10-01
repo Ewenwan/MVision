@@ -24,16 +24,9 @@
     const std::string Const::kTopicTracking = "tracking";
     
     ros_object_analytics/object_analytics_nodelet/src/
-        merger      object_analytics_nodelet::merger
-        model       object_analytics_nodelet::model
-        segmenter   object_analytics_nodelet::segmenter
-                                      2. 点云分割处理器
-                                        // 订阅 点云话题消息
-                                        sub_ = nh.subscribe(Const::kTopicPC2, 1, &SegmenterNodelet::cbSegment, this);
-                                        pub_ = nh.advertise<object_analytics_msgs::ObjectsInBoxes3D>(Const::kTopicSegmentation, 1);
-                                        ObjectsInBoxes3D ： x，y，z坐标最大最小值，投影到rgb图像平面上的 ROI框
+    
         splitter    object_analytics_nodelet::splitter    
-                                      1. RGBD传感器预处理分割器 
+                                      1. RGBD传感器预处理分割器  splitter 
                                       // 订阅  rgbd传感器消息
                                       sub_pc2_ = nh.subscribe(Const::kTopicRegisteredPC2, 1, &SplitterNodelet::cbSplit, this);
                                       // 发布 2d 图像消息
@@ -42,8 +35,43 @@
                                       pub_3d_ = nh.advertise<sensor_msgs::PointCloud2>(Const::kTopicPC2, 1);
                                       
                                       !!!!!! 需要修改为 直接从 图漾rgbd相机获取 彩色图 图 和 点云后 发布出去======
-        tracker     object_analytics_nodelet::tracker
+                                      
+        segmenter   object_analytics_nodelet::segmenter
+                                      2. 点云分割处理器 segmenter
+                                        // 订阅 点云话题消息
+                                        sub_ = nh.subscribe(Const::kTopicPC2, 1, &SegmenterNodelet::cbSegment, this);
+                                        // 发布 点云物体数组
+                                        pub_ = nh.advertise<object_analytics_msgs::ObjectsInBoxes3D>(Const::kTopicSegmentation, 1);
+                                        ObjectsInBoxes3D ： x，y，z坐标最大最小值，投影到rgb图像平面上的 ROI框
+                                        
+        merger      object_analytics_nodelet::merger
+                                      3. 3d定位器　merger  融合2d检测结果 和 3d分割结果=======
+                       using Subscriber2D = message_filters::Subscriber<ObjectsInBoxes>;  // 消息滤波器 订阅 2d边框数组消息
+                       using Subscriber3D = message_filters::Subscriber<ObjectsInBoxes3D>;// 消息滤波器 订阅 3d边框数组消息
+                       // 订阅  2d检测分割结果 detection
+                       sub_2d_ = std::unique_ptr<Subscriber2D>(new Subscriber2D(nh, Const::kTopicDetection, kMsgQueueSize));
+                       // 订阅  3d检测分割结果 segmentation
+                       sub_3d_ = std::unique_ptr<Subscriber3D>(new Subscriber3D(nh, Const::kTopicSegmentation, kMsgQueueSize));
+                       // 同时订阅两个消息的 消息同步器
+                       sub_sync_ = std::unique_ptr<ApproximateSynchronizer2D3D>();
+                       // 消息同步后，调用回调函数，融合 2d检测结果 和 3d分割结果=======
+                       sub_sync_->registerCallback(boost::bind(&MergerNodelet::cbMerge, this, _1, _2));
+                       
+                       // 发布  3d定位结果　　 localization
+                       pub_result_ = nh.advertise<ObjectsInBoxes3D>(Const::kTopicLocalization, 10);
+                       
+        tracker     object_analytics_nodelet::tracker       
+                                     4. 2d 目标跟踪器 tracker
+                        // 订阅 RGB图像话题
+                        sub_rgb_ = nh.subscribe(Const::kTopicRgb, 6, &TrackingNodelet::rgb_cb, this);
+                        // 订阅 2d目标检测结构 话题
+                        sub_obj_ = nh.subscribe(Const::kTopicDetection, 6, &TrackingNodelet::obj_cb, this);
+                        // 
+                        pub_tracking_ = nh.advertise<object_analytics_msgs::TrackedObjects>(Const::kTopicTracking, 10);             
         
+        
+        model       object_analytics_nodelet::model
+
 ## 3. 编译错误信息
     
     a. 缺少 boost/make_unique.hpp 文件
