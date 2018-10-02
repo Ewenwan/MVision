@@ -336,6 +336,7 @@ void ObjectUtils::copyPointCloud(const PointCloudT::ConstPtr& original, const st
          object_analytics_nodelet/tracker/TrackingNodelet
          
          检测结果的每一个roi会用来初始化一个跟踪器。之后会跟踪后面的每一帧，直到下一个检测结果来到。
+         [detection, tracking, tracking, tracking, ..., tracking] [detection, tracking, tracking, tracking, ..., tracking]
          
 ## object_analytics_visualization 可视化
       5. 3d定位可视化　visualization3d　localization
