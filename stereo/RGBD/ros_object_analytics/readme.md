@@ -200,4 +200,12 @@
         
 ## 5. 修改记录
 
-
+### A. 首先添加一个新的节点 detector
+    ros_object_analytics/object_analytics_nodelet/include/object_analytics_nodelet/detector/detector.h
+    ros_object_analytics/object_analytics_nodelet/include/object_analytics_nodelet/detector/detector_nodelet.h
+    ros_object_analytics/object_analytics_nodelet/include/object_analytics_nodelet/detector/ncnn/lib/libncnn.a
+    ros_object_analytics/object_analytics_nodelet/include/object_analytics_nodelet/detector/ncnn/include/*.h
+    ros_object_analytics/object_analytics_nodelet/src/detector/detector_nodelet.cpp
+    ros_object_analytics/object_analytics_nodelet/src/detector/detector.cpp
+    
+### B. 修改splitter  使用图漾API 获取相机 校准后的 RGB数据 和 点云数据 再发布出去
