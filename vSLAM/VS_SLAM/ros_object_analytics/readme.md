@@ -331,8 +331,8 @@ void ObjectUtils::copyPointCloud(const PointCloudT::ConstPtr& original, const st
          输入: 2d图像        rgb        input_rgb 
          输入: 2d检测分割结果 detection  input_2d 
          输出: 跟踪结果　　　 tracking　　output  
-         参数: 跟踪帧队列长度: aging_th：default="30"；
-         参数: 跟踪置信度: probability_th" default="0.5"
+         参数: 跟踪次数阈值:  aging_th：default="30"； // 被跟踪次数长度，年龄？？？，跟踪的次数越多，可能就越不准确===
+         参数: 跟踪置信度:    probability_th" default="0.5"
          object_analytics_nodelet/tracker/TrackingNodelet
          
          检测结果的每一个roi会用来初始化一个跟踪器。之后会跟踪后面的每一帧，直到下一个检测结果来到。
