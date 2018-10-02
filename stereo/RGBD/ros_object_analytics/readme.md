@@ -63,9 +63,10 @@
         tracker     object_analytics_nodelet::tracker       
                                      4. 2d 目标跟踪器 tracker
                         // 订阅 RGB图像话题
-                        sub_rgb_ = nh.subscribe(Const::kTopicRgb, 6, &TrackingNodelet::rgb_cb, this);
+                        sub_rgb_ = nh.subscribe(Const::kTopicRgb, 6, &TrackingNodelet::rgb_cb, this); // sensor_msgs::Image
                         // 订阅 2d目标检测结构 话题
                         sub_obj_ = nh.subscribe(Const::kTopicDetection, 6, &TrackingNodelet::obj_cb, this);
+                                                                                                   // object_msgs::ObjectsInBoxes
                         // 发布 2d目标跟踪结果
                         pub_tracking_ = nh.advertise<object_analytics_msgs::TrackedObjects>(Const::kTopicTracking, 10);             
                             // object_analytics_msgs::TrackedObjects  目标类别id + roi框 数组
@@ -74,6 +75,9 @@
                         tracker 对象创建可能会出现编译错误，老版本创建tracker对象时需要传入类型，新版本之间指定 特点类型的tracker
                         tracker_ = cv::TrackerMIL::create();// 新版本 >>>> tracker_ = cv::Tracker::create("MIL");
                         
+                   检测结果的每一个roi会用来初始化一个跟踪器。之后会跟踪后面的每一帧，直到下一个检测结果来到。
+                   [detection, tracking, tracking, tracking, ..., tracking] [detection, tracking, tracking, tracking, ..., tracking]
+                   
         model       object_analytics_nodelet::model
                      5. 模型类
                         11. object_analytics_nodelet::model::Object2D    
