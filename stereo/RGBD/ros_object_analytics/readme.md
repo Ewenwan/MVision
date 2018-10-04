@@ -208,4 +208,17 @@
     ros_object_analytics/object_analytics_nodelet/src/detector/detector_nodelet.cpp
     ros_object_analytics/object_analytics_nodelet/src/detector/detector.cpp
     
-### B. 修改splitter  使用图漾API 获取相机 校准后的 RGB数据 和 点云数据 再发布出去
+### B. 添加一个新 项目，获取 图漾相机 XYZRGBD点云数据 后发送出去
+    ty api 依赖opencv3.x  
+    而 cv_bridge 在 indigo版本下，默认为 2.4版本，编译正确，但是运行 出错，core dump，核心已转储
+    需要源码安转 cv_bridge 
+    https://github.com/ros-perception/vision_opencv/tree/indigo
+    
+    cd catkin_ws/src
+    catkin_create_pkg ty_rgbd_node roscpp std_msgs sensor_msgs pcl_conversions image_transport nodelet
+    
+    
+    
+    
+    
+    
