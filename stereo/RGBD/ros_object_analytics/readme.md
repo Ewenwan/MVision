@@ -217,7 +217,9 @@
     cd catkin_ws/src
     catkin_create_pkg ty_rgbd_node roscpp std_msgs sensor_msgs pcl_conversions image_transport nodelet
     
+    参考 https://github.com/ros-perception/image_pipeline/blob/indigo/stereo_image_proc/src/libstereo_image_proc/processor.cpp
     
+    生成 sensor_msgs::PointCloud2 消息
     
     
     
