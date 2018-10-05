@@ -223,4 +223,11 @@
     
     
     
-    
+## 6.运行
+    0. 运行roscore
+    a. 运行图漾相机节点                rosrun ty_rgbd_node ty_rgbd_node 
+    b. 运行目标检测 以及 目标分析主节点 roslaunch object_analytics_launch analytics_ncnn.launch
+    c. 运行可视化节点                  roslaunch object_analytics_visualization rviz.launch
+    d. rqt_graph                      节点结构图
+   
+           
