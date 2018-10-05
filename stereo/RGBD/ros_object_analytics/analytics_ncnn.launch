@@ -1,0 +1,44 @@
+<!--
+ ncnn 检测框架 
+-->
+<launch>
+  <arg name="namespace"                     default="object_analytics" />
+  <arg name="manager"                       default="ObjectAnalyticsMgr" />
+  <arg name="input_points"                  default="/camera/depth_registered/points"
+            doc="point cloud topic from rgbd sensor" />
+  <arg name="input_rgb"                     default="rgb"
+            doc="rgb topic from splitter" />
+  <arg name="input_detection"               default="detection"
+            doc="detection result topic from object detection nodelet" />
+  <arg name="output_localization"           default="localization"
+            doc="localization result topic" />
+  <arg name="output_tracking"               default="tracking"
+            doc="tracking result topic" />
+  <arg name="aging_th"                      default="30"
+            doc="tracking aging threshold" />
+  <arg name="probability_th"                default="0.5"
+            doc="tracking object probability threshold" />
+
+  <group ns="$(arg namespace)">
+      <include file="$(find object_analytics_launch)/launch/includes/manager.launch">
+          <arg name="name"                      value="$(arg manager)" />
+          <arg name="num_worker_threads"        value="6" />
+      </include>
+
+      <include file="$(find object_analytics_launch)/launch/includes/nodelet.launch.xml">
+          <arg name="manager"                   value="$(arg manager)" />
+          <arg name="input_points"              value="$(arg input_points)" />
+          <arg name="input_rgb"                 value="$(arg input_rgb)" />
+          <arg name="input_detection"           value="$(arg input_detection)" />
+          <arg name="output_localization"       value="$(arg output_localization)" />
+          <arg name="output_tracking"           value="$(arg output_tracking)" />
+          <arg name="aging_th"                  value="$(arg aging_th)" />
+          <arg name="probability_th"            value="$(arg probability_th)" />
+      </include>
+
+      <node pkg="object_detection_node" type="object_detection_node" name="object_detection_node"
+		output="screen">
+      </node>
+
+  </group>
+</launch>
