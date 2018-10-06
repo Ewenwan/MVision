@@ -17,7 +17,7 @@
 
         sudo apt-get install　build-essential　libboost-all-dev　
 
-        sudo apt-get install libvtk5-dev 
+        sudo apt-get install libvtk5-dev libopenni-dev
 
         Vtk，（visualization toolkit 可视化工具包）是一个开源的免费软件系统，
         教程　http://blog.csdn.net/www_doling_net/article/details/8763686
