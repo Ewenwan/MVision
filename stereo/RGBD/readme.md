@@ -6,7 +6,9 @@
     
     在 Linux 环境下执行以下命令下载 SDK。
     gitclone https://github.com/percipioxyz/Camport2.git
-
+    
+    ros下的工程 https://github.com/Ewenwan/camport2
+    
     1.  根据 Linux 系统的权限管理机制,默认情况下需要 root 权限才能操作深度摄像头设备,
         非 root用户可以创建 udev rule 来修改设备权限。
         /etc/udev/rules.d/88-tyusb.rules
