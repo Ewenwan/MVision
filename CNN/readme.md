@@ -48,6 +48,8 @@
 [参考](https://github.com/Ewenwan/deep_learning_object_detection)
 
 # 卷积神经网络
+[ssd/mobile ssd/yolo v2/yolo v3 implement in opencv3 ](https://github.com/Ewenwan/real_time_object_detect)
+
 [nanonets.com 来帮助使用很少的数据和没有计算机硬件的情况下构建机器学习模型 ](https://nanonets.com/#demo)
 
 [facebook目标检测平台 基于caffe2](https://github.com/Ewenwan/Detectron)
