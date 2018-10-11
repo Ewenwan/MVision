@@ -6,6 +6,9 @@
 
 [orbslam2 + imu](https://github.com/Ewenwan/LearnVIORB)
 
+[ORBSLAM2_with_pointcloud_map 添加一个可视化线程用来显示点云](https://github.com/Ewenwan/ORBSLAM2_with_pointcloud_map)
+
+
     ORB-SLAM是一个基于特征点的实时单目SLAM系统，在大规模的、小规模的、室内室外的环境都可以运行。
     该系统对剧烈运动也很鲁棒，支持宽基线的闭环检测和重定位，包括全自动初始化。
     该系统包含了所有SLAM系统共有的模块：
