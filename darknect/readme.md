@@ -25,6 +25,9 @@
 
 [darknet yolov1](https://pjreddie.com/darknet/yolov1/)
 
+[YOLOv3_SpringEdition  C++ Windows and Linux interface library. (Train,Detect both) ](https://github.com/Ewenwan/YOLOv3_SpringEdition)
+
+
 # yolov3改进
 ## 1. 多级预测(多尺度预测)
     终于为 YOLO 增加了 top down 的多级预测，解决了 YOLO 颗粒度粗，对小目标无力的问题。
