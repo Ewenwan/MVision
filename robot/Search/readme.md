@@ -1,8 +1,21 @@
 # 路径规划
+![](https://images2015.cnblogs.com/blog/710098/201604/710098-20160417134850410-1505250729.png)
+
 [Moving AI Lab](https://movingai.com/)
 
 [A* and D* c++代码](https://github.com/Ewenwan/Path-Planning)
 
+[机器人学 —— 轨迹规划（Introduction）](https://www.cnblogs.com/ironstark/p/5400998.html)
+
+[机器人学 —— 轨迹规划（Configuration Space） A* 或者 DJ 算法 ](https://www.cnblogs.com/ironstark/p/5537270.html)
+
+[机器人学 —— 轨迹规划（Sampling Method 采样的方法） 基于采样的轨迹规划算法。PRM(probabilistic road map)。使用PRM生成稀疏的路径图，再利用A*算法在路径图中进行轨迹规划，则可以显著提高效率 ](https://www.cnblogs.com/ironstark/p/5537323.html)
+
+[机器人学 —— 轨迹规划（Artificial Potential 人工势场）](https://www.cnblogs.com/ironstark/p/5544164.html)
+
+[]()
+
+[]()
 
 [一本圣经《Planning Algorithms》伊利诺伊大学教授Lavalle于2006年写的这本书](http://planning.cs.uiuc.edu/booka4.pdf)
 
