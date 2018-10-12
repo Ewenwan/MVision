@@ -1,5 +1,7 @@
 # opencv 学习
 
+[机器视觉与计算机视觉](https://www.cnblogs.com/ironstark/category/745953.html)
+
 [opencv代码实验](https://github.com/Ewenwan/OpenCV_Test)
 
 [LearnOpenCV.com 项目](https://github.com/Ewenwan/learnopencv)
