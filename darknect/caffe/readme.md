@@ -261,6 +261,9 @@ using caffe::Solver;// 作为网络的求解策略，涉及到求解优化问题
 ### gtest 
       google test一个用于测试的库,
       你make runtest时看见的很多绿色RUN OK就是它，这个与caffe的学习无关，不过是个有用的库
+      
+[gtest 使用示例 ](https://github.com/Ewenwan/gtest_min_sample)
+      
 ### caffe 关键的代码都在这里了
       1. test 用gtest测试caffe的代码
       2. util 数据转换时用的一些代码。
