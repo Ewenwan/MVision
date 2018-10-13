@@ -4,6 +4,9 @@
 [ELAS代码](https://github.com/Ewenwan/ELAS)
 [棋盘格](https://github.com/DLuensch/StereoVision-ADCensus/tree/master/Documents/chessboards)
 
+
+[DynamicStereo 算法较多 参考](https://github.com/Ewenwan/DynamicStereo)
+
 ## 双目相机 矫正 
     * 用法 ./Stereo_Calibr -w=6 -h=8  -s=24.3 stereo_calib.xml   
       我的  ./Stereo_Calibr -w=8 -h=10 -s=200 stereo_calib.xml
