@@ -1,4 +1,13 @@
 # 深度学习结合SLAM 研究现状总结
+
+[室内场景数据集 InteriorNet: Mega-scale Multi-sensor Photo-realistic Indoor Scenes Dataset](https://interiornet.org/)
+
+[多场景  数据集1 ](https://projects.asl.ethz.ch/datasets/doku.php?id=weedmap:remotesensing2018weedmap)
+
+[自动驾驶道路数据集 ](http://www.europe.naverlabs.com/Research/Computer-Vision/Proxy-Virtual-Worlds)
+
+[CMU 视觉定位数据集](http://www.europe.naverlabs.com/Research/Computer-Vision/Proxy-Virtual-Worlds)
+
 ## 1. 用深度学习方法替换传统slam中的一个/几个模块： 
                 特征提取，特征匹配，提高特征点稳定性，提取点线面等不同层级的特征点。
                 深度估计
@@ -193,6 +202,8 @@
 
 [深度学习 YOLO-V3 结合 orb-slam2  语义地图](https://github.com/Ewenwan/orb-slam2_with_semantic_label)
 
+
+[SemSLAM](https://github.com/XunshanMan/SemSLAM)
 
 ## B. 单目 LSD-SLAM + CNN卷积网络物体分割 
 
