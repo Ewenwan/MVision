@@ -83,7 +83,7 @@
     Sparse + Indirect:非直接法（即特征点法）SLAM，
     基本套路是：特征点+匹配+优化方法求解最小化重投影误差。 
     典型代表： 
-    Mono-SLAM（MonoSLAM: Real-Time Single Camera SLAM）
+    Mono-SLAM（扩展卡尔曼滤波 更新 相机特征点法得到的位姿
     PTAM(FAST角点),
     ORB-SLAM(ORB特征点),
     以及现在大部分SLAM 
