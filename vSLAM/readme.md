@@ -118,6 +118,20 @@
     间接法与直接法的区别:
 ![](https://img-blog.csdn.net/20170428164809095?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvS2V2aW5fY2M5OA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
+	ORB 、BRISK 等特征描述子、 LK光流法 等在 OpenCV均有实现 . 
+	另外一个重要的问题是相机和 IMU 的标定问题 , 相机的标定中对于针孔相机 OpenCV Calib 和 MATLAB 相机标定工具箱使用了标准的模型 .
+	Kalibr是一个工具箱 , 它能够标定多目相机系统、相机 IMU相对位姿和卷帘快门相机 . 
+	常用的SFM工具 有Bundler 、 OpenMVG 和 MATLAB 多视几何工具箱等 .
+	Bunlder 增量式地处理一组图像 , 提取其中的特征点进行匹配 , 完成三维重建并输出一个稀疏的场景结构 . 
+	OpenMVG 则偏重于多视几何问题的求解 .
+	优化方面 , 
+	Sophus 库为三维空间的刚体变换及李群李代数 一 个 C++ 的 实 现 . 
+	Eigen 为线性代数和 ( 稀疏 ) 矩阵的实现 , 对 LAPACK 实现了 C++ 的封装 . 
+	g2o是一个针对非线性最小 二 乘 优 化 问 题 的 C++ 代 码 实 现 . 
+	VO 问 题可以用图表示 , g2o 把非线性最小二乘问题表示为一个图或超图 , 图 的 边 可 以 连 接 多 个 节 点 ,
+	一个超图是图的拓展问题 , 
+	其他的优化实现还包括ceres.
+
 # 基础资料
 [基于视觉的 SLAM/Visual Odometry (VO) 开源资料、博客和论文列表](http://www.voidcn.com/article/p-amraedch-nh.html)
  
