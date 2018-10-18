@@ -183,6 +183,10 @@ somtmax 指数映射回归分类
          
          conv4_3_norm_mbox_priorbox   PriorBox      输入 conv4_3_norm 512*38*38    预设框===
                                                     输入 data
+                                                    输出 [1, 2, 4*num_priorbox]大小的prior box blob，
+                                                        其中2个channel分别存储prior box的4个点坐标 和 对应的4个variance，
+                                                        是一种bounding regression中的权重。
+                                                        
                         min_size: 30.0
                         max_size: 60.0
                         aspect_ratio: 2
