@@ -744,7 +744,7 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 ├── dequantize.h
 ├── detectionoutput.cpp       // ssd 的检测输出层================================
 ├── detectionoutput.h
-├── dropout.cpp               // 随机失活层
+├── dropout.cpp               // 随机失活层 在训练时由于舍弃了一些神经元,因此在测试时需要在激励的结果中乘上因子p进行缩放.
 ├── dropout.h
 ├── eltwise.cpp               // 逐元素操作， product(点乘), sum(相加减) 和 max(取大值)
 ├── eltwise.h
