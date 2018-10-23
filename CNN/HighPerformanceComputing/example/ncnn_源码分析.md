@@ -724,7 +724,7 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 ├── bias.h
 ├── binaryop.cpp              // 二元操作: add，sub， div， mul，mod等
 ├── binaryop.h
-├── bnll.cpp                  // 
+├── bnll.cpp                  // binomial normal log likelihood的简称 f(x)=log(1 + exp(x))  激活层
 ├── bnll.h
 ├── clip.cpp                  // 通道分路
 ├── clip.h
@@ -1343,3 +1343,62 @@ int Bias_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
 
 ```
+## 5. 两个blob进行二元运算 + - × / ^ max min   r-  r/
+```c
+// 最大
+template<typename T>
+struct binary_op_max : std::binary_function<T,T,T> {
+    T operator() (const T& x, const T& y) const { return std::max(x, y); }
+};
+// 最小
+template<typename T>
+struct binary_op_min : std::binary_function<T,T,T> {
+    T operator() (const T& x, const T& y) const { return std::min(x, y); }
+};
+// 乘方
+template<typename T>
+struct binary_op_pow : std::binary_function<T,T,T> {
+    T operator() (const T& x, const T& y) const { return pow(x, y); }
+};
+// 后-前
+template<typename T>
+struct binary_op_rsub : std::binary_function<T,T,T> {
+    T operator() (const T& x, const T& y) const { return y - x; }
+};
+// 后/前
+template<typename T>
+struct binary_op_rdiv : std::binary_function<T,T,T> {
+    T operator() (const T& x, const T& y) const { return y / x; }
+};
+
+```
+
+
+## 6. bnll  binomial normal log likelihood的简称 f(x)=log(1 + exp(x))  激活层
+```c
+int BNLL::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w;   // 宽度
+    int h = bottom_top_blob.h;   // 高度
+    int channels = bottom_top_blob.c;// 通道数
+    int size = w * h;// 一个通道的数据数量
+
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q);// 特征数据起始指针
+
+        for (int i=0; i<size; i++)
+        {
+            if (ptr[i] > 0)
+                ptr[i] = ptr[i] + log(1.f + exp(-ptr[i])); // x + 0～1
+            else
+                ptr[i] = log(1.f + exp(ptr[i]));// 0～1 之间
+        }
+    }
+
+    return 0;
+}
+```
+
+
