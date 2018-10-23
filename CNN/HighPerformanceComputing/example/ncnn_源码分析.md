@@ -726,7 +726,7 @@ static void sse_vector_mul(const std::vector<float>& vec_a,
 ├── binaryop.h
 ├── bnll.cpp                  // binomial normal log likelihood的简称 f(x)=log(1 + exp(x))  激活层
 ├── bnll.h
-├── clip.cpp                  // 通道分路
+├── clip.cpp                  // 截断=====
 ├── clip.h
 ├── concat.cpp                // 通道叠加
 ├── concat.h
@@ -1399,6 +1399,34 @@ int BNLL::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
     return 0;
 }
+```
+
+## 7. clip 截断 
+```c
+int Clip::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w; // 特征宽度
+    int h = bottom_top_blob.h; // 特征高度
+    int channels = bottom_top_blob.c;// 通道数量
+    int size = w * h;// 单通道特征数据数量
+
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q); // 数据起始指针
+
+        for (int i=0; i<size; i++)
+        {
+            if (ptr[i] < min)
+                ptr[i] = min; // 下限
+            if (ptr[i] > max)
+                ptr[i] = max; // 上限
+        }
+    }
+
+    return 0;
+}
+
 ```
 
 
