@@ -1538,7 +1538,7 @@ int InstanceNorm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
 ```
 
-## 8. ssd 的检测输出层 
+## 11. ssd 的检测输出层 
 ```c
 // 2d 检测框========================================================
 struct BBoxRect
