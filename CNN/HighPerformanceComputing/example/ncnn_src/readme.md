@@ -1,4 +1,5 @@
 # ncnn　源文件 注释解读
+[ncnn 源码分析](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/ncnn_%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.md)
 
     /src目录：
         目录顶层下是一些基础代码，如宏定义，平台检测，mat数据结构，layer定义，blob定义，net定义等。
