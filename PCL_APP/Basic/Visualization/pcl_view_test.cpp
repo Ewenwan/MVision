@@ -1,4 +1,47 @@
 // 载入点云 滤除不的点云 读取识别结果 显示物体三维框
+/*
+// CMakeLists.txt
+
+#编译器版本限制
+cmake_minimum_required( VERSION 2.8 )
+
+#工程名
+project( global_view )
+
+#模式
+set( CMAKE_BUILD_TYPE Release )
+# 添加c++ 11标准支持
+set( CMAKE_CXX_FLAGS "-std=c++11 -O3" )
+
+ # 矩阵 Eigen3
+find_package(Eigen3 3.1.0 REQUIRED)
+
+#找 pcl 并链接 
+#注意　common io filters visualization　分别为其子模块，
+# 使用到子模块的需要添加相应的子模块
+find_package( PCL REQUIRED COMPONENT common io filters visualization)
+include_directories( ${PCL_INCLUDE_DIRS} )
+link_directories(${PCL_LIBRARY_DIRS} ${EIGEN3_INCLUDE_DIR})
+add_definitions( ${PCL_DEFINITIONS} )
+
+# 找opencv
+find_package( OpenCV REQUIRED )
+# 包含opencv
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+
+#可执行文件 直通滤波器 PassThrough　
+add_executable( view view.cpp )
+target_link_libraries( view ${PCL_LIBRARIES} ${OpenCV_LIBS} ${EIGEN3_LIBS} 
+*/
+
+/*
+// result4.txt
+3d tvmonitor 0.72718 -0.41 -0.27 1.65 -0.27 -0.11 1.68 -0.68 -0.41 1.60
+3d chair 0.75304 0.09 0.05 2.00 0.27 0.39 2.05 -0.16 -0.25 1.85
+3d tvmonitor 0.52181 0.41 0.49 1.85 0.61 0.63 1.89 0.22 0.35 1.79
+3d chair 0.67358 0.80 0.04 1.98 0.98 0.31 2.05 0.62 -0.25 1.89
+*/
+
 #include <iostream>
 #include <pcl/point_types.h>
 #include <pcl/filters/passthrough.h>//直通滤波器 PassThrough　
@@ -20,9 +63,8 @@ typedef pcl::PointCloud<Point>  Cloud;
 
 
 /////////////////==== 数据标识映射====///////////////////
-
+// voc 类别:id 映射 
 std::map<std::string, int>::value_type init_value[] =
-
 {
     std::map<std::string, int>::value_type( "background", 0),
     std::map<std::string, int>::value_type( "aeroplane", 1),
@@ -97,8 +139,6 @@ void add_cube(pcl::visualization::PCLVisualizer &  viewer,
 			name_new.c_str());//
     }
 } 
-
-
 
 int main (int argc, char** argv)
 {
