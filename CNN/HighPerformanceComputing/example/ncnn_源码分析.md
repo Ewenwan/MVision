@@ -1428,6 +1428,115 @@ int Clip::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 }
 
 ```
+## 8. ELU 指数Relu 激活
+```c
+int ELU::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w;
+    int h = bottom_top_blob.h;
+    int channels = bottom_top_blob.c;
+    int size = w * h;
+
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q);
+
+        for (int i=0; i<size; i++)
+        {                                             // y = x
+            if (ptr[i] < 0.f)
+                ptr[i] = alpha * (exp(ptr[i]) - 1.f); // y = a*(exp(x) - 1)
+        }
+    }
+
+    return 0;
+}
+
+```
+## 9. 指数映射 Exp
+```c
+// 指数映射
+int Exp::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w;
+    int h = bottom_top_blob.h;
+    int channels = bottom_top_blob.c;
+    int size = w * h;
+
+    if (base == -1.f)
+    {
+        #pragma omp parallel for num_threads(opt.num_threads)
+        for (int q=0; q<channels; q++)
+        {
+            float* ptr = bottom_top_blob.channel(q);
+
+            for (int i=0; i<size; i++)
+            {
+                ptr[i] = exp(shift + ptr[i] * scale);// 平移缩放指数映射
+            }
+        }
+    }
+    else
+    {
+        #pragma omp parallel for num_threads(opt.num_threads)
+        for (int q=0; q<channels; q++)
+        {
+            float* ptr = bottom_top_blob.channel(q);
+
+            for (int i=0; i<size; i++)
+            {
+                ptr[i] = pow(base, (shift + ptr[i] * scale));// 自定义 平移缩放底数指数映射 
+            }
+        }
+    }
+
+    return 0;
+}
+
+```
+## 10.  InstanceNorm 单样本  数据 标准化 规范化  
+```c
+int InstanceNorm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    // x = (x - mean) / (sqrt(var) + eps) * gamma + beta // 去均值除方差 + 缩放 + 平移 
+
+    int w = bottom_top_blob.w;
+    int h = bottom_top_blob.h;
+    int size = w * h;
+
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q);
+
+        // mean and var
+        float sum = 0.f;
+        float sqsum = 0.f;
+        for (int i=0; i<size; i++)
+        {
+            sum += ptr[i];            // 和
+            sqsum += ptr[i] * ptr[i]; // 平方和
+        }
+        float mean = sum / size;      // 均值
+        float var = sqsum / size - mean * mean;// ???? 方差可以直接这样算????
+
+        float gamma = gamma_data[q]; // 缩放系数
+        float beta = beta_data[q];   // 平移系数
+
+        float a = gamma / (sqrt(var) + eps); // 整合成 a*x + b的形式
+        float b = - mean * a + beta;
+
+        for (int i=0; i<size; i++)
+        {
+            ptr[i] = ptr[i] * a + b;
+        }
+    }
+
+    return 0;
+}
+
+
+```
 
 ## 8. ssd 的检测输出层 
 ```c
