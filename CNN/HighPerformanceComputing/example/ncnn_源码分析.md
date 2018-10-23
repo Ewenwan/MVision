@@ -1429,4 +1429,104 @@ int Clip::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
 ```
 
+## 8. ssd 的检测输出层 
+```c
+// 2d 检测框========================================================
+struct BBoxRect
+{
+    float xmin;
+    float ymin;
+    float xmax;
+    float ymax;
+    int label;
+};
+// 交集区域面积======================================================
+static inline float intersection_area(const BBoxRect& a, const BBoxRect& b)
+{
+    if (a.xmin > b.xmax || a.xmax < b.xmin || a.ymin > b.ymax || a.ymax < b.ymin)
+    {
+        // no intersection
+        return 0.f;
+    }
 
+    float inter_width = std::min(a.xmax, b.xmax) - std::max(a.xmin, b.xmin); // 最小的最大值 - 最大的最小值 =  宽度
+    float inter_height = std::min(a.ymax, b.ymax) - std::max(a.ymin, b.ymin);
+
+    return inter_width * inter_height; // 交集面积
+}
+
+// 快速排序   升序===================================================
+template <typename T>
+static void qsort_descent_inplace(std::vector<T>& datas, std::vector<float>& scores, int left, int right)
+{
+    int i = left; // 左边起点
+    int j = right;// 右边终点
+    float p = scores[(left + right) / 2];// 取中间的数据为 参照数据
+
+    while (i <= j)// 遍历
+    {
+        while (scores[i] > p)// 从起点开始找到比参照数据大的
+            i++;
+
+        while (scores[j] < p)// 从重点回溯 找到比参照数据小的
+            j--;
+
+        if (i <= j)
+        {
+            // swap
+            std::swap(datas[i], datas[j]);  // 交换对应的数据
+            std::swap(scores[i], scores[j]);// 交换对应的得分
+
+            i++;
+            j--;
+        }
+    }
+
+    if (left < j)
+        qsort_descent_inplace(datas, scores, left, j); // 再递归左边
+
+    if (i < right)
+        qsort_descent_inplace(datas, scores, i, right);// 再递归右边
+}
+
+// NMS非极大值抑制 剔除重复的边框=====================================
+static void nms_sorted_bboxes(const std::vector<BBoxRect>& bboxes, std::vector<int>& picked, float nms_threshold)
+{
+    picked.clear(); //筛选出来的框
+
+    const int n = bboxes.size();// 原来总的框数量
+
+    std::vector<float> areas(n);// 每个框的面积
+    for (int i = 0; i < n; i++)
+    {
+        const BBoxRect& r = bboxes[i];
+
+        float width = r.xmax - r.xmin;
+        float height = r.ymax - r.ymin;
+
+        areas[i] = width * height;
+    }
+
+    for (int i = 0; i < n; i++)// 遍历每一个框 默认是排序好的
+    {
+        const BBoxRect& a = bboxes[i];
+
+        int keep = 1;
+        for (int j = 0; j < (int)picked.size(); j++)// 遍历每一个已经选出来的框
+        {
+            const BBoxRect& b = bboxes[picked[j]];
+
+            // intersection over union
+            float inter_area = intersection_area(a, b);// 交集面积
+            float union_area = areas[i] + areas[picked[j]] - inter_area;// 并集面积
+//          float IoU = inter_area / union_area
+            if (inter_area / union_area > nms_threshold)// 与已近选出来的框重叠度较大，剔除
+                keep = 0;
+        }
+
+        if (keep)
+            picked.push_back(i);// 保留该框
+    }
+}
+
+```
