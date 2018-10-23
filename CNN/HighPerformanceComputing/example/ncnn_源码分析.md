@@ -1267,4 +1267,79 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) cons
 }
 
 ```
+##  4.添加偏置类
+### c++ 版本
+```c
+int Bias::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w;// 特征图宽度
+    int h = bottom_top_blob.h;// 特征图高度
+    int channels = bottom_top_blob.c;// 通道数量
+    int size = w * h;// 单通道特征尺寸
 
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q);// 每个通道数据起始指针
+
+        float bias = bias_data[q];// 需要添加的偏置数据 前面从模型中载入的参数 每通道偏置参数一样
+
+        for (int i=0; i<size; i++)
+        {
+            ptr[i] += bias;// 加上偏置
+        }
+    }
+
+    return 0;
+}
+
+```
+### arm版本
+```c
+int Bias_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w;// 特征图宽度
+    int h = bottom_top_blob.h;// 特征图高度
+    int channels = bottom_top_blob.c;// 通道数量
+    int size = w * h;// 单通道特征尺寸
+
+    const float* bias_ptr = bias_data; // 偏置数据 指针
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q);// 每个通道数据起始指针 (原有特征数据)
+
+        float bias = bias_ptr[q];// 每通道偏置参数一样
+
+#if __ARM_NEON
+        int nn = size >> 2; // 一次运算4个数，总次数
+        int remain = size - (nn << 2);// 剩余不够4个的数量 1～3
+#else
+        int remain = size;
+#endif // __ARM_NEON
+
+#if __ARM_NEON
+        float32x4_t _bias = vdupq_n_f32(bias);// 偏置数据从内存 dup载入到 寄存器
+        for (; nn>0; nn--)
+        {
+            float32x4_t _p = vld1q_f32(ptr);// 载入 特征
+            float32x4_t _outp = vaddq_f32(_p, _bias);// 加上偏置
+            vst1q_f32(ptr, _outp);                   // 从寄存器数据 设置内存数据
+
+            ptr += 4;// 特征指针 移动四个单位
+        }
+#endif // __ARM_NEON
+
+        for (; remain>0; remain--)
+        {
+            *ptr = *ptr + bias; // 普通c 版本 加上偏置
+
+            ptr++;
+        }
+    }
+
+    return 0;
+}
+
+
+```
