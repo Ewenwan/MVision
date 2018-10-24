@@ -11,6 +11,7 @@ Note: the project aims at imitating the well-implemented algorithms in [Deep Lea
 
 [TensorFlow 学习](http://antkillerfarm.github.io/ai/2017/08/21/tensorflow.html)
 
+[深度学习500问](https://github.com/Ewenwan/DeepLearning-500-questions)
 
 [参考博客](https://github.com/DragonFive/myblog/blob/master/source/_posts/DL-learningNote1.md)
 
