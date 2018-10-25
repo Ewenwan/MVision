@@ -4,6 +4,7 @@
 
 [IMUProject](https://github.com/Ewenwan/IMUProject)
 
+[ros节点 MadgwickAHRS 和 MahonyAHRS ](https://github.com/Ewenwan/imu_proc)
 
 [从零开始的 IMU 状态模型推导](https://fzheng.me/2016/11/20/imu_model_eq/)
 
