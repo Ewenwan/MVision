@@ -2,6 +2,12 @@
 
 [澳大利亚机器人视觉研究中心](https://www.roboticvision.org/)
 
+[NIPS Neural Information Processing Systems](https://papers.nips.cc/)
+
+[icml Proceedings of Machine Learning Research PMLR](http://proceedings.mlr.press/index.html)
+
+[ICDM IEEE International Conference on Data Mining](http://www.cs.uvm.edu/~icdm/)
+
 [Computer Vision and Pattern Recognition arxiv.org 最新提交的论文](https://arxiv.org/list/cs.CV/recent)
 
 [技术刘 增强现实、图像识别、深度学习、机器人](http://liuxiao.org/category/robots/)
