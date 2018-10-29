@@ -8,3 +8,22 @@
 
 
 [课程分享 | 机器视觉与物体抓取 古月居 ](https://mp.weixin.qq.com/s?__biz=MzIyMzkxODg0Mw==&mid=2247484445&idx=1&sn=8f10fb4ee78da414588ffabd3eb721a6&chksm=e817ab89df60229f5888a2ec660649d81f371f16f7eff60b982e78fea0a6fe1c0762bc433e15&mpshare=1&scene=1&srcid=1023JPEqq835Iu6CamiVpO2R&pass_ticket=GUYqMrcaykeEbRgrCw0aeD%2BfAzY39PVt%2Bi56mOUARZhCrsvWuLlkpUmDb3YAV5LN#rd)
+
+
+# 书籍
+
+      ① Springer Handbook oƒ Robotics  2nd Edition，
+      Siciliano Khatib② Modelling and Identification in Robotics，
+      Springer③ Modern Robotics：Mechanics， Planning，and Control ，
+      Frank C. Park④ Robotics - Modelling, Planning and Control，
+      Siciliano⑤ Towards Safe Robots Approaching Asimov's 1st Law，
+      Sami Haddadin⑥ Modeling, Simulation and Optimization of Bipedal Walking，
+      Springer⑦ Humanoid Robots ，梶田秀司⑧ 
+      Introduction to Autonomous Mobile Robots，Ronald C.
+      Arkin⑨ Robotics，Vision and Control，
+      Peter Corke⑩ Deep Learning，Ian Goodfellow11.
+      Probabilistic Robotics，Sebastian Thrun12. 
+      Dynamics of Multibody Systems， Jens Wittenburg13. 
+      Modeling and Identification of Industrial Robots including Drive and joint flexibilities，Toon Hardeman14. 
+      Trajectory Planning for Automatic Machines and Robots，Luigi Biagiotti
+
