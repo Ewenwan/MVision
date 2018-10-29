@@ -7,6 +7,8 @@
    
 [comma.ai（无人驾驶公司）的这两千行Python/tf代码 Learning a Driving Simulator](https://github.com/Ewenwan/research)
 
+[openpilot 一个开源的自动驾驶（驾驶代理），它实行 Hondas 和 Acuras 的自适应巡航控制（ACC）和车道保持辅助系统（LKAS）的功能。 ](https://github.com/Ewenwan/openpilot)
+
 # Apollo 相关介绍
 
 
