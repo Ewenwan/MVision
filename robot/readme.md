@@ -18,6 +18,8 @@
 
 [(PDF) Principles of Robot Motion](https://www.researchgate.net/publication/265538531_Principles_of_Robot_Motion_Theory_Algorithms_and_Implementation_ERRATA_1)
 
+
+[树莓派+Arduino+TensorFlow：搭建图像识别小车](https://github.com/Ewenwan/rpi)
 #  Robotics 须知　
 
 相关参考 Relevant Awesome Lists
