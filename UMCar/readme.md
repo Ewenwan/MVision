@@ -3,13 +3,11 @@
     
    1. apollo 源码分析
    2. 感知
-   3. 规划
-    
-    
+   3. 规划  
     
 # Apollo 相关介绍
 
-[![Build Status](https://travis-ci.org/ApolloAuto/apollo.svg?branch=master)](https://travis-ci.org/ApolloAuto/apollo) [![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/dailybuild)
+
 
 ```
 We choose to go to the moon in this decade and do the other things,
