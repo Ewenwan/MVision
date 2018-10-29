@@ -13,9 +13,11 @@
 
 [机器人学 —— 轨迹规划（Artificial Potential 人工势场）](https://www.cnblogs.com/ironstark/p/5544164.html)
 
-[]()
+[A*](http://mnemstudio.org/path-finding-a-star.htm)
 
-[]()
+[Q-Learning Q-learning 强化学习](http://mnemstudio.org/path-finding-q-learning.htm)
+
+[Q-learning, 动态规划](http://antkillerfarm.github.io/ml/2017/08/31/Machine_Learning_27.html)
 
 [一本圣经《Planning Algorithms》伊利诺伊大学教授Lavalle于2006年写的这本书](http://planning.cs.uiuc.edu/booka4.pdf)
 
