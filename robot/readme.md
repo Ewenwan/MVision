@@ -16,6 +16,8 @@
 
 [Udacity_Bot 机器人定位路径规划仿真 两轮差分底盘 自适应蒙特卡洛定位  Gazebo仿真](https://github.com/Ewenwan/Udacity_Bot)
 
+[(PDF) Principles of Robot Motion](https://www.researchgate.net/publication/265538531_Principles_of_Robot_Motion_Theory_Algorithms_and_Implementation_ERRATA_1)
+
 #  Robotics 须知　
 
 相关参考 Relevant Awesome Lists
