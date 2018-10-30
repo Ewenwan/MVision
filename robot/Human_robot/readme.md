@@ -10,6 +10,12 @@
 [课程分享 | 机器视觉与物体抓取 古月居 ](https://mp.weixin.qq.com/s?__biz=MzIyMzkxODg0Mw==&mid=2247484445&idx=1&sn=8f10fb4ee78da414588ffabd3eb721a6&chksm=e817ab89df60229f5888a2ec660649d81f371f16f7eff60b982e78fea0a6fe1c0762bc433e15&mpshare=1&scene=1&srcid=1023JPEqq835Iu6CamiVpO2R&pass_ticket=GUYqMrcaykeEbRgrCw0aeD%2BfAzY39PVt%2Bi56mOUARZhCrsvWuLlkpUmDb3YAV5LN#rd)
 
 
+[机器人抓取时怎么定位的？用什么传感器来检测？](https://www.zhihu.com/question/26199861/answer/154228960)
+
+[传统的RCNN可以大致框出定位物体在图片中的位置，但是如何将这个图片中的位置转化为物理世界的位置？](https://www.zhihu.com/question/50868746/answer/123510561)
+
+[视觉识别与路径规划怎么做？](https://www.zhihu.com/question/67982903)
+
 # 书籍
 
       ① Springer Handbook oƒ Robotics  2nd Edition，
