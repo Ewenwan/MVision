@@ -119,7 +119,7 @@ B矩阵仿存，使用指针访问，
       6、九言科技 绝影（Prestissimo）
 [代码](https://github.com/Ewenwan/In-Prestissimo)
 
-      7、Google量化方法 r=S(q-Z)  tflite  TensorFlow Lite
+      7、Google量化方法 r=S(q-Z)  tflite  TensorFlow Lite  
 [代码](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)
       
       8、英伟达 TensorRT ， NVIDIA TensorRT是一种高性能神经网络推理(Inference)引擎
@@ -127,5 +127,7 @@ B矩阵仿存，使用指针访问，
 
 [英伟达 CUDA 和 TensorRT 代码实验](https://github.com/Ewenwan/CUDA_Test)
 
+      9、FaceBOOK caffe2 pytorch QNNPACK  uint8量化
+[QNNPACK uint8量化 ](https://github.com/Ewenwan/QNNPACK)
 
 [深度学习框架的并行优化方法小结](https://github.com/DragonFive/myblog/blob/master/source/_posts/mpi_parallel.md)
