@@ -109,6 +109,9 @@
 
 [百度自动驾驶开源框架 apollo](https://github.com/Ewenwan/apollo)
 
+
+[Halcon 使用参考](https://blog.csdn.net/maweifei/article/details/52613392)
+
 # 无人驾驶的各个方面知识
 [参考](https://blog.csdn.net/qq_40027052/article/details/78485120)
 
