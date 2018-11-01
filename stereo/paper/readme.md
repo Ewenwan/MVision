@@ -1,7 +1,7 @@
 # 双目立体匹配等算法论文
 [kitti双目算法评测](http://www.cvlibs.net/datasets/kitti/eval_scene_flow.php?benchmark=stereo)
 
-## 1. CSCA  2014
+## 1. CSCA  2014 多尺度代价聚合
 [论文： Cross-Scale Cost Aggregation for Stereo Matching](https://arxiv.org/pdf/1403.0316.pdf)
 
 [代码](https://github.com/Ewenwan/CrossScaleStereo)
@@ -127,5 +127,28 @@ return (float)std::max(
     2）我认为CSCA是一个多尺度的局部算法，还不应该归类为全局算法的类别，这种多尺度思想，
        我想在今后的工作中会有越来越多的研究人员继续深入研究。
        
-## 
+## 2. NLCA 算法 全局最小生成树代价聚合 (变形树局部框)
+[论文：A Non-Local Cost Aggregation Method for Stereo Matching](http://fcv2011.ulsan.ac.kr/files/announcement/592/A%20Non-Local%20Aggregation%20Method%20Stereo%20Matching.pdf)
+
+[代码](https://github.com/Ewenwan/NLCA-fo-stereo-matching/tree/master)
+
+[参考](https://blog.csdn.net/wsj998689aa/article/details/45041547)
+
+### 关键点
+    明确抛弃了support window（支持窗口）的算法思想，指出support window在视察估计上普遍具有陷入局部最优的缺陷，
+    创新性的提出了基于全局最小生成树进行代价聚合的想法，我觉得这个想法非常厉害，全局算法早就有了，
+    但是往往是基于复杂的优化算法，重心放在了视察粗估计和迭代求精两步，十分耗时，而最小生成树，
+    可以天然地建立像素之间的关系，像素之间的关系一目了然，
+    可以大幅减少代价聚合的计算时间，文献表述为线性搜索时间。
+    计算聚合代价的过程不需要迭代，算法时间复杂度小，符合实际应用的需求，
+    所以NL算法已经获得了不错的引用率。
+    在后续算法中得到了很多改进，一些好的立体匹配算法，如CSCA，ST等都是基于NL进行了改进，
+    以下部分着重说说我对NL核心部分，最小生成树(minimum spanning tree，MST)的理解。
+    
+    避免了局部最优解，找到了全局最优解。
+    其实MST就是一种贪心算法，每一步选择都是选取当前候选中最优的一个选择。
+    
+
+
+
 
