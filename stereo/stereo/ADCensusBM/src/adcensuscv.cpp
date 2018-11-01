@@ -82,8 +82,12 @@ float ADCensusCV::adCensus(int wL, int hL, int wR, int hR) const
     float cCensus = census(wL, hL, wR, hR);
 
     // 两个代价指数信息结合 combine the two costs
-    dist = 1 - exp(-cAD / lambdaAD);
+    dist = 1 - exp(-cAD / lambdaAD); // 指数映射到0~1
     dist += 1 - exp(-cCensus / lambdaCensus);
-
+/*
+    两种计算方法得到的取值范围可能会相差很大，比如一个取值1000，
+    另一个可能只取值10，这样便有必要将两者都归一化到[0，1]区间，
+    这样计算出来的C更加有说服力，这是一种常用的手段。*/
+	
     return dist;
 }
