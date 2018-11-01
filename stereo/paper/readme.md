@@ -45,7 +45,7 @@
     如此看来运算量还是比较可观的。
     
 ### 算法流程
-![]()
+![](https://github.com/Ewenwan/MVision/blob/master/stereo/paper/img/csca.png)
 
     1. 对左右两幅图像进行高斯下采样，得到多尺度图像。
 
