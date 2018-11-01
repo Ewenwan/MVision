@@ -153,6 +153,19 @@ return (float)std::max(
 
 [最小生成树](https://blog.csdn.net/qq_35644234/article/details/59106779)
 
+原地图：
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/1.png)
+
+修建步骤：
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/2.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/3.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/4.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/5.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/6.png)
+
+
 
 
 
