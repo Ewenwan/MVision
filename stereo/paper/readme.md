@@ -153,11 +153,15 @@ return (float)std::max(
 
 [最小生成树](https://blog.csdn.net/qq_35644234/article/details/59106779)
 
+> prim（普里姆）算法：
+
+[代码](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/MST/MST_Prim_Matrix.cpp)
+
 原地图：
 
 ![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/1.png)
 
-修建步骤：
+修建步骤（从一点向外扩展，每次都选最小权重对应的边）：
 
 ![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/2.png)
 ![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/3.png)
@@ -165,6 +169,18 @@ return (float)std::max(
 ![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/5.png)
 ![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/6.png)
 
+> kruskal（克鲁斯卡尔）算法:
+
+[代码](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/MST/MST_kruskal.cpp)
+
+修建步骤（每次选出最小的边，不产生环，直到所有的顶点都在树上了）：
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/7.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/8.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/9.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/10.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/11.png)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/profect/img/12.png)
 
 
 
