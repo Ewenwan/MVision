@@ -640,6 +640,20 @@ float ADCensusCV::adCensus(int wL, int hL, int wR, int hR) const
     听起来够绕口的，其实就好比最小代价的蔓延，
     当前代价聚合值由当前代价和路径上一点的加了惩罚的最小代价聚合值所决定（
     最后那一项纯粹是为了防止数字过大，这是常用手段）.
+    
+    r指某个指向当前像素p的方向，在此可以理解为像素p左边的相邻像素。
+    
+    Lr(p, d) 表示沿着当前方向（即从左向右），当目前像素p的disparity取值为d时，其最小cost值。
+
+    这个最小值是从4种可能的候选值中选取的最小值：
+        1.前一个像素（左相邻像素）disparity取值为d时，其最小的cost值。
+        2.前一个像素（左相邻像素）disparity取值为d-1时，其最小的cost值+惩罚系数P1。
+        3.前一个像素（左相邻像素）disparity取值为d+1时，其最小的cost值+惩罚系数P1。
+        4.前一个像素（左相邻像素）disparity取值为其他时，其最小的cost值+惩罚系数P2。
+    另外，当前像素p的cost值还需要减去前一个像素取不同disparity值时最小的cost。
+    这是因为Lr(p, d)是会随着当前像素的右移不停增长的，为了防止数值溢出，所以要让它维持在一个较小的数值。
+    
+    
 
 ### 4. 后处理(refinement)：多步后处理操作 Multi-stepDisparity Refinement 多步视差细化
 
@@ -705,7 +719,54 @@ float ADCensusCV::adCensus(int wL, int hL, int wR, int hR) const
     
     
     
+    
+    
 ## 9. Semi-Global Matching（SGM）半全局匹配
+[参考](https://blog.csdn.net/wsj998689aa/article/details/49464017)
+
+[代码](https://github.com/Ewenwan/SGM)
+
+[论文：Stereo Processing by Semi-Global Matching and Mutual Information](http://www.openrs.org/photogrammetry/2015/SGM%202008%20PAMI%20-%20Stereo%20Processing%20by%20Semiglobal%20Matching%20and%20Mutual%20Informtion.pdf)
+    
+    SGM中文名称“半全局匹配”，顾名思义，其介于局部算法和全局算法之间，
+    所谓半全局指的是算法既没有只考虑像素的局部区域，也没有考虑所有的像素点。
+    例如，BM计算某一点视差的时候，往往根据目标像素周围的矩形区域进行代价聚合计算；
+    DoubleBP在计算目的像素视差的时候，考虑的则是图像所有的像素点。
+    抛开具体的方法不说，SGM中考虑到的只有非遮挡点，这正是定义为半全局的原因。
+    
+    论文关键点：
+        分层互信息的代价计算+
+        基于动态规划的代价聚合+
+        其他
+### a. 代价计算    互信息 Mutual Information 
+    它采用了基于互信息的计算方法，互信息是一种熵。
+    那我们就先说说熵，熵是用来表征随机变量的不确定性（可以理解为变量的信息量），
+    不确定性越强那么熵的值越大（最大为1），那么图像的熵其实就代表图像的信息量。
+    互信息度量的是两个随机变量之间的相关性，相关性越大，那么互信息就越大。
+    可以想想看，两幅图像如果匹配程度非常高，说明这两幅图像相关性大还是小？
+    显然是大，知道一幅图像，另外一幅图像马上就知道了，相关性已经不能再大了！！！
+    反之，如果两幅图像配准程度很低，那么两幅图像的互信息就会非常小。
+    所以，立体匹配的目的当然就是互信息最大化。
+    这就是为什么使用互信息的原因。
+    
+    熵和互信息的定义分别如下所示：
+    熵：E = sum(pi * log(pi))  pi为图像分布的概率，即图像的灰度直方图(像素数/像素总数)
+    交叉熵（衡量p与q的相似性）： sum(pi * log(qi)) pi、qi 0~255两幅图像的直方图概率
+    联合熵（（X,Y）在一起时的不确定性度量）： sum(pij * log(pij))
+    
+    图像的灰度值是0~255，每个灰度值对应的像素个数除以图像像素个数就是该灰度值对应的概率，
+    单幅图像的概率密度是一维的，那么自然地，
+    两幅图像的 联合概率密度就是二维的，它的定义域取值就是（0，0）~（255，255）
+    
+    互信息对光照具有鲁棒性，
+    我们已经得到了互信息图，剩下要做的事情只是根据左图和右图挑选出来的像素点的灰度值对，
+    在互信息图中直接查找就行（又是一个速度优势），
+    注意：要取个负号，这点直觉上很好理解，
+    互信息越大->相关性越大->两个点的匹配程度越高->代价计算值理应越小。
+[Visual Correspondence Using Energy Minimization and Mutual Information](http://www.cs.cornell.edu/people/jkim/Thesis/KKZ-ICCV03.pdf)
+    
+    
+    
 
     
 
