@@ -1,4 +1,5 @@
 # opencv 学习
+[计算机视觉OpenCV实现 csdn专栏](https://blog.csdn.net/column/details/computer-vision.html?&page=3)
 
 [机器视觉与计算机视觉](https://www.cnblogs.com/ironstark/category/745953.html)
 
