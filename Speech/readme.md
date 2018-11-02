@@ -22,11 +22,9 @@
 
 [语音识别（五）——FBank, 语音识别的评价指标, 声学模型进阶, 语言模型进阶, GMM-HMM高斯混合-隐马尔科夫模型](http://antkillerfarm.github.io/graphics/2018/06/06/speech_5.html)
 
-[]()
+[中文分词!!!!!!!](https://github.com/Ewenwan/cppjieba)
 
-[]()
 
-[]()
 
 ### CTC(Connectionist Temporal Classifier)
     一般译为联结主义时间分类器 ，
@@ -37,9 +35,10 @@
 
 [Theano implementation of LSTM and CTC to recognize simple english sentence image ](https://github.com/Ewenwan/cnn-lstm-ctc)
 
-## 语义理解ALU 
-
+## 语义理解NLU 
+[图灵NLU 在线语意理解 ](https://github.com/Ewenwan/Ros/blob/master/src/voice_system/src/tl_nlu.cpp)
 
 ## 文字转语音TTS
+[科大讯飞 TTS](https://github.com/Ewenwan/Ros/blob/master/src/voice_system/src/xf_tts.cpp)
 
 ## 文字识别ocr 其实属于图像识别问题了
