@@ -13,6 +13,7 @@
 
 [OpenCV + 数字成像](http://antkillerfarm.github.io/ai/2016/07/19/opencv.html)
 
+[OpenCV-OpenGL--Reconstuction3d 三维重建](https://github.com/Ewenwan/OpenCV-OpenGL--Reconstuction3d)
 
 [图像处理理论（一）——直方图, 二值化, 滤波基础](http://antkillerfarm.github.io/graphics/2016/04/30/graphics.html)
 
