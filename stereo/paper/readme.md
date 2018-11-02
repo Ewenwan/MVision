@@ -6,6 +6,10 @@
 
 [立体匹配导论](https://blog.csdn.net/wangyaninglm/article/details/51531333)
 
+[三维重建技术概述 pcl 点云配准](https://blog.csdn.net/wangyaninglm/article/details/51558656)
+
+[三维重建基础 背景意义 双目立体视觉 tof 结构光 ](https://blog.csdn.net/wangyaninglm/article/details/51558310)
+
 ## 1. CSCA  2014 多尺度代价聚合
 [论文： Cross-Scale Cost Aggregation for Stereo Matching](https://arxiv.org/pdf/1403.0316.pdf)
 
