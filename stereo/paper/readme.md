@@ -1,6 +1,11 @@
 # 双目立体匹配等算法论文
 [kitti双目算法评测](http://www.cvlibs.net/datasets/kitti/eval_scene_flow.php?benchmark=stereo)
 
+
+[立体匹配的研究背景以及意义](https://blog.csdn.net/wangyaninglm/article/details/51533549)
+
+[立体匹配导论](https://blog.csdn.net/wangyaninglm/article/details/51531333)
+
 ## 1. CSCA  2014 多尺度代价聚合
 [论文： Cross-Scale Cost Aggregation for Stereo Matching](https://arxiv.org/pdf/1403.0316.pdf)
 
