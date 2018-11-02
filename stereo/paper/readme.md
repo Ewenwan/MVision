@@ -455,7 +455,8 @@ return (float)std::max(
             果你在左图上计算代价聚合，那么左图就叫做参考图像，右图就是匹配图像，反之，反过来叫。
             
 ### Census 代价   与 AD 代价融合     
-     
+[代码](https://github.com/Ewenwan/MVision/blob/master/stereo/stereo/ADCensusBM/src/adcensuscv.cpp)
+
      Census指的是一种代价计算方法，其属于非参数代价计算方法中的一种（另外一个代表是rank transform），
      准确的说它是一种距离度量，它的计算过程的前半部很像经典的纹理特征LBP，
      就是在给定的窗口内，比较中心像素与周围邻居像素之间的大小关系，
