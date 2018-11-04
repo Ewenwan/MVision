@@ -74,4 +74,16 @@
 [代码](https://github.com/Ewenwan/ElasticFusion)
 
 # KinectFusion
-
+    KinectFusion在世界坐标系中定义了一个立方体，并把该立方体按照一定的分辨率切割成小立方体（voxel）。
+    定义了一个3x3x3米的立方体，并把立方体分为不同分辨率的小立方体网格。
+    也就是说，这个大立方体限制了经过扫描重建的模型的体积。
+    然后，KinectFusion使用了一种称为“截断有符号距离函数”（truncated signed distance function，简称TSDF）
+    的方法来更新每个小网格中的一个数值，该数值代表了该网格到模型表面的最近距离，
+    也称为TSDF值。对于每个网格，在每一帧都会更新并记录TSDF的值，
+    然后再通过TSDF值还原出重建模型。
+    TSDF数值分布，我们可以很快还原出模型表面的形状和位置。
+    这种方法通常被称为基于体数据的方法（Volumetric-based method）。
+    该方法的核心思想是，通过不断更新并“融合”（fusion）TSDF这种类型的测量值，
+    我们能够 越来越接近所需要的真实值。
+    
+    
