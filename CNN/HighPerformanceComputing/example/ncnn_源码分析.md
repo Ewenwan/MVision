@@ -458,6 +458,14 @@ static void gemm_v2(float* matA, float* matB, float* matC, const int M, const in
     16个 VFP寄存器（32bit），  S0-S15
     NEON和VFP的区别在于VFP是加速浮点计算的硬件不具备数据并行能力，同时VFP更尽兴双精度浮点数（double）的计算，NEON只有单精度浮点计算能力。
 
+[ARM](https://www.cnblogs.com/lvdongjie/category/975651.html)
+
+[ARMv8 架构与指令集.学习笔记](https://www.cnblogs.com/lvdongjie/p/6644821.html)
+
+[ARMv8 内存管理架构.学习笔记](https://www.cnblogs.com/lvdongjie/p/6644848.html)
+
+[arm学习](https://github.com/Ewenwan/ShiYanLou/blob/master/MCU/arm/readme.md)
+
 [NEON指令和数据类型介绍](http://hongbomin.com/2016/05/13/arm_neon_instrinsic/)
 
 [AI 移动端框架常用指令·汇总](https://www.jianshu.com/p/5f75fa02c5d0)
