@@ -52,6 +52,12 @@
 ![](https://github.com/Ewenwan/MVision/blob/master/od.png)
 
 # 卷积神经网络
+[one-stage two-stage目标检测总结](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture6(Object%20Detection).pdf)
+
+[Deep Learning (Computer Architecture) 计算框架 caffe pytorch](https://zsc.github.io/megvii-pku-dl-course/slides18/deeplearning_framework_peking.pdf)
+
+[深度学习数学知识 向量 矩阵 概率密度函数 贝叶斯 协方差 信息熵 KL散度 梯度下降 过拟合 正则化](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture2(MathInDL).pdf)
+
 [ssd/mobile ssd/yolo v2/yolo v3 implement in opencv3 ](https://github.com/Ewenwan/real_time_object_detect)
 
 [nanonets.com 来帮助使用很少的数据和没有计算机硬件的情况下构建机器学习模型 ](https://nanonets.com/#demo)
