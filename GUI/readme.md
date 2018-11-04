@@ -1,5 +1,8 @@
 # 可视化界面软件
     PCL Visialization,  Pangolin,  ros下的rviz
+    
+[freetype-gl-cpp](https://github.com/Ewenwan/freetype-gl-cpp)
+    
 #  Pangolin 用于可视化和用户接口 基于opengl
 
 ## 安装，
