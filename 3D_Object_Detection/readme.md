@@ -7,6 +7,8 @@
 
 [YOLO-6D](https://github.com/Ewenwan/MVision/blob/master/darknect/YOLO-6D/readme.md)
 
+[ssd-6d](https://github.com/Ewenwan/ssd-6d)
+
 [传统算法 3D目标识别---局部特征描述子介绍](https://blog.csdn.net/FireMicrocosm/article/details/78059151)
 
 [object-3D目标检测算法调研（基于激光雷达、kitti数据集）](https://blog.csdn.net/sum_nap/article/details/80966979)
