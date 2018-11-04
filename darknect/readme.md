@@ -2,6 +2,9 @@
 
 [FOR Raspberry Pi 3 ](https://github.com/digitalbrain79/darknet-nnpack)
 
+[基于YOLO的3D目标检测：YOLO-6D bounding box在2D图像上的投影的1个中心点和8个角点 + 置信度 + 类别C](https://zhuanlan.zhihu.com/p/41790888)
+
+
 
 * YOLO-v1 论文翻译
 [You Only Look Once: Unified, Real-Time Object Detection](https://arxiv.org/abs/1506.02640)
