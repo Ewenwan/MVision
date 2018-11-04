@@ -13,7 +13,7 @@
 
 [使用手册 英文](http://www.gnuplot.info/docs_5.2/Gnuplot_5.2.pdf)
 
-[中文手册]()
+[中文手册](https://github.com/Ewenwan/MVision/blob/master/gnuplot/gnuplot%E4%B8%AD%E6%96%87%E6%89%8B%E5%86%8C.pdf)
 
 [cpp 接口](https://github.com/Ewenwan/gnuplot-cpp)
 
