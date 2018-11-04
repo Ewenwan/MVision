@@ -91,6 +91,8 @@
 
 [参考](https://zhuanlan.zhihu.com/p/25996617)
 
+[论文](https://arxiv.org/pdf/1703.07570.pdf)
+
     在2D图像物体检测任务中，RCNN、Fast RCNN、Faster RCNN以及刚发布的mask-RCNN等算法，
     对于单张图像物体检测均取得了较好的效果，对自动驾驶场景分析有着重要的作用，
     但是对于3D真实世界场景依然描述不够。
