@@ -76,6 +76,8 @@
 
 [图像分割 实例分割](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture8(Image%20Segmentation).pdf)
 
+[A Review on Deep Learning TechniquesApplied to Semantic Segmentation](https://arxiv.org/pdf/1704.06857.pdf)
+
 [RNN ](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture9%20Recurrent%20Neural%20Networks.pdf)
 
 [gan 生成对抗网络](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture%2010_%20Introduction%20to%20Generative%20Models.pdf)
