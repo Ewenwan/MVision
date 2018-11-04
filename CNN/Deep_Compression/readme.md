@@ -29,6 +29,8 @@ tag: 深度学习
 
 ## 2. 模型压缩：参数稀疏、剪裁、量化、分解
 
+[神经网络优化 量化 剪裁](https://github.com/zsc/zsc.github.io/blob/master/Neural%20Network%20Approximation.pdf)
+
 [数据压缩课程 Data Compression ](http://www.ws.binghamton.edu/fowler/fowler%20personal%20page/EE523.htm)
 
 [量化](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/readme.md)
