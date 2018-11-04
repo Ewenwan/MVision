@@ -12,7 +12,7 @@
 [object-3D目标检测算法调研（基于激光雷达、kitti数据集）](https://blog.csdn.net/sum_nap/article/details/80966979)
 
 
-# MaskFusion rgb-slam + 语义分割mask-rcnn 
+# MaskFusion rgbd-slam + 语义分割mask-rcnn 
 [论文 MaskFusion: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects](https://arxiv.org/pdf/1804.09194.pdf)
 
 [主页](http://visual.cs.ucl.ac.uk/pubs/maskfusion/index.html)
