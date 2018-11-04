@@ -2,7 +2,7 @@
 
 [frustum-pointnets 3d点云+2d检测框+pointnet3d标注框 ](https://github.com/Ewenwan/frustum-pointnets)
 
-[]()
+[KinectFusion ElasticFusion](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/pdf/KinectFusion%20%E5%92%8C%20ElasticFusion%20%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA%E6%96%B9%E6%B3%95_6_3.pdf)
 
 # MaskFusion rgb-slam + 语义分割mask-rcnn 
 [论文 MaskFusion: Real-Time Recognition, Tracking and Reconstruction of Multiple Moving Objects](https://arxiv.org/pdf/1804.09194.pdf)
