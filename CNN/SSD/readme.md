@@ -37,6 +37,9 @@
 
 [改进 DSSD : Deconvolutional Single Shot Detector 反卷积后再多尺度预测](https://arxiv.org/pdf/1701.06659.pdf)
 
+
+[ssd-6d](https://github.com/Ewenwan/ssd-6d/blob/master/README.md)
+
 # VGG16 结构图 13个卷积层+3个全链接层=16
 ```asm
 输入图像  3*300*300
