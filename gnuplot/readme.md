@@ -8,14 +8,14 @@
     它的功能是把数据资料和数学函数转换为容易观察的平面或立体的图形，它有两种工作方式，
     交互式方式和批处理方式，它可以让使用者很容易地读入外部的数据结果，在屏幕上显示图形，
     并且可以选择和修改图形的画法，明显地表现出数据的特性。
-    
-    
-    
+      
 [主页](http://www.gnuplot.info/)
 
 [使用手册 英文](http://www.gnuplot.info/docs_5.2/Gnuplot_5.2.pdf)
 
 [中文手册]()
+
+[cpp 接口](https://github.com/Ewenwan/gnuplot-cpp)
 
 # Linux安装编辑
     终端输入命令 $ sudo apt-get install gnuplot 系统自动获取包信息、处理依赖关系，完成安装
