@@ -87,7 +87,10 @@
     该方法的核心思想是，通过不断更新并“融合”（fusion）TSDF这种类型的测量值，
     我们能够 越来越接近所需要的真实值。
     
-# 车辆3D检测：Deep MANTA 
+# 车辆3D检测：Deep MANTA  一个针对单目图像联合2D-3D车辆检测的粗到精的多任务网络
+
+[参考](https://zhuanlan.zhihu.com/p/25996617)
+
     在2D图像物体检测任务中，RCNN、Fast RCNN、Faster RCNN以及刚发布的mask-RCNN等算法，
     对于单张图像物体检测均取得了较好的效果，对自动驾驶场景分析有着重要的作用，
     但是对于3D真实世界场景依然描述不够。
@@ -102,7 +105,58 @@
 
     为了实现上述多重任务，作者充分利用了车辆几何特征，将几何特征与语义特征（卷积神经网络中多层次特征）进行结合.
 ![](http://5b0988e595225.cdn.sohucs.com/images/20180110/325e2388d8414b65a33c152003ecb12b.jpeg)
+    
+    一个鲁棒的神经网络在这里被用来同时进行车辆检测，局部定位，视觉可视化和三维估计。
+    它的架构基于一个新的粗到精的物体检测网络以提升车辆检测的准确度。
+    与此同时，Deep MANTA网络可以在图像中定位车辆。即使车辆是不可见的。
+    在推断过程中，网络的输出作为一个鲁棒的实时位姿估计算法的输入，来进行姿态估计和三维车辆定位。
+    
+## 1、各符号含义解析：
+    论文第一个阶段是DeepMANTA Network，目标输出是：B、S、V、T。由于这篇论文采用了创新的研究思路，
+    因此，有较多关于自定义变量的解释，如果不清晰界定各变量代表的物理含义，则无法理解网络的前后因果，
+    所以，第一步，应该把作者对于相关符号的定义理解清楚。
 
+    （1）B ：B 是box的首字母，表示物体边界框，在论文中有两种表示：2D物体区域表示、3D物体区域表示。
+        对于2D车辆边界框，使用四个变量进行表示：中心位置坐标（cx，cy），及边界框宽高（w，h），
+           与Faster RCNN等物体检测方法定义边界框方式一致；
+        对于3D车辆边界框，使用五种变量（实际是7个）进行表示：车辆中心位置3D坐标（cx，cy，cz），
+          车辆方向θ，车辆实际长宽高t = （w，h，l）
+              
+    （2）S ：S 表示part coordinates，即物体关键部位（几何节点）的坐标。
+        同上，S也有两种形式，2D与3D，分别描述车辆关键部位在2D图像与3D真实坐标系中的坐标位置。
+        
+     （3）V ：V 表示车辆各部件的可见性，这里作者定义了4 classes of visibility，分别是：
+        a. 可见：visible if the part is observed in the image
+        b.被其他物体遮挡：occluded if the part is occluded by another object
+        c.被自身遮挡：self-occluded if the part is occluded by the vehicle
+        d. 截断：truncated if the part is out of the image
+        我们可有效利用V，确定摄像机拍摄位置及车辆的3D坐标，因为只有在特定的位置观测，才能与V相符合。
+        
+      （4）T：T表示模板相似性向量，3D template similarity vector，用以衡量图像中车辆与每个车辆模板的相似性，
+        用rm = (rx, ry, rz)表示，分别对应着三个坐标轴对应的缩放因子。
+## 2、Level 1 阶段 : region proposal network
+    首先，输入单张RGB图像，经过卷积层，得到Feature Maps，这个Feature Maps在Level 1、Level 2、Level 3阶段中共享。
+    
+    在Level 1阶段，将Feature Maps送入卷积层+RPN（使用Faster-RCNN论文中的方法），
+          可生成系列物体区域坐标集，用B1表示，原理与Faster-RCNN方法一致。
+## 3、Level 2 阶段: first refinement
+    将ROI对应区域的特征图，经过ROI Pooling（Fast-Rcnn），
+    生成固定大小的regions，经过两步卷积（Levell卷积层+level2卷积层），
+    再经过re-fined by offset transformations，生成系列物体区域坐标集，用B2表示。
+## 4、Level 3 阶段: second refinement
+    重复Level2，生成系列物体区域坐标集，用B3表示。
 
+    论文作者分析了采用这种三层网络的原因：
+    （1）克服大的物体大小变化，提供更高的准确度；
+    （2）保持高分辨率，用于检测难以检测的车辆；
+## 5、多任务预测/回归：Many-task prediction
+    对于B3中的每一个bounding box，同时输出其对应的：S，V，T，各符号含义在文章开头已经介绍。
+    这个环节比较神奇，作者也没有进行过多的描述，更是整篇论文的精髓所在。
+    我在最初阅读论文的时候，无法理解网络为什么具有这么强大的功能，
+    能够同时输出2D bounding box坐标B、2D 车辆部件坐标S、部件可见性V、车辆模型缩放因子T，
+    那么它是如何实现的？这里给出我自己的初步理解，由于我缺乏网络训练实践，因此更多的形象感性的理解。
+    
+## 6、Deep MANTA Inference
+    这部分实现了由2D坐标到3D空间确定的转换，用到了perspective-n-point-problem方面的计算机视觉基础知识。
 
 
