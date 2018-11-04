@@ -71,7 +71,6 @@
 [Computer-vision dataset tools that I am using or working on 轨迹处理 误差分析](https://github.com/Ewenwan/dataset-tools)
 
 
-
 # ElasticFusion 
 [代码](https://github.com/Ewenwan/ElasticFusion)
 
@@ -88,4 +87,22 @@
     该方法的核心思想是，通过不断更新并“融合”（fusion）TSDF这种类型的测量值，
     我们能够 越来越接近所需要的真实值。
     
-    
+# 车辆3D检测：Deep MANTA 
+    在2D图像物体检测任务中，RCNN、Fast RCNN、Faster RCNN以及刚发布的mask-RCNN等算法，
+    对于单张图像物体检测均取得了较好的效果，对自动驾驶场景分析有着重要的作用，
+    但是对于3D真实世界场景依然描述不够。
+
+    在自动驾驶中，除了能够检测车辆、行人、障碍物以外，对于其物体速度、方向的检测与定位也是非常重要的。
+    在这篇论文中，作者实现了仅通过单张图像进行：
+
+    （1）精确的车辆区域检测；
+    （2）车辆部件（如车轮、车灯、车顶等）定位；
+    （3）车辆部件可见性检测（车辆部件在图像中是否可见）；
+    （4）车辆3D模板匹配及3D定位。
+
+    为了实现上述多重任务，作者充分利用了车辆几何特征，将几何特征与语义特征（卷积神经网络中多层次特征）进行结合.
+![](http://5b0988e595225.cdn.sohucs.com/images/20180110/325e2388d8414b65a33c152003ecb12b.jpeg)
+
+
+
+
