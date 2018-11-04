@@ -5,13 +5,52 @@
 
 [KinectFusion ElasticFusion](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/pdf/KinectFusion%20%E5%92%8C%20ElasticFusion%20%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA%E6%96%B9%E6%B3%95_6_3.pdf)
 
-[YOLO-6D](https://github.com/Ewenwan/MVision/blob/master/darknect/YOLO-6D/readme.md)
-
-[ssd-6d](https://github.com/Ewenwan/ssd-6d)
-
 [传统算法 3D目标识别---局部特征描述子介绍](https://blog.csdn.net/FireMicrocosm/article/details/78059151)
 
 [object-3D目标检测算法调研（基于激光雷达、kitti数据集）](https://blog.csdn.net/sum_nap/article/details/80966979)
+
+# 2D Object Detection 2D目标检测
+[现代卷积目标检测器 速度/精度调研](https://arxiv.org/pdf/1611.10012.pdf)
+
+## one-stage 无先验框的一阶段方法1st stage methods without anchors (Thanks to Mr. Moon)
+
+[OverFeat, 2013](https://arxiv.org/abs/1312.6229.pdf)
+[MultiBox, 2014](https://arxiv.org/abs/1312.2249.pdf)
+[DenseBox, 2015](https://arxiv.org/abs/1509.04874.pdf)
+[YOLO, 2015](https://arxiv.org/abs/1506.02640.pdf)
+[UnitBox, 2016](https://arxiv.org/abs/1608.01471.pdf)
+[EAST, 2017](https://arxiv.org/abs/1704.03155.pdf)
+[代码](https://github.com/argman/EAST)
+[SFace, 2018](https://arxiv.org/abs/1804.06559.pdf)
+## 带先验框的一阶段方法 1st stage methods with anchors
+[SSD, 2015](https://arxiv.org/abs/1512.02325.pdf)
+[YOLOv2, 2016](https://arxiv.org/abs/1612.08242.pdf)
+[DSSD, 2017](https://arxiv.org/abs/1701.06659.pdf)
+[RON, 2017](https://arxiv.org/abs/1707.01691.pdf)
+[RetinaNet, 2017](https://arxiv.org/abs/1708.02002.pdf)
+[YOLOv3, 2018](https://arxiv.org/abs/1804.02767.pdf)
+
+## 两个阶段的方法 2nd stage methods
+[RCNN, 2014](https://arxiv.org/abs/1311.2524v5.pdf)
+[Fast RCNN, 2015](https://arxiv.org/abs/1504.08083.pdf)
+[Faster RCNN, 2015](https://arxiv.org/abs/1506.01497.pdf)
+[RFCN, 2016](https://arxiv.org/abs/1605.06409.pdf)
+[Light-Head RCNN, 2017](https://arxiv.org/abs/1711.07264.pdf)
+[FPN, 2017](https://arxiv.org/abs/1612.03144.pdf)
+[Mask RCNN, 2017](https://arxiv.org/abs/1703.06870.pdf)
+[RFCN++, 2018](http://www.skicyyu.org/Paper/RFCN_plus_plus.pdf)
+[MegDet, 2018](https://arxiv.org/abs/1711.07240.pdf)
+[DetNet, 2018](https://arxiv.org/abs/1804.06215.pdf)
+
+# 单目RGB 3D目标检测 Monocular 3D object detection
+[YOLO-6D](https://github.com/Ewenwan/MVision/blob/master/darknect/YOLO-6D/readme.md)
+[ssd-6d](https://github.com/Ewenwan/ssd-6d)
+[3DVP 2015](http://cvgl.stanford.edu/papers/xiang_cvpr15_3dvp.pdf)
+[Mono3D 2016](https://www.cs.toronto.edu/~urtasun/publications/chen_etal_cvpr16.pdf)
+[Deep MANTA 2017](https://arxiv.org/pdf/1703.07570.pdf)
+[Deep3DBox 2017](https://arxiv.org/abs/1612.00496.pdf)
+[代码](https://github.com/Ewenwan/3D-Deepbox)
+
 
 
 # MaskFusion rgbd-slam + 语义分割mask-rcnn 
