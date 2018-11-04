@@ -70,7 +70,17 @@
 
 [人脸识别代码实验 c++](https://github.com/Ewenwan/Face_Test)
 
+[OCR 文本检测和识别](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture7(Text%20Detection%20and%20Recognition_20171031).pdf)
+
 [OCR_Test（Optical Character Recognition，光学字符识别）实验代码](https://github.com/Ewenwan/OCR_Test)
+
+[图像分割 实例分割](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture8(Image%20Segmentation).pdf)
+
+[RNN ](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture9%20Recurrent%20Neural%20Networks.pdf)
+
+[gan 生成对抗网络](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture%2010_%20Introduction%20to%20Generative%20Models.pdf)
+
+[光流 单/多目标跟踪](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture%2013_%20Visual%20Object%20Tracking.pdf)
 
 [各种卷积方式](https://github.com/vdumoulin/conv_arithmetic)
 
