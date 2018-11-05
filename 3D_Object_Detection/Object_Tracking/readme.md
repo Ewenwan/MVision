@@ -96,3 +96,62 @@
     短期跟踪，不支持重新检测，丢失后，就跟踪失败
     跟踪器不使用任何未来帧。
     
+    步骤：
+        启动跟踪器 Setup tracker
+        设置目标区域 Read initial object region and first image
+        初始化跟踪器 Initialize tracker with provided region and image
+        循环 loop
+            读取下一张图像 Read next image
+            图像为空 if image is empty then
+                跳出循环 Break the tracking loop
+            end if
+            更新跟踪器 Update tracker with provided image
+            记录目标区域 Write region to file
+        结束循环 end loop
+        清理跟踪器 Cleanup tracker
+    
+    
+    
+    目标视觉跟踪(visual object tracking),根据目标的跟踪方式，跟踪一般可以分为两大类：
+        a. 生产(generative)模型方法 
+        b. 判别(discriminative)模型方法。
+    
+    生成类方法 在当前帧对目标区域建模，下一帧寻找与模型最相似的区域就是预测位置，
+        如卡尔曼滤波(Kalman Filter)，粒子滤波(Particle Filter)，均值漂移算法(Mean Shift)等。
+        
+    目前比较流行的是判别类方法(Discriminative Tracking)，也叫跟踪检测(tracking-by-detection)，
+        当前帧以目标区域为正样本，背景区域为负样本用来训练分类器，
+        下一帧用训练好的分类器找最优区域，经典的判别类方法有Struck和TLD等。
+        
+    最近几年相关滤波方法(Correlation Filter Tracking)如MOSSE, CF，KCF/DCF，CN，DSST也比较火。
+        MOSSE算法开启了相关滤波器的大门，提出以滤波器求相关的形式来获取输出响应，进而获得最大响应处的位置也即我们期望跟踪的目标中心位置。 
+        CF，KCF/DCF,三者都是核相关滤波方法，引入核函数使高维空间中的非线性问题变为线性问题从而加速训练和检测，
+        利用循环矩阵增加训练样本，利用DFT的性质避免求逆操作提高跟踪速度。
+        CSK利用图像的灰度信息，高斯滤波和1倍padding；
+        KCF利用HOG特征，高斯滤波和1.5倍padding，
+        DCF利用HOG特征，线性滤波和1.5倍padding。 
+        CSK没有解决多尺度问题和循环矩阵边界效应只利用了图像的灰度信息；
+        KCF和DCF输入可以是多通道的可以利用更多的图像信息进行跟踪。 
+        
+        CN跟踪算法是CSK跟踪算法的扩展，CSK没有利用图像的颜色信息，而CN则是在CSK的基础上加上了图像颜色信息，
+        将图像的RGB颜色信息映射到包含(black , blue , brown , grey , green , orange , pink , purple , red , white , yellow)
+        11颜色通道的CN空间，对每一个通道空间进行FFT变换，核映射，然后对频域信号求和，
+        这种方法运算量大，可以使用PCA对颜色通道降维，把11维的颜色通道降为2维，提高运算速度。 
+        
+        DSST提出了基于3维尺度空间相关滤波器translation-scale的联合跟踪方式，
+        利用两个滤波器位置滤波器(translation filter)和尺度滤波器(scale filter)依次进行目标定位和尺度评估，
+        两个滤波器相互独立可以利用不同的特征种类和特征计算方式进行训练和测试，
+        而利用尺度滤波器进行尺度估计的方法可以移植到其他算法中。
+        fDSST对DSST进行加速，分别对位置滤波器和尺度滤波器进行PCA降维和QR分解来降低计算量提高计算速度。 
+        
+        SRDCF在KCF/DCF的基础上通过多尺度搜索解决了多尺度问题，并且加入惩罚项来解决循环矩阵的边界效应。
+        在空间权重函数中加入惩罚权重w，超过边界的w更大作为惩罚；在检测时选择一定的候选框进行尺度匹配，找到最合适的尺度大小。 
+        
+    深度学习方法：
+        
+        
+        
+    通常目标跟踪主要面临的难点有：
+        外观变化，光照变化，快速运动，运动模糊，背景干扰等。
+    
+    
