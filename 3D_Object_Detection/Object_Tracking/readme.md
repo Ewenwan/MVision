@@ -24,7 +24,7 @@
     （1）亮度恒定，前后帧观测到的对应点的灰度值一样。 
     （2）时间连续或者运动位移小。 
     （3）空间一致性：邻近点有相似运动，同一子图像的像素点具有相同的运动。 
-### klt Kanade-Lucas-Tomasi Feature Tracker
+### 传统算法求光流 klt Kanade-Lucas-Tomasi Feature Tracker
     首先找去特征点，之后用光流去跟踪的方法。
     
     a. 找到好的特征点，例如 Harris角点、Shi-Tomasi角点、FAST角点等
@@ -62,6 +62,13 @@
             V = (A转置*A)逆 * A转置*(-B) = A逆*A转置逆* A转置*(-B)=A逆*(-B) 
             (伪逆求解，A矩阵可能没有逆矩阵)
             
-            
+### 卷积网络求光流
+    [flownet/flownet2](https://github.com/Ewenwan/flownet2)
+![](http://img.mp.sohu.com/upload/20170520/1bc91a54f9844b82b3a47f680a56798b_th.png)
+    
+    他们的两个神经网络大体的思路就是这样。
+    首先他们有一个收缩部分，主要由卷积层组成，用于深度的提取两个图片的一些特征。
+    但是pooling会使图片的分辨率降低，为了提供一个密集的光流预测，他们增加了一个扩大层，能智能的把光流恢复到高像素。
+
             
                  
