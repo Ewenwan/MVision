@@ -9,6 +9,9 @@
     1. 运动估计/光流 Mption Estimation / optical Flow
     2. 单目标跟踪    Single Object Tracking
     3. 多目标跟踪    Multiple Object Trackink
+
 ## 1. 运动估计/光流
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/mf.PNG)
+
     3D运动 投影到 2D图像平面上
     相邻帧上对应像素点的移动 I(x,y,t) = I(x+dx,y+dy,t+dt) 灰度不变
