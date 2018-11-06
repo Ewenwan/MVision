@@ -1,9 +1,11 @@
     ##########################################################
 # F 点云配准 Registration 
-
+ 
 [4点法粗采样](http://graphics.stanford.edu/~niloy/research/fpcs/paper_docs/fpcs_slides_sig_08.pdf)
 
 [Super4PCS: Fast Global Pointcloud Registration via Smart Indexing](http://geometry.cs.ucl.ac.uk/projects/2014/super4PCS/)
+
+[开源ICP库，trimesh2，实测下来应该是开源ICP算法中效果最好的，谁用谁知道 ](https://github.com/Ewenwan/trimesh2)
 
     #################################################
 
