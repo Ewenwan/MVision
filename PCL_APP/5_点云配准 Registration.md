@@ -1,5 +1,10 @@
     ##########################################################
 # F 点云配准 Registration 
+
+[4点法粗采样](http://graphics.stanford.edu/~niloy/research/fpcs/paper_docs/fpcs_slides_sig_08.pdf)
+
+[Super4PCS: Fast Global Pointcloud Registration via Smart Indexing](http://geometry.cs.ucl.ac.uk/projects/2014/super4PCS/)
+
     #################################################
 
     在逆向工程，计算机视觉，文物数字化等领域中，由于点云的不完整，旋转错位，平移错位等，
