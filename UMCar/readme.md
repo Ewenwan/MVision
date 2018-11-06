@@ -9,6 +9,8 @@
 
 [openpilot 一个开源的自动驾驶（驾驶代理），它实行 Hondas 和 Acuras 的自适应巡航控制（ACC）和车道保持辅助系统（LKAS）的功能。 ](https://github.com/Ewenwan/openpilot)
 
+[Autoware](https://github.com/Ewenwan/Autoware)
+
 [udacity/self-driving-car](https://github.com/Ewenwan/self-driving-car)
 
 [第六十八篇：从ADAS到自动驾驶（一）：自动驾驶发展及分级](https://blog.csdn.net/liaojiacai/article/details/55062873)
