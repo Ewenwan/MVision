@@ -33,16 +33,16 @@ int main(int argc, char **argv) {
             f[6] = image.at<uchar>(i + 1, j);
             f[7] = image.at<uchar>(i + 1, j + 1);
             int w1, w2, w;
-            w1 = f[3] + f[4] + f[2] - f[0] - f[6] - f[7];
-            w2 = f[2] + f[1] + f[0] - f[4] - f[5] - f[6];
+            w1 = f[3] + f[4] + f[2] - f[0] - f[6] - f[7]; // 左上角 - 右下角
+            w2 = f[2] + f[1] + f[0] - f[4] - f[5] - f[6]; // 左下角 - 右上角
             w = abs(w1) + abs(w2);
             if (w > 80)
-                priwitt.at<uchar>(i, j) = 255;
+                priwitt.at<uchar>(i, j) = 255;// 角点
             else
                 priwitt.at<uchar>(i, j) = 0;
             int Dx, Dy;
-            Dx = f[1] + f[0] + f[7] - f[3] - f[4] - f[5];
-            Dy = f[3] + f[2] + f[1] - f[5] - f[6] - f[7];
+            Dx = f[1] + f[0] + f[7] - f[3] - f[4] - f[5];// 下 - 上
+            Dy = f[3] + f[2] + f[1] - f[5] - f[6] - f[7];// 左 - 右
             smoothed.at<uchar>(i, j) = abs(Dx) + abs(Dy);
         }
 
