@@ -45,6 +45,8 @@
 [LSD_slam & 激光雷达slam](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/04_SLAM.pdf)
 
 
+[视觉SLAM滑窗 局部全局优化 Double Window Optimisation for Constant Time Visual SLAM](http://www.doc.ic.ac.uk/~ajd/Publications/strasdat_etal_iccv2011.pdf)
+
 # 目录:
 
     ch1 Preface 
