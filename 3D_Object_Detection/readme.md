@@ -5,6 +5,8 @@
 
 [KinectFusion ElasticFusion](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/pdf/KinectFusion%20%E5%92%8C%20ElasticFusion%20%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA%E6%96%B9%E6%B3%95_6_3.pdf)
 
+[2d目标检测网络各种结构代码](https://github.com/Ewenwan/awesome-object-detection)
+
 [传统算法 3D目标识别---局部特征描述子介绍](https://blog.csdn.net/FireMicrocosm/article/details/78059151)
 
 [object-3D目标检测算法调研（基于激光雷达、kitti数据集）](https://blog.csdn.net/sum_nap/article/details/80966979)
