@@ -54,6 +54,9 @@
 # 卷积神经网络
 [one-stage two-stage目标检测总结](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture6(Object%20Detection).pdf)
 
+[2d目标检测网络各种结构代码](https://github.com/Ewenwan/awesome-object-detection)
+
+
 [Deep Learning (Computer Architecture) 计算框架 caffe pytorch](https://zsc.github.io/megvii-pku-dl-course/slides18/deeplearning_framework_peking.pdf)
 
 [深度学习数学知识 向量 矩阵 概率密度函数 贝叶斯 协方差 信息熵 KL散度 梯度下降 过拟合 正则化](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture2(MathInDL).pdf)
