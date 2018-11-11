@@ -140,8 +140,6 @@
 [Computer-vision dataset tools that I am using or working on 轨迹处理 误差分析](https://github.com/Ewenwan/dataset-tools)
 
 
-# ElasticFusion 
-[代码](https://github.com/Ewenwan/ElasticFusion)
 
 # KinectFusion
     KinectFusion在世界坐标系中定义了一个立方体，并把该立方体按照一定的分辨率切割成小立方体（voxel）。
@@ -174,7 +172,18 @@
            网格中的数值代表距离重建场景表面的距离，网格中从正值到负值的穿越点连接线表示重建的表面
         4. 光线投影算法求当前视角下能够看到的场景表面
 
+# ElasticFusion 
+[代码](https://github.com/Ewenwan/ElasticFusion)
 
+
+# BundleFusion
+    2017年斯坦福大学提出的BundleFusion算法，可以说是目前基于RGB-D相机进行稠密三维重建效果最好的方法了。
+[代码](https://github.com/Ewenwan/BundleFusion)
+    
+    
+    
+    
+    
 # 车辆3D检测：Deep MANTA  一个针对单目图像联合2D-3D车辆检测的粗到精的多任务网络
 
 [参考](https://zhuanlan.zhihu.com/p/25996617)
