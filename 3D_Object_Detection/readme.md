@@ -158,7 +158,8 @@
     KinectFusion是微软研究院的一个项目，研究用Kinect来实时地重构3D表面，最终用于人机交互。
     
 [其他团队实现](https://github.com/Ewenwan/kfusion)
-    
+
+[TSDF算法](https://blog.csdn.net/qq_40213457/article/details/82383621)
     
     首次实现基于 RGB-D 的实时三位重建
 
