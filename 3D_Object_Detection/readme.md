@@ -181,7 +181,10 @@
     2017年斯坦福大学提出的BundleFusion算法，可以说是目前基于RGB-D相机进行稠密三维重建效果最好的方法了。
 [代码](https://github.com/Ewenwan/BundleFusion)
     
-    
+    它通过slam获取相机的位置信息，关键帧等等，如果是稠密的，那就是每一帧图像都参与融合，
+    要是基于关键帧就直接融合关键帧，融合的方式采用bundlefuison 的 integrate 和 deintegrate.
+    其中对于实时三维重构要想能在slam获得回环后把位置经过修正的帧重新融合必须有deintegrate功能。
+    笔者真心认为bundlefusion是三维实时重构的里程碑，是最完善的
     
     
     
