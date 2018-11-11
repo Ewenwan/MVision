@@ -155,7 +155,12 @@
     这种方法通常被称为基于体数据的方法（Volumetric-based method）。
     该方法的核心思想是，通过不断更新并“融合”（fusion）TSDF这种类型的测量值，
     我们能够 越来越接近所需要的真实值。
+
+
+    KinectFusion是微软研究院的一个项目，研究用Kinect来实时地重构3D表面，最终用于人机交互。
     
+[其他团队实现](https://github.com/Ewenwan/kfusion)
+
 # 车辆3D检测：Deep MANTA  一个针对单目图像联合2D-3D车辆检测的粗到精的多任务网络
 
 [参考](https://zhuanlan.zhihu.com/p/25996617)
