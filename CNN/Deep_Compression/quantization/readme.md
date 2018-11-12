@@ -6,8 +6,14 @@
 
 [论文合集](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/quantization/quantizedNN_paper.md)
 
+[低数值精度深度学习推理与训练](https://software.intel.com/zh-cn/articles/lower-numerical-precision-deep-learning-inference-and-training)
+
+
+
 # 具体量化方法
 [参考](https://github.com/Ewenwan/pytorch-playground/blob/master/utee/quant.py)
+
+
 
 ```python
 # 线性量化
