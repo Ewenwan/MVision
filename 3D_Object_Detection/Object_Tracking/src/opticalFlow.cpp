@@ -134,13 +134,18 @@ int main(int, char**)
 	//cap.open("test_02.wmv"); 
 	if( !cap.isOpened() ) 
 		return -1; 
-	Mat prevgray, gray, flow, cflow, frame; 
+	Mat prevgray, gray, flow, flow2, cflow, frame, frameSrc; 
 	namedWindow("flow", 1); 
-	Mat motion2color;
+	Mat motion2color,motion2color2 ;
 	for(;;) 
 	{
 		 double t = (double)cvGetTickCount(); 
-		 cap >> frame; 
+		 cap >> frameSrc;
+
+// 下采样一下 加快速度====================== 速度 ×3 ==================
+	         pyrDown(frameSrc, frame, Size(frameSrc.cols / 2, frameSrc.rows / 2));
+// ====================================================================================
+
 		 cvtColor(frame, gray, CV_BGR2GRAY); // 转成灰度
 		 //imshow("original", frame); 
 		 if( prevgray.data ) 
@@ -162,9 +167,15 @@ int main(int, char**)
 // flags：计算方法。主要包括 OPTFLOW_USE_INITIAL_FLOW 和 OPTFLOW_FARNEBACK_GAUSSIAN 
 
 		    calcOpticalFlowFarneback(prevgray, gray, flow, 0.5, 3, 15, 3, 5, 1.2, 0); 
-		    motionToColor(flow, motion2color); 
-		    imshow("flow", motion2color); 
+		    motionToColor(flow, motion2color);
 
+// 上采样 ======
+          pyrUp(motion2color, motion2color2, Size(motion2color.cols * 2, motion2color.rows * 2));
+	  imshow("flow", motion2color2); 
+
+          pyrUp(flow, flow2, Size(flow.cols * 2, flow.rows * 2));
+
+            /*
               // 显示光流方线段=====================================
                  for(int y=0; y<frame.rows; y+= 5) // 每隔5行画线
                  { 
@@ -182,7 +193,27 @@ int main(int, char**)
                       circle(frame, Point(x,y), 1, Scalar(0,0,0), -1); // 起点
                     } 
                  }
-                   imshow("original", frame); 
+                 imshow("original", frame); 
+              */
+
+              // 显示光流方线段=====================================
+                 for(int y=0; y<frameSrc.rows; y+= 5) // 每隔5行画线
+                 { 
+                   for(int x=0; x<frameSrc.cols; x+= 5)
+                    { 
+                      const Point2f xy = flow2.at<Point2f>(y, x);
+                      const Point2f flowatxy = xy*10;// 光流值放大10倍
+
+		      float tep = sqrt(xy.x * xy.x + xy.y * xy.y); 
+		      if(tep < 4.0) // 剔除过小的 光流值
+		          continue; // 光流太大，假
+                      line(frameSrc, Point(x,y), 
+                           Point(cvRound(x+flowatxy.x), cvRound(y+flowatxy.y)), 
+                           Scalar(255, 0, 0));// 起点到 终点 画线
+                      circle(frameSrc, Point(x,y), 1, Scalar(0,0,0), -1); // 起点
+                    } 
+                 }
+                 imshow("original", frameSrc); 
 
 
 		 } 
@@ -195,4 +226,3 @@ int main(int, char**)
 	}
 	return 0; 
 }
-
