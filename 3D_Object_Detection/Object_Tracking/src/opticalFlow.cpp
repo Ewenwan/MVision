@@ -2,7 +2,7 @@
 // 2D dense optical flow algorithm from the following paper: 
 // Gunnar Farneback. "Two-Frame Motion Estimation Based on Polynomial Expansion". 
 // And the OpenCV source code locate in ..\opencv2.4.3\modules\video\src\optflowgf.cpp 
-
+// https://blog.csdn.net/ironyoung/article/details/60884929
 
 #include <iostream> 
 #include "opencv2/opencv.hpp" 
