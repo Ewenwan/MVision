@@ -140,10 +140,11 @@ int main(int, char**)
 // levels：金字塔层数 
 // winsize：均值窗口大小，越大越能denoise并且能够检测快速移动目标，但会引起模糊运动区域 
 // iterations：迭代次数
- // poly_n：像素领域大小，一般为5，7等 
+// poly_n：像素领域大小，一般为5，7等 
 // poly_sigma：高斯标注差，一般为1-1.5 
 // flags：计算方法。主要包括 OPTFLOW_USE_INITIAL_FLOW 和 OPTFLOW_FARNEBACK_GAUSSIAN 
-
+			 
+// 为了解决孔径问题，主函数中引入了图像金字塔================
 		    calcOpticalFlowFarneback(prevgray, gray, flow, 0.5, 3, 15, 3, 5, 1.2, 0); 
 		    motionToColor(flow, motion2color); 
 		    imshow("flow", motion2color); 
