@@ -2,7 +2,9 @@
 // 2D dense optical flow algorithm from the following paper: 
 // Gunnar Farneback. "Two-Frame Motion Estimation Based on Polynomial Expansion". 
 // And the OpenCV source code locate in ..\opencv2.4.3\modules\video\src\optflowgf.cpp 
+
 // https://blog.csdn.net/ironyoung/article/details/60884929
+// https://blog.csdn.net/yzhang6_10/article/details/51225545
 
 #include <iostream> 
 #include "opencv2/opencv.hpp" 
@@ -148,6 +150,8 @@ int main(int, char**)
 		    calcOpticalFlowFarneback(prevgray, gray, flow, 0.5, 3, 15, 3, 5, 1.2, 0); 
 		    motionToColor(flow, motion2color); 
 		    imshow("flow", motion2color); 
+			 
+			 
 		 } 
 		 if(waitKey(10)>=0) break; 
 		 std::swap(prevgray, gray); // 更新上一帧灰度图
