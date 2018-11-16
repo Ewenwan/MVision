@@ -70,7 +70,10 @@ for (int i= 0; i < flow.rows; ++i)
           maxrad = maxrad > rad ? maxrad : rad;// 保留最大 综合光流
         } 
 } 
-
+// 这个flow颜色可视化分成这么几步： 
+// 1） 对flow归一化后，算出它的极坐标 （angle, radius） 
+// 2） 将angle 映射到色调（hue）， 将radius 映射到色度(saturation)。 
+// 这里共分了55个色调
 for (int i= 0; i < flow.rows; ++i) // 行
 { 
 	for (int j = 0; j < flow.cols; ++j) // 列
