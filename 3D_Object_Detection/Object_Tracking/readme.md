@@ -16,6 +16,9 @@
 
 [光流简介](http://vision.middlebury.edu/flow/floweval-ijcv2011.pdf)
 
+[光流法总结](https://zhuanlan.zhihu.com/p/35392023)
+
+
 ![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/mf.PNG)
 
     3D运动 投影到 2D图像平面上
