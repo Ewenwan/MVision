@@ -129,6 +129,21 @@ int main(int, char**)
 		 imshow("original", frame); 
 		 if( prevgray.data ) 
 		 { 
+// CalcOpticalFlowFarneback()函数是利用用Gunnar Farneback的算法,
+// 计算全局性的稠密光流算法（即图像上所有像素点的光流都计算出来），
+// 由于要计算图像上所有点的光流，故计算耗时，速度慢。
+// 参数说明如下： 
+// _prev0：输入前一帧图像 
+// _next0：输入后一帧图像 
+// _flow0：输出的光流 
+// pyr_scale：金字塔上下两层之间的尺度关系 
+// levels：金字塔层数 
+// winsize：均值窗口大小，越大越能denoise并且能够检测快速移动目标，但会引起模糊运动区域 
+// iterations：迭代次数
+ // poly_n：像素领域大小，一般为5，7等 
+// poly_sigma：高斯标注差，一般为1-1.5 
+// flags：计算方法。主要包括 OPTFLOW_USE_INITIAL_FLOW 和 OPTFLOW_FARNEBACK_GAUSSIAN 
+
 		    calcOpticalFlowFarneback(prevgray, gray, flow, 0.5, 3, 15, 3, 5, 1.2, 0); 
 		    motionToColor(flow, motion2color); 
 		    imshow("flow", motion2color); 
