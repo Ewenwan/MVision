@@ -10,7 +10,7 @@
 #include "opencv2/opencv.hpp" 
 using namespace cv; 
 using namespace std; 
-#define UNKNOWN_FLOW_THRESH 1e9 // 光流最大值???
+#define UNKNOWN_FLOW_THRESH 1e9 // 光流最大值 1000000000
 
 // 孟塞尔颜色系统===========
 // Color encoding of flow vectors from: 
@@ -72,9 +72,12 @@ for (int i= 0; i < flow.rows; ++i)
           maxrad = maxrad > rad ? maxrad : rad;// 保留最大 综合光流
         } 
 } 
+
+ cout << "max flow:  " << maxrad << endl; // 打印一下 最大 综合光流值
+
 // 这个flow颜色可视化分成这么几步： 
 // 1） 对flow归一化后，算出它的极坐标 （angle, radius） 
-// 2） 将angle 映射到色调（hue）， 将radius 映射到色度(saturation)。 
+//2） 将angle 映射到色调（hue）， 将radius 映射到色度(saturation)。 
 // 这里共分了55个色调
 for (int i= 0; i < flow.rows; ++i) // 行
 { 
@@ -82,9 +85,20 @@ for (int i= 0; i < flow.rows; ++i) // 行
         { 
           uchar *data = color.data + color.step[0] * i + color.step[1] * j; // rgb图
           Vec2f flow_at_point = flow.at<Vec2f>(i, j);
+
+
+
+      float tep = sqrt(flow_at_point[0] * flow_at_point[0] + flow_at_point[1] * flow_at_point[1]); 
+         if(tep < 4.0) // 剔除过小的 光流值
+          { 
+            data[0] = data[1] = data[2] = 0;
+                 continue; // 光流太大，假
+          } 
+
           // 使用最大 综合光流 来归一化 水平和垂直光流 ======
           float fx = flow_at_point[0] / maxrad; 
           float fy = flow_at_point[1] / maxrad; 
+// 这里有问题，fx，fy已经归一化了
           if ((fabs(fx) > UNKNOWN_FLOW_THRESH) || (fabs(fy) > UNKNOWN_FLOW_THRESH)) 
           { 
             data[0] = data[1] = data[2] = 0;
@@ -128,9 +142,10 @@ int main(int, char**)
 		 double t = (double)cvGetTickCount(); 
 		 cap >> frame; 
 		 cvtColor(frame, gray, CV_BGR2GRAY); // 转成灰度
-		 imshow("original", frame); 
+		 //imshow("original", frame); 
 		 if( prevgray.data ) 
 		 { 
+
 // CalcOpticalFlowFarneback()函数是利用用Gunnar Farneback的算法,
 // 计算全局性的稠密光流算法（即图像上所有像素点的光流都计算出来），
 // 由于要计算图像上所有点的光流，故计算耗时，速度慢。
@@ -142,17 +157,37 @@ int main(int, char**)
 // levels：金字塔层数 
 // winsize：均值窗口大小，越大越能denoise并且能够检测快速移动目标，但会引起模糊运动区域 
 // iterations：迭代次数
-// poly_n：像素领域大小，一般为5，7等 
+ // poly_n：像素领域大小，一般为5，7等 
 // poly_sigma：高斯标注差，一般为1-1.5 
 // flags：计算方法。主要包括 OPTFLOW_USE_INITIAL_FLOW 和 OPTFLOW_FARNEBACK_GAUSSIAN 
-			 
-// 为了解决孔径问题，主函数中引入了图像金字塔================
+
 		    calcOpticalFlowFarneback(prevgray, gray, flow, 0.5, 3, 15, 3, 5, 1.2, 0); 
 		    motionToColor(flow, motion2color); 
 		    imshow("flow", motion2color); 
-			 
-			 
+
+              // 显示光流方线段=====================================
+                 for(int y=0; y<frame.rows; y+= 5) // 每隔5行画线
+                 { 
+                   for(int x=0; x<frame.cols; x+= 5)
+                    { 
+                      const Point2f xy = flow.at<Point2f>(y, x);
+                      const Point2f flowatxy = xy*10;// 光流值放大10倍
+
+		      float tep = sqrt(xy.x * xy.x + xy.y * xy.y); 
+		      if(tep < 4.0) // 剔除过小的 光流值
+		          continue; // 光流太大，假
+                      line(frame, Point(x,y), 
+                           Point(cvRound(x+flowatxy.x), cvRound(y+flowatxy.y)), 
+                           Scalar(255, 0, 0));// 起点到 终点 画线
+                      circle(frame, Point(x,y), 1, Scalar(0,0,0), -1); // 起点
+                    } 
+                 }
+                   imshow("original", frame); 
+
+
 		 } 
+
+
 		 if(waitKey(10)>=0) break; 
 		 std::swap(prevgray, gray); // 更新上一帧灰度图
 		 t = (double)cvGetTickCount() - t; 
@@ -160,9 +195,4 @@ int main(int, char**)
 	}
 	return 0; 
 }
-
-
-
-
-
 
