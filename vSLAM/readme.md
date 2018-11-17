@@ -10,6 +10,12 @@
 **2d/3d 空间变换**
 ![](https://github.com/Ewenwan/MVision/blob/master/vSLAM/img/2D-planar-transformations.PNG)
 
+[SLAM 开发学习资源与经验分享 ](https://github.com/Ewenwan/Lee-SLAM-source)
+
+[AR 增强现实开发资源汇总 ](https://github.com/Ewenwan/AR-Source)
+
+[VR 虚拟现实开发者必备资源汇总](https://github.com/Ewenwan/Lee-VR-Source)
+
 [视觉SLAM基础知识总结](https://blog.csdn.net/myarrow/article/details/53704339)
 
 [SLAM/VIO学习总结](https://zhuanlan.zhihu.com/p/34995102)
