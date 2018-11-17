@@ -2,10 +2,13 @@
 %This is a very simple, no-frills implementation.
 %Bob Collins,
 
+% 粒子滤波跟踪
+
 %As observations, we will use the ground truth bounding 
 %box information provided with the VS-PETS soccer dataset
 %to simulate a (very accurate) person detector.
 %observations
+% 初始目标边框数据
 load soccerboxes.mat
 
 %each box is stored as one row of allboxes
@@ -121,6 +124,8 @@ for fnum = (fstart+deltaframe): deltaframe : fend
     
     %resample particles according to likelihood weights
     %the resulting samples will then have equal weight
+    
+    % 重采样==================================
     indices = resampindex(weights);
     sampx = predx(indices);
     sampy = predy(indices);
