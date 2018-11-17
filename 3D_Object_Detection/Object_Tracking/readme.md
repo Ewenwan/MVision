@@ -292,30 +292,29 @@
 # 2d变换总结 平移 缩放 欧式变换 相似变换 仿射变换 投影变换
 > 平移变换 方向+...不变
 
-![]()
-> 平移变换 方向+...不变
-
-![]()
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/translation.png)
 > 缩放变换 方向+...不变 长度变化
 
-![]()
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/scale.png)
 > 欧式变换 长度+...不变
 
-![]()
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/eucli.png)
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/e2.png)
 > 相似变换 角度+...不变
 
-![]()
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/sim.png)
 
 > 仿射变换 平行+...不变
 
-![]()
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/affine.png)
 
 > 投影变换 直线性+...不变
 
-![]()
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/pro.png)
 
 > 黎曼几何 直线变曲线
 
-![]()
+
+
 
 
