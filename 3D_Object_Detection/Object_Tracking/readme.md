@@ -285,6 +285,9 @@
 ## 多目标跟踪
 [数据关联，特征匹配、哪个目标加入到轨迹内、kf预测、2d框交并比、](http://www.cse.psu.edu/~rtc12/CSE598C/datassocPart1.pdf)
 
+[comboptBlockICM](http://www.cse.psu.edu/~rtc12/CSE598C/comboptBlockICM.pdf)
+
+
 ![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/mht.png)
 
 ![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/da.png)
