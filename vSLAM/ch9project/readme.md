@@ -450,7 +450,7 @@ int main( int argc, char** argv )
     // 构建相机矩阵
     cv::Mat cameraMatrix( 3, 3, CV_64F, camera_matrix_data );// 8字节
     cv::Mat rvec, tvec, inliers;
-    // 求解pnp            3d点     2d点  相机内参数矩阵K         旋转矩阵rvec 平移向量tvec
+    // 求解pnp            3d点     2d点  相机内参数矩阵K          旋转向量 rvec 平移向量tvec
     cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 100, inliers );
     
 // 这个就叫做“幸福的家庭都是相似的，不幸的家庭各有各的不幸”吧。
@@ -602,8 +602,9 @@ RESULT_OF_PNP estimateMotion( FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PAR
     // 构建相机矩阵
     cv::Mat cameraMatrix( 3, 3, CV_64F, camera_matrix_data );
     cv::Mat rvec, tvec, inliers;
-    // 求解pnp            3d点     2d点  相机内参数矩阵K         旋转矩阵rvec 平移向量tvec
+    // 求解pnp            3d点     2d点  相机内参数矩阵K         旋转向量 rvec 平移向量tvec
     cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 100, inliers );
+    // 旋转向量形式 3×1 rvec
 // 这个就叫做“幸福的家庭都是相似的，不幸的家庭各有各的不幸”吧。
 // 你这样理解也可以。ransac适用于数据噪声比较大的场合
 
@@ -685,8 +686,8 @@ public:
 # 等号前后不能有空格
 # part 4 里定义的参数
 
-detector=SIFT
-descriptor=SIFT
+detector=ORB
+descriptor=ORB
 good_match_threshold=4
 
 # camera
@@ -703,4 +704,138 @@ camera.scale=1000.0;
 
 # 点云拼接
 
+	点云的拼接，实质上是对点云做变换的过程。这个变换往往是用变换矩阵(transform matrix)来描述的：
+	T=[R t
+	   O 1]∈R4×4
+	该矩阵的左上部分 R 是一个3×3的旋转矩阵，它是一个正交阵。
+	右上部分 t 是3×1的位移矢量。
+	左下O是3×1的 !!!缩放矢量!!!!，在SLAM中通常取成0，
+	因为环境里的东西不太可能突然变大变小（又没有缩小灯）。
+	
+	右下角是个1. 这样的一个阵可以对点或者其他东西进行齐次变换。
 
+	[X1        [X2
+	 Y1         Y2
+	 Z1    = T⋅ Z2 
+	 1]         1]   
+         由于变换矩阵t 结合了 旋转R 和 平移t，是一种较为经济实用的表达方式。
+	 它在机器人和许多三维空间相关的科学中都有广泛的应用。
+	 PCL里提供了点云的变换函数，只要给定了变换矩阵，就能对移动整个点云：
+	 
+	pcl::transformPointCloud( input, output, T );
+	
+	OpenCV认为旋转矩阵R，虽然有3×3 那么大，自由变量却只有三个，不够节省空间。
+	所以在OpenCV里使用了一个向量来表达旋转。
+	向量的方向是旋转轴，大小则是转过的弧度.
+        我们先用 罗德里格斯变换（Rodrigues）将旋转向量转换为矩阵，然后“组装”成变换矩阵。
+	代码如下：
+
+```c
+// src/jointPointCloud.cpp===============================
+/*****************************************************
+	> File Name: src/jointPointCloud.cpp
+	> Author: Xiang gao
+	> Mail: gaoxiang12@mails.tsinghua.edu.cn 
+	> Created Time: 2015年07月22日 星期三 20时46分08秒
+ **********************************************/
+
+#include<iostream>
+using namespace std;
+
+#include "slamBase.h"
+
+#include <opencv2/core/eigen.hpp>
+
+#include <pcl/common/transforms.h> // 点云转换
+#include <pcl/visualization/cloud_viewer.h> // 点云显示
+
+// Eigen !
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
+int main( int argc, char** argv )
+{
+// 参数读取器， 请见include/slamBase.h
+    ParameterReader pd;
+    // 声明两个帧，FRAME结构请见include/slamBase.h
+    FRAME frame1, frame2;
+   //本节要拼合data中的两对图像
+    //读取图像==============================
+    frame1.rgb = cv::imread( "./data/rgb1.png" );
+    frame1.depth = cv::imread( "./data/depth1.png", -1);// 
+    frame2.rgb = cv::imread( "./data/rgb2.png" );
+    frame2.depth = cv::imread( "./data/depth2.png", -1 );
+
+    // 提取特征并计算描述子====================
+    cout<<"extracting features"<<endl;
+    string detecter = pd.getData( "detector" );     // 参数读取 特征检测器
+    string descriptor = pd.getData( "descriptor" ); // 描述子计算器
+    // 计算 特征点和描述子=
+    computeKeyPointsAndDesp( frame1, detecter, descriptor );
+    computeKeyPointsAndDesp( frame2, detecter, descriptor );
+
+    // 相机内参=========================================
+    CAMERA_INTRINSIC_PARAMETERS camera;
+    camera.fx = atof( pd.getData( "camera.fx" ).c_str()); // 参数读取 相机参数 字符串转换成 浮点型
+    camera.fy = atof( pd.getData( "camera.fy" ).c_str());
+    camera.cx = atof( pd.getData( "camera.cx" ).c_str());
+    camera.cy = atof( pd.getData( "camera.cy" ).c_str());
+    camera.scale = atof( pd.getData( "camera.scale" ).c_str() );
+
+    cout<<"solving pnp"<<endl;
+    // 求解 pnp  2d-3d 配准估计变换======================================
+    RESULT_OF_PNP result = estimateMotion( frame1, frame2, camera );
+
+    cout<<result.rvec<<endl<<result.tvec<<endl;
+
+    // 处理result
+    // 将 旋转向量 转化为 旋转矩阵
+    cv::Mat R;
+    cv::Rodrigues( result.rvec, R ); // 旋转向量  罗德里格斯变换 转换为 旋转矩阵
+    Eigen::Matrix3d r;// 3×3矩阵
+    cv::cv2eigen(R, r);
+  
+    // 将平移向量 和 旋转矩阵 转换 成 变换矩阵
+    Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
+
+    Eigen::AngleAxisd angle(r);// 旋转矩阵
+    cout<<"translation"<<endl; // 平移向量============
+    Eigen::Translation<double,3> trans(result.tvec.at<double>(0,0), 
+                                       result.tvec.at<double>(0,1),
+				       result.tvec.at<double>(0,2));// 多余??????=========
+    T = angle;// 旋转矩阵 赋值 给 变换矩阵 T 
+    T(0,3) = result.tvec.at<double>(0,0); // 添加 平移部分
+    T(1,3) = result.tvec.at<double>(0,1); 
+    T(2,3) = result.tvec.at<double>(0,2);
+
+    // 转换点云
+    cout<<"converting image to clouds"<<endl;
+    PointCloud::Ptr cloud1 = image2PointCloud( frame1.rgb, frame1.depth, camera ); // 帧1 对应的 点云
+    PointCloud::Ptr cloud2 = image2PointCloud( frame2.rgb, frame2.depth, camera ); // 针2 对应的 点云
+
+    // 合并点云
+    cout<<"combining clouds"<<endl;
+    PointCloud::Ptr output (new PointCloud());
+    pcl::transformPointCloud( *cloud1, *output, T.matrix() );// F1下的 c1点云  T*c1 --> F2下 
+    
+    *output += *cloud2;// 在 F2下 加和 两部分 点云 ========
+    pcl::io::savePCDFile("data/result.pcd", *output);
+    cout<<"Final result saved."<<endl;
+
+    pcl::visualization::CloudViewer viewer( "viewer" );
+    viewer.showCloud( output );
+    while( !viewer.wasStopped() )
+    {
+        
+    }
+    return 0;
+}
+
+// 至此，我们已经实现了一个只有两帧的SLAM程序。然而，也许你还不知道，这已经是一个视觉里程计(Visual Odometry)啦！
+// 只要不断地把进来的数据与上一帧对比，就可以得到完整的运动轨迹以及地图了呢！
+
+// 以两两匹配为基础的里程计有明显的累积误差，我们需要通过回环检测来消除它。这也是我们后面几讲的主要内容啦！
+// 我们先讲讲关键帧的处理，因为把每个图像都放进地图，会导致地图规模增长地太快，所以需要关键帧技术。
+// 然后呢，我们要做一个SLAM后端，就要用到g2o啦！
+
+```
