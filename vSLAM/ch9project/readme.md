@@ -483,6 +483,8 @@ int main( int argc, char** argv )
 // 装进slamBase库中， 
 // 在 include/slamBase.h  扩展 以下代码
 
+// 我们把关键帧和PnP的结果都封成了结构体，以便将来别的程序调用==========
+
 // FRAME 帧结构=============== 结构体
 struct FRAME
 {
@@ -495,22 +497,188 @@ struct FRAME
 struct RESULT_OF_PNP
 {
     cv::Mat rvec, tvec;
-    int inliers;
+    int inliers; // 内点数量=====!!!!
 };
 
-// computeKeyPointsAndDesp 同时提取关键点与特征描述子======================
-void computeKeyPointsAndDesp( FRAME& frame, string detector, string descriptor );
+// computeKeyPointsAndDesp 同时提取关键点与特征描述子========引用传递==============
+void computeKeyPointsAndDesp( FRAME & frame, string detector, string descriptor );
 
-// estimateMotion 2d-3d pnp配准 计算两个帧之间的运动=======================
+// estimateMotion 2d-3d pnp配准 计算两个帧之间的运动==========引用传递==============
 // 输入：帧1和帧2, 相机内参
-RESULT_OF_PNP estimateMotion( FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera );
+RESULT_OF_PNP estimateMotion( FRAME & frame1, FRAME & frame2, CAMERA_INTRINSIC_PARAMETERS& camera );
+
+
+```
+
+```c
+// 提取关键点与特征描述子函数 2d-3d-pnp配准函数 src/slamBase.cpp=========================
+
+// computeKeyPointsAndDesp 同时提取关键点与特征描述子============引用传递============== 
+void computeKeyPointsAndDesp( FRAME & frame, string detector, string descriptor )
+{
+    cv::Ptr<cv::FeatureDetector> _detector;        // 关键点检测
+    cv::Ptr<cv::DescriptorExtractor> _descriptor;  // 描述子计算
+
+    cv::initModule_nonfree(); // 如果使用 SIFI / SURF 的话========
+    
+    _detector = cv::FeatureDetector::create( detector.c_str() );
+    _descriptor = cv::DescriptorExtractor::create( descriptor.c_str() );
+
+    if (!_detector || !_descriptor)
+    {
+        cerr<<"Unknown detector or discriptor type !"<<detector<<","<<descriptor<<endl;
+        return;
+    }
+
+    _detector->detect( frame.rgb, frame.kp ); // 检测关键点
+    _descriptor->compute( frame.rgb, frame.kp, frame.desp );// 计算描述子
+
+    return;
+}
+
+// estimateMotion 计算两个帧之间的运动==========================================================
+// 输入：帧1和帧2
+// 输出：rvec 和 tvec
+RESULT_OF_PNP estimateMotion( FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera )
+{
+    static ParameterReader pd;   // // 好关键点阈值 参数 读取==============
+    vector< cv::DMatch > matches;// 匹配点对
+    cv::FlannBasedMatcher matcher;// 快速最近邻 匹配器============
+    matcher.match( frame1.desp, frame2.desp, matches );// 对两个关键帧的关键点 进行匹配
+   
+    cout<<"find total "<<matches.size()<<" matches."<<endl;
+// 初步筛选 好的匹配点对==========================
+    vector< cv::DMatch > goodMatches;
+    double minDis = 9999;
+    
+    double good_match_threshold = atof( pd.getData( "good_match_threshold" ).c_str() );// 好关键点阈值 读取
+    
+    for ( size_t i=0; i<matches.size(); i++ )
+    {
+        if ( matches[i].distance < minDis )
+            minDis = matches[i].distance; // 最好的匹配点对  对应的匹配距离
+    }
+
+    for ( size_t i=0; i<matches.size(); i++ )
+    {
+        if (matches[i].distance < good_match_threshold*minDis)
+            goodMatches.push_back( matches[i] ); // 筛选下来的 好的 匹配点对
+    }
+
+    cout<<"good matches: "<<goodMatches.size()<<endl;
+    // 第一个帧的三维点
+    vector<cv::Point3f> pts_obj;  // 2d 关键点对应的像素点 + 对应的深度距离 根据相机参数 转换得到
+    // 第二个帧的图像点
+    vector< cv::Point2f > pts_img;// 2d 关键点对应的像素点
+    
+// 从匹配点对 获取 2d-3d点对 ===========================
+    for (size_t i=0; i<goodMatches.size(); i++) 
+    {
+        // query 是第一个, train 是第二个 得到的是 关键点的id
+        cv::Point2f p = frame1.kp[goodMatches[i].queryIdx].pt;// .pt 获取关键点对应的 像素点
+        // 获取d是要小心！x是向右的，y是向下的，所以y才是行，x是列！
+        ushort d = frame1.depth.ptr<ushort>( int(p.y) )[ int(p.x) ];// y行，x列
+        if (d == 0)
+            continue; // 深度值不好 跳过
+        // 将(u,v,d)转成(x,y,z)
+        cv::Point3f pt ( p.x, p.y, d ); // 2d 关键点对应的像素点 + 对应的深度距离
+        cv::Point3f pd = point2dTo3d( pt, camera );// 根据相机参数 转换得到 3d点
+        pts_obj.push_back( pd );
+	
+	
+	pts_img.push_back( cv::Point2f( frame2.kp[goodMatches[i].trainIdx].pt ) );// 后一帧的 2d像素点
+
+    }
+    
+// 相机内参数矩阵 K =========================
+    double camera_matrix_data[3][3] = 
+    {
+        {camera.fx, 0, camera.cx},
+        {0, camera.fy, camera.cy},
+        {0, 0, 1}
+    };
+
+    cout<<"solving pnp"<<endl;
+    // 构建相机矩阵
+    cv::Mat cameraMatrix( 3, 3, CV_64F, camera_matrix_data );
+    cv::Mat rvec, tvec, inliers;
+    // 求解pnp            3d点     2d点  相机内参数矩阵K         旋转矩阵rvec 平移向量tvec
+    cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 100, inliers );
+// 这个就叫做“幸福的家庭都是相似的，不幸的家庭各有各的不幸”吧。
+// 你这样理解也可以。ransac适用于数据噪声比较大的场合
+
+    RESULT_OF_PNP result;  // 2D-3D匹配结果
+    result.rvec = rvec;
+    result.tvec = tvec;
+    result.inliers = inliers.rows; //   内点数量=====!!!!
+
+    return result; 返回
+}
 
 
 ```
 
 
+# 文件参数 读取类
+	此外，我们还实现了一个简单的参数读取类。
+	这个类读取一个参数的文本文件，能够以关键字的形式提供文本文件中的变量。
+```c
+// 装进slamBase库中， 
+// 在 include/slamBase.h  扩展 以下代码
+
+// 参数读取类
+class ParameterReader
+{
+public:
+    ParameterReader( string filename="./parameters.txt" )
+    {
+        ifstream fin( filename.c_str() );
+        if (!fin)
+        {
+            cerr<<"parameter file does not exist."<<endl;
+            return;
+        }
+        while(!fin.eof())// 知道文件结尾
+        {
+            string str;
+            getline( fin, str );// 每一行======
+            if (str[0] == '#')// [0]是开头的第一个字符
+            {
+                // 以‘＃’开头的是注释
+                continue;
+            }
+
+            int pos = str.find("="); // 变量赋值等号 =  前后 无空格=====
+            if (pos == -1) 
+                continue;// 没找到 =
+		
+            string key = str.substr( 0, pos ); // 变量名字====
+            string value = str.substr( pos+1, str.length() );// 参数值 字符串
+            data[key] = value; // 装入字典========
+
+            if ( !fin.good() )
+                break;
+        }
+    }
+    
+    string getData( string key ) // 按关键字 在 字典中查找========
+    {
+        map<string, string>::iterator iter = data.find(key);// 二叉树查找 log(n)
+        if (iter == data.end())
+        {
+            cerr<<"Parameter name "<<key<<" not found!"<<endl;
+            return string("NOT_FOUND");
+        }
+        return iter->second; // 返回对应关键字对应 的 值  iter->first 为 key  iter->second 为值
+    }
+    
+public:
+    map<string, string> data; // 解析得到的参数字典
+    
+};
 
 
+```
 
 
 
