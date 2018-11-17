@@ -221,6 +221,31 @@
         下一帧用训练好的分类器找最优区域，经典的判别类方法有Struck和TLD等。
         
 ## c. 相关滤波方法
+[参考](http://www.cse.psu.edu/~rtc12/CSE598C/LKintro.pdf)
+
+    目标框f(x,y) 和 搜索框g(x,y) 之间的相关性
+    1. 需要一个相关性评价准则 相关性函数   SSD 差平方和  ssd = sum(f(x,y)-g(x,y))^2  块匹配 零均值处理
+       ssd = sum(f(x,y)-g(x,y))^2 =
+             sum( f^2 + g^2 - 2*f()*g())  = sum(f^2) + sum(g^2) - 2*Correlation_func
+    
+       Correlation_func = sum(f(x,y)g(x,y))  零均值处理
+       交叉相关/互相关 cross-correlation
+       
+       强度归一化
+       f‘ = (f - fmean)/ f标准差
+       g' = (g - gmean)/ g标准差
+       
+       带窗函数的 SSD
+        ssd = sum(W(x,y)*(f(x,y)-g(x,y))^2)
+        W(x,y) 权值窗口， 高斯窗函数
+        
+        一阶泰勒展开：
+        ssd = sum(W(x,y)*(u×fx + v*fy + f(x,y)-g(x,y))^2)
+        
+       
+    2. 搜索策略，穷举搜索 exhaustive search
+
+
     最近几年 相关滤波方法(Correlation Filter Tracking)如MOSSE, CF，KCF/DCF，CN，DSST也比较火。
         MOSSE算法开启了相关滤波器的大门，提出以滤波器求相关的形式来获取输出响应，
         进而获得最大响应处的位置也即我们期望跟踪的目标中心位置。 
