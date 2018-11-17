@@ -68,7 +68,13 @@
       ${OpenCV_LIBS} 
       ${PCL_LIBRARIES} )
 
+# RGBD SLAM 工程 记录 
+[rgbdslam_v2 参考](https://github.com/Ewenwan/rgbdslam_v2)
 
+[高翔博士 博客](https://www.cnblogs.com/gaoxiang12/p/4669490.html)
+
+[高翔博士代码](https://github.com/gaoxiang12/rgbd-slam-tutorial-gx)
+      
       
 # 2d 点转 3d点  函数
 ```c
@@ -839,3 +845,9 @@ int main( int argc, char** argv )
 // 然后呢，我们要做一个SLAM后端，就要用到g2o啦！
 
 ```
+
+
+# Visual Odometry (视觉里程计)
+
+
+
