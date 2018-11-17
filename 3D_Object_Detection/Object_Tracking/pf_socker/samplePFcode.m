@@ -8,7 +8,15 @@
 %box information provided with the VS-PETS soccer dataset
 %to simulate a (very accurate) person detector.
 %observations
-% 初始目标边框数据
+
+% 目标边框数据 glound trouth
+% www.cse.psu.edu/~rcollins/CSE598B/Datasets/soccerboxes.mat
+% 视频数据
+% www.cse.psu.edu/~rcollins/CSE598B/Datasets/Soccer.zip
+% 背景
+% www.cse.psu.edu/~rcollins/CSE598B/Datasets/soccerbgimage.mat
+% 介绍
+% http://www.cse.psu.edu/~rtc12/CSE598C/Chap2ParticlesDAF.pdf
 load soccerboxes.mat
 
 %each box is stored as one row of allboxes
