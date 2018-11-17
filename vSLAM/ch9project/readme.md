@@ -59,7 +59,7 @@
       TARGET_LINK_LIBRARIES( generate_pointcloud ${OpenCV_LIBS} 
           ${PCL_LIBRARIES} )
       
-# 2d 点转 3d点
+# 2d 点转 3d点  函数
 ```c
 // generatePointCloud.cpp
 // https://www.cnblogs.com/gaoxiang12/p/4652478.html
@@ -125,3 +125,122 @@ const double camera_fy = 519.0;
             cloud->points.push_back( p );
         }
 ```
+
+
+# 2d 点转 3d点  函数  封装成库
+
+```c
+// include/slamBase.h  库头文件
+/*************************************************************************
+    > File Name: rgbd-slam-tutorial-gx/part III/code/include/slamBase.h
+    > Author: xiang gao
+    > Mail: gaoxiang12@mails.tsinghua.edu.cn
+    > Created Time: 2015年07月18日 星期六 15时14分22秒
+    > 说明：rgbd-slam教程所用到的基本函数（C风格）
+ ************************************************************************/
+# pragma once
+
+// 各种头文件 
+// C++标准库
+#include <fstream>
+#include <vector>
+using namespace std;
+
+// OpenCV
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+//PCL
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+
+// 类型定义
+typedef pcl::PointXYZRGBA PointT;
+typedef pcl::PointCloud<PointT> PointCloud;
+
+// 相机内参结构===============================
+// 把相机参数封装成了一个结构体，
+struct CAMERA_INTRINSIC_PARAMETERS 
+{ 
+    double cx, cy, fx, fy, scale;
+};
+
+// 另外还声明了 image2PointCloud 和 point2dTo3d 两个函数
+// 函数接口
+// image2PonitCloud 将rgb图转换为点云
+PointCloud::Ptr image2PointCloud( cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera );
+
+// point2dTo3d 将单个点从图像坐标转换为空间坐标
+// input: 3维点Point3f (u,v,d)
+cv::Point3f point2dTo3d( cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera );
+
+```
+
+```c
+// src/slamBase.cpp
+/*************************************************************************
+    > File Name: src/slamBase.cpp
+    > Author: xiang gao
+    > Mail: gaoxiang12@mails.tsinghua.edu.cn
+    > Implementation of slamBase.h
+    > Created Time: 2015年07月18日 星期六 15时31分49秒
+ ************************************************************************/
+
+#include "slamBase.h"
+// image2PonitCloud 将rgb图转 换为 点云====================
+PointCloud::Ptr image2PointCloud( cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera )
+{
+    PointCloud::Ptr cloud ( new PointCloud );
+
+    for (int m = 0; m < depth.rows; m++)
+        for (int n=0; n < depth.cols; n++)
+        {
+            // 获取深度图中(m,n)处的值
+            ushort d = depth.ptr<ushort>(m)[n];
+            // d 可能没有值，若如此，跳过此点
+            if (d == 0)
+                continue;
+            // d 存在值，则向点云增加一个点
+            PointT p;
+
+            // 计算这个点的空间坐标
+            p.z = double(d) / camera.scale;
+            p.x = (n - camera.cx) * p.z / camera.fx;
+            p.y = (m - camera.cy) * p.z / camera.fy;
+            
+            // 从rgb图像中获取它的颜色
+            // rgb是三通道的BGR格式图，所以按下面的顺序获取颜色
+            p.b = rgb.ptr<uchar>(m)[n*3];
+            p.g = rgb.ptr<uchar>(m)[n*3+1];
+            p.r = rgb.ptr<uchar>(m)[n*3+2];
+
+            // 把p加入到点云中
+            cloud->points.push_back( p );
+        }
+    // 设置并保存点云
+    cloud->height = 1;
+    cloud->width = cloud->points.size();
+    cloud->is_dense = false;
+
+    return cloud;
+}
+// point2dTo3d 将单个点从图像坐标转换为空间坐标
+// input: 3维点Point3f (u,v,d)
+cv::Point3f point2dTo3d( cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera )
+{
+    cv::Point3f p; // 3D 点
+    p.z = double( point.z ) / camera.scale;
+    p.x = ( point.x - camera.cx) * p.z / camera.fx;
+    p.y = ( point.y - camera.cy) * p.z / camera.fy;
+    return p;
+}
+
+
+
+```
+
+
+
+
+
+
