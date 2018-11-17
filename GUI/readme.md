@@ -1,5 +1,5 @@
 # 可视化界面软件
-    PCL Visialization,  Pangolin,  ros下的rviz
+    PCL Visialization,  Pangolin,  ros下的rviz    QT
     
 [freetype-gl-cpp](https://github.com/Ewenwan/freetype-gl-cpp)
     
@@ -119,4 +119,25 @@ TARGET_LINK_LIBRARIES(test_${sample_basename} ${OPENGL_LIBRARIES})
 	
 	
 	
-	
+# QT
+
+	安装命令：
+	sudo apt-get install qt4-dev-tools qt4-doc qt4-qtconfig qt4-demos qt4-designer
+
+	关于集成开发环境我觉得QDevelop很不错，它跟Qt Designer结合的很好，而且有提示类成员函数的功能。
+	这样，使用Qdevelop编写代码和编译、调试，使用Qt Designer设计界面，开发效率较高。
+	运行以下命令安装QDevelop：
+	sudo apt-get install qdevelop
+
+	为了连接MySQL数据库，需要安装连接MySQL的驱动程序：
+	sudo apt-get install libqt4-sql-mysql
+
+	如果还需要其它的没有默认安装的Qt库，可以在命令行输入
+	sudo apt-get install libqt4-
+	然后按tab键自动补全，就会列出所有以libqt4- 
+
+
+	如果还需要画一些数据曲线和统计图表等，而第三方的QWT库提供了这些功能。同样，只需要一个命令即可完成安装：
+	sudo apt-get install libqwt5-qt4 libqwt5-qt4-dev 
+
+
