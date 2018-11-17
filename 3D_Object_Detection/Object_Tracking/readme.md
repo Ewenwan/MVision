@@ -285,7 +285,9 @@
 ## 多目标跟踪
 [数据关联，特征匹配、哪个目标加入到轨迹内、kf预测、2d框交并比、](http://www.cse.psu.edu/~rtc12/CSE598C/datassocPart1.pdf)
 
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/mht.png)
 
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/da.png)
 
 # 通常目标跟踪主要面临的难点有：
         外观变化，光照变化，快速运动，运动模糊，背景干扰等。
