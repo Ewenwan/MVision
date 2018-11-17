@@ -13,6 +13,8 @@
     2. 单目标跟踪    Single Object Tracking
     3. 多目标跟踪    Multiple Object Trackink
        个体之间的差异性 几何信息约束、不相容约束
+       
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/mtt.png)
 
 ## 1. 运动估计/光流
 
@@ -189,6 +191,9 @@
         d. 深度学习方法
         
 ## a. 生成类方法    Appearance-Based Tracking
+
+![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/abt.png)
+
     在当前帧对目标区域建模，下一帧寻找与模型最相似的区域就是预测位置，
     如卡尔曼滤波(Kalman Filter)，粒子滤波(Particle Filter)，均值漂移算法(Mean Shift)、LK光流等。
     
