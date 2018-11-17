@@ -677,8 +677,30 @@ public:
     
 };
 
+// 示例参数
+它读的参数文件是长这个样子的：
 
+# 这是一个参数文件
+# 去你妹的yaml! 我再也不用yaml了！简简单单多好！
+# 等号前后不能有空格
+# part 4 里定义的参数
+
+detector=SIFT
+descriptor=SIFT
+good_match_threshold=4
+
+# camera
+camera.cx=325.5;
+camera.cy=253.5;
+camera.fx=518.0;
+camera.fy=519.0;
+camera.scale=1000.0;
+
+# 如果我们想更改特征类型，就只需在parameters.txt文件里进行修改，不必编译源代码了。
+# 这对接下去的各种调试都会很有帮助。
 ```
 
+
+# 点云拼接
 
 
