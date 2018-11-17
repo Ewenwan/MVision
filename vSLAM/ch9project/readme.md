@@ -59,6 +59,17 @@
       TARGET_LINK_LIBRARIES( generate_pointcloud ${OpenCV_LIBS} 
           ${PCL_LIBRARIES} )
       
+      
+      # 自检函数库=======
+      # 最后，在 src/CMakeLists.txt 中加入以下几行，将 slamBase.cpp 编译成一个库，供将来调用：
+
+      ADD_LIBRARY( slambase slamBase.cpp )
+      TARGET_LINK_LIBRARIES( slambase
+      ${OpenCV_LIBS} 
+      ${PCL_LIBRARIES} )
+
+
+      
 # 2d 点转 3d点  函数
 ```c
 // generatePointCloud.cpp
@@ -239,6 +250,232 @@ cv::Point3f point2dTo3d( cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera
 
 ```
 
+      # 自检函数库=======
+      # 最后，在 src/CMakeLists.txt 中加入以下几行，将 slamBase.cpp 编译成一个库，供将来调用：
+
+      ADD_LIBRARY( slambase slamBase.cpp )
+      TARGET_LINK_LIBRARIES( slambase
+      ${OpenCV_LIBS} 
+      ${PCL_LIBRARIES} )
+
+
+
+# 图像配准 数学部分   3d-3d配准
+      用基于特征的方法（feature-based）或直接的方法（direct method）来解。
+      虽说直接法已经有了一定的发展，但目前主流的方法还是基于特征点的方式。
+      在后者的方法中，首先你需要知道图像里的“特征”，以及这些特征的一一对应关系。
+
+      假设我们有两个帧：F1和F2. 并且，我们获得了两组一一对应的 特征点：
+            P={p1,p2,…,pN}∈F1
+            Q={q1,q2,…,qN}∈F2
+       其中p和q都是 R3 中的点。
+
+      我们的目的是求出一个旋转矩阵R和位移矢量t，使得：
+        ∀i, pi = R*qi + t
+
+      然而实际当中由于误差的存在，等号基本是不可能的。所以我们通过最小化一个误差来求解R,t:
+      　min R,t ∑i=1/N * ∥pi−(R*qi + t)∥2
+　　   这个问题可以用经典的ICP算法求解。其核心是奇异值分解(SVD)。
+      我们将调用OpenCV中的函数求解此问题，
+      
+      那么从这个数学问题上来讲，我们的关键就是要获取一组一一对应的空间点，
+      这可以通过图像的特征匹配来完成。　　
+      提示：由于OpenCV中没有提供ICP，我们在实现中使用PnP进行求解。 2d-3d
+# 配准编程
+```c
+// detectFeatures.cpp 
+/*************************************************************************
+	> File Name: detectFeatures.cpp
+	> Author: xiang gao
+	> Mail: gaoxiang12@mails.tsinghua.edu.cn
+    > 特征提取与匹配
+	> Created Time: 2015年07月18日 星期六 16时00分21秒
+ ************************************************************************/
+
+#include<iostream>
+#include "slamBase.h"
+using namespace std;
+
+// OpenCV 特征检测模块
+#include <opencv2/features2d/features2d.hpp>
+// #include <opencv2/nonfree/nonfree.hpp> // use this if you want to use SIFT or SURF
+#include <opencv2/calib3d/calib3d.hpp>
+
+int main( int argc, char** argv )
+{
+    // 声明并从data文件夹里读取两个rgb与深度图
+    cv::Mat rgb1 = cv::imread( "./data/rgb1.png");
+    cv::Mat rgb2 = cv::imread( "./data/rgb2.png");
+    cv::Mat depth1 = cv::imread( "./data/depth1.png", -1);
+    cv::Mat depth2 = cv::imread( "./data/depth2.png", -1);
+
+    // 声明特征提取器 与 描述子提取器
+    cv::Ptr<cv::FeatureDetector> detector;
+    cv::Ptr<cv::DescriptorExtractor> descriptor;
+
+    // 构建提取器，默认两者都为 ORB
+    
+    // 如果使用 sift, surf ，之前要初始化nonfree模块=========
+    // cv::initModule_nonfree();
+    // _detector = cv::FeatureDetector::create( "SIFT" );
+    // _descriptor = cv::DescriptorExtractor::create( "SIFT" );
+    
+    detector = cv::FeatureDetector::create("ORB");
+    descriptor = cv::DescriptorExtractor::create("ORB");
+    
+//  使用 _detector->detect()函数提取关键点==============================
+    // 关键点是一种cv::KeyPoint的类型。
+    // 带有 Point2f pt 这个成员变量，指这个关键点的像素坐标。
+    
+    // kp1[i].pt 获取 这个关键点的像素坐标 (u，v) ==================
+    
+    // 此外，有的关键点还有半径、角度等参数，画在图里就会像一个个的圆一样。
+    vector< cv::KeyPoint > kp1, kp2; // 关键点
+    detector->detect( rgb1, kp1 );   // 提取关键点
+    detector->detect( rgb2, kp2 );
+
+    cout<<"Key points of two images: "<<kp1.size()<<", "<<kp2.size()<<endl;
+    
+    // 可视化， 显示关键点
+    cv::Mat imgShow;
+    cv::drawKeypoints( rgb1, kp1, imgShow, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    cv::imshow( "keypoints", imgShow );
+    cv::imwrite( "./data/keypoints.png", imgShow );
+    cv::waitKey(0); //暂停等待一个按键
+   
+    // 计算描述子===================================================
+    // 在 keypoint 上计算描述子。
+    // 描述子是一个cv::Mat的矩阵结构，
+    // 它的每一行代表一个对应于Keypoint的特征向量。
+    // 当两个keypoint的描述子越相似，说明这两个关键点也就越相似。
+    // 我们正是通过这种相似性来检测图像之间的运动的。
+    cv::Mat desp1, desp2;
+    descriptor->compute( rgb1, kp1, desp1 );
+    descriptor->compute( rgb2, kp2, desp2 );
+
+    // 匹配描述子===================================================
+    // 对上述的描述子进行匹配。
+    // 在OpenCV中，你需要选择一个匹配算法，
+    // 例如粗暴式（bruteforce），近似最近邻（Fast Library for Approximate Nearest Neighbour, FLANN）等等。
+    // 这里我们构建一个FLANN的匹配算法：
+    vector< cv::DMatch > matches; 
+    // cv::BFMatcher matcher;      // 暴力匹配，穷举
+    cv::FlannBasedMatcher matcher; // 近似最近邻
+    matcher.match( desp1, desp2, matches );
+    cout<<"Find total "<<matches.size()<<" matches."<<endl;
+
+// 匹配完成后，算法会返回一些 DMatch 结构。该结构含有以下几个成员：
+//    queryIdx 源特征描述子的索引（也就是第一张图像，第一个参数代表的desp1）。
+//    trainIdx 目标特征描述子的索引（第二个图像，第二个参数代表的desp2）
+//    distance 匹配距离，越大表示匹配越差。  matches[i].distance
+// matches.size() 总数
+
+
+//　　有了匹配后，可以用drawMatch函数画出匹配的结果：
+
+    // 可视化：显示匹配的特征
+    cv::Mat imgMatches;
+    cv::drawMatches( rgb1, kp1, rgb2, kp2, matches, imgMatches );
+    cv::imshow( "matches", imgMatches );
+    cv::imwrite( "./data/matches.png", imgMatches );
+    cv::waitKey( 0 );
+
+    // 筛选匹配，把距离太大的去掉
+    // 这里使用的准则是去掉大于四倍最小距离的匹配
+    // 筛选的准则是：去掉大于最小距离四倍的匹配。====================================
+    vector< cv::DMatch > goodMatches;
+    double minDis = 9999;
+    for ( size_t i=0; i<matches.size(); i++ )
+    {
+        if ( matches[i].distance < minDis )
+            minDis = matches[i].distance;
+    }
+    cout<<"min dis = "<<minDis<<endl;// 最好的匹配===============
+
+    for ( size_t i=0; i<matches.size(); i++ )
+    {
+        if (matches[i].distance < 10*minDis)
+            goodMatches.push_back( matches[i] );// 筛选出来的 剩下的较好的匹配
+    }
+
+    // 显示 good matches
+    cout<<"good matches="<<goodMatches.size()<<endl;
+    cv::drawMatches( rgb1, kp1, rgb2, kp2, goodMatches, imgMatches );
+    cv::imshow( "good matches", imgMatches );
+    cv::imwrite( "./data/good_matches.png", imgMatches );
+    cv::waitKey(0);
+
+    // 计算图像间的运动关系
+    // 关键函数：cv::solvePnPRansac()
+    // 为调用此函数准备必要的参数
+    
+    // 第一个帧的三维点
+    vector<cv::Point3f> pts_obj;// desp1 的2d点 利用深度值 转换成 3d点
+    // 第二个帧的图像点
+    vector< cv::Point2f > pts_img;
+
+    // 相机内参
+    CAMERA_INTRINSIC_PARAMETERS C;
+    C.cx = 325.5;
+    C.cy = 253.5;
+    C.fx = 518.0;
+    C.fy = 519.0;
+    C.scale = 1000.0;
+
+    for (size_t i=0; i<goodMatches.size(); i++)
+    {
+        // query 是第一个, train 是第二个
+        cv::Point2f p = kp1[goodMatches[i].queryIdx].pt;      // 2d点==============
+        // 获取d是要小心！x是向右的，y是向下的，所以y才是行，x是列！！！！！！！！
+        ushort d = depth1.ptr<ushort>( int(p.y) )[ int(p.x) ];// 从深度图 取得深度===
+        if (d == 0)
+            continue;// 跳过深度值异常的点=============
+            
+        pts_img.push_back( cv::Point2f( kp2[goodMatches[i].trainIdx].pt ) );// 图像2 关键点对应的 2d像素点
+
+        // 将(u,v,d)转成(x,y,z)=======================
+        cv::Point3f pt ( p.x, p.y, d );
+        cv::Point3f pd = point2dTo3d( pt, C );
+        pts_obj.push_back( pd );// 图像1 关键点对应 2d像素点 对应的 3d点
+    }
+
+// 相机内参数矩阵K ===============================
+    double camera_matrix_data[3][3] =
+    {
+        {C.fx, 0,    C.cx},
+        {0,    C.fy, C.cy},
+        {0,    0,    1}
+    };
+
+    // 构建相机矩阵
+    cv::Mat cameraMatrix( 3, 3, CV_64F, camera_matrix_data );// 8字节
+    cv::Mat rvec, tvec, inliers;
+    // 求解pnp            3d点     2d点  相机内参数矩阵K         旋转矩阵rvec 平移向量tvec
+    cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 100, inliers );
+    
+// 这个就叫做“幸福的家庭都是相似的，不幸的家庭各有各的不幸”吧。
+// 你这样理解也可以。ransac适用于数据噪声比较大的场合
+
+    cout<<"inliers: "<<inliers.rows<<endl; // ransac 随机采样一致性 得到的内点数量
+    cout<<"R="<<rvec<<endl;
+    cout<<"t="<<tvec<<endl;
+
+    // 画出inliers匹配 
+    vector< cv::DMatch > matchesShow; // 好的匹配
+    for (size_t i=0; i<inliers.rows; i++)
+    {
+        matchesShow.push_back( goodMatches[inliers.ptr<int>(i)[0]] );// inliers 第i行的地一个参数为 匹配点id
+    }
+    cv::drawMatches( rgb1, kp1, rgb2, kp2, matchesShow, imgMatches );
+    cv::imshow( "inlier matches", imgMatches );
+    cv::imwrite( "./data/inliers.png", imgMatches );
+    cv::waitKey( 0 );
+
+    return 0;
+}
+
+
+```
 
 
 
