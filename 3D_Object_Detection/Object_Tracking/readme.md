@@ -207,6 +207,10 @@
     
     Appearance-Based Tracking 均值漂移算法(Mean Shift)、LK光流等。
     
+    http://www.cse.psu.edu/~rtc12/CSE598C/meanshiftIntro.pdf
+    
+    
+    
     当前帧+上一帧的位置
     +                           >>>> 响应图(置信图、概率图) Response map  >>> current location
     外观模型/颜色、边缘、强度直方图      confidence map; likelihood image 
@@ -220,6 +224,10 @@
         当前帧以目标区域为正样本，背景区域为负样本用来训练分类器，
         下一帧用训练好的分类器找最优区域，经典的判别类方法有Struck和TLD等。
         
+    分类器 跟踪
+    http://www.cse.psu.edu/~rtc12/CSE598C/classificationTracking.pdf
+    
+    
 ## c. 相关滤波方法
 [参考](http://www.cse.psu.edu/~rtc12/CSE598C/LKintro.pdf)
 
@@ -273,7 +281,11 @@
         在空间权重函数中加入惩罚权重w，超过边界的w更大作为惩罚；在检测时选择一定的候选框进行尺度匹配，找到最合适的尺度大小。 
         
 ## d. 深度学习方法：
-        
+   
+## 多目标跟踪
+[数据关联，特征匹配、哪个目标加入到轨迹内、kf预测、2d框交并比、](http://www.cse.psu.edu/~rtc12/CSE598C/datassocPart1.pdf)
+
+
 
 # 通常目标跟踪主要面临的难点有：
         外观变化，光照变化，快速运动，运动模糊，背景干扰等。
