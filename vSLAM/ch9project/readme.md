@@ -478,6 +478,39 @@ int main( int argc, char** argv )
 ```
 
 
+# 配准程序 放入库 
+```c
+// 装进slamBase库中， 
+// 在 include/slamBase.h  扩展 以下代码
+
+// FRAME 帧结构=============== 结构体
+struct FRAME
+{
+    cv::Mat rgb, depth; // 该帧对应的 彩色图 与深度图
+    cv::Mat desp;       // 特征描述子 集 一行对应一个关键点
+    vector<cv::KeyPoint> kp; // 关键点 集  kp[i].pt 是关键点对应的像素坐标
+};
+
+// PnP 结果 2d-3d 配置结果===== 结构体
+struct RESULT_OF_PNP
+{
+    cv::Mat rvec, tvec;
+    int inliers;
+};
+
+// computeKeyPointsAndDesp 同时提取关键点与特征描述子======================
+void computeKeyPointsAndDesp( FRAME& frame, string detector, string descriptor );
+
+// estimateMotion 2d-3d pnp配准 计算两个帧之间的运动=======================
+// 输入：帧1和帧2, 相机内参
+RESULT_OF_PNP estimateMotion( FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera );
+
+
+```
+
+
+
+
 
 
 
