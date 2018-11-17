@@ -13,7 +13,13 @@
     2. 单目标跟踪    Single Object Tracking
     3. 多目标跟踪    Multiple Object Trackink
        个体之间的差异性 几何信息约束、不相容约束
-       
+  
+# 运动假设
+    constant position (+ noise)  恒定位置（+噪声  高斯噪声、非高斯噪声）
+    constant velocity      速度恒定
+    constant acceleration  加速度恒定
+    多目标运动之间的关联性
+  
 ![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/mtt.png)
 
 ## 1. 运动估计/光流
@@ -195,7 +201,11 @@
 ![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/Object_Tracking/img/abt.png)
 
     在当前帧对目标区域建模，下一帧寻找与模型最相似的区域就是预测位置，
-    如卡尔曼滤波(Kalman Filter)，粒子滤波(Particle Filter)，均值漂移算法(Mean Shift)、LK光流等。
+    如卡尔曼滤波(Kalman Filter)，贝叶斯滤波Bayes filter 
+    
+    采样的方法：粒子滤波(Particle Filter)，
+    
+    Appearance-Based Tracking 均值漂移算法(Mean Shift)、LK光流等。
     
     当前帧+上一帧的位置
     +                           >>>> 响应图(置信图、概率图) Response map  >>> current location
@@ -239,9 +249,14 @@
         
 ## d. 深度学习方法：
         
-        
-        
+
 # 通常目标跟踪主要面临的难点有：
         外观变化，光照变化，快速运动，运动模糊，背景干扰等。
+        
+        
     
-    
+# 目标状态  观测有噪声，状态估计问题
+    e.g.:  [x  y]                        (location 位置)
+           [x  y  dx  dy]                (location + velocity   位置+速度)
+            [x,y,θ,scale]
+           [x  y   appearance_params]    (location + appearance 位置+样貌)
