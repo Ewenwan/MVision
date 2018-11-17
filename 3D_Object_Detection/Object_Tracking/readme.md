@@ -5,12 +5,14 @@
     Augmented Reality   增强现实
     Motion Capture      运动捕捉
     Surveillance        监控
-    Sports Analysis     运动(足球、篮球...)分析
+    Sports Analysis     运动(足球、篮球...)分析  
+    动物行为分析
     ...
 # 目录
     1. 运动估计/光流 Mption Estimation / optical Flow
     2. 单目标跟踪    Single Object Tracking
     3. 多目标跟踪    Multiple Object Trackink
+       个体之间的差异性 几何信息约束、不相容约束
 
 ## 1. 运动估计/光流
 
@@ -180,20 +182,35 @@
     
     
     
-    目标视觉跟踪(visual object tracking),根据目标的跟踪方式，跟踪一般可以分为两大类：
-        a. 生产(generative)模型方法 
-        b. 判别(discriminative)模型方法。
-    
-    生成类方法 在当前帧对目标区域建模，下一帧寻找与模型最相似的区域就是预测位置，
-        如卡尔曼滤波(Kalman Filter)，粒子滤波(Particle Filter)，均值漂移算法(Mean Shift)等。
+# 目标视觉跟踪(visual object tracking),根据目标的跟踪方式，分为
+        a. 生产(generative)模型方法        Appearance-Based Tracking
+        b. 判别(discriminative)模型方法 
+        c. 相关滤波    
+        d. 深度学习方法
         
-    目前比较流行的是判别类方法(Discriminative Tracking)，也叫跟踪检测(tracking-by-detection)，
+## a. 生成类方法    Appearance-Based Tracking
+    在当前帧对目标区域建模，下一帧寻找与模型最相似的区域就是预测位置，
+    如卡尔曼滤波(Kalman Filter)，粒子滤波(Particle Filter)，均值漂移算法(Mean Shift)、LK光流等。
+    
+    当前帧+上一帧的位置
+    +                           >>>> 响应图(置信图、概率图) Response map  >>> current location
+    外观模型/颜色、边缘、强度直方图      confidence map; likelihood image 
+                                       Mode-Seeking  模式搜索 
+                                      Mean Shift、KF、PF
+    finding discriminative features
+    找到最具区别性的特征
+    
+## b. 目前比较流行的是判别类方法(Discriminative Tracking) 
+    也叫跟踪检测(tracking-by-detection)，
         当前帧以目标区域为正样本，背景区域为负样本用来训练分类器，
         下一帧用训练好的分类器找最优区域，经典的判别类方法有Struck和TLD等。
         
-    最近几年相关滤波方法(Correlation Filter Tracking)如MOSSE, CF，KCF/DCF，CN，DSST也比较火。
-        MOSSE算法开启了相关滤波器的大门，提出以滤波器求相关的形式来获取输出响应，进而获得最大响应处的位置也即我们期望跟踪的目标中心位置。 
-        CF，KCF/DCF,三者都是核相关滤波方法，引入核函数使高维空间中的非线性问题变为线性问题从而加速训练和检测，
+## c. 相关滤波方法
+    最近几年 相关滤波方法(Correlation Filter Tracking)如MOSSE, CF，KCF/DCF，CN，DSST也比较火。
+        MOSSE算法开启了相关滤波器的大门，提出以滤波器求相关的形式来获取输出响应，
+        进而获得最大响应处的位置也即我们期望跟踪的目标中心位置。 
+        CF，KCF/DCF,三者都是核相关滤波方法，
+        引入核函数使高维空间中的非线性问题变为线性问题从而加速训练和检测，
         利用循环矩阵增加训练样本，利用DFT的性质避免求逆操作提高跟踪速度。
         CSK利用图像的灰度信息，高斯滤波和1倍padding；
         KCF利用HOG特征，高斯滤波和1.5倍padding，
@@ -215,11 +232,11 @@
         SRDCF在KCF/DCF的基础上通过多尺度搜索解决了多尺度问题，并且加入惩罚项来解决循环矩阵的边界效应。
         在空间权重函数中加入惩罚权重w，超过边界的w更大作为惩罚；在检测时选择一定的候选框进行尺度匹配，找到最合适的尺度大小。 
         
-    深度学习方法：
+## d. 深度学习方法：
         
         
         
-    通常目标跟踪主要面临的难点有：
+# 通常目标跟踪主要面临的难点有：
         外观变化，光照变化，快速运动，运动模糊，背景干扰等。
     
     
