@@ -51,6 +51,18 @@
 typedef pcl::PointXYZRGBA PointT; # 点类型
 typedef pcl::PointCloud<PointT> PointCloud;  # 点云类型
 
+/*
+
+我们使用OpenCV的imread函数读取图片。在OpenCV2里，图像是以矩阵(cv::MAt)作为基本的数据结构。
+Mat结构既可以帮你管理内存、像素信息，还支持一些常见的矩阵运算，是非常方便的结构。
+彩色图像含有R,G,B三个通道，每个通道占8个bit（也就是unsigned char），故称为8UC3（8位unsigend char, 3通道）结构。
+而深度图则是单通道的图像，每个像素由16个bit组成（也就是C++里的unsigned short），像素的值代表该点离传感器的距离。
+通常1000的值代表1米，所以我们把camera_factor设置成1000.
+这样，深度图里每个像素点的读数除以1000，就是它离你的真实距离了。
+
+*/
+
+
 // 相机内参
 const double camera_factor = 1000;  // 深度值放大倍数
 const double camera_cx = 325.5;
@@ -62,11 +74,18 @@ const double camera_fy = 519.0;
     // 使用智能指针，创建一个空点云。这种指针用完会自动释放。
     PointCloud::Ptr cloud ( new PointCloud );
     // 遍历深度图
-    for (int m = 0; m < depth.rows; m++)
-        for (int n=0; n < depth.cols; n++)
+    // 按照“先列后行”的顺序，遍历了整张深度图。
+    for (int m = 0; m < depth.rows; m++)    // 每一行
+        for (int n=0; n < depth.cols; n++)  // 每一列
         {
             // 获取深度图中(m,n)处的值
             ushort d = depth.ptr<ushort>(m)[n];
+            // 深度图第m行，第n行的数据可以使用depth.ptr<ushort>(m) [n]来获取。
+            // 其中，cv::Mat的ptr函数会返回指向该图像第m行数据的头指针。
+            // 然后加上位移n后，这个指针指向的数据就是我们需要读取的数据啦。
+
+
+            
             // d 可能没有值，若如此，跳过此点
             if (d == 0)
                 continue;
