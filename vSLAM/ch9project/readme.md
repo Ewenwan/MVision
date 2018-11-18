@@ -859,6 +859,34 @@ int main( int argc, char** argv )
 	这个思路比较简单，实际当中也比较有效，能够保证局部运动的正确性。
 
 
+> 旋转向量 和平移向量 变换成 变换矩阵T 放入库
+```c
+//  src/slamBase.cpp
+// cvMat2Eigen
+// 旋转向量 rvec 和 平移向量 tvec 变换成 变换矩阵T===========================
+Eigen::Isometry3d cvMat2Eigen( cv::Mat& rvec, cv::Mat& tvec )
+{
+    cv::Mat R;
+    // 旋转向量 rvec 变成 旋转矩阵==========
+    cv::Rodrigues( rvec, R );
+    // cv 3×3矩阵 转换成 Eigen 3×3 矩阵====
+    Eigen::Matrix3d r;
+    for ( int i=0; i<3; i++ )
+        for ( int j=0; j<3; j++ ) 
+            r(i,j) = R.at<double>(i,j);// 8×8字节 double
+  
+    // 将平移向量 和 旋转矩阵 转换成 变换矩阵 T
+    Eigen::Isometry3d T = Eigen::Isometry3d::Identity();// 单位阵
 
+    Eigen::AngleAxisd angle(r);// 旋转矩阵 >>> Eigen 旋转轴  
+    T = angle;// 旋转轴 >>> 变换矩阵
+    T(0,3) = tvec.at<double>(0,0);  // 附加上 平移向量
+    T(1,3) = tvec.at<double>(1,0); 
+    T(2,3) = tvec.at<double>(2,0);
+    return T;
+}
+
+
+```
 
 
