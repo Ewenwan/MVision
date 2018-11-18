@@ -1055,19 +1055,325 @@ FRAME readFrame( int index, ParameterReader& pd )
     f.depth = cv::imread( filename, -1 );// 深度图
     return f;
 }
-
+// 估计一个运动的大小 =====================================
 double normofTransform( cv::Mat rvec, cv::Mat tvec )
 {
-    return fabs(min(cv::norm(rvec), 2*M_PI-cv::norm(rvec)))+ fabs(cv::norm(tvec));
+// 旋转大小 0~2*pi  + 平移大小=============
+    return fabs(min(cv::norm(rvec), 2*M_PI - cv::norm(rvec)))+ fabs(cv::norm(tvec));
 }
 
 
 
 ```
 
+　   这个里程计有什么不足呢？
+      1. 一旦出现了错误匹配，整个程序就会跑飞。
+      2. 误差会累积。常见的现象是：相机转过去的过程能够做对，但转回来之后则出现明显的偏差。
+      3. 效率方面不尽如人意。在线的点云显示比较费时。
+
 
 
 # 图优化工具g2o
+	姿态图（原理部分）
+	姿态图，顾名思义，就是由相机姿态构成的一个图（graph）。
+	这里的图，是从图论的意义上来说的。
+	一个图由 节点 vertex 与 边 edge 构成：
+	G={V,E}.
+	
+ 	在最简单的情况下，节点代表相机的各个姿态(四元数形式或矩阵形式）：
+	vi=[x,y,z,qx,qy,qz,qw]= Ti=[R3×3 t3×1
+	                            O1×3 1]i
+				    
+	而边指的是两个节点间的变换：
+        Ei,j = Ti,j = [R3×3 t3×1
+	                O1×3  1]i,j.
+			
+	 利用 边可以将两个节点进行变换，由于计算误差，变换不可能完全一致，就会出现误差
+	我们就可以优化一个不一致性误差：
+         min C = ∑i,j∥v'i − Ti,j * v'j∥2 .  非线性平方误差函数
+	 v’ 是上面 pnp求解出来的初始变量值，最开始 误差C有一个初始值，可以使用梯度下降法来优化变量
+	 
+	 v'(t+1) =  v'(t) - 学习率*导数*C(t) , t 表示优化迭代id。
+	 
+	 https://github.com/Ewenwan/MVision/blob/master/vSLAM/ch6/g2o_curve_fitting/main.cpp
+	 
+	 调整v的值使得E缩小。最后，如果这个问题收敛的话，v的 变化 就会越来越小，E也收敛到一个极小值。
+	 
+	 根据迭代策略的不同，又可分为Gauss-Netwon(GN)下山法，
+	 Levenberg-Marquardt(LM)方法等等。
+	 这个问题也称为Bundle Adjustment(BA)，
+	 我们通常使用LM方法优化这个非线性平方误差函数。
+	 
+	 为什么说slam里的BA问题稀疏呢？因为同样的场景很少出现在许多位置中。
+	 这导致上面的pose graph中，图G离全图很远，只有少部分的节点存在直接边的联系。
+	 这就是姿态图的稀疏性。
+	 
+	 求解BA的软件包有很多，感兴趣的读者可以去看wiki: https://en.wikipedia.org/wiki/Bundle_adjustment。我
+	 们这里介绍的g2o（Generalized Graph Optimizer），就是近年很流行的一个图优化求解软件包。
+	 
+	 
+## G2O 实验 
+	要使用g2o，首先你需要下载并安装它：https://github.com/RainerKuemmerle/g2o。 
+	安装依赖项：
+	sudo apt-get install libeigen3-dev libsuitesparse-dev libqt4-dev qt4-qmake libqglviewer-qt4-dev
+	1404或1604的最后一项改为 libqglviewer-dev 即可。
+	
+	解压g2o并编译安装：
+	进入g2o的代码目录，并：
+
+	mkdir build
+	cd build 
+	cmake ..
+	make
+	sudo make install
+	
+	多说两句，你可以安装cmake-curses-gui这个包，
+	通过gui来选择你想编译的g2o模块并设定cmake编译过程中的flags。
+	例如，当你实在装不好上面的libqglviewer时，你可以选择不编译g2o可视化模块（把G2O_BUILD_APPS关掉)，
+	这样即使没有libqglviewer，你也能编译过g2o。
+
+	 cd build
+	 ccmake ..
+	 make
+	 sudo make install
+	
+	安装成功后，你可以在/usr/local/include/g2o中找到它的头文件，而在/usr/local/lib中找到它的库文件。
+	使用g2o
+	安装完成后，我们把g2o引入自己的cmake工程：
+	
+	# 添加g2o的依赖
+	# 因为g2o不是常用库，要添加它的findg2o.cmake文件
+	LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules )
+	SET( G2O_ROOT /usr/local/include/g2o )
+	FIND_PACKAGE( G2O )
+	# CSparse
+	FIND_PACKAGE( CSparse )
+	INCLUDE_DIRECTORIES( ${G2O_INCLUDE_DIR} ${CSPARSE_INCLUDE_DIR} )
+	
+	同时，在代码根目录下新建cmake_modules文件夹，
+	把g2o代码目录下的cmake_modules里的东西都拷进来，
+	保证cmake能够顺利找到g2o。
+	
+	
+```c
+
+
+// src/slamEnd.cpp===========================================================
+/*************************************************************************
+	> File Name: rgbd-slam-tutorial-gx/part V/src/visualOdometry.cpp
+	> Author: xiang gao
+	> Mail: gaoxiang12@mails.tsinghua.edu.cn
+	> Created Time: 2015年08月15日 星期六 15时35分42秒
+    * add g2o slam end to visual odometry
+ ************************************************************************/
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+using namespace std;
+
+#include "slamBase.h"
+
+// G2O图优化===============================================
+#include <g2o/types/slam3d/types_slam3d.h>//顶点类型
+#include <g2o/core/sparse_optimizer.h>    // 稀疏优化
+#include <g2o/core/block_solver.h>        // 矩阵分块
+#include <g2o/core/factory.h>
+#include <g2o/core/optimization_algorithm_factory.h>
+#include <g2o/core/optimization_algorithm_gauss_newton.h>// GN 优化
+#include <g2o/core/robust_kernel.h>// 核函数
+#include <g2o/core/robust_kernel_factory.h>
+#include <g2o/core/optimization_algorithm_levenberg.h>
+// 莱文贝格－马夸特方法（Levenberg–Marquardt algorithm）能提供数非线性最小化（局部最小）的数值解。
+#include <g2o/solvers/eigen/linear_solver_eigen.h>
+
+
+// 给定index，读取一帧数据
+FRAME readFrame( int index, ParameterReader& pd );
+// 估计一个运动的大小
+double normofTransform( cv::Mat rvec, cv::Mat tvec );
+
+int main( int argc, char** argv )
+{
+// 数据集==================================================================
+    // 前面部分和vo是一样的
+    ParameterReader pd;
+    int startIndex  =   atoi( pd.getData( "start_index" ).c_str() );
+    int endIndex    =   atoi( pd.getData( "end_index"   ).c_str() );
+
+// initialize 初始化=============================
+    cout<<"Initializing ..."<<endl;
+    int currIndex = startIndex; // 当前索引为currIndex
+    FRAME lastFrame = readFrame( currIndex, pd ); // 上一帧数据
+    
+    // 我们总是在比较currFrame和lastFrame
+    string detector = pd.getData( "detector" );
+    string descriptor = pd.getData( "descriptor" );
+    CAMERA_INTRINSIC_PARAMETERS camera = getDefaultCamera();
+    computeKeyPointsAndDesp( lastFrame, detector, descriptor ); // 关键点和描述子
+    PointCloud::Ptr cloud = image2PointCloud( lastFrame.rgb, lastFrame.depth, camera );// 点云
+    
+    pcl::visualization::CloudViewer viewer("viewer");
+
+    // 是否显示点云
+    bool visualize = pd.getData("visualize_pointcloud")==string("yes");
+
+    int min_inliers = atoi( pd.getData("min_inliers").c_str() );// pnp 匹配内点数量
+    double max_norm = atof( pd.getData("max_norm").c_str() );   // 最大运动 阈值
+    
+/******************************* 
+// 新增:有关g2o的初始化
+*******************************/
+    // 选择优化方法
+    typedef g2o::BlockSolver_6_3 SlamBlockSolver;  // 矩阵块求解器  优化变量 6维度
+    typedef g2o::LinearSolverEigen< SlamBlockSolver::PoseMatrixType > SlamLinearSolver; 
+    
+// 类型选择 ==========================
+// 由于我们是3D的slam，所以顶点取成了相机姿态：g2o::VertexSE3，
+// 而边则是连接两个VertexSE3的边：g2o::EdgeSE3。 4×4的变换矩阵，
+// 如果你想用别的类型的顶点（如2Dslam，路标点），你可以看看/usr/local/include/g2o/types/下的文件，
+// 基本上涵盖了各种slam的应用，应该能满足你的需求。
+
+    // 初始化求解器
+    SlamLinearSolver* linearSolver = new SlamLinearSolver();
+    linearSolver->setBlockOrdering( false );
+    SlamBlockSolver* blockSolver = new SlamBlockSolver( linearSolver );
+    g2o::OptimizationAlgorithmLevenberg* solver = new g2o::OptimizationAlgorithmLevenberg( blockSolver );
+
+    g2o::SparseOptimizer globalOptimizer;  // 最后用的就是这个东东
+    globalOptimizer.setAlgorithm( solver ); 
+    // 不要输出调试信息
+    globalOptimizer.setVerbose( false );
+
+    // 向globalOptimizer增加第一个顶点====================================
+    g2o::VertexSE3* v = new g2o::VertexSE3();
+    v->setId( currIndex );
+    v->setEstimate( Eigen::Isometry3d::Identity() ); //估计为单位矩阵
+    v->setFixed( true ); // 第一个顶点固定，不用优化
+    globalOptimizer.addVertex( v );
+
+    int lastIndex = currIndex; // 上一帧的id
+
+    for ( currIndex=startIndex+1; currIndex<endIndex; currIndex++ )
+    {
+        cout<<"Reading files "<<currIndex<<endl;
+        FRAME currFrame = readFrame( currIndex,pd ); // 读取currFrame
+        computeKeyPointsAndDesp( currFrame, detector, descriptor );// 计算特征点和描述子
+        // 比较currFrame 和 lastFrame
+        RESULT_OF_PNP result = estimateMotion( lastFrame, currFrame, camera );// pnp估计位姿
+        if ( result.inliers < min_inliers ) //inliers不够，放弃该帧
+            continue;
+        // 计算运动范围是否太大
+        double norm = normofTransform(result.rvec, result.tvec);
+        cout<<"norm = "<<norm<<endl;
+        if ( norm >= max_norm )
+            continue;
+        Eigen::Isometry3d T = cvMat2Eigen( result.rvec, result.tvec );
+        cout<<"T="<<T.matrix()<<endl;
+        
+        // 去掉可视化的话，会快一些
+        if ( visualize == true )
+        {
+            cloud = joinPointCloud( cloud, currFrame, T, camera );// 点晕加到一起
+            viewer.showCloud( cloud );
+        }
+        
+        // 向g2o中增加这个顶点与上一帧顶点联系的边
+        // 顶点部分
+        // 顶点只需设定id即可
+        g2o::VertexSE3 *v = new g2o::VertexSE3();
+        v->setId( currIndex );
+        v->setEstimate( Eigen::Isometry3d::Identity() );// 定点 带估计=====
+        globalOptimizer.addVertex(v);
+	
+        // 边部分
+        g2o::EdgeSE3* edge = new g2o::EdgeSE3();
+        // 连接此边的两个顶点id
+        edge->vertices() [0] = globalOptimizer.vertex( lastIndex );
+        edge->vertices() [1] = globalOptimizer.vertex( currIndex );
+        // 信息矩阵  6自由度变量 的 协方差矩阵的逆  为 6×6 矩阵====================================
+        Eigen::Matrix<double, 6, 6> information = Eigen::Matrix< double, 6,6 >::Identity();
+        // 信息矩阵是 协方差矩阵的逆，表示我们对边的精度的预先估计
+        // 因为pose为6D的，信息矩阵是6*6的阵，假设位置和角度的估计精度均为0.1且互相独立
+        // 那么协方差则为对角为0.01的矩阵，信息阵则为100的矩阵  倒数=================================
+        information(0,0) = information(1,1) = information(2,2) = 100;// 角度值 信息 误差权值
+        information(3,3) = information(4,4) = information(5,5) = 100;// 平移值 信息 误差权值
+        // 也可以将角度设大一些，表示对角度的估计更加准确
+        edge->setInformation( information );
+	
+        // 边的估计即是pnp求解之结果 ======================
+        edge->setMeasurement( T );
+        // 将此边加入图中
+        globalOptimizer.addEdge(edge);
+
+        lastFrame = currFrame;
+        lastIndex = currIndex;
+
+    }
+
+    // 优化所有边
+    cout<<"optimizing pose graph, vertices: "<<globalOptimizer.vertices().size()<<endl;
+    globalOptimizer.save("./data/result_before.g2o");
+    globalOptimizer.initializeOptimization();
+    globalOptimizer.optimize( 100 ); //可以指定优化步数
+    globalOptimizer.save( "./data/result_after.g2o" );
+    cout<<"Optimization done."<<endl;
+
+    globalOptimizer.clear();
+
+    return 0;
+    
+// g2o的优化结果是存储在一个.g2o的文本文件里的，你可以用gedit等编辑软件打开它。
+// 这个文件前面是顶点的定义，包含 ID, x,y,z,qx,qy,qz,qw。后边则是边的定义：ID1, ID2, dx, T 以及信息阵的上半角。
+// 实际上，你也可以自己写个程序去生成这样一个文件，交给g2o去优化，写文本文件不会有啥困难的啦。
+// 这个文件也可以用g2o_viewer打开，你还能直观地看到里面的节点与边的位置。
+// 同时你可以选一个优化方法对该图进行优化，这样你可以直观地看到优化的过程哦。
+
+
+}
+
+FRAME readFrame( int index, ParameterReader& pd )
+{
+    FRAME f;
+    string rgbDir   =   pd.getData("rgb_dir");
+    string depthDir =   pd.getData("depth_dir");
+    
+    string rgbExt   =   pd.getData("rgb_extension");
+    string depthExt =   pd.getData("depth_extension");
+
+    stringstream ss;
+    ss<<rgbDir<<index<<rgbExt;
+    string filename;
+    ss>>filename;
+    f.rgb = cv::imread( filename ); // RGB
+
+    ss.clear();
+    filename.clear();
+    ss<<depthDir<<index<<depthExt;
+    ss>>filename;
+
+    f.depth = cv::imread( filename, -1 ); // 深度图
+    f.frameID = index;
+    return f;
+}
+
+// 估计一个运动的大小 =====================================
+double normofTransform( cv::Mat rvec, cv::Mat tvec )
+{
+// 旋转大小 0~2*pi  + 平移大小=============
+    return fabs(min(cv::norm(rvec), 2*M_PI-cv::norm(rvec)))+ fabs(cv::norm(tvec));
+}
 
 
 
+```
+	
+	
+
+
+# 添加回环检测	 
+	 
+	 
+	
+	
+	
