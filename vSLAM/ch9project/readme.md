@@ -889,4 +889,35 @@ Eigen::Isometry3d cvMat2Eigen( cv::Mat& rvec, cv::Mat& tvec )
 
 ```
 
+> 前后两帧点云合并
+```c
 
+// joinPointCloud 
+// 输入：原始点云，新来的帧 以及 它的位姿
+// 输出：将新来帧加到原始帧后的图像
+PointCloud::Ptr joinPointCloud( PointCloud::Ptr original, // 原始点云
+                                FRAME& newFrame,          // 新来的帧
+				Eigen::Isometry3d T,      // 它的位姿，相对 原始点云的位姿
+				CAMERA_INTRINSIC_PARAMETERS& camera ) // 相机参数
+{
+    // 新来的帧 根据 RGB 和 深度图 产生 一帧点云 =======
+    PointCloud::Ptr newCloud = image2PointCloud( newFrame.rgb, newFrame.depth, camera );
+
+    // 合并点云
+    PointCloud::Ptr output (new PointCloud());
+    pcl::transformPointCloud( *original, *output, T.matrix() );// 怎么是前面的点云 变换到 当前帧 下
+    *newCloud += *output; // 当前帧 点云 和变换的点云 加和
+
+    // Voxel grid 滤波降采样
+    static pcl::VoxelGrid<PointT> voxel;// 静态变量  体素格下采样，只会有一个 变量实体======================
+    static ParameterReader pd;          // 静态变量 文件参数读取器 
+    double gridsize = atof( pd.getData("voxel_grid").c_str() );// 体素格精度 
+    voxel.setLeafSize( gridsize, gridsize, gridsize );// 设置体素格子 大小
+    voxel.setInputCloud( newCloud );// 输入点云
+    PointCloud::Ptr tmp( new PointCloud() );// 临时点云
+    voxel.filter( *tmp );// 滤波输出点云
+    return tmp;
+}
+
+
+```
