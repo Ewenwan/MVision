@@ -2012,6 +2012,42 @@ int main( int argc, char** argv )
 
 ```
 
+> cmakelists
+```c
+
+# 增加PCL库的依赖
+FIND_PACKAGE( PCL REQUIRED COMPONENTS common io )
+
+# 添加头文件和库文件
+ADD_DEFINITIONS( ${PCL_DEFINITIONS} )
+INCLUDE_DIRECTORIES( ${PCL_INCLUDE_DIRS}  )
+LINK_LIBRARIES( ${PCL_LIBRARY_DIRS} )
+
+# octomap
+FIND_PACKAGE( octomap REQUIRED )
+INCLUDE_DIRECTORIES( ${OCTOMAP_INCLUDE_DIRS} )
+
+ADD_EXECUTABLE( pcd2octomap pcd2octomap.cpp )
+TARGET_LINK_LIBRARIES( pcd2octomap
+    ${PCL_LIBRARIES}
+    ${OCTOMAP_LIBRARIES})
+
+ADD_EXECUTABLE( pcd2colorOctomap pcd2colorOctomap.cpp )
+TARGET_LINK_LIBRARIES( pcd2colorOctomap
+    ${PCL_LIBRARIES}
+    ${OCTOMAP_LIBRARIES})
+
+FIND_PACKAGE(OpenCV REQUIRED)
+
+ADD_EXECUTABLE( joinmap joinMap.cpp )
+TARGET_LINK_LIBRARIES( joinmap
+    ${OCTOMAP_LIBRARIES}
+    ${OpenCV_LIBS})
+
+
+```
+
+
 
 
 ## pcl PointXYZRGBA 点云 转换到 xyzrgb类型的 octomap
