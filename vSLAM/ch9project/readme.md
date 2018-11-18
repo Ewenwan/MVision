@@ -921,3 +921,153 @@ PointCloud::Ptr joinPointCloud( PointCloud::Ptr original, // 原始点云
 
 
 ```
+
+> 新添加的参数 
+```c
+# part 5 
+
+# 数据相关=================
+# 图片序列 起始 与 终止索引
+start_index=1
+end_index=700
+# 数据 所在目录 =========
+rgb_dir=../data/rgb_png/
+rgb_extension=.png
+depth_dir=../data/depth_png/
+depth_extension=.png
+# 点云分辨率 ============
+voxel_grid=0.02
+# 是否实时可视化  是否显示点云
+visualize_pointcloud=yes
+# 最小匹配数量
+min_good_match=10 最少特征匹配数量
+# 最小内点 数量  pnp求解 返回的 匹配点数
+min_inliers=5
+# 最大运动量 ， 运动量过大也可能是噪声======= 
+max_norm=0.3
+
+
+
+```
+
+## 实现VO
+	最后，利用之前写好的工具函数，实现一个VO:
+	src/visualOdometry.cpp
+```c
+/*************************************************************************
+	> File Name: rgbd-slam-tutorial-gx/part V/src/visualOdometry.cpp
+	> Author: xiang gao
+	> Mail: gaoxiang12@mails.tsinghua.edu.cn
+	> Created Time: 2015年08月01日 星期六 15时35分42秒
+ ************************************************************************/
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+using namespace std;
+
+#include "slamBase.h"
+
+// 给定index，读取一帧数据
+FRAME readFrame( int index, ParameterReader& pd );
+// 度量运动的大小
+double normofTransform( cv::Mat rvec, cv::Mat tvec );
+
+int main( int argc, char** argv )
+{
+
+// 数据集==================================================================
+    ParameterReader pd;
+    int startIndex  =   atoi( pd.getData( "start_index" ).c_str() );// 起始图片
+    int endIndex    =   atoi( pd.getData( "end_index"   ).c_str() );// 终止图片
+  // 初始化 initialize
+    cout<<"Initializing ..."<<endl;
+    int currIndex = startIndex; // 当前  索引 为 currIndex
+    FRAME lastFrame = readFrame( currIndex, pd ); // 上一帧数据
+    // 我们总是在比较 currFrame 和 lastFrame
+    string detector = pd.getData( "detector" );     // 特征检测 
+    string descriptor = pd.getData( "descriptor" ); // 特征描述
+    CAMERA_INTRINSIC_PARAMETERS camera = getDefaultCamera();// 相机参数
+    computeKeyPointsAndDesp( lastFrame, detector, descriptor );// 计算 特征点与描述子
+    PointCloud::Ptr cloud = image2PointCloud( lastFrame.rgb, lastFrame.depth, camera );// 最开始的点云
+    
+    pcl::visualization::CloudViewer viewer("viewer");// 点云可视化器
+
+    // 是否显示点云
+    bool visualize = pd.getData("visualize_pointcloud")==string("yes");
+
+    int min_inliers = atoi( pd.getData("min_inliers").c_str() ); // pnp求解位姿 最少内点数量
+    double max_norm = atof( pd.getData("max_norm").c_str() );    // 平移 运动 
+
+    for ( currIndex=startIndex+1; currIndex<endIndex; currIndex++ )// 便利数据集
+    {
+        cout<<"Reading files "<< currIndex << endl;
+        FRAME currFrame = readFrame( currIndex, pd ); // 读取 currFrame rgb+深度图
+        computeKeyPointsAndDesp( currFrame, detector, descriptor );// 计算特征点+描述子
+        // 比较currFrame 和 lastFrame
+        RESULT_OF_PNP result = estimateMotion( lastFrame, currFrame, camera );// PNP获取位姿
+        if ( result.inliers < min_inliers ) // inliers 不够(匹配效果差)，放弃该帧
+            continue;
+        // 计算运动范围是否太大  因为假设运动是连贯的，两帧之间不会隔的太远
+        double norm = normofTransform(result.rvec, result.tvec);
+        cout<<"norm = "<<norm<<endl;
+        if ( norm >= max_norm )// 运动量过大也可能是噪声=======
+            continue;
+        Eigen::Isometry3d T = cvMat2Eigen( result.rvec, result.tvec );// 旋转、平移向量转换成 变换矩阵
+        cout<<"T="<<T.matrix()<<endl;
+        
+        cloud = joinPointCloud( cloud, currFrame, T, camera ); // 点云放在一起
+        
+        if ( visualize == true )
+            viewer.showCloud( cloud ); // 可视化点云
+// 当点云出现时，可按5显示颜色，然后按r重置视角，快速查看点云=====================================
+// 可以调节parameters.txt中的voxel_grid值来设置点云分辨率。0.01表示每1cm3的格子里有一个点。===
+
+        lastFrame = currFrame;// 迭代上一帧
+    }
+
+    pcl::io::savePCDFile( "data/result.pcd", *cloud );//保存点云
+    return 0;
+}
+
+// 诉它我要读第几帧的数据，它就会乖乖的把数据给找出来，返回一个FRAME结构体。
+// 从数据集中读取一帧数据 RGB+深度============================ 
+FRAME readFrame( int index, ParameterReader& pd )
+{
+    FRAME f;
+    string rgbDir   =   pd.getData("rgb_dir");// 数据集路径
+    string depthDir =   pd.getData("depth_dir");
+    
+    string rgbExt   =   pd.getData("rgb_extension");// 图片格式====
+    string depthExt =   pd.getData("depth_extension");
+
+    stringstream ss;
+    ss<<rgbDir<<index<<rgbExt;// 组合成 文件路径名
+    string filename;
+    ss>>filename;
+    f.rgb = cv::imread( filename );// 读取文件  RGB
+
+    ss.clear();
+    filename.clear();
+    ss<<depthDir<<index<<depthExt;
+    ss>>filename;
+
+    f.depth = cv::imread( filename, -1 );// 深度图
+    return f;
+}
+
+double normofTransform( cv::Mat rvec, cv::Mat tvec )
+{
+    return fabs(min(cv::norm(rvec), 2*M_PI-cv::norm(rvec)))+ fabs(cv::norm(tvec));
+}
+
+
+
+```
+
+
+
+# 图优化工具g2o
+
+
+
