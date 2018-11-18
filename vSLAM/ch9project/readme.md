@@ -1,6 +1,6 @@
 
 # rgbd-slam 第一版
-[rgbd-slam 第二版]()
+[rgbd-slam 第二版](https://github.com/Ewenwan/rgbd-slam-tutor2/blob/master/README.md)
 
 # 工程结构 
       1. /bin             存放可执行的二进制文件
