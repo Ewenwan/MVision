@@ -1938,4 +1938,326 @@ Q：用PCL的cloudviewer把点云显示出来，为什么会是上下颠倒?
 	 能看出这是一层楼的扫描图。octovis是一个比较实用的工具，你生成的各种octomap地图都可以用它来看。
 	 （所以你可以把octovis放到/usr/local/bin/下，省得以后还要找。）
 	 
+## pcl PointXYZRGBA 点云 转换到 xyz类型的 octomap
+```c
+/*************************************************************************
+	> File Name: src/pcd2octomap.cpp
+	> Author: Gao Xiang
+	> Mail: gaoxiang12@mails.tsinghua.edu.cn
+	> Created Time: 2015年12月12日 星期六 15时51分45秒
+	
+  将命令行参数1作为输入文件，参数2作为输出文件，把输入的pcd格式点云转换成octomap格式的点云。
+  通过这个例子，你可以学会如何创建一个简单的OcTree对象并往里面添加新的点。　
+  
+  调用： bin/pcd2octomap data/sample.pcd data/sample.bt
+  
+  这个octomap里只存储了点的空间信息，而没有颜色信息。
+  我按照高度给它染色了，否则它应该就是灰色的。
+  通过octomap，我们能查看每个小方块是否可以通行，从而实现导航的工作。
+  
+  octomap存储的文件后缀名是.bt（二进制文件）和.ot（普通文件），前者相对更小一些。
+  不过octomap文件普遍都很小，所以也不差这么些容量。
+  如果你存成了其他后缀名，octovis可能认不出来。
+  
+ ************************************************************************/
+
+#include <iostream>
+#include <assert.h>
+
+// pcl==========
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+
+// octomap =====
+#include <octomap/octomap.h>
+
+// 命名空间======
+using namespace std;
+
+int main( int argc, char** argv )
+{
+    if (argc != 3)
+    {
+        cout<<"Usage: pcd2octomap <input_file> <output_file>"<<endl;
+        return -1;
+    }
+
+    string input_file = argv[1], output_file = argv[2];
+    pcl::PointCloud<pcl::PointXYZRGBA> cloud;
+    pcl::io::loadPCDFile<pcl::PointXYZRGBA> ( input_file, cloud );// 载入点云
+
+    cout<<"point cloud loaded, piont size = "<<cloud.points.size()<<endl;
+
+    //声明octomap变量
+    cout<<"copy data into octomap..."<<endl;
+    // 创建八叉树对象，参数为分辨率，这里设成了0.05=========
+    octomap::OcTree tree( 0.05 ); // ColorOcTree 可存储颜色信息
+
+    for (auto p:cloud.points)// 每一个点云中的点  范围for c++11标准
+    {
+        // 将点云里的点插入到octomap中
+        tree.updateNode( octomap::point3d(p.x, p.y, p.z), true );// xyz类型
+    }
+
+    // 更新octomap==================
+    tree.updateInnerOccupancy();
+    // 存储octomap==================
+    tree.writeBinary( output_file );
+    cout<<"done."<<endl;
+
+    return 0;
+}
+
+
+
+```
+
+
+
+## pcl PointXYZRGBA 点云 转换到 xyzrgb类型的 octomap
+```c
+// octomap提供了 ColorOcTree 类，能够帮你存储颜色信息。下面我们就来做一个保存颜色信息的示例。
+// 代码见：src/pcd2colorOctomap.cpp
+
+/*************************************************************************
+	> File Name: src/pcd2octomap.cpp
+	> Author: Gao Xiang
+	> Mail: gaoxiang12@mails.tsinghua.edu.cn
+	> Created Time: 2015年12月12日 星期六 15时51分45秒
+	
+	 调用
+	 bin/pcd2colorOctomap data/sample.pcd data/sample.ot
+	 这段代码会编译出pcd2colorOctomap这个程序，完成带颜色的转换。不过，后缀名改成了.ot文件。　
+	 颜色信息能够更好地帮助我们辨认结果是否正确，给予一个直观的印象。
 	 
+ ************************************************************************/
+
+#include <iostream>
+#include <assert.h>
+
+//pcl=======================
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+
+//octomap =================
+#include <octomap/octomap.h>
+#include <octomap/ColorOcTree.h>
+
+using namespace std;
+
+int main( int argc, char** argv )
+{
+    if (argc != 3)
+    {
+        cout<<"Usage: pcd2colorOctomap <input_file> <output_file>"<<endl;
+        return -1;
+    }
+
+    string input_file = argv[1], output_file = argv[2];
+    pcl::PointCloud<pcl::PointXYZRGBA> cloud;
+    pcl::io::loadPCDFile<pcl::PointXYZRGBA> ( input_file, cloud ); // 载入pcl点云
+
+    cout<<"point cloud loaded, piont size = "<<cloud.points.size()<<endl;
+
+    //声明octomap变量
+    cout<<"copy data into octomap..."<<endl;
+    // 创建带颜色的八叉树对象，参数为分辨率，这里设成了0.05
+    octomap::ColorOcTree tree( 0.05 );// ColorOcTree 带颜色 octomap
+
+    for (auto p:cloud.points)
+    {
+        // 将点云里的点插入到octomap中
+        tree.updateNode( octomap::point3d(p.x, p.y, p.z), true );//插入点
+    }
+
+    // 设置颜色
+    for (auto p:cloud.points)
+    {
+        tree.integrateNodeColor( p.x, p.y, p.z, p.r, p.g, p.b );// 设置颜色
+    }
+
+    // 更新octomap===================
+    tree.updateInnerOccupancy();
+    // 存储octomap, 注意要存成.ot文件而非.bt文件===！！！！！！！！！
+    tree.write( output_file );
+    cout<<"done."<<endl;
+
+    return 0;
+}
+
+
+
+```
+
+
+## 更好的拼接与转换
+	前两个例程中，我们都是对单个pcd文件进行了处理。实际做slam时，我们需要拼接很多帧的octomap。
+	为了做这样一个示例，我从自己的实验数据中取出了一小段。
+	这一小段总共含有五张图像（因为github并不适合传大量数据），它们存放在data/rgb_index和data/dep_index下。
+	我的slam程序估计了这五个关键帧的位置，放在data/trajectory.txt中。
+	它的格式是：帧编号 x y z qx qy qz qw （位置＋姿态四元数）。
+	事实上它是从一个g2o文件中拷出来的。
+	你可以用g2o_viewer data/result_after.g2o来看整个轨迹。
+
+```c
+/*************************************************************************
+	> File Name: src/joinMap.cpp
+	> Author: Gao Xiang
+	> Mail: gaoxiang12@mails.tsinghua.edu.cn
+	> Created Time: 2015年12月13日 星期日 14时37分05秒
+ ************************************************************************/
+
+#include <iostream>
+#include <vector>
+
+// octomap ================
+#include <octomap/octomap.h>
+#include <octomap/ColorOcTree.h>
+#include <octomap/math/Pose6D.h>
+
+// opencv 用于图像数据读取与处理===========
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+// 使用Eigen的Geometry模块处理3d运动======
+#include <Eigen/Core>
+#include <Eigen/Geometry> 
+
+// pcl============================
+#include <pcl/common/transforms.h>
+#include <pcl/point_types.h>
+
+// boost.format 字符串处理
+#include <boost/format.hpp>
+
+using namespace std;
+
+// 全局变量：相机矩阵
+// 更好的写法是存到参数文件中，但为方便起见我就直接这样做了
+float camera_scale  = 1000;
+float camera_cx     = 325.5;
+float camera_cy     = 253.5;
+float camera_fx     = 518.0;
+float camera_fy     = 519.0;
+
+int main( int argc, char** argv )
+{
+    // 读关键帧编号=====================================
+    ifstream fin( "./data/keyframe.txt" );
+    vector<int> keyframes;
+    vector< Eigen::Isometry3d > poses;
+    // 把文件 ./data/keyframe.txt 里的数据读取到vector中
+    while( fin.peek() != EOF )
+    {
+        int index_keyframe;
+        fin>>index_keyframe;
+        if (fin.fail()) break;
+        keyframes.push_back( index_keyframe );
+    }
+    fin.close();
+
+    cout<<"load total "<<keyframes.size()<<" keyframes. "<<endl;
+
+    // 读关键帧姿态======================================
+    // 我的代码中使用了Eigen来存储姿态，类似的，也可以用octomath::Pose6D来做这件事
+    fin.open( "./data/trajectory.txt" );
+    while( fin.peek() != EOF )
+    {
+        int index_keyframe;
+        float data[7]; // 三个位置加一个 姿态四元数 x,y,z, w,ux,uy,uz
+        fin>>index_keyframe;
+        for ( int i=0; i<7; i++ )
+        {
+            fin>>data[i];
+            cout<<data[i]<<" ";
+        }
+        cout<<endl;
+        if (fin.fail()) break;
+        // 注意这里的顺序。g2o文件四元数按 qx, qy, qz, qw来存==================
+        // 但Eigen初始化按照qw, qx, qy, qz来做==============
+        Eigen::Quaterniond q( data[6], data[3], data[4], data[5] );// 姿态四元数
+        Eigen::Isometry3d T(q);// 用 姿态四元数 初始化 变换矩阵T
+        T(0,3) = data[0]; T(1,3) = data[1]; T(2,3) = data[2];
+        poses.push_back( T );
+    }
+    fin.close();
+
+    // 拼合全局地图
+    octomap::ColorOcTree tree( 0.05 ); //全局map  带颜色
+
+    // 注意我们的做法是 先把图像 转换至 pcl的点云，进行姿态变换，最后存储成octomap
+    // 因为octomap的 颜色信息 不是特别方便处理，所以采用了这种迂回的方式
+    // 所以，如果不考虑颜色，那不必转成pcl点云，而可以直接使用 octomap::Pointcloud 结构
+    
+    for ( size_t i=0; i<keyframes.size(); i++ )
+    {
+        pcl::PointCloud<pcl::PointXYZRGBA> cloud; 
+        cout<<"converting "<<i<<"th keyframe ..." <<endl;
+        int k = keyframes[i];
+        Eigen::Isometry3d& pose = poses[i]; // 每一帧的 位姿
+
+        // 生成第k帧的点云，拼接至全局octomap上
+        boost::format fmt ("./data/rgb_index/%d.ppm" );
+        cv::Mat rgb = cv::imread( (fmt % k).str().c_str() );
+        fmt = boost::format("./data/dep_index/%d.pgm" );
+        cv::Mat depth = cv::imread( (fmt % k).str().c_str(), -1 );
+
+        // 从rgb, depth生成点云，运算方法见《一起做》第二讲
+        // 第一次遍历用于生成空间点云  pcl==============================
+        for ( int m=0; m<depth.rows; m++ )
+            for ( int n=0; n<depth.cols; n++ )
+            {
+                ushort d = depth.ptr<ushort> (m) [n];// 深度值
+                if (d == 0)
+                    continue;
+                float z = float(d) / camera_scale;
+                float x = (n - camera_cx) * z / camera_fx;
+                float y = (m - camera_cy) * z / camera_fy;
+                pcl::PointXYZRGBA p;
+                p.x = x; p.y = y; p.z = z;
+
+                uchar* rgbdata = &rgb.ptr<uchar>(m)[n*3];
+                uchar b = rgbdata[0];
+                uchar g = rgbdata[1];
+                uchar r = rgbdata[2];
+
+                p.r = r; p.g = g; p.b = b;
+                cloud.points.push_back( p ); 
+            }
+        // 将cloud旋转之后插入全局地图
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr temp( new pcl::PointCloud<pcl::PointXYZRGBA>() );
+        pcl::transformPointCloud( cloud, *temp, pose.matrix() ); // 转换到当前枕坐标系下
+
+        octomap::Pointcloud cloud_octo; // 当前帧octo点云==========================
+        for (auto p:temp->points) // 遍例每一个 pcl点云
+            cloud_octo.push_back( p.x, p.y, p.z );
+        
+	// 总octo点云 中插入 octo 点云============================
+// insertPointCloud会比单纯的插入点更好一些。octomap里的pointcloud是一种射线的形式，
+// 只有末端才存在被占据的点，中途的点则是没被占据的。这会使一些重叠地方处理的更好。
+        tree.insertPointCloud( cloud_octo, 
+                octomap::point3d( pose(0,3), pose(1,3), pose(2,3) ) );//按当前帧的位置 插入
+
+        for (auto p:temp->points)
+            tree.integrateNodeColor( p.x, p.y, p.z, p.r, p.g, p.b );//加入颜色
+    }
+    
+    tree.updateInnerOccupancy();// 更新
+    tree.write( "./data/map.ot" );// 保存
+
+    cout<<"done."<<endl;
+    
+    return 0;
+
+}
+
+
+
+```
+
+
+
+
+
+
