@@ -848,6 +848,17 @@ int main( int argc, char** argv )
 
 
 # Visual Odometry (视觉里程计)
+[视频流数据 RGB+Depth 400M+ 取自nyuv2数据集](https://yun.baidu.com/s/1i33uvw5)
+
+	http://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html 
+
+	这可是一个国际上认可的，相当有名的数据集哦。如果你想要跑自己的数据，当然也可以，不过需要你进行一些预处理啦。
+
+
+	实际上和滤波器很像，通过不断的两两匹配，估计机器人当前的位姿，过去的就给丢弃了。
+	这个思路比较简单，实际当中也比较有效，能够保证局部运动的正确性。
+
+
 
 
 
