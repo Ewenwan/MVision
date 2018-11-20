@@ -17,7 +17,7 @@
 
 [maskFusion elasFusion+ mask_rcnn 动态物体跟踪重建 ](https://github.com/Ewenwan/maskfusion)
 
-[]()
+[DS-SLAM  ORB_SLAM2 +  SegNet 动态语义 slam](https://arxiv.org/pdf/1809.08379.pdf)
 
     ORB-SLAM是一个基于特征点的实时单目SLAM系统，在大规模的、小规模的、室内室外的环境都可以运行。
     该系统对剧烈运动也很鲁棒，支持宽基线的闭环检测和重定位，包括全自动初始化。
