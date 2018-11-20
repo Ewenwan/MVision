@@ -1,21 +1,8 @@
 /**
 * This file is part of ORB-SLAM2.
-*
-* Copyright (C) 2014-2016 Raúl Mur-Artal <raulmur at unizar dot es> (University of Zaragoza)
-* For more information see <https://github.com/raulmur/ORB_SLAM2>
-*
-* ORB-SLAM2 is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* ORB-SLAM2 is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
+* 地图显示  普通地图点 黑色 参考地图点红色
+            关键帧 蓝色   当前帧 绿色
+            
 */
 
 #include "MapDrawer.h"
@@ -32,85 +19,108 @@ MapDrawer::MapDrawer(Map* pMap, const string &strSettingPath):mpMap(pMap)
 {
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
 
-    mKeyFrameSize = fSettings["Viewer.KeyFrameSize"];
-    mKeyFrameLineWidth = fSettings["Viewer.KeyFrameLineWidth"];
-    mGraphLineWidth = fSettings["Viewer.GraphLineWidth"];
-    mPointSize = fSettings["Viewer.PointSize"];
-    mCameraSize = fSettings["Viewer.CameraSize"];
-    mCameraLineWidth = fSettings["Viewer.CameraLineWidth"];
+    mKeyFrameSize = fSettings["Viewer.KeyFrameSize"];//关键帧 线长
+    mKeyFrameLineWidth = fSettings["Viewer.KeyFrameLineWidth"];//关键帧线宽
+    mGraphLineWidth = fSettings["Viewer.GraphLineWidth"];// 关键帧连线宽度
+    mPointSize = fSettings["Viewer.PointSize"];// 点大小
+    mCameraSize = fSettings["Viewer.CameraSize"];// 当前帧 相机线长
+    mCameraLineWidth = fSettings["Viewer.CameraLineWidth"];// 当前帧 相机线宽
 
+	/*
+	Viewer.KeyFrameSize: 0.05
+	Viewer.KeyFrameLineWidth: 1
+	Viewer.GraphLineWidth: 0.9
+	Viewer.PointSize:2
+	Viewer.CameraSize: 0.08
+	Viewer.CameraLineWidth: 3
+	Viewer.ViewpointX: 0
+	Viewer.ViewpointY: -0.7
+	Viewer.ViewpointZ: -1.8
+	Viewer.ViewpointF: 500
+	*/
 }
 
+
+// 显示点======普通点黑色===参考地图点红色===颜色可修改====
 void MapDrawer::DrawMapPoints()
 {
-    const vector<MapPoint*> &vpMPs = mpMap->GetAllMapPoints();
-    const vector<MapPoint*> &vpRefMPs = mpMap->GetReferenceMapPoints();
+    const vector<MapPoint*> &vpMPs = mpMap->GetAllMapPoints();// 所有地图点  黑色
+    const vector<MapPoint*> &vpRefMPs = mpMap->GetReferenceMapPoints();// 参考 地图点 红色===
 
-    set<MapPoint*> spRefMPs(vpRefMPs.begin(), vpRefMPs.end());
+    set<MapPoint*> spRefMPs(vpRefMPs.begin(), vpRefMPs.end());// set有序集合， 查找快!!!!!
 
     if(vpMPs.empty())
         return;
 
-    glPointSize(mPointSize);
+    glPointSize(mPointSize);// 点大小
+// 开始添加点===========
     glBegin(GL_POINTS);
-    glColor3f(0.0,0.0,0.0);
+    glColor3f(0.0,0.0,0.0);// 普通地图点 为黑色================rgb=
 
-    for(size_t i=0, iend=vpMPs.size(); i<iend;i++)
+    for(size_t i=0, iend=vpMPs.size(); i<iend;i++)// 所有的地图点=====
     {
-        if(vpMPs[i]->isBad() || spRefMPs.count(vpMPs[i]))
+        if(vpMPs[i]->isBad() || spRefMPs.count(vpMPs[i]))// 除去不好的 和 参考帧点
             continue;
-        cv::Mat pos = vpMPs[i]->GetWorldPos();
-        glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
+        cv::Mat pos = vpMPs[i]->GetWorldPos();// 点的时间坐标 位姿
+        glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));// 顶点
     }
+// 结束添加点=========
     glEnd();
 
-    glPointSize(mPointSize);
+    glPointSize(mPointSize);// 点大小
+// 开始添加点===========
     glBegin(GL_POINTS);
-    glColor3f(1.0,0.0,0.0);
+    glColor3f(1.0,0.0,0.0);// 参考 地图点 显示红色============rgb=======
 
     for(set<MapPoint*>::iterator sit=spRefMPs.begin(), send=spRefMPs.end(); sit!=send; sit++)
     {
         if((*sit)->isBad())
-            continue;
+            continue;// 除去不好的 
         cv::Mat pos = (*sit)->GetWorldPos();
-        glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
+        glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));// 添加点
 
     }
-
+// 结束添加点=========
     glEnd();
 }
 
+// 显示关键帧================蓝色============================
 void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
 {
     const float &w = mKeyFrameSize;
     const float h = w*0.75;
     const float z = w*0.6;
 
-    const vector<KeyFrame*> vpKFs = mpMap->GetAllKeyFrames();
+    const vector<KeyFrame*> vpKFs = mpMap->GetAllKeyFrames();// 所有关键帧======
 
     if(bDrawKF)
     {
-        for(size_t i=0; i<vpKFs.size(); i++)
+        for(size_t i=0; i<vpKFs.size(); i++)// 遍例每一个关键帧=====
         {
-            KeyFrame* pKF = vpKFs[i];
-            cv::Mat Twc = pKF->GetPoseInverse().t();
+            KeyFrame* pKF = vpKFs[i];// 关键帧
+            cv::Mat Twc = pKF->GetPoseInverse().t();// 帧到世界坐标系====
 
-            glPushMatrix();
-
+            glPushMatrix();// 矩阵
             glMultMatrixf(Twc.ptr<GLfloat>(0));
 
-            glLineWidth(mKeyFrameLineWidth);
-            glColor3f(0.0f,0.0f,1.0f);
-            glBegin(GL_LINES);
-            glVertex3f(0,0,0);
-            glVertex3f(w,h,z);
+            glLineWidth(mKeyFrameLineWidth);//关键帧线宽
+            glColor3f(0.0f,0.0f,1.0f);// rgb 蓝色 帧位姿
+            glBegin(GL_LINES); // 开始添加线=======
+
+// 相机光心 与 顶点 连线========
+            glVertex3f(0,0,0); // 相机光心
+            glVertex3f(w,h,z); // 宽 高 深度
+
             glVertex3f(0,0,0);
             glVertex3f(w,-h,z);
+
             glVertex3f(0,0,0);
             glVertex3f(-w,-h,z);
+
             glVertex3f(0,0,0);
             glVertex3f(-w,h,z);
 
+// 四个顶点之间连线============
             glVertex3f(w,h,z);
             glVertex3f(w,-h,z);
 
@@ -122,7 +132,8 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
 
             glVertex3f(-w,-h,z);
             glVertex3f(w,-h,z);
-            glEnd();
+
+            glEnd();// 画线结束
 
             glPopMatrix();
         }
@@ -131,14 +142,17 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
     if(bDrawGraph)
     {
         glLineWidth(mGraphLineWidth);
-        glColor4f(0.0f,1.0f,0.0f,0.6f);
+        glColor4f(0.0f,1.0f,0.0f,0.6f);// rgba  透明度
+
+// 开始画线===============
         glBegin(GL_LINES);
 
         for(size_t i=0; i<vpKFs.size(); i++)
         {
-            // Covisibility Graph
-            const vector<KeyFrame*> vCovKFs = vpKFs[i]->GetCovisiblesByWeight(100);
+            // Covisibility Graph  共视图 ===
+            const vector<KeyFrame*> vCovKFs = vpKFs[i]->GetCovisiblesByWeight(100);// 共视图 权重 交大的===
             cv::Mat Ow = vpKFs[i]->GetCameraCenter();
+
             if(!vCovKFs.empty())
             {
                 for(vector<KeyFrame*>::const_iterator vit=vCovKFs.begin(), vend=vCovKFs.end(); vit!=vend; vit++)
@@ -151,7 +165,7 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
                 }
             }
 
-            // Spanning tree
+            // Spanning tree  最小生成树======
             KeyFrame* pParent = vpKFs[i]->GetParent();
             if(pParent)
             {
@@ -160,25 +174,27 @@ void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)
                 glVertex3f(Owp.at<float>(0),Owp.at<float>(1),Owp.at<float>(2));
             }
 
-            // Loops
+            // Loops  闭环帧===连接线======
             set<KeyFrame*> sLoopKFs = vpKFs[i]->GetLoopEdges();
             for(set<KeyFrame*>::iterator sit=sLoopKFs.begin(), send=sLoopKFs.end(); sit!=send; sit++)
             {
-                if((*sit)->mnId<vpKFs[i]->mnId)
+                if((*sit)->mnId < vpKFs[i]->mnId)// 避免重复画线???
                     continue;
                 cv::Mat Owl = (*sit)->GetCameraCenter();
                 glVertex3f(Ow.at<float>(0),Ow.at<float>(1),Ow.at<float>(2));
                 glVertex3f(Owl.at<float>(0),Owl.at<float>(1),Owl.at<float>(2));
             }
         }
-
+// 结束画线==============
         glEnd();
     }
 }
 
+
+// 显示当前帧 相机位姿========绿色=========================
 void MapDrawer::DrawCurrentCamera(pangolin::OpenGlMatrix &Twc)
 {
-    const float &w = mCameraSize;
+    const float &w = mCameraSize;// 当前帧 相机线长
     const float h = w*0.75;
     const float z = w*0.6;
 
@@ -190,18 +206,25 @@ void MapDrawer::DrawCurrentCamera(pangolin::OpenGlMatrix &Twc)
         glMultMatrixd(Twc.m);
 #endif
 
-    glLineWidth(mCameraLineWidth);
-    glColor3f(0.0f,1.0f,0.0f);
+    glLineWidth(mCameraLineWidth);// 当前帧 相机线宽
+    glColor3f(0.0f,1.0f,0.0f);// 绿色========
+// 开始画线=============
     glBegin(GL_LINES);
+
+// 相机光心 与 顶点 连线========
     glVertex3f(0,0,0);
     glVertex3f(w,h,z);
+
     glVertex3f(0,0,0);
     glVertex3f(w,-h,z);
+
     glVertex3f(0,0,0);
     glVertex3f(-w,-h,z);
+
     glVertex3f(0,0,0);
     glVertex3f(-w,h,z);
 
+// 四个顶点之间连线============
     glVertex3f(w,h,z);
     glVertex3f(w,-h,z);
 
@@ -213,18 +236,20 @@ void MapDrawer::DrawCurrentCamera(pangolin::OpenGlMatrix &Twc)
 
     glVertex3f(-w,-h,z);
     glVertex3f(w,-h,z);
+// 结束画线==============
     glEnd();
 
     glPopMatrix();
 }
 
-
+// 设置当前帧 相机姿======================================
 void MapDrawer::SetCurrentCameraPose(const cv::Mat &Tcw)
 {
     unique_lock<mutex> lock(mMutexCamera);
     mCameraPose = Tcw.clone();
 }
 
+// 获取当前相机位姿，返回 OpenGlMatrix 类型=====
 void MapDrawer::GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M)
 {
     if(!mCameraPose.empty())
