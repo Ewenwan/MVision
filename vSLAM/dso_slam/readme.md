@@ -7,6 +7,12 @@
 
 [安装](https://github.com/Ewenwan/MVision/blob/master/vSLAM/dso_slam/install.md)
 
+
+[TUM 德国 慕尼黑工业大学（Technische Universität München）](https://vision.in.tum.de/research/vslam/ldso)
+
+[高翔 带有回环检测sim3变换的的DSO LDSO](https://github.com/Ewenwan/LDSO)
+
+
     
     DSO属于稀疏直接法的视觉里程计。它不是完整的SLAM，因为它不包含回环检测、地图复用的功能。
     因此，它不可避免地会出现累计误差，尽管很小，但不能消除。
