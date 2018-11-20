@@ -1,5 +1,36 @@
 # 深度学习结合SLAM 研究现状总结
 
+[语义 SLAM 中的概率数据融合 ](https://www.cis.upenn.edu/~kostas/mypub.dir/bowman17icra.pdf)
+    
+    期望最大化(EM) 估计来把语义 SLAM 转换成概率问题，优化目标仍然是熟悉的重投影误差。
+    这篇文章只用了 DPM 这种传统方法做检测没有用流行的深度学习的检测网络依然取得了一定的效果。
+    当然其文章中有很多比较强的假设，比如物体的三维中心投影过来应该是接近检测网络的中心，
+    这一假设实际中并不容易满足。
+    
+[参考](https://www.cnblogs.com/luyb/p/9430488.html)
+    
+    这个问题的关键在于，
+    一幅图像中可能检测出数个相同类别的目标物体，
+    如何能够正确地将其对应于地图数据中已有的该类别的3D物体。
+    
+    下面列出几种有用的因素。
+
+    较为准确的先验估计（姿态），比如通过IMU、GPS、里程计等。
+    能够得到VO和目标的准确位置，比如双目、深度摄像头、结合激光等。
+    地图中有很多（局部）唯一确定的路标物体。
+    考虑所有可能的数据关联。
+
+    利用第一点，我们能够使用一些简单的方法建立数据关联，但此时仍需考虑错误关联的影响。
+
+    利用第二点，我们能够准确地重建出语义目标的几何特性（空间位置、朝向等）。
+              X-View: Graph-Based Semantic Multi-View Localization这篇文章将多帧的语义目标位置组合成图，
+              利用图匹配算法求解相机在全局地图中的位置（只定位不建图）。
+
+    利用第三点，我们能够方便地确定关联关系。比如，行车道上的交通指示牌结合文字OCR识别，
+              能够唯一确定该路牌的位置，相当于一个全局观测。比如，考虑到交通指示牌相互之间的间距很大，
+              在局部唯一，因此结合GPS和指示牌即可唯一确定该指示牌的位置。根据Mobileye的REM的专利描述，它们可能利用了该类信息。  
+
+
 [室内场景数据集 InteriorNet: Mega-scale Multi-sensor Photo-realistic Indoor Scenes Dataset](https://interiornet.org/)
 
 [多场景  数据集1 ](https://projects.asl.ethz.ch/datasets/doku.php?id=weedmap:remotesensing2018weedmap)
@@ -7,6 +38,49 @@
 [自动驾驶道路数据集 ](http://www.europe.naverlabs.com/Research/Computer-Vision/Proxy-Virtual-Worlds)
 
 [CMU 视觉定位数据集](http://www.europe.naverlabs.com/Research/Computer-Vision/Proxy-Virtual-Worlds)
+
+
+
+# 基于视觉的 语义定位和建图
+
+
+    目标定义:
+           位置 position
+           方向 orientation 表面法线 surface normal 线方向 line direction
+           类别 category
+           大小 size 
+           编号 id
+           连接关系  空间spatial、时间time
+    建图 mapping:
+           目标检测 ： 基于关键帧 、 基于cnn
+           目标跟踪 ： 光流、关键帧上的 2d-2d跟踪、地图中的3d-3d跟踪
+           目标重建 ： 2d检测框 计算3d目标点云、中心点、方向、尺寸、多帧匹配融合、3d目标连接关系
+           地图融合 ： icp配准融合。。。
+           地图应用 ： 
+    定位 localization:
+           地图加载 : 3d语义目标、关键帧 、匹配的3dobjects
+           新关键帧 目标检测 ： 
+           目标级别的数据关联 ：  先验值、概率分布、空间分布、icp
+           跟踪：     2d 物体跟踪，pnp(2d-3d) 更新 和 添加新的目标
+           重定位： 关键帧选择  点/线特征、词带表示向量 物体分布图  数据关联后 全局优化
+           多传感器融合
+           
+           
+# 项目的一般思路。
+[参考](https://www.cnblogs.com/luyb/p/9124950.html)
+
+    1. 前期调研。
+       分析项目的产品化需求，输入输出，软硬件平台，以及相关（开源）算法的初步测试和分析。
+    2. 算法架构设计。
+       根据调研结果，大致确定算法模块的功能和具体实现方法。
+    3. 迭代开发。
+       开发过程中必然会碰到很多预料之外的问题。
+       如果有备案，那么尝试备案方案。如果遇到了原理性的问题，那么要修正和扩展架构。
+    3. 技术储备。
+       开发过程中要时刻注重新技术和新方法的储备。
+
+
+
 
 ## 1. 用深度学习方法替换传统slam中的一个/几个模块： 
                 特征提取，特征匹配，提高特征点稳定性，提取点线面等不同层级的特征点。
