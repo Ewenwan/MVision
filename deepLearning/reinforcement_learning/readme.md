@@ -1,6 +1,8 @@
 # 强化学习、反馈学习、遗传学习 自主学习...
 [	深度强化学习综述(上)](https://blog.csdn.net/SIGAI_CSDN/article/details/83862597)
 
+[openAI Deep RL 学习](https://spinningup.openai.com/en/latest/)
+
     人工智能中的很多应用问题需要算法在每个时刻做出决策并执行动作。
     
     1. 对于围棋，每一步需要决定在棋盘的哪个位置放置棋子，以最大可能的战胜对手；
