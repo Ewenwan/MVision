@@ -1,13 +1,46 @@
 # 深度学习结合SLAM 研究现状总结
 
+[参考 技术刘](http://www.liuxiao.org/2018/08/semantic-slam-%E6%96%87%E7%AB%A0%E6%94%B6%E9%9B%86/)
+
 [语义 SLAM 中的概率数据融合 ](https://www.cis.upenn.edu/~kostas/mypub.dir/bowman17icra.pdf)
     
 [语义SLAM的概率数据关联 解析（一）简介](https://zhuanlan.zhihu.com/p/39849427)
+
+[上面的论文——融合传统CPM分割语义信息](http://www.liuxiao.org/wp-content/uploads/2018/08/Probabilistic-Data-Association-for-Semantic-SLAM.pdf)
 
     期望最大化(EM) 估计来把语义 SLAM 转换成概率问题，优化目标仍然是熟悉的重投影误差。
     这篇文章只用了 DPM 这种传统方法做检测没有用流行的深度学习的检测网络依然取得了一定的效果。
     当然其文章中有很多比较强的假设，比如物体的三维中心投影过来应该是接近检测网络的中心，
     这一假设实际中并不容易满足。
+    
+[融合语义分割信息  Visual Semantic Odometry ](http://www.liuxiao.org/wp-content/uploads/2018/08/VSO-Visual-Semantic-Odometry.pdf)
+    
+    既然检测可以融合，把分割结果融合当然是再自然不过的想法，而且直观看来分割有更加细粒度的对物体的划分
+    对于 SLAM 这种需要精确几何约束的问题是更加合适的。
+    ETH 的这篇文章紧随其后投到了今年的 ECCV 2018。
+    这篇文章依然使用 EM 估计，在上一篇的基础上使用距离变换将分割结果的边缘作为约束，同时依然利用投影误差构造约束条件。
+    在 ORB SLAM2 和 PhotoBundle 上做了验证取得了一定效果。这篇文章引入距离变换的思路比较直观，
+    很多人可能都能想到，不过能够做 work 以及做了很多细节上的尝试，依然是非常不容易的。
+    但仍然存在一个问题是，分割的边缘并不代表是物体几何上的边缘，
+    不同的视角这一分割边缘也是不停变化的，因此这一假设也不是非常合理。
+    
+[双目语义3D物体跟踪 ](http://www.liuxiao.org/wp-content/uploads/2018/08/Stereo-Vision-based-Semantic-3D-Object-and-Ego-motion-Tracking-for-Autonomous-Driving.pdf) 
+    
+    港科大沈邵劼老师团队的最新文章，他们的 VINS 在 VIO 领域具有很不错的开创性成果。
+    现在他们切入自动驾驶领域做了这篇双目语义3D物体跟踪的工作，效果还是很不错的。
+    在沈老师看来，SLAM 是一个多传感器融合的框架，RGB、激光、语义、IMU、
+    码盘等等都是不同的观测，所以只要是解决关于定位的问题，SLAM 的框架都是一样适用的。
+    在这篇文章中，他们将不同物体看成不同的 Map，一边重建一边跟踪。
+    使用的跟踪方法仍然是传统的 Local Feature，而 VIO 作为世界坐标系的运动估计。
+    语义融合方面，他们构造了4个优化项.
+    
+    思想和 mask-fuscision 类似，就是把 不同的物体当作 地图对象来进行跟踪和重建。！！！！！
+    
+    
+    
+    
+    
+    
 # 数学描述
     路标点集合       L = {Lm} m=[1:M]
     传感器姿态序列    X = {xt} t=[1:T]
