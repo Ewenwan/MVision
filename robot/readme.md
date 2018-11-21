@@ -34,6 +34,24 @@
 
 
 [树莓派+Arduino+TensorFlow：搭建图像识别小车](https://github.com/Ewenwan/rpi)
+
+
+[高程制图-粗糙地形导航 ](https://github.com/Ewenwan/elevation_mapping)
+
+[网格地图——移动机器人地图的通用栅格地图库 ](https://github.com/Ewenwan/grid_map)
+
+[自由步态——腿式机器人多功能控制的体系结构 ](https://github.com/Ewenwan/free_gait)
+
+[机器人运动学与动力学](https://github.com/Ewenwan/kindr)
+
+[ROS wrappers for kindr  定制的ros系统](https://github.com/Ewenwan/kindr_ros)
+
+[粗糙地形导航的建图 移动  估计](https://github.com/Ewenwan/traversability_estimation)
+
+[一种高度移动和动态的四足机器人 ](https://www.research-collection.ethz.ch/bitstream/handle/20.500.11850/118642/eth-49454-01.pdf?sequence=1)
+
+[]()
+
 #  Robotics 须知　
 
 相关参考 Relevant Awesome Lists
