@@ -19,6 +19,9 @@
     Exploration of unknown terrain
  ](http://ais.informatik.uni-freiburg.de/teaching/ss17/robotics/)
 
+[弗莱堡课程Robot Mapping - WS 2013/14](http://ais.informatik.uni-freiburg.de/teaching/ws13/mapping/)
+
+[ Occupancy Grid Mapping 占用栅格地图构建算法实现《概率机器人》第9章](https://github.com/Ewenwan/occ_grid_mapping)
 
 [CSE598C Vision-Based Tracking 课程  滤波+跟踪 ](http://101.96.10.63/www.cse.psu.edu/~rtc12/CSE598C/)
 
