@@ -65,8 +65,19 @@
     
     
     
+# 动态 语义 SLAM相关论文
     
+[DynaSLAM:  Tracking,  Mapping  and  Inpainting  in  Dynamic  Scenes MASK-RCNN语义分割 和多视角集合判断动态点 剔除 动态关键点](https://arxiv.org/pdf/1806.05620.pdf)
     
+[DynSLAM, Robust  Dense  Mapping  for  Large-Scale  Dynamic  Environments 语义分割&光流 ](http://www.cvlibs.net/publications/Barsan2018ICRA.pdf )
+    
+[DS-SLAM:A Semantic Visual SLAM towards Dynamic Environments 语义分割 & 运动一致性检测 & octomap](https://arxiv.org/pdf/1809.08379.pdf)
+    
+[语义概率数据融合 语义slam](https://www.cis.upenn.edu/~kostas/mypub.dir/bowman17icra.pdf)
+[博客解析](https://blog.csdn.net/crazydogg/article/details/82670046)
+
+[VSO: Visual Semantic Odometry 语义概率数据融合 ](https://demuc.de/papers/lianos2018vso.pdf)
+[知乎论文解析](https://zhuanlan.zhihu.com/p/45689132)
     
 # 数学描述
     路标点集合       L = {Lm} m=[1:M]
