@@ -53,6 +53,9 @@
 
 [视觉SLAM滑窗 局部全局优化 Double Window Optimisation for Constant Time Visual SLAM](http://www.doc.ic.ac.uk/~ajd/Publications/strasdat_etal_iccv2011.pdf)
 
+
+[Visual Odometry(视觉里程计) StereoScan  viso2 ](https://github.com/Ewenwan/viso2)
+
 # 目录:
 
     ch1 Preface 
