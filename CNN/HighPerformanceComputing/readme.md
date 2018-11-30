@@ -10,6 +10,56 @@
       
 [浮点运算和代码优化, 并行计算, Optimizer软件](http://antkillerfarm.github.io/ai/2015/10/12/float.html)
 
+# 相关 库
+      0、小米 mace
+[代码](https://github.com/Ewenwan/mace)
+      
+      Mobile AI Compute Engine (MACE) 是一个专为移动端异构计算平台优化的神经网络计算框架。
+
+      1、OpenVINO  intel cpu 核显 优化加速
+      Intel推出OpenVINO工具包，将计算机视觉带到物联网终端
+      OpenVINO（开放的视觉推理和神经网络优化）工具包
+      使开发人员能够在云上（如TensorFlow，MXNet和Caffe等流行款框架）构建和训练人工智能模型，
+      并将其部署到各种产品中。
+      Windows*
+      Linux* (supports Ubuntu*, CentOS*, and Yocto Project*)
+      Linux for FPGA 
+[英特尔推深度学习加速工具包 OpenVINO](https://github.com/Ewenwan/dldt)
+
+      
+      2、腾讯NCNN框架入门到应用
+
+[代码](https://github.com/Ewenwan/ncnn)
+     
+     3、FeatherCNN
+[代码](https://github.com/Ewenwan/FeatherCNN)
+
+     4、Tengine 高性能神经网络推理引擎
+[代码](https://github.com/Ewenwan/Tengine)
+
+      5、百度MDL
+[代码](https://github.com/Ewenwan/paddle-mobile)
+
+      6、九言科技 绝影（Prestissimo）
+[代码](https://github.com/Ewenwan/In-Prestissimo)
+
+      7、Google量化方法 r=S(q-Z)  tflite  TensorFlow Lite  
+[代码](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)
+      
+      8、英伟达 TensorRT ， NVIDIA TensorRT是一种高性能神经网络推理(Inference)引擎
+[代码](https://github.com/Ewenwan/TensorRT_Tutorial)
+
+[英伟达 CUDA 和 TensorRT 代码实验](https://github.com/Ewenwan/CUDA_Test)
+
+      9、FaceBOOK caffe2 pytorch QNNPACK  uint8量化
+[QNNPACK uint8量化 ](https://github.com/Ewenwan/QNNPACK)
+
+
+[深度学习框架的并行优化方法小结](https://github.com/DragonFive/myblog/blob/master/source/_posts/mpi_parallel.md)
+
+
+
+
 ## 卷积计算优化
     目前，卷积的计算大多采用间接计算的方式，主要有以下三种实现方式：
 
@@ -87,47 +137,3 @@ B矩阵仿存，使用指针访问，
 
 之后可以使用更大的分块，在进行寄存器，指针，展开优化。
       
-# 在深度神经网络中 特指提高卷积计算方式的方法
-      0、小米 mace
-[代码](https://github.com/Ewenwan/mace)
-      
-      Mobile AI Compute Engine (MACE) 是一个专为移动端异构计算平台优化的神经网络计算框架。
-
-      1、OpenVINO
-      Intel推出OpenVINO工具包，将计算机视觉带到物联网终端
-      OpenVINO（开放的视觉推理和神经网络优化）工具包
-      使开发人员能够在云上（如TensorFlow，MXNet和Caffe等流行款框架）构建和训练人工智能模型，
-      并将其部署到各种产品中。
-      Windows*
-      Linux* (supports Ubuntu*, CentOS*, and Yocto Project*)
-      Linux for FPGA 
-      
-      
-      2、腾讯NCNN框架入门到应用
-
-[代码](https://github.com/Ewenwan/ncnn)
-     
-     3、FeatherCNN
-[代码](https://github.com/Ewenwan/FeatherCNN)
-
-     4、Tengine 高性能神经网络推理引擎
-[代码](https://github.com/Ewenwan/Tengine)
-
-      5、百度MDL
-[代码](https://github.com/Ewenwan/paddle-mobile)
-
-      6、九言科技 绝影（Prestissimo）
-[代码](https://github.com/Ewenwan/In-Prestissimo)
-
-      7、Google量化方法 r=S(q-Z)  tflite  TensorFlow Lite  
-[代码](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite)
-      
-      8、英伟达 TensorRT ， NVIDIA TensorRT是一种高性能神经网络推理(Inference)引擎
-[代码](https://github.com/Ewenwan/TensorRT_Tutorial)
-
-[英伟达 CUDA 和 TensorRT 代码实验](https://github.com/Ewenwan/CUDA_Test)
-
-      9、FaceBOOK caffe2 pytorch QNNPACK  uint8量化
-[QNNPACK uint8量化 ](https://github.com/Ewenwan/QNNPACK)
-
-[深度学习框架的并行优化方法小结](https://github.com/DragonFive/myblog/blob/master/source/_posts/mpi_parallel.md)
