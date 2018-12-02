@@ -1,4 +1,6 @@
 # opencv4.0
+[github](https://github.com/opencv/opencv/tree/4.0.0)
+
 ## C++ 11
     OpenCV 1.x 的许多C API 接口被移除，
     对objdetect, photo, video, videoio, imgcodecs, calib3d模块会有影响。
@@ -31,3 +33,29 @@
     非常高效且高质量的DIS密集光流算法已经从opencv_contrib转移到opencv的视频模块中。
     CPU和GPU加速的KinFu实时三维密集重建算法已包含在opencv_contrib中。
 
+## 安装
+
+    # 依赖项
+    sudo apt-get install build-essential cmake git pkg-config  
+    sudo apt-get install libjpeg8-dev   
+    sudo apt-get install libtiff5-dev   
+    sudo apt-get install libjasper-dev   
+    sudo apt-get install libpng12-dev  
+    sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev <span>libcv-dev </span>
+
+    sudo apt-get install libgtk2.0-dev  
+    sudo apt-get install libatlas-base-dev gfortran  
+    
+    
+    # 编译
+    cd opencv-master
+    mkdir release 
+    cd release 
+    生成makefile
+
+    sudo cmake -D CMAKE_BUILD_TYPE=RELEASE \  
+               -D CMAKE_INSTALL_PREFIX=/usr/local ..  
+
+    sudo make -j2
+    sudo make install  
+    sudo ldconfig  
