@@ -108,6 +108,8 @@
 
 [IMU代码参考](https://github.com/Ewenwan/IMUProject)
 
+[鲁棒陀螺仪双积分](https://github.com/Ewenwan/ridi_imu)
+
 # 难点 
       复杂性主要来源于 IMU测量 加速度 和 角速度 这两个量的事实，所以不得不引入运动学计算。
       
