@@ -106,6 +106,8 @@
 
 [四元数AHRS姿态解算和IMU姿态解算分析](http://www.bspilot.com/?p=121)
 
+[IMU代码参考](https://github.com/Ewenwan/IMUProject)
+
 # 难点 
       复杂性主要来源于 IMU测量 加速度 和 角速度 这两个量的事实，所以不得不引入运动学计算。
       
