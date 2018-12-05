@@ -4,6 +4,8 @@
 
 [本文github链接](https://github.com/Ewenwan/MVision/blob/master/vSLAM/oRB_SLAM2/readme.md)
 
+[基于ORBSLAM2加入线特征重建 半稠密地图](https://github.com/Ewenwan/ORB_Line_SLAM)
+
 [orbslam2 + imu](https://github.com/Ewenwan/LearnVIORB)
 
 [ORBSLAM2_with_pointcloud_map 添加一个可视化线程用来显示点云](https://github.com/Ewenwan/ORBSLAM2_with_pointcloud_map)
