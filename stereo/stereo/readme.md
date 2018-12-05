@@ -4,6 +4,7 @@
 [ELAS代码](https://github.com/Ewenwan/ELAS)
 [棋盘格](https://github.com/DLuensch/StereoVision-ADCensus/tree/master/Documents/chessboards)
 
+[双目视差图 精细化调整算法](https://github.com/Ewenwan/FDR)
 
 [DynamicStereo 算法较多 参考](https://github.com/Ewenwan/DynamicStereo)
 
