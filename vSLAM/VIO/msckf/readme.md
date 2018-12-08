@@ -5,6 +5,9 @@
 [论文 MSCKF 2.0 : High-Precision, Consistent EKF-based Visual-Inertial Odometry](http://intra.ece.ucr.edu/~mourikis/papers/Li2013IJRR.pdf)
 
 
+[双目MSCKF视觉惯性里程计](https://github.com/Ewenwan/msckf_vio)
+
+
 # 紧耦合
       紧耦合方式使用 IMU 完成视觉 VO 中的运动估计 , 
       IMU 在图像帧间的积分的误差比较小 , IMU的数据可用于预测帧间运动 , 
