@@ -22,6 +22,7 @@
 
 [Artificial Intelligence 词汇集](https://jiqizhixin.github.io/AI-Terminology-page/)
 
+[课程《Python3 入门机器学习》示例代码](https://github.com/liuyubobobo/Play-Leetcode)
 
 [台大机器学习课程作业详解 ](https://github.com/Ewenwan/ML-Foundation-and-ML-Techniques)
 
