@@ -3,6 +3,10 @@
 
 [openAI Deep RL 学习](https://spinningup.openai.com/en/latest/)
 
+[CS294-112深度增强学习课程（加州大学伯克利分校 2017） B站视频](https://www.bilibili.com/video/av9802698/)
+
+[CS294-112官方课程主页](http://rail.eecs.berkeley.edu/deeprlcourse/)
+
     人工智能中的很多应用问题需要算法在每个时刻做出决策并执行动作。
     
     1. 对于围棋，每一步需要决定在棋盘的哪个位置放置棋子，以最大可能的战胜对手；
