@@ -28,6 +28,45 @@
     
     Tensorflow前端支持多种开发语言，包括Python,C++，Go,Java等，出于性能的考虑，后端实现采用了C++和CUDA。
 
+示例:
+
+```python
+import tensor flow as tf
+# 生成一个1维度向量，长度为100，初始化为0
+b = tf.Variable(tf.zeros([100])) 
+
+#生成一个二维数组，大小为784x100,随机初始化 -1~1
+W = tf.Variable(tf.random_uniform([784,100],-1,1)) 
+
+# 生成输入的Placeholder，计算的时候填入输入值
+x = tf.palceholder(name="x")
+#计算最终输出
+s  = tf.matmul(W,x) + b
+out= tf.nn.relu(s)
+#开始计算
+with tf.Session() as sess:
+    r = sess.run(out, feed_dict={x:input})
+    print(r)
+
+# 我们我们算法是输入是 x, 输出是 out = Relu(wx+b) .
+```
+
+![](https://upload-images.jianshu.io/upload_images/12714329-664b59dc942586c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/330/format/webp)
+
+1. 计算图(graph)：TensorFlow中的计算都可以表示为一个有向图(directed graph),上图就是一个计算图(Graph)。
+
+2. 节点(node)：计算图中的每个运算操作，比如Add,Relu,Matmul就将作为节点，b,w,x,out等也是节点
+
+3. 运算(operation)：例如Add,Relu,Matmul，运算代表一种类型的抽象运算。运算可以有自己的属性，但是所有属性必须被预先设置，或则能在计算的时候被推断出来。
+
+4. 运算核：是一个运算在一个具体硬件(GPU,CPU,ARM等)上的实现。
+
+5. 张量（Tensor）：张量是对Tensorflow中所有数据的抽象，张量有自己的维度和size。有自己是数据类型，比如浮点，整形等。张量沿着计算图的边流动，这也是平台名称tensorflow名字的来源。
+
+6. 会话（session）：会话包含了计算图运行的所有上线问信息。
+
+
+
 # tensorflow  pip安装
     Ubuntu/Linux 64-bit$ 
     安装 python
@@ -97,8 +136,6 @@
 * 9. [TensorBoard]                    tensorboard 显示优化记录专题 (09_tensorboard.py)
 * 10. [Save and restore net]          保存和载入网络模型           (10_save_restore_net.py)
 ```
-
-
 
 # 1. TensorFlow 前身 DistBelief 分析 
     DistBelief 的编程模型是基于 层 的 DAG 图。
