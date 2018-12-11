@@ -32,14 +32,18 @@
 
 ```python
 import tensor flow as tf
-# 生成一个1维度向量，长度为100，初始化为0
-b = tf.Variable(tf.zeros([100])) 
+# 生成一个1维度向量，长度为10，初始化为0
+b = tf.Variable(tf.zeros([10])) 
 
-#生成一个二维数组，大小为784x100,随机初始化 -1~1
-W = tf.Variable(tf.random_uniform([784,100],-1,1)) 
+#生成一个二维数组，大小为784x10,随机初始化 -1~1
+W = tf.Variable(tf.random_uniform([784,10],-1,1)) 
 
 # 生成输入的Placeholder，计算的时候填入输入值
-x = tf.palceholder(name="x")
+x = tf.palceholder(name="x") # tf.placeholder 定义了一个占位的 OP
+# 当 Session.run 时，将通过 feed_dict 的字典提供一个 mini-batch 的
+# 样本数据集，从而自动推导出 tf.placeholder 的大小。
+
+
 #计算最终输出
 s  = tf.matmul(W,x) + b
 out= tf.nn.relu(s)
@@ -49,6 +53,9 @@ with tf.Session() as sess:
     print(r)
 
 # 我们我们算法是输入是 x, 输出是 out = Relu(wx+b) .
+# MNIST 拥有 50000 个训练样本，如果 batch_size 为 100，
+# 则需要迭代 500 次才能完整地遍历一次训练样本数据集，常称为一个 epoch 周期。
+
 ```
 
 ![](https://upload-images.jianshu.io/upload_images/12714329-664b59dc942586c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/330/format/webp)
