@@ -110,6 +110,9 @@ with tf.Session() as sess:
     github 源码安装源码安装介绍
     http://blog.csdn.net/masa_fish/article/details/54096996
     
+    TensorFlow技术内幕（二）：编译与安装
+    https://www.imooc.com/article/265349
+
 # 学习tensorflow 目录
 ```asm
 * 1. [Simple Multiplication] 两个数相乘 相加 (00_multiply.py) 
@@ -235,20 +238,20 @@ with tf.Session() as sess:
 
 ```
 ./tensorflow
-├── c
-├── cc              53 万行+  C/C++ 代码
-├── compiler
-├── contrib
+├── c               C API代码
+├── cc              C++ API代码            53 万行+  C/C++ 代码
+├── compiler        XLA,JIT等编译优化相关 
+├── contrib         贡献的代码
 ├── core            内核代码, 主要由 C++ 实现，大约拥有 26 万行代码
-├── docs_src
-├── examples
-├── g3doc
-├── go
-├── java
-├── python          37 万行+  Python 代码 Python提供的 API 最完善
-├── stream_executor
-├── tools
-└── user_ops
+├── docs_src        文档相关文件
+├── examples        例子相关代码
+├── g3doc           TF文档
+├── go              go API相关代码
+├── java            java API相关代码
+├── python          Python API相关代码 37 万行+   Python提供的 API 最完善
+├── stream_executor 并行计算框架代码
+├── tools           辅助工具工程代码
+└── user_ops        tf插件代码
 ```
 
 core 内核代码 目录：
@@ -256,22 +259,47 @@ core 内核代码 目录：
 
 ```
 ./tensorflow/core
-├── common_runtime            本地运行时
-├── debug                     调试
-├── distributed_runtime       分布式运行时
-├── example
-├── framework                 基础框架
-├── graph                     图操作
-├── grappler                  模型优化之Grappler
-├── kernels                   Kernel 实现
+├── common_runtime            本地运行时，公共运行库
+├── debug                     调试相关
+├── distributed_runtime       分布式运行时，分布式执行模块
+├── example                   例子代码
+├── framework                 基础框架，基础功能模块
+├── graph                     图操作，计算图相关
+├── grappler                  模型优化模块 Grappler
+├── kernels                   Kernel 实现，包括CPU和GPU上的实现
+├── lib                       公共基础库
+├── ops                       OP 定义，操作代码
+├── platform                  各种平台实现相关 
+├── profiler
+├── protobuf                  Protobuf 定义
+├── public
+├── user_ops                  OP 定义
+└── util                      实用函数库？
+```
+
+ Python API相关代码 目录：
+> tree -d -L 1 ./tensorflow/python
+
+```
+./tensorflow/python
+├── client
+├── debug
+├── estimator
+├── feature_column
+├── framework
+├── grappler
+├── kernel_tests
+├── layers
 ├── lib
-├── ops                      OP 定义
+├── ops
 ├── platform
 ├── profiler
-├── protobuf                 Protobuf 定义
-├── public
-├── user_ops                 OP 定义
-└── util                     实用函数库？
+├── saved_model
+├── summary
+├── tools
+├── training
+├── user_ops
+└── util
 ```
 
 
