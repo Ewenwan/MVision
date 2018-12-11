@@ -239,20 +239,27 @@ with tf.Session() as sess:
 ```
 ./tensorflow
 ├── c               C API代码
-├── cc              C++ API代码            53 万行+  C/C++ 代码
-├── compiler        XLA,JIT等编译优化相关 
-├── contrib         贡献的代码
+├── cc              C++ API代码            总53 万行+  C/C++ 代码
+├── compiler        XLA,JIT等编译优化相关   大约为 12.5 万行，主要使用 C++ 实现
+├── contrib         第三方贡献的代码
 ├── core            内核代码, 主要由 C++ 实现，大约拥有 26 万行代码
 ├── docs_src        文档相关文件
 ├── examples        例子相关代码
 ├── g3doc           TF文档
 ├── go              go API相关代码
 ├── java            java API相关代码
-├── python          Python API相关代码 37 万行+   Python提供的 API 最完善
-├── stream_executor 并行计算框架代码
+├── python          Python API相关代码   总37 万行+   Python提供的 API 最完善
+├── stream_executor 并行计算框架代码，实现了 CUDA 和 OpenCL 的统一封装。  C++ 实现 2.5 万行代码
 ├── tools           辅助工具工程代码
 └── user_ops        tf插件代码
 ```
+
+    contrib 是第三方贡献的编程库，
+    它也是 TensorFlow 标准化之前的实验性编程接口，
+    犹如 Boost 社区与 C++ 标准之间的关系。
+    当 contrib 的接口成熟后，便会被 TensorFlow
+    标准化，并从 contrib 中搬迁至 core, python 中，
+
 
 core 内核代码 目录：
 > tree -d -L 1 ./tensorflow/core
@@ -277,12 +284,12 @@ core 内核代码 目录：
 └── util                      实用函数库？
 ```
 
- Python API相关代码 目录：
-> tree -d -L 1 ./tensorflow/python
+ Python API相关代码 目录： 大约有 18 万行代码
+> tree -d -L 1 ./tensorflow/python         
 
 ```
 ./tensorflow/python
-├── client
+├── client          客户端?
 ├── debug
 ├── estimator
 ├── feature_column
