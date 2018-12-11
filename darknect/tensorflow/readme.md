@@ -5,6 +5,8 @@
 
 [Learn_TensorFLow](https://github.com/Ewenwan/Learn_TensorFLow)
 
+[TensorFlow技术内幕（一）：导论](https://www.imooc.com/article/265350)
+
     TensorFlow 是一个使用 数据流图 (Dataﬂow Graph)  表达数值计算的开源软件库。
     用 节点 表示抽象的 数学计算，并使用 OP 表达计算的逻辑；
     而 边   表示节点间 传递的数据流，
@@ -22,6 +24,8 @@
     
     Google Brain 构建了第一代分布式深度学习框架 DistBelief。
     于 2015.11 重磅推出第二代分布式深度学习框架 TensorFlow。
+    
+    Tensorflow前端支持多种开发语言，包括Python,C++，Go,Java等，出于性能的考虑，后端实现采用了C++和CUDA。
 
 # tensorflow  pip安装
     Ubuntu/Linux 64-bit$ 
@@ -181,10 +185,55 @@
 ## 代码结构
 克隆源代码：
 > $ git clone git@github.com:tensorflow/tensorflow.git
+
 切换到最新的稳定分支上。例如， r1.4 分支.
 
 > $ cd tensorflow
 
 > $ git checkout r1.4
+
+查看代码结构：
+>$ tree -d -L 1 ./tensorflow   目录下 一级目标列表
+
+```
+./tensorflow
+├── c
+├── cc              53 万行+  C/C++ 代码
+├── compiler
+├── contrib
+├── core            内核代码, 主要由 C++ 实现，大约拥有 26 万行代码
+├── docs_src
+├── examples
+├── g3doc
+├── go
+├── java
+├── python          37 万行+  Python 代码 Python提供的 API 最完善
+├── stream_executor
+├── tools
+└── user_ops
+```
+
+core 内核代码 目录：
+> tree -d -L 1 ./tensorflow/core
+
+```
+./tensorflow/core
+├── common_runtime            本地运行时
+├── debug                     调试
+├── distributed_runtime       分布式运行时
+├── example
+├── framework                 基础框架
+├── graph                     图操作
+├── grappler                  模型优化之Grappler
+├── kernels                   Kernel 实现
+├── lib
+├── ops                      OP 定义
+├── platform
+├── profiler
+├── protobuf                 Protobuf 定义
+├── public
+├── user_ops                 OP 定义
+└── util                     实用函数库？
+```
 
 
