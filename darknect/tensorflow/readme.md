@@ -296,7 +296,7 @@ core 内核代码 目录：
 
 ```
 ./tensorflow/python
-├── client          客户端?
+├── client          客户端? 是前端系统的主要组成部分
 ├── debug
 ├── estimator
 ├── feature_column
@@ -315,5 +315,51 @@ core 内核代码 目录：
 ├── user_ops
 └── util
 ```
+
+
+# 3. TensorFlow 系统架构
+
+
+
+# 4. C API：分水岭
+
+
+# 5. 计算图
+
+
+# 6. 设备
+
+
+# 7. 会话  Session 
+
+
+ 
+# 8. 变量  Variable
+
+
+
+# 9. 队列  QueueRunner  控制异步计算的强大工具 
+
+
+# 10. OP 本质论 
+
+
+# 11. 本地执行
+
+
+# 12. 分布式 TensorFlow
+
+
+# 13. BP反向传播算法 实现 
+
+# 14. 数据加载
+
+
+# 15. 模型保存 Saver 
+
+
+# 16. 会话监视器 MonitoredSession
+
+
 
 
