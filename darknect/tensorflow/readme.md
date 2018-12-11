@@ -2,10 +2,11 @@
 
 [TFLearn: Deep learning library featuring a higher-level API for TensorFlow ](https://github.com/Ewenwan/tflearn)
 
-
 [Learn_TensorFLow](https://github.com/Ewenwan/Learn_TensorFLow)
 
 [TensorFlow技术内幕（一）：导论](https://www.imooc.com/article/265350)
+
+![](https://upload-images.jianshu.io/upload_images/12714329-6928cb6461e05052.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/565/format/webp)
 
     TensorFlow 是一个使用 数据流图 (Dataﬂow Graph)  表达数值计算的开源软件库。
     用 节点 表示抽象的 数学计算，并使用 OP 表达计算的逻辑；
