@@ -55,6 +55,7 @@ int
   pass.setInputCloud (cloud_ptr);//设置输入点云
   pass.setFilterFieldName ("z");// 定义轴
   pass.setFilterLimits (0.0, 1.0);//　范围
+ // pass.setKeepOrganized(true); // 保持 有序点云结构===============
   pass.setFilterLimitsNegative (true);//标志为false时保留范围内的点
   pass.filter (*cloud_filtered_ptr);
 
