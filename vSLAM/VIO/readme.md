@@ -110,6 +110,22 @@
 
 [鲁棒陀螺仪双积分](https://github.com/Ewenwan/ridi_imu)
 
+      IMU预积分技术最早由T Lupton于12年提出  http://www.sohu.com/a/242760307_715754
+      
+[Visual-Inertial-Aided Navigation for High-Dynamic Motion in Built Environments Without Initial Conditions](  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6092505) 
+    
+      C Forster于15年[2][3][4]将其进一步拓展到李代数上，形成了一套优雅的理论体系。
+      https://arxiv.org/pdf/1512.02363v1.pdf
+      http://rpg.ifi.uzh.ch/docs/RSS15_Forster.pdf
+      http://rpg.ifi.uzh.ch/docs/RSS15_Forster_Supplementary.pdf
+      
+      Forster将IMU预积分在开源因子图优化库GTSAM中进行了实现，并完成了和其另一大作SVO的组合。
+      https://bitbucket.org/gtborg/gtsam
+      https://github.com/Ewenwan/gtsam-1
+      
+      这套理论目前已经被广泛的应用在基于Bundle Adjustment优化框架的Visual Inertial Odometry中。
+      其中包括VI-ORBSLAM，港科大VINS，浙大ICE-BA等。
+
 # 难点 
       复杂性主要来源于 IMU测量 加速度 和 角速度 这两个量的事实，所以不得不引入运动学计算。
       
