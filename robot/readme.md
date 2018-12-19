@@ -6,7 +6,9 @@
 
 [ probabilistic robotics 概率机器人编程练习题 matlab](https://github.com/Ewenwan/probabilistic_robotics)
 
-[基于激光雷达的 移动机器人小车 代码](https://github.com/Ewenwan/ddl_0725)
+[ros下  基于激光雷达的 移动机器人小车 代码](https://github.com/Ewenwan/ddl_0725)
+
+[ros下 基于激光雷达的 动态环境下的 导航 路径规划 避障](https://github.com/Ewenwan/dynamic_robot_localization)
 
 
 ## 其他参考课程
