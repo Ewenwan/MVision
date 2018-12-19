@@ -124,6 +124,9 @@ with tf.Session() as sess:
     https://www.imooc.com/article/265349
 
 # 学习tensorflow 目录
+
+[学习tensorflow ](https://github.com/Ewenwan/Learn_TensorFLow)
+
 ```asm
 * 1. [Simple Multiplication] 两个数相乘 相加 (00_multiply.py) 
 * 2. [Linear Regression]     两维变量 线性回归  (01_linear_regression.py)
