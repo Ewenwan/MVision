@@ -21,6 +21,8 @@
 
 [Caffe使用教程_c++接口](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/Caffe%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B_c%2B%2B%E6%8E%A5%E5%8F%A3.md)
 
+[caffe MobileNet-SSD  Focal-loss ](https://github.com/Ewenwan/MobileNet-SSD-Focal-loss)
+
 [caffe 模型搜集](https://github.com/SnailTyan/caffe-model-zoo)
 ![screenshot](https://user-images.githubusercontent.com/21311442/33640664-cbcbeff2-da6c-11e7-97c8-1ad8d7fdf4c0.png)
 
