@@ -1,7 +1,7 @@
 # MXnet
 [参考](http://lucianlv.blog.51cto.com/9871307/1812733)
 
-[通过 MXNet / Gluon 来动手学习深度学习　在线](http://zh.gluon.ai/)
+[通过 MXNet / Gluon 来动手学习深度学习　在线](https://zh.diveintodeeplearning.org/)
 
 [pdf](http://zh.gluon.ai/gluon_tutorials_zh.pdf)
 
