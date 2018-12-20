@@ -3,6 +3,8 @@
 
 [通过 MXNet / Gluon 来动手学习深度学习　在线](https://zh.diveintodeeplearning.org/)
 
+[github](https://github.com/diveintodeeplearning/d2l-zh)
+
 [pdf](http://zh.gluon.ai/gluon_tutorials_zh.pdf)
 
 [代码](https://github.com/Ewenwan/gluon-tutorials-zh)
