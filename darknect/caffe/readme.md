@@ -23,6 +23,8 @@
 
 [caffe MobileNet-SSD  Focal-loss ](https://github.com/Ewenwan/MobileNet-SSD-Focal-loss)
 
+[caffe 实现  MobileNet-YOLOv3 ](https://github.com/Ewenwan/MobileNet-YOLO)
+
 [caffe 模型搜集](https://github.com/SnailTyan/caffe-model-zoo)
 ![screenshot](https://user-images.githubusercontent.com/21311442/33640664-cbcbeff2-da6c-11e7-97c8-1ad8d7fdf4c0.png)
 
