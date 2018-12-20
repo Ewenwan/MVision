@@ -6,6 +6,8 @@
 
 [SVO代码分析 较细致](https://www.cnblogs.com/hxzkh/p/8607714.html)
 
+[学习rpg_svo 根据代码和论文进行一步步的分析](https://github.com/yueying/OpenMVO)
+
 [svo： semi-direct visual odometry 论文解析](https://blog.csdn.net/heyijia0327/article/details/51083398)
 
 [鲁棒 边缘特征SVO](https://github.com/Ewenwan/svo_edgelet)
