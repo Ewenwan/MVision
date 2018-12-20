@@ -4,7 +4,7 @@
 
 [基于YOLO的3D目标检测：YOLO-6D bounding box在2D图像上的投影的1个中心点和8个角点 + 置信度 + 类别C](https://zhuanlan.zhihu.com/p/41790888)
 
-
+[yolov1 赛灵思（Xilinx） ZCU102 SoC 16bit量化 x86 / ARM  NEON优化加速](https://github.com/Ewenwan/YOLO_quantize)
 
 * YOLO-v1 论文翻译
 [You Only Look Once: Unified, Real-Time Object Detection](https://arxiv.org/abs/1506.02640)
