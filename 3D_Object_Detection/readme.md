@@ -11,8 +11,14 @@
 
 [object-3D目标检测算法调研（基于激光雷达、kitti数据集）](https://blog.csdn.net/sum_nap/article/details/80966979)
 
-
 [实时3d目标重建 InfiniTAM ](https://github.com/Ewenwan/InfiniTAM)
+
+[3D卷积网络点云配准](https://github.com/Ewenwan/3dmatch-toolbox)
+
+[apc-vision-toolbox matlab 亚马逊抓取比赛](https://github.com/andyzeng/apc-vision-toolbox)
+
+
+[深度增强学习 训练 机械臂推开抓取 python](https://github.com/Ewenwan/visual-pushing-grasping)
 
 > 3d检测跟踪  利用光流+ransac 进行目标跟踪
 ![](https://github.com/Ewenwan/MVision/blob/master/3D_Object_Detection/img/dynamic.png)
