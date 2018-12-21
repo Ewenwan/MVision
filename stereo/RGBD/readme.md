@@ -86,6 +86,8 @@
                 
 #  主动立体双目算法的框架
 
+https://blog.csdn.net/u013626386/article/details/79892149
+
     step1. 双目设备的标定；
     step2. 双目设备的校准；
     step3. 双目立体匹配算法；
