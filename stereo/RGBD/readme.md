@@ -83,8 +83,20 @@
         畸变参数：
                 -0.40128  0.407587 0.000954767 0.000714202 0.114102 
                 0.0422759 0.11784  0.370694    -0.0115273  0.00464497 -0.00642652 0.00200558
+                
+#  主动立体双目算法的框架
 
-#  深度图空洞修复算法
+    step1. 双目设备的标定；
+    step2. 双目设备的校准；
+    step3. 双目立体匹配算法；
+    step4. 视差数据的去噪与空洞修复
+    step5. 视差数据映射到三维深度值
+       如果涉及到输出显示 RGB point cloud，需要另外结合1颗RGB彩色摄像头，
+       标定位置关系后可以将点云数据的RGB值一一对应上，用作3D彩色显示，
+    step6. RGB与点云数据的配准与对齐。
+
+
+#  视差图空洞修复算法
     // https://blog.csdn.net/u013626386/article/details/54860969
     holefilling算法流程
     Input:disp –待修复视差图Output:dstDisp -修复后视差图
@@ -158,7 +170,7 @@ void holefilling(Mat _dispSrc, Mat* _dispDst)
 
 ```
 
-# 深度图去噪
+# 视差图去噪
 ```c
 static int depthDenoise(Mat _dispSrc, Mat* _dispDenoise)
 {
