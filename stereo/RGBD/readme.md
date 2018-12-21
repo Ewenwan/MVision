@@ -84,4 +84,100 @@
                 -0.40128  0.407587 0.000954767 0.000714202 0.114102 
                 0.0422759 0.11784  0.370694    -0.0115273  0.00464497 -0.00642652 0.00200558
 
+#  深度图空洞修复算法
+    // https://blog.csdn.net/u013626386/article/details/54860969
+    holefilling算法流程
+    Input:disp –待修复视差图Output:dstDisp -修复后视差图
+    Step1.找到disp中未计算深度的空点，空点集合设为Ω；
+    Step2.遍历每一空点Ω(e)，根据其邻域信息δ(e)判断其是否处于空洞中，
+          如果δ(e)内包含一半以上的深度有效像素(validPixel)，则认为其为空洞点；
+    Step3.使用方形滤波器对空洞点进行填补，利益滤波器与有效像素的加权值补充空洞点处深度值，得到dstDisp；
 
+    Step4.根据设定的迭代次数(iteration)来，置disp =dstDisp，并重复上述步骤，
+           直至迭代完成，输出结果修复后的dstDisp，并据此生成深度数据。
+
+    滤波器及权重设置:
+          采用类似高斯权重设置的方法设置该滤波器权重，离目标像素越远的有效像素，
+          对该空洞点视差值填补的贡献越小。
+    filterSize滤波器大小选择:
+          滤波器目前可选取5x5, 7x7, 9x9, 11x11.
+
+    validPixel有效像素点数选择:
+        例如：使用5x5的滤波器时，需要对空点周边的24个像素值进行深度有效像素点数量的判断，
+              通常认为，空洞点周边应被有效点所环绕，所以此时有效像素点数至少设置为滤波器包含像素一半以上才合理，
+              可设置为validPixel =12；使用其他size滤波器时，有效像素点数设置也应大于滤波器包含像素一半。
+
+    iteration迭代次数选择
+        针对不同的滤波器大小，收敛至较好效果时的迭代次数不一样，需要根据具体场景分析设定。
+```c
+void holefilling(Mat _dispSrc, Mat* _dispDst)
+{
+  int64 t = getTickCount();
+  if (CV_8UC1 != _dispSrc.type())
+  {
+    _dispSrc.convertTo(_dispSrc, CV_8UC1);
+  }
+  Mat dispBw;
+  threshold(_dispSrc, dispBw, dispMin, 255, THRESH_BINARY);
+  dispBw.convetTo(dispBw, CV_32F, 1.0/255);
+  Mat dispValid;
+  _dispSrc.convertTo(dispValid, CV_32F);
+  int margin = filterSize/2;
+  Mat dispFilt = _dispSrc;
+  
+  for (int i = margin; i < dispBw.rows; i++)
+  {
+    for (int j = margin; j < dispBw.cols; j++)
+    {
+      if (0 == dispBw.at<float>(i, j))
+      {
+        Mat filtMat = dispBw(Range(i - margin, i + margin + 1), Range(j - margin, j + margin + 1));
+        Scalar s = sum(filtMat);
+        if (s[0] > validPixel)
+        {
+          Mat tmpWeight;
+          multiply(filtMat, domainFilter, tmpWeight);
+          Scalar s1 = sum(tmpWeight);
+          Mat valid = dispValid(Range(i - margin, i + margin + 1), Range(j - margin, j + margin + 1));
+          Mat final;
+          multiply(tmpWeight, valid, final);
+          Scalar s2 = sum(final);
+          dispFilt.at<unsigned char>(i, j) = (unsigned char)(s2[0] / s1[0]);
+        }
+      }
+      else
+      {
+        dispFilt.at<unsigned char>(i, j) = (unsigned char)(dispValid.at<unsigned char>(i, j));
+      }
+    }
+  }
+  *dispDst = dispFilt;
+  t = getTickCount() - t;
+  printf("Time Elapsed t : %fms\n", t1*1000/getTickFrequency);
+}
+
+```
+
+# 深度图去噪
+```c
+static int depthDenoise(Mat _dispSrc, Mat* _dispDenoise)
+{
+  Mat contourBw;
+  threshold(_dispSrc, contourBw, dispMin, 255, THRESH_BINARY);
+  vector<vector<Point>> contours;
+  findContours(contourBw, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+  double minArea = 10000*scale;
+  for (int i = contours.size() - 1; i >= 0; i--)
+  {
+    double area = countourArea(contours[i]);
+    if (area < minArea)
+    {
+      contours.erase(contours.begin() + i);
+    }
+  }
+  Mat contourDisp(_dispSrc.size(), CV_8UC1, Scalar(0));
+  drawContours(contourDisp, contours, Scalar(1), -1);
+  multiply(_dispSrc, contourDisp, *_dispDenoise);
+  return 0;
+}
+```
