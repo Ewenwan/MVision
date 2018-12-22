@@ -257,3 +257,6 @@ To be added.
 
 ## 人脸识别
 [使用Google的人脸检测API检测情绪-Python](http://blog.topspeedsnail.com/archives/10489)
+
+[使用OpenFace进行人脸识别](http://blog.topspeedsnail.com/archives/10933)
+
