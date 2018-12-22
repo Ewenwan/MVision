@@ -1,4 +1,5 @@
 # 机器学习
+[我的代码!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!](https://github.com/Ewenwan/PyML)
 
 [机器学习&深度学习网站资源汇总（Machine Learning Resources） ](https://github.com/Ewenwan/mlhub123)
 
@@ -6,7 +7,6 @@
 
 [机器学习与概率 概率图模型CPD 结构学习 CRF MCMC ](https://www.cnblogs.com/ironstark/category/765694.html)
 
-[我的代码!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!](https://github.com/Ewenwan/PyML)
 
 [机器学习实战 一整套教学 ](https://github.com/Ewenwan/MachineLearning)
 
