@@ -253,3 +253,7 @@ To be added.
 [学习资料论文代码](https://github.com/Ewenwan/transferlearning)
 
 [学习手册 视觉文本时序医疗健康 KL散度度量 特征学习 子空间 深度对抗网络 ](http://jd92.wang/assets/files/transfer_learning_tutorial_wjd.pdf)
+
+
+## 人脸识别
+[使用Google的人脸检测API检测情绪-Python](http://blog.topspeedsnail.com/archives/10489)
