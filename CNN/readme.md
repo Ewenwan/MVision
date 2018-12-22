@@ -252,3 +252,4 @@ To be added.
 ## 迁移学习 Transfer Learning
 [学习资料论文代码](https://github.com/Ewenwan/transferlearning)
 
+[学习手册 视觉文本时序医疗健康 KL散度度量 特征学习 子空间 深度对抗网络 ](http://jd92.wang/assets/files/transfer_learning_tutorial_wjd.pdf)
