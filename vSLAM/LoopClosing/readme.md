@@ -15,11 +15,27 @@
 
 ## 2 雷达激光数据闭环检测
 
+[Deformation Loop Closure sample code to enable non-rigid alignment of point clouds.](https://github.com/Ewenwan/DeformationLoopClosure)
 
+[laser_loop_closure](https://github.com/Ewenwan/laser_loop_closure)
+
+[laserScan_Similarity](https://github.com/zc-tx/laserScan_Similarity)
+
+[]()
+
+[]()
+
+[]()
 
 ## 3 视觉闭环 结合 激光闭环
 
 
+[]()
 
+[]()
+
+[]()
+
+[]()laserScan_Similarity
 
 
