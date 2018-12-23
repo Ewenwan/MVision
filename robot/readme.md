@@ -1,5 +1,7 @@
 # 机器人
 
+[移动机器人 VREP下仿真 ros控制](https://github.com/Ewenwan/Virtual-Robot-Challenge)
+
 [机器人环境软件安装脚本 ceres tensorflow ros caffe vrep eigen cudnn and cuda ](https://github.com/Ewenwan/robotics_setup)
 
 # 以优达学城 机器人人工智能课程为起点 逐渐丰富内容
