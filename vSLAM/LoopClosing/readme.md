@@ -1,6 +1,6 @@
 # LoopClosing 闭环检测
 
-## 视觉信息 闭环检测
+## 1 视觉信息 闭环检测
 
 [LoopClosing闭环检测](http://frc.ri.cmu.edu/~kaess/vslam_cvpr14/media/VSLAM-Tutorial-CVPR14-A23-LoopClosing.pdf)
 
@@ -13,6 +13,13 @@
 [haloc 图像特征哈希表示 图像与图像匹配](https://github.com/srv/libhaloc)
 
 
-## 雷达数据闭环检测
+## 2 雷达激光数据闭环检测
+
+
+
+## 3 视觉闭环 结合 激光闭环
+
+
+
 
 
