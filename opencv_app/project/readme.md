@@ -1,11 +1,14 @@
 # opencv项目
+
 道路标线检测
 
 交通灯检测
 
+级联回归人脸笑脸检测 
 
 [车道线和交通标志检测](https://github.com/ZhangChaoZhong/LaneMarkings_TrafficSigns_Detection)
 
+基于 特征匹配单应变换的实时 3D物体跟踪
 
 # 纹理对象的实时姿态估计
 
