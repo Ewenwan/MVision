@@ -50,11 +50,17 @@
 
 [LSD_slam & 激光雷达slam](http://www.cs.toronto.edu/~urtasun/courses/CSC2541/04_SLAM.pdf)
 
-
 [视觉SLAM滑窗 局部全局优化 Double Window Optimisation for Constant Time Visual SLAM](http://www.doc.ic.ac.uk/~ajd/Publications/strasdat_etal_iccv2011.pdf)
 
-
 [Visual Odometry(视觉里程计) StereoScan  viso2 ](https://github.com/Ewenwan/viso2)
+
+闭环检测:
+
+[DBoW2 二进制字符串特征 词袋模型](https://github.com/dorian3d/DBoW2)
+[DBoW3 二进制、浮点型特征 词袋模型](https://github.com/rmsalinas/DBow3)
+[FBOW  AVX,SSE and MMX指令集优化的 DBoW2 DBoW3](https://github.com/rmsalinas/fbow)
+[haloc 图像特征哈希表示 图像与图像匹配](https://github.com/srv/libhaloc)
+
 
 # 目录:
 
