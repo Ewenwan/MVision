@@ -57,6 +57,19 @@ total_number_of_pixels = gray_img.size
 
 # 自适应窗口显示图像
 cv2.imshow("OpenCV logo", image)
+b, g, r = cv2.split(image)            # bgr
+img_matplotlib = cv2.merge([r, g, b]) # rgb
+
+# 矩阵连接 图像连接  image在左边 img_matplotlib 在右边
+img_concats = np.concatenate((image, img_matplotlib), axis=1) # 按列 闫拓
+
+# 功能同 cv2.split(image)
+B = image[:, :, 0]
+G = image[:, :, 1]
+R = image[:, :, 2]
+
+# 第三通道 逆序 bgr ----> rgb  Numpy 
+img_RGB = img_OpenCV[:, :, ::-1]
 
 # 显示灰度图
 cv2.imshow("OpenCV logo gray format", gray_image)
@@ -67,6 +80,7 @@ cv2.imwrite("./gray", gray_image)
 
 # difference = cv2.subtract(bgr_image, temp)# 矩阵相减
 # b, g, r = cv2.split(difference)           # 矩阵通道分割  merge() 合并
+# img_matplotlib = cv2.merge([r, g, b]) # brg 图像 变成 RGB 图像 !!!!!!!!
 # assert cv2.countNonZero(b) == 0 and cv2.countNonZero(g) == 0 and cv2.countNonZero(r) == 0
 
 
