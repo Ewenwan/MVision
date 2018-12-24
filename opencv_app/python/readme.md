@@ -99,10 +99,97 @@ cv2.destroyAllWindows()
 ```
 
 
-
-
+## 2. 命令行参数解析 摄像头读取 录制视频
 ```python
+import argparse
+import cv2
 
+# 时间 ====
+import datetime
+import time
+
+# 解析命令行参数
+parser = argparse.ArgumentParser()
+
+# 添加key
+parser.add_argument("path_image", help="path to input image to be displayed")# 添加 key
+parser.add_argument("path_image_output", help="path of the processed image to be saved")
+parser.add_argument("index_camera", help="index of the camera to read from", type=int)# 摄像头id
+parser.add_argument("ip_url", help="IP URL to connect") # 网络摄像头
+parser.add_argument("video_path", help="path to the video file") # 视频文件
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter03/01-chapter-content/read_video_file_all_properties.py
+
+
+args = parser.parse_args()# 解析
+image_input = cv2.imread(args.path_image)
+# 解析参数成字典 类型
+arg_dict = vars(parser.parse_args())
+image2 = cv2.imread(arg_dict["path_image"])
+
+gray_image = cv2.cvtColor(image_input, cv2.COLOR_BGR2GRAY)
+# 保存
+cv2.imwrite(arg_dict["path_image_output"], gray_image)
+
+
+# 打开摄像头
+capture = cv2.VideoCapture(arg_dict["index_camera"])
+# capture = cv2.VideoCapture(arg_dict["ip_url"]) # 打开网络摄像头
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter03/01-chapter-content/write_video_file.py # 写视频文件 录制视频
+
+# capture = cv2.VideoCapture(arg_dict["video_path"]) # 打开 视频文件
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter03/01-chapter-content/read_video_file_backwards.py # 反向播放视频
+
+
+# 获取参数
+frame_width = capture.get(cv2.CAP_PROP_FRAME_WIDTH)
+frame_height = capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+fps = capture.get(cv2.CAP_PROP_FPS) # 帧率
+
+# 检测摄像头是否打开
+if capture.isOpened()is False:
+    print("Error opening the camera")
+
+
+# 读取摄像头
+while capture.isOpened():
+    # Capture frame-by-frame from the camera
+    ret, frame = capture.read()
+
+    if ret is True:
+        # 开始时间
+        processing_start = time.time()
+        # 显示原图
+        cv2.imshow('Input frame from the camera', frame)
+
+        # 转换成灰度图
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # 显示 灰度图
+        cv2.imshow('Grayscale input camera', gray_frame)
+        
+        # c 键 保存图像
+        if cv2.waitKey(20) & 0xFF == ord('c'):
+            frame_name = "camera_frame_{}.png".format(frame_index)
+            gray_frame_name = "grayscale_camera_frame_{}.png".format(frame_index)
+            cv2.imwrite(frame_name, frame)
+            cv2.imwrite(gray_frame_name, gray_frame)
+            frame_index += 1
+            
+        # 按键检测 关闭 q键
+        if cv2.waitKey(20) & 0xFF == ord('q'):
+            break
+        
+        # 结束时间
+        processing_end = time.time()
+        processing_time_frame = processing_end - processing_start  #时间差
+        print("fps: {}".format(1.0 / processing_time_frame))# 帧率
+        
+    # Break the loop
+    else:
+        break
+ 
+# Release everything:
+capture.release()
 
 ```
 
