@@ -2,6 +2,9 @@
     PCL Visialization,  Pangolin,  ros下的rviz    QT
     
 [freetype-gl-cpp](https://github.com/Ewenwan/freetype-gl-cpp)
+       
+[Mastering Qt 5 GUI Programming}(https://github.com/PacktPublishing/Mastering-Qt-5-GUI-Programming)
+
     
 #  Pangolin 用于可视化和用户接口 基于opengl
 
