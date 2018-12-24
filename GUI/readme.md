@@ -7,6 +7,8 @@
 
 [End-to-End-GUI-development-with-Qt5](https://github.com/PacktPublishing/End-to-End-GUI-development-with-Qt5)
     
+[Learn QT 5](https://github.com/PacktPublishing/Learn-Qt-5)
+    
 #  Pangolin 用于可视化和用户接口 基于opengl
 
 ## 安装，
