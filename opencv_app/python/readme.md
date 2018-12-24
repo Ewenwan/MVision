@@ -376,6 +376,10 @@ histr.append(cv2.calcHist([img], [1], None, [256], [0, 256]))
 histr.append(cv2.calcHist([img], [2], None, [256], [0, 256]))
 # https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/tree/master/Chapter06/01-chapter-content
 
+
+# 直方图模板匹配 分类器
+https://github.com/PacktPublishing/OpenCV-4-for-Secret-Agents-Second-Edition/blob/master/Chapter002/HistogramClassifier.py
+
 ```
 
 
