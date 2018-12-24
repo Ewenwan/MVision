@@ -17,6 +17,8 @@ Note: the project aims at imitating the well-implemented algorithms in [Deep Lea
 
 [吴恩达老师的深度学习课程笔记及资源](https://github.com/fengdu78/deeplearning_ai_books)
 
+[Deep Learning with Keras ](https://github.com/PacktPublishing/Deep-Learning-with-Keras/tree/master/Chapter07)
+
 # 博客资源
 
 [深度学习（一）——MP(多层感知器)神经元模型, BP(反向传播)算法, 《机器学习》周志华著; 台湾大学李宏毅副教授的深度学习课程; Deep Learning书籍](http://antkillerfarm.github.io/dl/2017/01/13/Deep_Learning.html)
