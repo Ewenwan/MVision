@@ -331,8 +331,8 @@ ret, thresholded = cv2.threshold(edges, 70, 255, cv2.THRESH_BINARY_INV)
 # 双边滤波
 filtered = cv2.bilateralFilter(img, 10, 250, 250)
 # https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter05/01-chapter-content/cartoonizing.py # 图片卡通 化
-
-
+# 各种颜色空间
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter05/01-chapter-content/color_map_all.py
 
 # 位操作======================掩码=========
 # Create the first image:
@@ -360,50 +360,102 @@ bitwise_not_1 = cv2.bitwise_not(img_1)
 # Bitwise NOT
 bitwise_not_2 = cv2.bitwise_not(img_2)
 
-
-
-```
-
-
-
-
-
-```python
-
+# 腐蚀膨胀 开闭 区域操作
+https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter05/01-chapter-content/morphological_operations.py
 
 ```
 
 
 
-
+## 5.  颜色直方图
 
 ```python
-
+histr = []
+histr.append(cv2.calcHist([img], [0], None, [256], [0, 256]))
+histr.append(cv2.calcHist([img], [1], None, [256], [0, 256]))
+histr.append(cv2.calcHist([img], [2], None, [256], [0, 256]))
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/tree/master/Chapter06/01-chapter-content
 
 ```
 
 
 
-
+## 6.阈值处理
 
 ```python
+# 自适应阈值
+thresh1 = cv2.adaptiveThreshold(gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+thresh2 = cv2.adaptiveThreshold(gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 31, 3)
+thresh3 = cv2.adaptiveThreshold(gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+thresh4 = cv2.adaptiveThreshold(gray_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 3)
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/tree/master/Chapter07/01-chapter-content
+```
 
+
+
+## 7.边缘轮廓区域
+
+```python
+#  https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/tree/master/Chapter08/01-chapter-content
 
 ```
 
 
 
-
+## 8. 相机 aruco 校正
 ```python
+# 相机 aruco 码 校正
+https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter09/01-chapter-content/aruco_camera_calibration.py
 
-
+# aruco 码识别 增强现实
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter09/01-chapter-content/aruco_detect_markers_augmented_reality.py
+# https://blog.csdn.net/ZJU_fish1996/article/details/72312514?fps=1&locationNum=7
 ```
 
 
-
+## 9. 特征检测
 
 ```python
+# orb 特征点 =====================
+# Load test image:
+image = cv2.imread('opencv_logo_with_text.png')
 
+# Initiate ORB detector:
+orb = cv2.ORB_create()
+
+# Detect the keypoints using ORB:
+keypoints = orb.detect(image, None)
+
+# Compute the descriptors of the detected keypoints:
+keypoints, descriptors = orb.compute(image, keypoints)
+
+# Print one ORB descriptor:
+print("First extracted descriptor: {}".format(descriptors[0]))
+
+# Draw detected keypoints:
+image_keypoints = cv2.drawKeypoints(image, keypoints, None, color=(255, 0, 255), flags=0)
+
+# 检测 + 描述子
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter09/01-chapter-content/feature_matching.py
+
+# Detect the keypoints and compute the descriptors with ORB:
+keypoints_1, descriptors_1 = orb.detectAndCompute(image_query, None)
+keypoints_2, descriptors_2 = orb.detectAndCompute(image_scene, None)
+# 特征匹配
+bf_matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+bf_matches = bf_matcher.match(descriptors_1, descriptors_2)
+# Sort the matches in the order of their distance:
+bf_matches = sorted(bf_matches, key=lambda x: x.distance)
+
+# 特征检测模板匹配物体识别
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter09/01-chapter-content/feature_matching_object_recognition.py
+
+# 二维码扫描
+https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter09/01-chapter-content/qr_code_scanner.py
+
+
+# 级联回归 人脸 人眼检测 + 卡通眼睛
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter09/01-chapter-content/snapchat_augmeted_reality_glasses.py
 
 ```
 
