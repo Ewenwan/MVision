@@ -8,10 +8,17 @@
 import cv2
 # 默认方式读取图片
 image = cv2.imread("logo.png")
+# gray_img = cv2.imread('logo.png', cv2.IMREAD_GRAYSCALE)
 
 dimensions = img.shape
-# 矩阵维度
+# 矩阵维度   1/3
 print(dimensions)
+if len(dimensions) < 3:
+    print("grayscale image!")
+if len(dimensions) == 3:
+    print("color image!")
+
+
 (h, w, c) = img.shape
 print("Dimensions of the image - Height: {}, Width: {}, Channels: {}".format(h, w, c))
 
