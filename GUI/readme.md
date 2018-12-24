@@ -3,8 +3,9 @@
     
 [freetype-gl-cpp](https://github.com/Ewenwan/freetype-gl-cpp)
        
-[Mastering Qt 5 GUI Programming}(https://github.com/PacktPublishing/Mastering-Qt-5-GUI-Programming)
+[Mastering Qt 5 GUI Programming](https://github.com/PacktPublishing/Mastering-Qt-5-GUI-Programming)
 
+[End-to-End-GUI-development-with-Qt5](https://github.com/PacktPublishing/End-to-End-GUI-development-with-Qt5)
     
 #  Pangolin 用于可视化和用户接口 基于opengl
 
