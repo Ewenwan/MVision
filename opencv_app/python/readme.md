@@ -320,6 +320,20 @@ abs_gradient_y = cv2.convertScaleAbs(gradient_y)
 # 叠加
 sobel_image = cv2.addWeighted(abs_gradient_x, 0.5, abs_gradient_y, 0.5, 0)
 
+
+# 中值滤波=====
+img_gray = cv2.medianBlur(img_gray, 5)
+# 拉普拉斯变换 检测边缘====
+edges = cv2.Laplacian(img_gray, cv2.CV_8U, ksize=5)
+# 阈值二值化====
+ret, thresholded = cv2.threshold(edges, 70, 255, cv2.THRESH_BINARY_INV)
+
+# 双边滤波
+filtered = cv2.bilateralFilter(img, 10, 250, 250)
+# https://github.com/PacktPublishing/Mastering-OpenCV-4-with-Python/blob/master/Chapter05/01-chapter-content/cartoonizing.py # 图片卡通 化
+
+
+
 # 位操作======================掩码=========
 # Create the first image:
 img_1 = np.zeros((300, 300), dtype="uint8")
