@@ -1,6 +1,8 @@
 # opencv 学习
 [Hands-On-Algorithms-for-Computer-Vision 代码](https://github.com/PacktPublishing/Hands-On-Algorithms-for-Computer-Vision)
 
+[OpenCV 3 Computer Vision Application Programming Cookbook, Third Edition](https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition)
+
 [计算机视觉OpenCV实现 csdn专栏](https://blog.csdn.net/column/details/computer-vision.html?&page=3)
 
 [机器视觉与计算机视觉](https://www.cnblogs.com/ironstark/category/745953.html)
