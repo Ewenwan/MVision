@@ -78,3 +78,100 @@
     sqrt                    开根号
     tanh	
  
+### 归约方法
+    方法名                     说明
+    cumprod(t, axis)       在指定维度对t进行累积
+    cumsum                 在指定维度对t进行累加
+    dist(a,b,p=2)          返回a,b之间的p阶范数
+    mean                   均值
+    median                 中位数
+    std                    标准差
+    var                    方差
+    norm(t,p=2)            返回t的p阶范数
+    prod(t)                返回t所有元素的积
+    sum(t)                 返回t所有元素的和
+    
+### 比较方法
+    方法名                  说明
+    eq                  比较tensor是否相等，支持broadcast
+    equal               比较tensor是否有相同的shape与值
+    ge/le               大于/小于比较
+    gt/lt               大于等于/小于等于比较
+    max/min(t,axis)     返回最值，若指定axis，则额外返回下标
+    topk(t,k,axis)      在指定的axis维上取最高的K个值
+    
+### 他操作
+    方法名                       说明
+    cat(iterable, axis)      在指定的维度上拼接序列
+    chunk(tensor, c, axis)   在指定的维度上分割tensor
+    squeeze(input,dim)       将张量维度为1的dim进行压缩，不指定dim则压缩所有维度为1的维
+    unsqueeze(dim)           squeeze操作的逆操作
+    transpose(t)             计算矩阵的转置换
+    cross(a, b, axis)        在指定维度上计算向量积
+    diag                     返回对角线元素
+    hist(t, bins)            计算直方图
+    trace                    返回迹
+
+### 矩阵操作
+    方法名               说明
+    dot(t1, t2)     计算张量的内积
+    mm(t1, t2)      计算矩阵乘法
+    mv(t1, v1)      计算矩阵与向量乘法
+    qr(t)           计算t的QR分解
+    svd(t)          计算t的SVD分解
+ 
+### tensor对象的方法
+    方法名                作用
+    size()         返回张量的shape属性值
+    numel(input)   计算tensor的元素个数
+    view(*shape)   修改tensor的shape，与np.reshape类似，view返回的对象共享内存
+    resize         类似于view，但在size超出时会重新分配内存空间
+    item           若为单元素tensor，则返回pyton的scalar
+    from_numpy     从numpy数据填充
+    numpy          返回ndarray类型
+
+### 使用pytorch进行线性回归
+```python
+import torch
+import torch.optim as optim
+import matplotlib.pyplot as plt
+
+def get_fake_data(batch_size=32):
+    ''' y=x*2+3 '''
+    x = torch.randn(batch_size, 1) * 20
+    y = x * 2 + 3 + torch.randn(batch_size, 1)
+    return x, y
+
+x, y = get_fake_data()
+
+class LinerRegress(torch.nn.Module):
+    def __init__(self):
+        super(LinerRegress, self).__init__()
+        self.fc1 = torch.nn.Linear(1, 1)
+
+    def forward(self, x):
+        return self.fc1(x)
+
+
+net = LinerRegress()
+loss_func = torch.nn.MSELoss()
+optimzer = optim.SGD(net.parameters())
+
+for i in range(40000):
+    optimzer.zero_grad()
+
+    out = net(x)
+    loss = loss_func(out, y)
+    loss.backward()
+
+    optimzer.step()
+
+w, b = [param.item() for param in net.parameters()]
+print w, b  # 2.01146, 3.184525
+
+# 显示原始点与拟合直线
+plt.scatter(x.squeeze().numpy(), y.squeeze().numpy())
+plt.plot(x.squeeze().numpy(), (x*w + b).squeeze().numpy())
+plt.show()
+```
+ 
