@@ -57,4 +57,24 @@
     normal(means, std   返回一个正态分布N(means, std)
  
     
+### 数学操作
+    这些方法均为逐元素处理方法
+
+    方法名                   说明
+    abs                     绝对值
+    add                     加法
+    addcdiv(t, v, t1, t2)   t1与t2的按元素除后，乘v加t
+    addcmul(t, v, t1, t2)   t1与t2的按元素乘后，乘v加t
+    ceil                    向上取整，天花板
+    floor                   向下取整，地面
+    clamp(t, min, max)      将张量元素限制在指定区间
+    exp                     指数
+    log                     对数
+    pow                     幂
+    mul                     逐元素乘法
+    neg                     取反
+    sigmoid                 指数归一化   exp(-xi)/sum(exp(-xi))
+    sign                    取符号
+    sqrt                    开根号
+    tanh	
  
