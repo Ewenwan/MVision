@@ -23,6 +23,30 @@
       不仅使深度学习模型能够应用在图这种非欧几里德结构上，
       还为深度学习模型赋予了一定的因果推理能力。
 
+## GNN的三大通用框架
+      1. 消息传递神经网络(message passing neural network， MPNN)，统一了各种 图神经网络 和 图卷积网络方法。
+      2. 非局部神经网络(non-local neural network, NLNN)，它结合了几种“self-attention”风格的方法。
+      3. 图网络(graph network, GN)，它统一了统一了MPNN和NLNN方法以及许多其他变体，
+         如交互网络(Interaction Networks)，
+         神经物理引擎(Neural Physics Engine)，
+         CommNet，structure2vec，
+         GGNN，
+         关系网络(Relation Network)，
+         Deep Sets 和
+         Point Net。
+## 问题
+      1. GNN总是很浅，大多数不超过三层。
+         堆叠多个GCN层将导致过度平滑，也就是说，所有顶点将收敛到相同的值。
+         
+      2. GNN在非结构场景中的应用。
+      
+      3. 对GNN进行扩展是很困难的。
+         首先，图数据并不规则，每个节点都有自己的邻域结构，因此不能批量化处理。
+         其次，当存在的节点和边数量达到数百万时，计算图的拉普拉斯算子也是不可行的。
+         此外，我们需要指出，可扩展性的高低，决定了算法是否能够应用于实际场景。
+         目前已经有一些研究提出了解决这个问题的办法，我们正在密切关注这些新进展。
+         
+
 
 
 ## 综述研究类论文
