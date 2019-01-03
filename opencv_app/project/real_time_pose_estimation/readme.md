@@ -2,7 +2,7 @@
 [官方参考](https://docs.opencv.org/trunk/dc/d2c/tutorial_real_time_pose.html)
 # 运行 
     一、生成物体三维纹理模型数据 ====
-     首先 Data/box.ply 文件 
+     首先 Data/box.ply mesh 文件 
        提供了 单张图片中 盒子 8个定点的 3d坐标点信息(以某个定点为世界坐标系原点)
        以及 6个 长方形面 构成的 12个三角形
      我们首先需要 生成其 3d描述 信息，需要运行 src/main_registration.cpp 获取
@@ -28,9 +28,23 @@
          
        4. 将 2d-3d点对 、关键点 以及 关键点描述子 存 入 物体的三维纹理模型中
           Data/cookies_ORB.yml
-     
-     二、
        
+       运行:
+       ./pnp_registration 
+       
+     二、使用数据库对视频/拍摄图像 进行实时 检测 目标定位
+       主程序 src/main_detection.cpp
+       1. 读取网格数据文件Data/box.ply  和 三维纹理数据文件Data/cookies_ORB.yml (上一步获取) 获取3d描述数据库 
+       2. 对真实场景(视频文件帧/摄像头拍摄数据) 提取特征点2D 及其 描述子
+       3. 与模型库中的 3d点带有的 描述子进行匹配，得到 2d-3d匹配点
+       4. 使用PnP + Ransac 估计 当前物体的姿态 (R,t)
+       5. 显示 PNP求解后　得到的内点
+       6. 使用线性卡尔曼滤波去除错误的姿态估计变换矩阵 (R,t)
+       7. 更新pnp 的　变换矩阵
+       8. 将数据库中的 8个3D顶点 使用(R,t) 反投影到 图像2D平面上，绘制3D框，显示姿态
+       
+       运行
+       ./pnp_detection 
        
 # 项目分析
 ## 1 PLY网格模型，CSV格式的ply文件类
