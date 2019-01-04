@@ -5,6 +5,9 @@
 
 [机器学习资源 Machine learning Resources](https://github.com/Ewenwan/MachineLearning-1)
 
+
+[c++ 机器学习库源码，可借鉴，学习!!!!!!!](https://github.com/mlpack/mlpack)
+
 ![](http://antkillerfarm.github.io/images/article/ML.jpg)
 
 [机器学习与概率 概率图模型CPD 结构学习 CRF MCMC ](https://www.cnblogs.com/ironstark/category/765694.html)
