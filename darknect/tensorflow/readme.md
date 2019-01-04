@@ -1,4 +1,5 @@
 # tensorflow  使用
+[深入浅出Tensorflow 中文教程](https://www.ctolib.com/docs-Tensorflow-c-index.html)
 
 [TFLearn: Deep learning library featuring a higher-level API for TensorFlow ](https://github.com/Ewenwan/tflearn)
 
