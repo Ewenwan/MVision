@@ -238,6 +238,8 @@ If you like this, star it, thanks!
 
 [ocn代码示例](https://github.com/fengbingchun/OCR_Test)
 
+[Use CTC + tensorflow to OCR ](https://github.com/ilovin/lstm_ctc_ocr)
+
 * CTPN  
 [Detecting Text in Natural Image with Connectionist Text Proposal Network](https://arxiv.org/abs/1609.03605)
 [中文版](http://noahsnail.com/2018/02/02/2018-02-02-Detecting%20Text%20in%20Natural%20Image%20with%20Connectionist%20Text%20Proposal%20Network%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E2%80%94%E2%80%94%E4%B8%AD%E6%96%87%E7%89%88/)
