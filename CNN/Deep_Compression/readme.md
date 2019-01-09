@@ -15,6 +15,7 @@ tag: 深度学习
 
 [使用Caffe实现，需要加入一个mask来表示剪枝。剪枝的阈值，是该layer的权重标准差乘上某个超参数。有人基于Caffe官方的repo给FC层加上了剪枝](https://github.com/BVLC/caffe/pull/4294/files)
 
+[model-pruning 模型剪枝总结](https://xmfbit.github.io/2018/10/03/paper-summary-model-pruning/#more)
 
 # 性能提升方法
 [本文github链接](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/readme.md)
