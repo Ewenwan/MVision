@@ -61,7 +61,20 @@
            介绍了涉及感知不确定性的几个规划问题和算法。
            这包括定位localization，地图构建 map building，pursuit-evasion跟踪? 和 操作 等问题。
            所有这些问题都是在信息空间规划的思想下统一起来的.
-     C.
+           
+     C. 差异约束下的规划Planning Under Differential Constraints
+        这里，在运动规划中出现的连续状态空间上可能存在全局（障碍）和局部（差分）约束。
+        还考虑动态系统，其产生包括位置和速度信息的状态空间（这与控制理论中的状态空间或物理和微分方程中的相空间的概念一致）。
+        1. 差分模型Differential Models
+           介绍涉及差异约束的众多模型，
+           包括车轮滚动产生的约束 以及 机械系统 动力学 产生的约束。
+           
+        2. 差分约束下的基于抽样的规划 Sampling-Based Planning Under Differential Constraints
+           所有方法都是基于采样的，因为在差分约束的情况下，组合技术很少能实现。
+           
+        3. 系统理论和分析技术System Theory and Analytical Techniques
+          概述了主要在控制理论文献中开发的概念和工具,
+          通常在差分约束下开发规划算法时提供重要的见解或组成部分。
      
      
      
