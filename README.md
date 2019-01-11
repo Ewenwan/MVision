@@ -10,6 +10,8 @@
 
 [Computer Vision and Pattern Recognition arxiv.org 最新提交的论文](https://arxiv.org/list/cs.CV/recent)
 
+[会议论文投递](https://controls.papercept.net/conferences/scripts/start.pl)
+
 [技术刘 增强现实、图像识别、深度学习、机器人](http://liuxiao.org/category/robots/)
 
 [漫谈 SLAM 技术（上）](https://cloud.tencent.com/developer/article/1005894)
