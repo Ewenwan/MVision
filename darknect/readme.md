@@ -1,5 +1,7 @@
 # yolo darknet
 
+[YOLO_v3 TF 加强版 GN FC DA ](https://github.com/Stinky-Tofu/YOLO_V3)
+
 [caffe 实现  MobileNet-YOLOv3 ](https://github.com/Ewenwan/MobileNet-YOLO)
 
 [Translate darknet to tensorflow darkflow](https://github.com/thtrieu/darkflow)
