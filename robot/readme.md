@@ -4,6 +4,19 @@
 
 [机器人环境软件安装脚本 ceres tensorflow ros caffe vrep eigen cudnn and cuda ](https://github.com/Ewenwan/robotics_setup)
 
+[webots 便携式机器人仿真平台](https://github.com/Ewenwan/webots)
+
+[V-Rep、Open HRP、Gazebo、Webots这四种机器人仿真软件各自有何特点和优缺点？](https://www.zhihu.com/question/41611869/answer/124462692)
+        
+        Webots 貌似没有V-REP易用度高（仅仅是第一感觉），但是功能上应该至少跟V-REP相当甚至更强，
+              感觉上Webots跟仿真交互的编程方式更紧密和灵活。
+              开源免费之后的Webots在License上比V-REP更宽松.
+              
+        Gazebo相比前两者还是差了些.
+        OpenHRP主要是做humanoid仿真的.
+        Gazebo在学习ROS的时候可能会用到，比如跑一跑Turtlebo的仿真，对于学习还是很有帮助的。
+        VREP对用户友好很多，文档齐全，EDU版本也没有功能限制，还是跨平台的，所以初学者容易上手很多。
+        
 # 以优达学城 机器人人工智能课程为起点 逐渐丰富内容
 
 [ probabilistic robotics 概率机器人编程练习题 matlab](https://github.com/Ewenwan/probabilistic_robotics)
@@ -11,6 +24,8 @@
 [ros下  基于激光雷达的 移动机器人小车 代码](https://github.com/Ewenwan/ddl_0725)
 
 [ros下 基于激光雷达的 动态环境下的 导航 路径规划 避障](https://github.com/Ewenwan/dynamic_robot_localization)
+
+
 
 
 ## 其他参考课程
