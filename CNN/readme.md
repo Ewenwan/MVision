@@ -51,6 +51,9 @@
 
 ![](https://github.com/Ewenwan/MVision/blob/master/od.png)
 
+
+[目标检测相关论文笔记](https://github.com/Ewenwan/windy-afternoon/tree/master/ml/papers/detection)
+
 # 卷积神经网络
 [one-stage two-stage目标检测总结](https://zsc.github.io/megvii-pku-dl-course/slides/Lecture6(Object%20Detection).pdf)
 
