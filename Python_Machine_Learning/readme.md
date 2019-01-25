@@ -1,6 +1,8 @@
 # 机器学习
 [我的代码!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!](https://github.com/Ewenwan/PyML)
 
+[机器学习算法 程序笔记 待整合](https://github.com/Ewenwan/Machine_Learning)
+
 [机器学习&深度学习网站资源汇总（Machine Learning Resources） ](https://github.com/Ewenwan/mlhub123)
 
 [机器学习资源 Machine learning Resources](https://github.com/Ewenwan/MachineLearning-1)
