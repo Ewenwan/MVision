@@ -1,6 +1,8 @@
 # PyTorch
 [参考](https://blog.csdn.net/zzulp/article/details/80573331)
 
+[PyTorch 实战教程 待整合](https://github.com/Ewenwan/PyTorch_Tutorials)
+
     Pytorch是torch的python版本，
     是由Facebook开源的神经网络框架。
     与Tensorflow的静态计算图不同，
