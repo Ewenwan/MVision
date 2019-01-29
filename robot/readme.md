@@ -157,7 +157,7 @@ Simulators 仿真器  模拟器
 - [orocos_kinematics_dynamics Orocos运动学和动力学的C++库 ](https://github.com/orocos/orocos_kinematics_dynamics) - Orocos Kinematics and Dynamics C++ library.
 - [flexible-collsion-library 在一对由三角形组成的几何模型执行三类临近查找，集成在ROS中](https://github.com/flexible-collision-library/fcl) - Performs three types of proximity queries on a pair of geometric models composed of triangles, integrated with ROS. 
 - [robot_calibration 用于ROS的通用机器人运动学标定](https://github.com/mikeferguson/robot_calibration) - generic robot kinematics calibration for ROS
-
+- [Kindr - Kinematics and Dynamics for Robotics 运动学和动力学](https://github.com/ethz-asl/kindr) - [Kindr ROS](https://github.com/ethz-asl/kindr_ros)
 校准 Calibration
 -----------
 
@@ -220,4 +220,7 @@ Simulators 仿真器  模拟器
 - [Google Cartographer 提供了实时的二维和三维SLAM系统，可以跨多个平台和传感器配置](https://github.com/googlecartographer/cartographer/) - Cartographer is a system that provides real-time simultaneous localization and mapping (SLAM) in 2D and 3D across multiple platforms and sensor configurations.
 - [OctoMap 一个有效的基于概率三维映射框架，包含主要的OctoMap库， viewer octovis以及动态EDT3D. ](https://github.com/OctoMap/octomap) - An Efficient Probabilistic 3D Mapping Framework Based on Octrees. Contains the main OctoMap library, the viewer octovis, and dynamicEDT3D.
 - [ORB_SLAM2 实时SLAM，用于单眼、立体、RGB-D相机，包含循环检测与重定位功能 ](https://github.com/raulmur/ORB_SLAM2) - Real-Time SLAM for Monocular, Stereo and RGB-D Cameras, with Loop Detection and Relocalization Capabilities.
+- [栅格地图 移动机器人导航 Grid Map – Universal grid map library for mobile robotic mapping](https://github.com/ethz-asl/grid_map)
+
+
 
