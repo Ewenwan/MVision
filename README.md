@@ -12,6 +12,8 @@
 
 [会议论文投递](https://controls.papercept.net/conferences/scripts/start.pl)
 
+[DBLP 计算机核心技术文献](https://dblp.uni-trier.de/)
+
 [技术刘 增强现实、图像识别、深度学习、机器人](http://liuxiao.org/category/robots/)
 
 [漫谈 SLAM 技术（上）](https://cloud.tencent.com/developer/article/1005894)
