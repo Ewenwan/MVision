@@ -25,7 +25,7 @@
 
 [ros下 基于激光雷达的 动态环境下的 导航 路径规划 避障](https://github.com/Ewenwan/dynamic_robot_localization)
 
-
+[路径跟踪 c++实现 ](https://github.com/Ewenwan/pathtracer)
 
 
 ## 其他参考课程
