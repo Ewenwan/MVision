@@ -1,4 +1,6 @@
 # tensorflow  使用
+[TensorFlow 教程和实战经验 ](https://github.com/Ewenwan/EffectiveTensorflow)
+
 [tensorflow_tutorials 教程 待整合](https://github.com/Ewenwan/tensorflow_tutorials)
 
 [深入浅出Tensorflow 中文教程](https://www.ctolib.com/docs-Tensorflow-c-index.html)
