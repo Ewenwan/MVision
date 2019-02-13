@@ -33,6 +33,8 @@
 
 [台大机器学习课程作业详解 ](https://github.com/Ewenwan/ML-Foundation-and-ML-Techniques)
 
+[集体智慧编程 collective intelligence](https://github.com/Ewenwan/Programming-Collective-Intelligence-Source-Code)
+
 ## 1 最大释然估计  Maximum Likelihood Estimation (MLE)  最大后验概率Maximum A Posterior (MAP) 
 ## 2 朴素贝叶斯 Naive Bayes
 ## 3 线性回归 逻辑回归 多项式回归 Linear Regression Logistic regression  Polynomial Regression 
