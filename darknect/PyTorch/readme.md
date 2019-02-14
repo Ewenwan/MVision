@@ -5,17 +5,36 @@
 
 [pytorch-tutorial 2 ](https://github.com/Ewenwan/pytorch-tutorial)
 
+[PyTorch 中文手册 （pytorch handbook）](https://github.com/Ewenwan/pytorch-handbook)
+
+很多人都会拿PyTorch和Google的Tensorflow进行比较，这个肯定是没有问题的，因为他们是最火的两个深度学习框架了。
+
+但是说到PyTorch，其实应该先说Torch。
+
+
     Pytorch是torch的python版本，
     是由Facebook开源的神经网络框架。
     与Tensorflow的静态计算图不同，
     pytorch的计算图是动态的，
     可以根据计算需要实时改变计算图。
     
+    Torch英译中：火炬
+    Torch是一个与Numpy类似的张量（Tensor）操作库，
+    与Numpy不同的是Torch对GPU支持的很好，Lua是Torch的上层包装。
+    
+    PyTorch是一个基于Torch的Python开源机器学习库，用于自然语言处理等应用程序。
+    它主要由Facebook的人工智能研究小组开发。Uber的"Pyro"也是使用的这个库。
+    
     安装：
     
     pip install torch torchvision  # for python2.7
     pip3 install torch torchvision  # for python3
     
+    PyTorch是一个Python包，提供两个高级功能：
+      1. 具有强大的GPU加速的张量计算（如NumPy）
+      2. 包含自动求导系统的的深度神经网络
+
+
 ## 特点
 
     1. Numpy风格的Tensor操作。pytorch中tensor提供的API参考了Numpy的设计，
