@@ -15,7 +15,13 @@
 
 [VINS-Mobile MacOS](https://github.com/Ewenwan/VINS-Mobile)
 
+[代码注释](https://github.com/Ewenwan/VINS-Mono-code-annotation)
+
 ![](https://pic3.zhimg.com/80/v2-145f576a58d1123a9faa1d265af40522_hd.png)
+
+
+![](https://images2018.cnblogs.com/blog/699318/201804/699318-20180414235214918-500793897.png)
+
 
 ### Feature tracker 特征跟踪
     这部分代码在feature_tracker包下面，主要是接收图像topic,
