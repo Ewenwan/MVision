@@ -13,6 +13,7 @@
 
 [参考 刘光聪 著 TensorFlow 内核剖析](https://github.com/Ewenwan/MVision/blob/master/darknect/tensorflow/TensorFlow%E5%86%85%E6%A0%B8%E5%89%96%E6%9E%90.pdf)
 
+[Simple Tensorflow Cookbook 代码本](https://github.com/Ewenwan/Tensorflow-Cookbook)
 
 ![](https://upload-images.jianshu.io/upload_images/12714329-6928cb6461e05052.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/565/format/webp)
 
