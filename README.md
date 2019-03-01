@@ -331,68 +331,13 @@
 ##  公司
 [视觉领域的部分国内公司](http://www.ipcv.org/cvcom/)
 ###  初创公司：
-[图普科技](http://www.tuputech.com/)
-
-[Face++](http://www.faceplusplus.com.cn/)
-
-[Linkface](http://www.linkface.cn/index.html)
-
-[Minieye](http://www.minieye.cc/cn/)
-
-[知图Cogtu](http://www.cogtu.com/?lang=zh)
-
-[商汤科技Sensetime](http://www.sensetime.com/cn)
-
-[亮风台Hiscene](http://www.hiscene.com/)
-
-[掌赢科技](http://www.zhangying.mobi/index.html)
-
-[格灵深瞳DeepPG](http://www.deepglint.com/)
-
-[凌感科技usens](http://www.lagou.com/gongsi/j114187.html)
-
-[图森TuSimple](http://www.tusimple.com/)
-
-[中科视拓Seetatech(山世光)](http://www.seetatech.com/)
-
-[第四范式](https://www.4paradigm.com/product/prophet)
+[图普科技](http://www.tuputech.com/)---[Face++](http://www.faceplusplus.com.cn/)---[Linkface](http://www.linkface.cn/index.html)---[Minieye](http://www.minieye.cc/cn/)---[知图Cogtu](http://www.cogtu.com/?lang=zh)---[商汤科技Sensetime](http://www.sensetime.com/cn)---[亮风台Hiscene](http://www.hiscene.com/)---[掌赢科技](http://www.zhangying.mobi/index.html)---[格灵深瞳DeepPG](http://www.deepglint.com/)---[凌感科技usens](http://www.lagou.com/gongsi/j114187.html)---[图森TuSimple](http://www.tusimple.com/)---[中科视拓Seetatech(山世光)](http://www.seetatech.com/)---[第四范式](https://www.4paradigm.com/product/prophet)
 
 ### 上市公司：
-
-[百度DL实验室](http://idl.baidu.com/)
-
-[腾讯优图](http://youtu.qq.com/)
-
-[阿里高德](http://www.newsmth.net/nForum/#!article/Career_Upgrade/429476)
-
-[暴风魔镜](http://www.newsmth.net/nForum/#!article/Career_PHD/225254)
-
-[搜狗](http://www.newsmth.net/nForum/#!article/Career_PHD/224449)
-
-[乐视tv](http://www.newsmth.net/nForum/#!article/Career_PHD/222651)
-
-[奇虎360](http://www.newsmth.net/nForum/#!article/Career_PHD/222379)
-
-[京东实验室](http://www.newsmth.net/nForum/#!article/Career_PHD/223133/a>)
-
-[阿里巴巴](http://www.newsmth.net/nForum/#!article/Career_PHD/222007)
-
-[联想研究院](http://www.newsmth.net/nForum/#!article/Career_PHD/220225)
-
-[华为研究院](http://www.newsmth.net/nForum/#!article/Career_PHD/225976)
+[百度DL实验室](http://idl.baidu.com/)---[腾讯优图](http://youtu.qq.com/)---[阿里高德](http://www.newsmth.net/nForum/#!article/Career_Upgrade/429476)---[暴风魔镜](http://www.newsmth.net/nForum/#!article/Career_PHD/225254)---[搜狗](http://www.newsmth.net/nForum/#!article/Career_PHD/224449)---[乐视tv](http://www.newsmth.net/nForum/#!article/Career_PHD/222651)---[奇虎360](http://www.newsmth.net/nForum/#!article/Career_PHD/222379)---[京东实验室](http://www.newsmth.net/nForum/#!article/Career_PHD/223133/a>)---[阿里巴巴](http://www.newsmth.net/nForum/#!article/Career_PHD/222007)---[联想研究院](http://www.newsmth.net/nForum/#!article/Career_PHD/220225)---[华为研究院](http://www.newsmth.net/nForum/#!article/Career_PHD/225976)
 
 ### 知名外企：
-[佳能信息](http://www.newsmth.net/nForum/#!article/Career_PHD/222548)
-
-[索尼研究院](http://www.newsmth.net/nForum/#!article/Career_PHD/223437)
-
-[富士通研发中心](http://www.newsmth.net/nForum/#!article/Career_PHD/220654)
-
-[微软研究院](https://careers.microsoft.com/?rg=cn)
-
-[英特尔研究院](http://www.newsmth.net/nForum/#!article/Career_PHD/221175)
-
-[三星研究院](http://www.yingjiesheng.com/job-001-742-124.html)
+[佳能信息](http://www.newsmth.net/nForum/#!article/Career_PHD/222548)---[索尼研究院](http://www.newsmth.net/nForum/#!article/Career_PHD/223437)---[富士通研发中心](http://www.newsmth.net/nForum/#!article/Career_PHD/220654)---[微软研究院](https://careers.microsoft.com/?rg=cn)---[英特尔研究院](http://www.newsmth.net/nForum/#!article/Career_PHD/221175)---[三星研究院](http://www.yingjiesheng.com/job-001-742-124.html)
 
 
 
@@ -459,7 +404,6 @@
 [视觉SLAM](http://www.ipcv.org/on-visual-slam/)
 
 [Self-augmented Convolutional Neural Networks](https://github.com/msraig/self-augmented-net)
-
 
 [运动估计 motion estimation](http://www.ipcv.org/on-motion-estimation/)
 
