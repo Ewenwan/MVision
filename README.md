@@ -10,7 +10,9 @@
 
 [Computer Vision and Pattern Recognition arxiv.org 最新提交的论文](https://arxiv.org/list/cs.CV/recent)
 
-[会议论文投递](https://controls.papercept.net/conferences/scripts/start.pl)
+[papercept 会议论文投递](https://controls.papercept.net/conferences/scripts/start.pl)
+
+[easychair 会议论文投递](https://easychair.org/my/roles.cgi?welcome=1)
 
 [DBLP 计算机核心技术文献](https://dblp.uni-trier.de/)
 
