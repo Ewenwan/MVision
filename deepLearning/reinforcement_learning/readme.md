@@ -1,6 +1,8 @@
 # 强化学习、反馈学习、遗传学习 自主学习...
 [	深度强化学习综述(上)](https://blog.csdn.net/SIGAI_CSDN/article/details/83862597)
 
+[UCL(伦敦大学)主讲的强化学习经典课程 AI = Deep Learning + Reinforcement Learning ](https://github.com/Ewenwan/UCL-DeepReinforcementLearning)
+
 [openAI Deep RL 学习](https://spinningup.openai.com/en/latest/)
 
 [CS294-112深度增强学习课程（加州大学伯克利分校 2017） B站视频](https://www.bilibili.com/video/av9802698/)
