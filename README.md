@@ -1,4 +1,5 @@
 # MVision　Machine Vision 机器视觉
+[AI 安全数据科学和算法 ](https://github.com/Ewenwan/AI-Security-Learning)
 
 [澳大利亚机器人视觉研究中心](https://www.roboticvision.org/)
 
