@@ -7,6 +7,7 @@
 
 [机器学习资源 Machine learning Resources](https://github.com/Ewenwan/MachineLearning-1)
 
+[（西瓜书）公式推导解析](https://github.com/Ewenwan/pumpkin-book)
 
 [c++ 机器学习库源码，可借鉴，学习!!!!!!!](https://github.com/mlpack/mlpack)
 
