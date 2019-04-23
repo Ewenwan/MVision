@@ -4,6 +4,8 @@
 
 [arm官方数据手册](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.subset.swdev.sdt/index.html)
 
+[Cortex-A Series Programmer’s Guide Version: 4.0](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.subset.swdev.sdt/index.html)
+
 ARM CPU最开始只有普通的寄存器，可以进行基本数据类型的基本运算。
 自ARMv5开始引入了VFP（Vector Floating Point）指令，该指令用于向量化加速浮点运算。
 自ARMv7开始正式引入NEON指令，NEON性能远超VFP，因此VFP指令被废弃。
@@ -39,7 +41,33 @@ Polynomial over {0,1} P8       多项式
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/neon.PNG)
 
+注：每一个Q0-Q15寄存器映射到 一对D寄存器。
 
+> 寄存器之间的映射关系：
+
+* D<2n> 偶数 映射到 Q 的最低有效半部；
+* D<2n+1> 奇数 映射到 Q 的最高有效半部；
+
+> NEON 数据处理指令可分为：
+
+* 1. 正常指令 Normal instructions 结果 同 操作数 同大小同类型。
+* 2. 长指令   Long instructions   操作双字vectors，生成四倍长字vectors 结果的宽度一般比操作数加倍，同类型。
+
+     在指令中加L
+     
+* 3. 宽指令   Wide instructions   操作 双字+四倍长字，生成四倍长字，结果和第一个操作数都是第二个操作数的两倍宽度。
+
+     在指令中加W
+* 4. 窄指令   Narrow instructions 操作四倍长字，生成双字 结果宽度一般是操作数的一半
+     
+     在指令中加N
+* 5. 饱和变量 Saturating variants
+
+	对于有符号饱和运算，如果结果小于 –2^n，则返回的结果将为 –2^n；
+	对于无符号饱和运算，如果整个结果将是负值，那么返回的结果是 0；如果结果大于 2^n–1，则返回的结果将为 2^n–1；
+	NEON中的饱和算法：通过在V和指令助记符之间使用Q前缀可以指定饱和指令，原理与上述内容相同。
+     
+     
 
 > 使用NEON主要有四种方法：
 
