@@ -68,8 +68,8 @@
        原因是将问题转化为矩阵乘法后可以方便的使用很多矩阵运算库（如MKL、openblas、Eigen等）。
 [openblas](https://www.leiphone.com/news/201704/Puevv3ZWxn0heoEv.html)
        
-[GEMM 普通矩阵乘法（General Matrix Multiplication）](https://github.com/flame/how-to-optimize-gemm/wiki)
-       
+[GEMM 普通矩阵乘法（General Matrix Multiplication）多种优化](https://github.com/flame/how-to-optimize-gemm/wiki)
+     
        
     2、FFT变换。 
        时域卷积等于频域相乘，因此可将问题转化为简单的乘法问题。
@@ -109,11 +109,18 @@ BLAS是 Basic Linear Algebra Subprograms （基本线性代数子程序）的首
 
 ![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08d87a8397.png?imageMogr2/format/jpg/quality/90)
 
-矩阵分块，块复用，减少仿存，相当于减少内存访问：
+矩阵分块，块复用，减少仿存，相当于减少内存访问，提高Cache利用率：
 
 ![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08dd7b16d4.png?imageMogr2/format/jpg/quality/90)
 
 ![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08e08680b9.png?imageMogr2/format/jpg/quality/90)
+
+核心汇编优化：
+
+* 寄存器分块
+* SIMD指令
+* 指令流水线优化，循环展开，重排，预取
+
 
 操作寄存器，不是操作内存：
 
