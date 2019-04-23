@@ -2,6 +2,7 @@
 
 [参考1 ARM NEON 编程系列](http://hongbomin.com/2016/05/13/arm_neon_introduction/)
 
+[arm官方数据手册](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.subset.swdev.sdt/index.html)
 
 ARM CPU最开始只有普通的寄存器，可以进行基本数据类型的基本运算。
 自ARMv5开始引入了VFP（Vector Floating Point）指令，该指令用于向量化加速浮点运算。
@@ -36,7 +37,7 @@ Polynomial over {0,1} P8       多项式
 * 或32×64bit寄存器(D0D31)   32个64位的寄存器
 * 或上述寄存器的组合。
 
-![]()
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/neon.PNG)
 
 
 
