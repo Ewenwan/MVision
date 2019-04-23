@@ -98,6 +98,13 @@
 
 ![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08bf33fabd.png?imageMogr2/format/jpg/quality/90)
 
+BLAS是 Basic Linear Algebra Subprograms （基本线性代数子程序）的首字母缩写，主要用来做基础的矩阵计算，或者是向量计算。它分为三级：
+
+      BLAS 1级，主要做向量与向量间的dot或乘加运算，对应元素的计算；
+      BLAS 2级，主要做矩阵和向量，就类似PPT中蓝色部分所示，矩阵A*向量x， 得到一个向量y。除此之外，可能还会有对称的矩阵变形；
+      BLAS 3级，主要是矩阵和矩阵的计算，最典型的是A矩阵*B矩阵，得到一个C矩阵。由矩阵的宽、高，得到一个m*n的C矩阵。
+
+
 最原始3个for循环 (矩阵比较小的时候，速度还能快一些，当矩阵大了的时候，一定会跌下去,cache缓存问题):
 
 ![](https://static.leiphone.com/uploads/new/article/740_740/201704/58f08d87a8397.png?imageMogr2/format/jpg/quality/90)
