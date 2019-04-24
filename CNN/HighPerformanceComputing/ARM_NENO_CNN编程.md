@@ -77,7 +77,47 @@ Polynomial over {0,1} P8       多项式
 	对于无符号饱和运算，如果整个结果将是负值，那么返回的结果是 0；如果结果大于 2^n–1，则返回的结果将为 2^n–1；
 	NEON中的饱和算法：通过在V和指令助记符之间使用Q前缀可以指定饱和指令，原理与上述内容相同。
      
-     
+> **NEON指令集（重点）ARMv7/AArch32指令格式**
+
+所有的支持NEON指令都有一个助记符V，下面以32位指令为例，说明指令的一般格式：
+
+V{<mod模式>}<op操作>{<shape指令类型>}{<cond条件>}{.<dt数据类型>}{<dest目标地址>}, src1, src2
+	
+> <mod模式> 可选：
+
+	Q: 饱和效果The instruction uses saturating arithmetic, so that the result is saturated within the range of the specified data type, such as VQABS, VQSHLetc.
+
+	H: The instruction will halve the result. It does this by shifting right by one place (effectively a divide by two with truncation), such as VHADD,VHSUB.
+	D: 双倍结果 The instruction doubles the result, such as VQDMULL, VQDMLAL, VQDMLSL and VQ{R}DMULH.
+	R: 取整 The instruction will perform rounding on the result, equivalent to adding 0.5 to the result before truncating, such as VRHADD, VRSHR.
+	
+> <op操作>：  必须
+
+the operation (for example, ADD加, SUB减, MUL乘).	
+
+> <shape> shape指令类型 可选：
+	
+即前文中的Long (L), Wide (W), Narrow (N).
+
+> <cond条件> Condition 可选,
+	
+	used with IT instruction.
+> <.dt> Datatype 可选 数据类型  .数据类型  前面有点
+ 
+	such as .s8, .u8, .f32 , .I16, .S16 etc.
+> <dest> Destination. 可选  目标操作数地址
+
+> <src1> Source operand 1. 必须 源操作数地址
+> <src2> Source operand 2. 必须 源操作数地址
+
+
+注: {} 表示可选的参数。
+
+比如：
+
+VADD.I16 D0, D1, D2   @ 16位整数 加法
+
+VMLAL.S16 Q2, D8, D9  @ 有符号16位整数 乘加
 
 > 使用NEON主要有四种方法：
 
