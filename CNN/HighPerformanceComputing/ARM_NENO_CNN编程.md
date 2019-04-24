@@ -24,6 +24,10 @@ ARM CPU最开始只有普通的寄存器，可以进行基本数据类型的基�
 SIMD即单指令多数据指令，目前在x86平台下有MMX/SSE/AVX系列指令，arm平台下有NEON指令。
 一般SIMD指令通过intrinsics(内部库C函数接口的函数) 或者 汇编 实现。
 
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/simd.PNG)
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/simd_add-op.PNG)
+
 类似于Intel CPU下的MMX/SSE/AVX/FMA指令，ARM CPU的NEON指令同样是通过向量化计算来进行速度优化，通常应用于图像处理、音视频处理等等需要大量计算的场景。
 
 > NEON支持的数据类型：
