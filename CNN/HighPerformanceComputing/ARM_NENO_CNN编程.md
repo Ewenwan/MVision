@@ -53,6 +53,10 @@ Polynomial over {0,1} P8       多项式
 
 NEON和VFP的区别在于VFP是加速浮点计算的硬件不具备数据并行能力，同时VFP更尽兴双精度浮点数（double）的计算，NEON只有单精度浮点计算能力。
 
+16个通用寄存器
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/register.PNG)
+
 > NEON寄存器有几种形式：
 
 * 16×128bit寄存器(Q0-Q15)；  16个128位的寄存器
