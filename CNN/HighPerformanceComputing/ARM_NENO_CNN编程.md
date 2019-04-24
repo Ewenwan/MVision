@@ -1,5 +1,16 @@
 # ARM_NENO_CNN编程
 
+> 术语： 
+
+System-on-Chip(SOC) 片上系统：核心、内存控制器、片上内存、外围设备、总线互连和其他逻辑（可能包括模拟或射频组件），以便产生系统。 SOC通常指集成度较高的设备，包括单个设备中系统的许多部分，可能包括模拟、混合信号或射频电路。
+
+专用集成电路Application Specific Integrated Circuit(ASIC) :包含ARM内核、内存和其他组件。显然，ASIC和SOC之间有很大的重叠。
+
+嵌入式系统 Embedded systems，
+内存消耗 Memory Footprint(memory usage),
+SIMD Single Instruction, Multiple Data.单指令多数据流，
+MMU Memory Management Unit.内存管理单元，
+
 [参考1 ARM NEON 编程系列](http://hongbomin.com/2016/05/13/arm_neon_introduction/)
 
 [arm官方数据手册](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.subset.swdev.sdt/index.html)
