@@ -32,6 +32,15 @@ Polynomial over {0,1} P8       多项式
 
 多项式算术在实现某些加密、数据完整性算法中非常有用。
 
+寄存器 ARMV7架构包含：
+
+16个通用寄存器（32bit），R0-R15
+
+16个NEON寄存器（128bit），Q0-Q15（同时也可以被视为32个64bit的寄存器，D0-D31）
+
+16个VFP寄存器（32bit），S0-S15
+
+NEON和VFP的区别在于VFP是加速浮点计算的硬件不具备数据并行能力，同时VFP更尽兴双精度浮点数（double）的计算，NEON只有单精度浮点计算能力。
 
 > NEON寄存器有几种形式：
 
@@ -55,28 +64,42 @@ Polynomial over {0,1} P8       多项式
 > NEON 数据处理指令可分为：
 
 * 1. 正常指令 Normal instructions 结果 同 操作数 同大小同类型。
+
+     生成大小相同且类型通常与操作数向量相同到结果向量。
 * 2. 长指令   Long instructions   操作双字vectors，生成四倍长字vectors 结果的宽度一般比操作数加倍，同类型。
 
      在指令中加L
+     
+     对双字向量操作数执行运算，生成四字向量到结果。所生成的元素一般是操作数元素宽度到两倍，并属于同一类型。L标记，如VMOVL。
      
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/long.PNG)
      
 * 3. 宽指令   Wide instructions   操作 双字+四倍长字，生成四倍长字，结果和第一个操作数都是第二个操作数的两倍宽度。
 
      在指令中加W
+     
+     一个双字向量操作数和一个四字向量操作数执行运算，生成四字向量结果。W标记，如VADDW。
+     
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/wide.PNG)
      
 * 4. 窄指令   Narrow instructions 操作四倍长字，生成双字 结果宽度一般是操作数的一半
      
      在指令中加N
+     
+     四字向量操作数执行运算，并生成双字向量结果，所生成的元素一般是操作数元素宽度的一半。N标记，如VMOVN。
+     
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/narrow.PNG)
      
 * 5. 饱和变量 Saturating variants
 
 	对于有符号饱和运算，如果结果小于 –2^n，则返回的结果将为 –2^n；
+	 
 	对于无符号饱和运算，如果整个结果将是负值，那么返回的结果是 0；如果结果大于 2^n–1，则返回的结果将为 2^n–1；
+	
 	NEON中的饱和算法：通过在V和指令助记符之间使用Q前缀可以指定饱和指令，原理与上述内容相同。
-     
+        
+	饱和指令：当超过数据类型指定到范围则自动限制在该范围内。Q标记，如VQSHRUN
+	
 > **NEON指令集（重点）ARMv7/AArch32指令格式**
 
 所有的支持NEON指令都有一个助记符V，下面以32位指令为例，说明指令的一般格式：
@@ -87,13 +110,16 @@ V{<mod模式>}<op操作>{<shape指令类型>}{<cond条件>}{.<dt数据类型>}{<
 
 	Q: 饱和效果The instruction uses saturating arithmetic, so that the result is saturated within the range of the specified data type, such as VQABS, VQSHLetc.
 
-	H: The instruction will halve the result. It does this by shifting right by one place (effectively a divide by two with truncation), such as VHADD,VHSUB.
+	H: 结果右移动移位，相当于得到结构后在除以2 The instruction will halve the result. It does this by shifting right by one place (effectively a divide by two with truncation), such as VHADD,VHSUB.
+	
 	D: 双倍结果 The instruction doubles the result, such as VQDMULL, VQDMLAL, VQDMLSL and VQ{R}DMULH.
 	R: 取整 The instruction will perform rounding on the result, equivalent to adding 0.5 to the result before truncating, such as VRHADD, VRSHR.
 	
 > <op操作>：  必须
 
 the operation (for example, ADD加, SUB减, MUL乘).	
+
+NEON指令按照作用可以分为：加载数据、存储数据、加减乘除运算、逻辑AND/OR/XOR运算、比较大小运算
 
 > <shape> shape指令类型 可选：
 	
@@ -143,8 +169,131 @@ VMLAL.S16 Q2, D8, D9  @ 有符号16位整数 乘加
 
 [所有的intrinsics函数都在GNU官方说明文档 ](https://gcc.gnu.org/onlinedocs/gcc-4.7.4/gcc/ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics)
 
-## 示例1：向量加法
-```neon
+NEON Instrinsic是编译器支持的一种buildin类型和函数的集合，基本涵盖NEON的所有指令，通常这些Instrinsic包含在arm_neon.h头文件中。
+
+
+NEON指令按照作用可以分为：加载数据、存储数据、加减乘除运算、逻辑AND/OR/XOR运算、比较大小运算
+
+> **初始化寄存器**
+```c
+// 寄存器的每个lane（通道）都赋值为一个值N
+Result_t vcreate_type(Scalar_t N)   // type需要换成具体类型 s8, u8, f32, I16, S16
+Result_t vdup_type(Scalar_t N)      // vcreate_s8  vdup_s8   vmov_s8
+Result_t vmov_type(Scalar_t N)
+```
+> **加载load 内存数据进寄存器**
+```c
+// 间隔为x，加载数据进NEON寄存器, 间隔：交叉存取，是ARM NEON特有的指令
+Result_t vld[x]_type(Scalar_t* N)  // 
+Result_t vld[x]q_type(Scalar_t* N) // vld1q_s32 间隔1 即连续内存访问，q是mod模式中的q? 饱和模式?
+
+
+float32x4x3_t = vld3q_f32(float32_t* ptr)
+// 此处间隔为3，即交叉读取12个float32进3个NEON寄存器中。
+// 3个寄存器的值分别为：
+// {ptr[0],ptr[3],ptr[6],ptr[9]}，   // 128为Q寄存器
+// {ptr[1],ptr[4],ptr[7],ptr[10]}，
+// {ptr[2],ptr[5],ptr[8],ptr[11]}。
+```
+
+> **存储set 寄存器数据到内存   间隔为x，存储NEON寄存器的数据到内存中**
+```cpp
+void vst[x]_type(Scalar_t* N)
+void vst[x]q_type(Scalar_t* N)
+```
+
+> **算数运算指令**
+
+[普通指令]  普通加法运算 res = M+N
+```c
+Result_t vadd_type(Vector_t M,Vector_t N)
+Result_t vaddq_type(Vector_t M,Vector_t N)
+
+```
+[长指令 long] 变长加法运算 res = M+N
+
+为了防止溢出，一种做法是使用如下指令，加法结果存储到长度x2的寄存器中，
+
+如：
+```c
+
+Result_t vaddl_type(Vector_t M,Vector_t N)
+
+vuint16x8_t res = vaddl_u8(uint8x8_t M,uint8x8_t N)
+```
+
+[宽指令] 加法运算 res = M+N，第一个参数M宽度大于第二个参数N。
+```c
+Result_t vaddw_type(Vector_t M,Vector_t N)
+```
+
+[普通指令] 减法运算 res = M-N
+```c
+Result_t vsub_type(Vector_t M,Vector_t N)
+```
+
+[普通指令] 乘法运算 res = M*N
+```c
+Result_t vmul_type(Vector_t M,Vector_t N)
+Result_t vmulq_type(Vector_t M,Vector_t N)
+```
+
+[普通指令] 乘&加法运算 res = M + N*P
+```c
+Result_t vmla_type(Vector_t M,Vector_t N,Vector_t P)
+Result_t vmlaq_type(Vector_t M,Vector_t N,Vector_t P)
+```
+
+乘&减法运算 res = M-N*P
+```c
+Result_t vmls_type(Vector_t M,Vector_t N,Vector_t P)
+Result_t vmlsq_type(Vector_t M,Vector_t N,Vector_t P)
+```
+
+> **数据处理指令**
+
+[普通指令] 计算绝对值 res=abs(M)
+```c
+Result_t vabs_type(Vector_t M)
+```
+[普通指令] 计算负值 res=-M   negative
+```c
+Result_t vneg_type(Vector_t M)
+```
+[普通指令] 计算最大值 res=max(M,N)   maxmum
+```c
+Result_t vmax_type(Vector_t M,Vector_t N)
+```
+[普通指令] 计算最小值 res=min(M,N)
+```c
+Result_t vmin_type(Vector_t M,Vector_t N)
+```
+
+> **比较指令**
+
+[普通指令] 比较是否相等 res=mask(M == N)  compare equal
+```c
+Result_t vceg_type(Vector_t M,Vector_t N)
+```
+[普通指令] 比较是否大于或等于 res=mask(M >= N)  compare greate and  equal
+```c
+Result_t vcge_type(Vector_t M,Vector_t N)
+```
+[普通指令] 比较是否大于 res=mask(M > N)
+```c
+Result_t vcgt_type(Vector_t M,Vector_t N)
+```
+[普通指令] 比较是否小于或等于 res=mask(M <= N)  compare little  and equal
+```c
+Result_t vcle_type(Vector_t M,Vector_t N)
+```
+[普通指令] 比较是否小于 res=mask(M < N)        compare little 
+```c
+Result_t vclt_type(Vector_t M,Vector_t N)
+```
+
+## 示例1：向量加法**
+```c
 // 假设 count 是4的倍数
 #include<arm_neon.h>
 
