@@ -35,11 +35,15 @@ Polynomial over {0,1} P8       多项式
 
 > NEON寄存器有几种形式：
 
-* 16×128bit寄存器(Q0Q15)；  16个128位的寄存器
-* 或32×64bit寄存器(D0D31)   32个64位的寄存器
+* 16×128bit寄存器(Q0-Q15)；  16个128位的寄存器
+* 或32×64bit寄存器(D0-D31)   32个64位的寄存器
 * 或上述寄存器的组合。
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/neon.PNG)
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/neon-regest.PNG)
+
+一个D寄存器64位是双字宽度，一个Q寄存器是128位是四字宽度。
 
 注：每一个Q0-Q15寄存器映射到 一对D寄存器。
 
@@ -55,12 +59,18 @@ Polynomial over {0,1} P8       多项式
 
      在指令中加L
      
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/long.PNG)
+     
 * 3. 宽指令   Wide instructions   操作 双字+四倍长字，生成四倍长字，结果和第一个操作数都是第二个操作数的两倍宽度。
 
      在指令中加W
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/wide.PNG)
+     
 * 4. 窄指令   Narrow instructions 操作四倍长字，生成双字 结果宽度一般是操作数的一半
      
      在指令中加N
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/narrow.PNG)
+     
 * 5. 饱和变量 Saturating variants
 
 	对于有符号饱和运算，如果结果小于 –2^n，则返回的结果将为 –2^n；
