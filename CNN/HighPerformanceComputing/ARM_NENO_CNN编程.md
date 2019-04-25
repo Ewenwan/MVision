@@ -24,11 +24,16 @@ ARM CPU最开始只有普通的寄存器，可以进行基本数据类型的基�
 SIMD即单指令多数据指令，目前在x86平台下有MMX/SSE/AVX系列指令，arm平台下有NEON指令。
 一般SIMD指令通过intrinsics(内部库C函数接口的函数) 或者 汇编 实现。
 
+Intrinsics是使用C语言的方式对NEON寄存器进行操作，因为相比于传统的使用纯汇编语言，具有可读性强，开发速度快等优势。如果需要在代码中调用NEON Intrinsics函数，需要加入头文件"arm_neon.h"。
+
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/simd.PNG)
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/simd_add-op.PNG)
 
 ![](https://upload-images.jianshu.io/upload_images/3270173-633789004154255f.gif?imageMogr2/auto-orient/strip%7CimageView2/2/w/634/format/webp)
+
+在这里，一条SIMD加法指令可以同时得到8个加法结果。就计算步骤本身而言，比单独使用8条加法指令能够获得8倍的加速比。从该示例也可以看出，随着寄存器长度的变长，单指令能够处理的数据量也越来越大，从而获得更高的加速性能。
+在Intel最新的AVX2指令集中，寄存器最大长度已经达到512位。
 
 类似于Intel CPU下的MMX/SSE/AVX/FMA指令，ARM CPU的NEON指令同样是通过向量化计算来进行速度优化，通常应用于图像处理、音视频处理等等需要大量计算的场景。
 
@@ -262,6 +267,51 @@ VMLAL.S16 Q2, D8, D9  @ 有符号16位整数 乘加
 ## 3. NEON Instrinsic函数
 
 NEON Instrinsic是编译器支持的一种buildin类型和函数的集合，基本涵盖NEON的所有指令，通常这些Instrinsic包含在arm_neon.h头文件中。
+
+[ARM-NEON-Intrinsics](https://gcc.gnu.org/onlinedocs/gcc-4.6.1/gcc/ARM-NEON-Intrinsics.html)
+
+[使用ARM NEON Intrinsics加速Video Codec 参考](https://www.jianshu.com/p/70601b36540f)
+
+### 数据类型
+
+NEON Intrinsics内置的整数数据类型主要包括以下几种:
+
+* (u)int8x8_t;
+* (u)int8x16_t;
+* (u)int16x4_t;
+* (u)int16x8_t;
+* (u)int32x2_t;
+* (u)int32x4_t;
+* (u)int64x1_t;
+
+其中，第一个数字代表的是数据类型宽度为8/16/32/64位，第二个数字代表的是一个寄存器中该类型数据的数量。如int16x8_t代表16位有符号数，寄存器中共有8个数据。
+
+〉**示例函数指令分析**
+```c
+int16x8_t vqaddq_s16 (int16x8_t, int16x8_t)
+int16x4_t vqadd_s16 (int16x4_t, int16x4_t)
+```
+
+* 第一个字母'v'指明是vector向量指令，也就是NEON指令；
+* 第二个字母'q'指明是饱和指令，即后续的加法结果会自动饱和；
+* 第三个字段'add'指明是加法指令；
+* 第四个字段'q'指明操作寄存器宽度，为'q'时操作QWORD, 为128位；未指明时操作寄存器为DWORD，为64位；
+* 第五个字段's16'指明操作的基本单元为有符号16位整数，其最大表示范围为-32768 ~ 32767；
+* 第六个字段为空，普通指令，形参和返回值类型约定与C语言一致。
+
+其它可能用到的助记符包括:
+
+* l 长指令，数据扩展，双字运算得到四字结果
+* w 宽指令，数据对齐，双字和四字运算得到四字结果
+* n 窄指令, 数据压缩，四字运算得到双字结果
+
+> 示例2
+```c
+uint8x8_t vld1_u8 (const uint8_t *)
+```
+* 第一个字母'v'指明是vector向量指令，也就是NEON指令；
+* 第二个字段'ld'表示加载指令 load
+* 第三个字段'1'(注意是1，不是l)表示顺次加载。如果需要处理图像的RGB分量，可能会用到vld3间隔3个单元加载。
 
 
 NEON指令按照作用可以分为：加载数据、存储数据、加减乘除运算、逻辑AND/OR/XOR运算、比较大小运算
