@@ -257,6 +257,8 @@ VMLAL.S16 Q2, D8, D9  @ 有符号16位整数 乘加
 
 [所有的intrinsics函数都在GNU官方说明文档 ](https://gcc.gnu.org/onlinedocs/gcc-4.7.4/gcc/ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics)
 
+## 3. NEON Instrinsic函数
+
 NEON Instrinsic是编译器支持的一种buildin类型和函数的集合，基本涵盖NEON的所有指令，通常这些Instrinsic包含在arm_neon.h头文件中。
 
 
@@ -273,7 +275,9 @@ Result_t vmov_type(Scalar_t N)
 ```c
 // 间隔为x，加载数据进NEON寄存器, 间隔：交叉存取，是ARM NEON特有的指令
 Result_t vld[x]_type(Scalar_t* N)  // 
-Result_t vld[x]q_type(Scalar_t* N) // vld1q_s32 间隔1 即连续内存访问，q是mod模式中的q? 饱和模式?
+Result_t vld[x]q_type(Scalar_t* N) // vld1q_s32 间隔1 即连续内存访问， 
+
+// **通过将 Q 附加到指令助记符，可以指定正常指令的操作数和结果必须全部为四字。** 
 
 
 float32x4x3_t = vld3q_f32(float32_t* ptr)
@@ -380,7 +384,7 @@ Result_t vcle_type(Vector_t M,Vector_t N)
 Result_t vclt_type(Vector_t M,Vector_t N)
 ```
 
-## 示例1：向量加法**
+### 示例1：向量加法**
 ```c
 // 假设 count 是4的倍数
 #include<arm_neon.h>
@@ -435,7 +439,7 @@ void add_float_neon1(int* dst,
 
 
 
-## 示例2：向量乘法 
+### 示例2：向量乘法 
 
 ```neon
 //NRON优化的vector相乘
@@ -473,12 +477,184 @@ static void neon_vector_mul(
 
 ```
 
-4. NEON assembly
+## 4. NEON assembly
 
 NEON可以有两种写法：
 * 1. Assembly文件： 纯汇编文件，后缀为”.S”或”.s”。注意对寄存器数据的保存。
 * 2. inline assembly内联汇编
 
+### 1.纯汇编 Assembly
+
+#### 数据加载保存移动
+
+> **扩展 寄存器 加载和存储 指令**
+
+语法：
+```asm
+VLDR{cond}{.size} Fd, [Rn{, #offset}]   # load加载，从内存中加载一个扩展寄存器。
+VSTR{cond}{.size} Fd, [Rn{, #offset}]   # set保存，将一个扩展寄存器的内容保存到内存中。
+VLDR{cond}{.size} Fd, label
+VSTR{cond}{.size} Fd, label
+```
+cond: 是一个可选的条件代码，EQ等于\NE不等于\HI无符号大于\LS无符号小于等于\GE有符号大于等于\LT有符号小于\GT有符号大于\LE有符号小于等于
+
+size：是一个可选的数据大小说明符。 如果 Fd 是单精度 VFP 寄存器，则必须为 32，传送一个字；否则必须为 64，传送两个字。
+
+Fd：是要加载或保存的扩展寄存器。 对于 NEON 指令，它必须为 Dd。 对于 VFP 指令，它可以为 Dd 或 Sd。
+
+Rn：是存放要传送的基址的 ARM 寄存器。
+
+offset：是一个可选的数值表达式。 在汇编时，该表达式的值必须为一个数字常数。 该值必须是 4 的倍数，并在 -1020 到 +1020 的范围内。 该值被加到基址上以构成用于传送的地址。
+
+label：是一个程序相对的表达式。必须位于当前指令的 ±1KB 范围之内。
+
+> **扩展寄存器加载多个、存储多个、从堆栈弹出、推入堆栈**
+
+语法:
+```asm
+VLDMmode{cond} Rn,{!} Registers # 加载多个
+VSTMmode{cond} Rn,{!} Registers # 存储多个
+VPOP{cond} Registers            # 从堆栈弹出 VPOP Registers 等效于 VLDM sp!,Registers
+VPUSH{cond} Registers           # 推入堆栈   VPUSH Registers 等效于 VSTMDB sp!,Registers
+```
+mode 必须是下列值之一：
+
+	IA 表示在每次传送后递增地址。IA 是缺省值，可以省略。 increase
+	DB 表示在每次传送前递减地址。 decrease
+	EA 表示空的升序堆栈操作。 对于加载操作，该值与 DB 相同；对于保存操作，该值与 IA 相同。
+	FD 表示满的降序堆栈操作。 对于加载操作，该值与 IA 相同；对于保存操作，该值与 DB 相同。
+
+! 是可选的。! 指定必须将更新后的基址写回到 Rn 中。 如果未指定!，则 mode 必须为 IA。
+
+Registers 是一个用大括号 { 和 } 括起的连续扩展寄存器的列表。 该列表可用逗号分隔，也可以采用范围格式。 列表中必须至少有一个寄存器。可指定 S、D 或 Q 寄存器，但一定不能混用这些寄存器。 D 寄存器的数目不得超过 16 个，Q 寄存器的数目不得超过 8 个。 如果指定 Q 寄存器，则在反汇编时它们将显示为 D 寄存器。
+
+> **VMOV（在两个 ARM 寄存器和一个扩展寄存器之间传送内容）**
+
+在两个 ARM 寄存器与一个 64 位扩展寄存器或两个连续的 32 位 VFP 寄存器之间传送内容。
+
+语法:
+```asm
+VMOV{cond} Dm, Rd, Rn # 将 Rd 的内容传送到 Dm 的低半部分，并将 Rn 的内容传送到 Dm 的高半部分
+VMOV{cond} Rd, Rn, Dm # 将 Dm 的低半部分的内容传送到 Rd，并将 Dm 的高半部分的内容传送到 Rn
+VMOV{cond} {Sm, Sm1}, Rd, Rn # 将 Sm 的内容传送到 Rd，并将 Sm1 的内容传送到
+VMOV{cond} Rd, Rn, {Sm, Sm1} # 将 Rd 的内容传送到 Sm，并将 Rn 的内容传送到 Sm1
+```
+
+	Dm 是一个 64 位扩展寄存器。
+	Sm 是一个 VFP 32 位寄存器。
+	Sm1 是 Sm 之后的下一个 VFP 32 位寄存器。
+	Rd、Rn 是 ARM 寄存器。 不要使用 r15。
+> **VMOV（在一个 ARM 寄存器R 和一个 NEON 标量之间）**
+
+在一个 ARM 寄存器和一个 NEON 标量之间传送内容。
+
+语法
+VMOV{cond}{.size} Dn[x], Rd     # 将 Rd 的最低有效字节、半字或字的内容传送到 Sn。
+VMOV{cond}{.datatype} Rd, Dn[x] # 将 Dn[x] 的内容传送到 Rd 的最低有效字节、半字或字。
+
+size 是数据大小。 可以为 8、16 或 32。 如果省略，则 size 为 32。
+
+datatype 是数据类型。 可以为 U8、S8、U16、S16 或 32。 如果省略，则 datatype为 32。
+
+Dn[x] 是 NEON 标量,16 位标量限定为寄存器 D0-D7，其中 x 位于范围 0-3 内,32 位标量限定为寄存器 D0-D15，其中 x 为 0 或 1。
+
+Rd 是 ARM 寄存器。Rd 不得为 R15。
+
+#### NEON 逻辑运算和比较运算
+> **VAND、VBIC、VEOR、VORN 和 VORR（寄存器）**
+
+VAND（按位与）、VBIC（位清除）、VEOR（按位异或）、VORN（按位或非）和 VORR（按位或）指令在两个寄存器之间执行按位逻辑运算，并将结果存放到目标寄存器中。
+
+语法:
+```asm
+Vop{cond}.{datatype} {Qd}, Qn, Qm
+Vop{cond}.{datatype} {Dd}, Dn, Dm
+```
+
+op 必须是下列值之一：
+AND 逻辑“与”\ORR 逻辑“或”\EOR 逻辑异或\BIC 逻辑“与”求补\ORN 逻辑“或”求补。
+
+Qd、Qn、Qm 为四字运算指定目标寄存器、第一个操作数寄存器和第二个操作数寄存器。
+
+Dd、Dn、Dm 为双字运算指定目标寄存器、第一个操作数寄存器和第二个操作数寄存器。
+
+> **VBIC 和 VORR（立即数）**
+
+VBIC（位清除（立即数））获取目标向量的每个元素，对其与一个立即数执行按位与求补运算，并将结果返回到目标向量。
+
+VORR（按位或（立即数））获取目标向量的每个元素，对其与一个立即数执行按位或运算，并将结果返回到目标向量。
+
+
+语法:
+```asm
+Vop{cond}.datatype Qd, #imm
+Vop{cond}.datatype Dd, #imm
+```
+op 必须为 BIC 或 ORR。
+
+datatype 必须为 I16 或 I32。
+
+Qd 或 Dd 是用于存放源和结果的 NEON 寄存器。
+
+imm 是立即数。
+
+立即数 
+
+如果 datatype 为 I16，则立即数必须采用下列格式之一：
+• 0x00XY
+• 0xXY00。
+
+如果 datatype 为 I32，则立即数必须采用下列格式之一：
+• 0x000000XY
+• 0x0000XY00
+• 0x00XY0000
+• 0xXY000000。
+
+〉**VBIF、VBIT 和 VBSL**
+
+VBIT（为 True 时按位插入）：如果第二个操作数的对应位为 1，则该指令将第一个操作数中的每一位插入目标中；否则将目标位保持不变。
+
+VBIF（为 False 时按位插入）：如果第二个操作数的对应位为 0，则该指令将第一个操作数中的每一位插入目标中；否则将目标位保持不变。
+
+VBSL（按位选择）：如果目标的对应位为 1，则该指令从第一个操作数中选择目标的每一位；如果目标的对应位为 0，则从第二个操作数中选择目标的每一位。
+
+语法：
+```asm
+Vop{cond}{.datatype} {Qd}, Qn, Qm
+Vop{cond}{.datatype} {Dd}, Dn, Dm
+
+```
+
+> **VMOV、VMVN（寄存器）**
+
+VMOV向量移动（寄存器）将源寄存器中的值复制到目标寄存器中。
+
+VMVN向量求反移动（寄存器）对源寄存器中每一位的值执行求反运算，并将结果存放到目标寄存器中。
+
+
+语法:
+```asm
+VMOV{cond}{.datatype} Qd, Qm
+VMOV{cond}{.datatype} Dd, Qm
+VMVN{cond}{.datatype} Qd, Qm
+VMVN{cond}{.datatype} Dd, Qm
+```
+
+#### NEON 乘法指令
+
+VMUL（向量乘法））将两个向量中的相应元素相乘，并将结果存放到目标向量中。
+VMLA（向量乘加）将两个向量中的相应元素相乘，并将结果累加到目标向量的元素中。
+VMLS（向量乘减）将两个向量中的相应元素相乘，从目标向量的相应元素中减去相乘的结果，并将最终结果放入目标向量中。
+语法:
+```asm
+Vop{cond}.datatype {Qd}, Qn, Qm
+Vop{cond}.datatype {Dd}, Dn, Dm
+VopL{cond}.datatype Qd, Dn, Dm
+```
+
+
+
+### 2.内联汇编 inline assembly
 [ARM GCC Inline Assembler Cookbook](http://www.ethernut.de/en/documents/arm-inline-asm.html)
 
 优点：在C代码中嵌入汇编，调用简单，无需手动存储寄存器；
