@@ -28,6 +28,8 @@ SIMD即单指令多数据指令，目前在x86平台下有MMX/SSE/AVX系列指�
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/simd_add-op.PNG)
 
+![](https://upload-images.jianshu.io/upload_images/3270173-633789004154255f.gif?imageMogr2/auto-orient/strip%7CimageView2/2/w/634/format/webp)
+
 类似于Intel CPU下的MMX/SSE/AVX/FMA指令，ARM CPU的NEON指令同样是通过向量化计算来进行速度优化，通常应用于图像处理、音视频处理等等需要大量计算的场景。
 
 > NEON支持的数据类型：
