@@ -8,8 +8,10 @@ System-on-Chip(SOC) 片上系统：核心、内存控制器、片上内存、外
 
 嵌入式系统 Embedded systems，
 内存消耗 Memory Footprint(memory usage),
-SIMD Single Instruction, Multiple Data.单指令多数据流，
-MMU Memory Management Unit.内存管理单元，
+SIMD(Single Instruction, Multiple Data) 单指令多数据流，
+MMU(Memory Management Unit) 内存管理单元，
+MPE(Media Processing Engine) 媒体处理引擎。
+VFP(Vector Floating Point) 向量浮点
 
 [参考1 ARM NEON 编程系列](http://hongbomin.com/2016/05/13/arm_neon_introduction/)
 
@@ -36,6 +38,32 @@ Intrinsics是使用C语言的方式对NEON寄存器进行操作，因为相比�
 在Intel最新的AVX2指令集中，寄存器最大长度已经达到512位。
 
 类似于Intel CPU下的MMX/SSE/AVX/FMA指令，ARM CPU的NEON指令同样是通过向量化计算来进行速度优化，通常应用于图像处理、音视频处理等等需要大量计算的场景。
+
+> **SISD(Single Instruction Single Data)单指令单数据**
+```asm
+add r0, r5  # 单条指令执行一个运算
+add r1, r6
+add r2, r7
+add r3, r8
+```
+> **SIMD(Single Instruction Multiple Data (vector mode向量模式))单指令多数据**
+```c
+VADD.F32 S24, S8, S16 
+// four operations occur 单条指令并行执行四个运算
+// S24 = S8 +S16
+// S25 = S9 +S17
+// S26 = S10 +S18
+// S27 = S11 +S20
+
+```
+
+> **SIMD(Single Instruction Multiple Data (packed data mode)包数据模式)**
+```c
+VADD.I16 Q10, Q8, Q9
+// One operation adds two 64-bit registers, 128位寄存器
+// but each of the four 16-bit lanes in the register is added separately.
+// 单个数据为16位，所以有8个数据并行计算加法运算
+```
 
 > NEON支持的数据类型：
 
@@ -219,12 +247,23 @@ V{<mod模式>}<op操作>{<shape指令类型>}{<cond条件>}{.<dt数据类型>}{<
 	
 > <mod模式> 可选：
 
-	Q: 饱和效果The instruction uses saturating arithmetic, so that the result is saturated within the range of the specified data type, such as VQABS, VQSHLetc.
-
-	H: 结果右移动移位，相当于得到结构后在除以2 The instruction will halve the result. It does this by shifting right by one place (effectively a divide by two with truncation), such as VHADD,VHSUB.
+	Q: Staturating饱和结果，The instruction uses saturating arithmetic, so that the result is saturated within the range of the specified data type, such as VQABS, VQSHLetc.
+        
+	VQADD.S16 D0, D2, D3
 	
-	D: 双倍结果 The instruction doubles the result, such as VQDMULL, VQDMLAL, VQDMLSL and VQ{R}DMULH.
-	R: 取整 The instruction will perform rounding on the result, equivalent to adding 0.5 to the result before truncating, such as VRHADD, VRSHR.
+	H: Halving，半结果，结果右移动移位，相当于得到结构后在除以2 The instruction will halve the result. It does this by shifting right by one place (effectively a divide by two with truncation), such as VHADD,VHSUB.
+	
+	VHADD.S16 Q0, Q1, Q4
+	
+	D: Doubling，双倍结果 The instruction doubles the result, such as VQDMULL, VQDMLAL, VQDMLSL and VQ{R}DMULH.
+	
+	VQDMULL.S16 Q0, D1, D3   双倍+饱和+长指令
+	
+	
+	R: Rounding，取整 The instruction will perform rounding on the result, equivalent to adding 0.5 to the result before truncating, such as VRHADD, VRSHR.
+	
+	VRSUBHN.I16 D0, Q1, Q3
+	
 	
 > <op操作>：  必须
 
@@ -234,7 +273,7 @@ NEON指令按照作用可以分为：加载数据、存储数据、加减乘除�
 
 > <shape> shape指令类型 可选：
 	
-即前文中的Long (L), Wide (W), Narrow (N).
+即前文中的Long (L长指令，结果数据位扩大), Wide (W), Narrow (N结果数据位变窄).
 
 > <cond条件> Condition 可选,
 	
