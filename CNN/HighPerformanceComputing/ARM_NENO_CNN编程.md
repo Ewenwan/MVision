@@ -43,7 +43,27 @@ Intrinsics是使用C语言的方式对NEON寄存器进行操作，因为相比�
 * 8, 16, 32 and 64bit unsigned and signed integers ，  8, 16, 32 and 64bit 无符号/有符号 整型；
 * 8 and 16bit polynomials 8 and 16bit 多项式。
 
+
+	B字节Byte：      8 bits.
+	H半字Halfword：  16 bits.   半精度浮点16位
+	S字Word：        32 bits.   单精度浮点32位
+	D双字Doubleword：64 bits.   双精度浮点64位
+	Q四字Quadword：  128 bits.
+
+> 浮点数取整:
+
+向负无穷取整(向左取整) Round towards Minus Infinity (RM) roundTowardsNegative
+
+向正无穷取整(向右取整) Round towards Plus Infinity (RP) roundTowardsPositive
+
+向零取整(向中间取整)Round towards Zero (RZ) roundTowardZero
+
+就近取整 Round to Nearest (RN) roundTiesToEven
+
+随机取整
+
 >NEON数据类型说明符：
+
 * Unsigned integer  无符号整形 U8 U16 U32 U64
 * Signed integer    有符号整形 S8 S16 S32 S64
 * Integer of unspecified type  未指定类型的整数  I8 I16 I32 I64
