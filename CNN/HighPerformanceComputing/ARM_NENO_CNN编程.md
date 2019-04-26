@@ -954,8 +954,8 @@ uint16x8_t vabdl_u8(uint8x8_t a, uint8x8_t b); // VABDL.U8 q0,d0,d0
 uint32x4_t vabdl_u16(uint16x4_t a, uint16x4_t b); // VABDL.U16 q0,d0,d0
 uint64x2_t vabdl_u32(uint32x2_t a, uint32x2_t b); // VABDL.U32 q0,d0,d0
 ```
-
->** **
+#### 加载存储指令
+>**加载并存储单个向量 加载并存储某类型的单个向量。vld1q_type**
 ```c
 
 ```
