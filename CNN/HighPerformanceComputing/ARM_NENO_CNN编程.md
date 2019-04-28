@@ -1019,16 +1019,6 @@ uint64x2_t vabdl_u32(uint32x2_t a, uint32x2_t b); // VABDL.U32 q0,d0,d0
 
 ```
 
->** **
-```c
-
-```
-
->** **
-```c
-
-```
-
 
 ### 示例1：向量加法**
 ```c
@@ -1058,6 +1048,10 @@ void add_float_neon1(int* dst,
 		
 		// 1. 从内存 载入 数据 到寄存器
 		in1 = vld1q_s32(src1);// intrinsics传入的为内存数据指针
+		                      // v 表示neon函数
+				      // ld表示加载load
+				      // q表示使用128位寄存器
+				      // s32,有符号32位整数，单个数据32，共有4个数据并行超声
 		src1 += 4;// 数据 指针 递增+4 
 		
 		in2 = vld1q_s32(src2);
