@@ -1117,6 +1117,99 @@ static void neon_vector_mul(
 
 ```
 
+### 从内存变量 加载数据 到 寄存器向量
+```c
+#include <stdio.h>
+#include <arm_neon.h>
+unsigned short int A[] = {1,2,3,4}; 
+    // 含有四个无符号短整型整数的数组 array with 4 elements
+int main(void)
+{
+	uint16x4_t v;     // 4通道16位的向量declare a vector of four 16-bit lanes
+	v = vld1_u16(A);  // 从数组加载到向量load the array from memory into a vector
+	v = vadd_u16(v,v);// 每个元素加上自身，扩大一倍double each element in the vector
+	vst1_u16(A, v);   // 存储结果回数组A store the vector back to memory
+	return 0;
+}
+```
+
+
+### 直接从数据创建vcreate_u8()寄存器变量
+```c
+#include <arm_neon.h>
+int main (void)
+{
+	uint8x8_t v;        // 定义一个8通道个8位数据的向量
+	unsigned char A[8]; // 分配内存存储一个含有8个无符号字符数据的数组
+	v = vcreate_u8(0x0102030405060708); // 创建一个8X8位向量，存储 1,2,3,4,5,6,7,8
+	vst1_u8(A, v);      // 将向量数据 存储到内存
+	return 0;
+}
+
+```
+
+### 加载多个向量数据
+```c
+#include <arm_neon.h>
+int main (void)
+{
+	uint8x8x3_t v; // 定义一个包含3个向量的向量数组，每个向量为8通道8位无符号整形
+	unsigned char A[24]; // 定义一个包含24个无符号字节数据的数组，表示24个像素
+	v = vld3_u8(A);      // 从A处加载数据(多向量间隔加载)
+	// v.val[0] 是第一个向量={A[0],A[3],A[6],A[9],A[12],A[15],A[18],A[21]},RGB红色通道
+	// v.val[1] 是第二个向量={A[1],A[4],A[7],A[10],A[13],A[16],A[19],A[22]},RGB绿色通道
+	// v.val[2] 是第三个向量={A[2],A[5],A[8],A[11],A[14],A[17],A[20],A[23]},RGB蓝色通道
+	v.val[0] = vadd_u8(v.val[0],v.val[0]);// 红色通道数值加倍
+	vst3_u8(A, v); // 在把使用向量处理后的数据，存回内存数组A中
+	return 0;
+}
+
+```
+
+
+### 数组相乘
+```c
+void altneonmult(const float *matrixA, const float *matrixB, float *matrixR)
+// matrixA \ matrixB \ matrixR均为 4*4 浮点数矩阵，列优先存储??
+// 计算过程为 matrixR = matrixA * matrixB
+{
+	float32x4_t a, b0, b1, b2, b3, r;// 4通道32位浮点数  行row 列column
+	a0 = vld1q_f32(matrixA);     /* 列col 0 of matrixA  从内存地址加载数据，连续加载，4个32位共128位数据*/
+	a1 = vld1q_f32(matrixA + 4); /* 列col 1 of matrixA */
+	a2 = vld1q_f32(matrixA + 8); /* 列col 2 of matrixA */
+	a3 = vld1q_f32(matrixA + 12); /* 列col 3 of matrixA */
+	
+	b = vld1q_f32(matrixB); /* load col 0 of matrixB */
+	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);     // 乘
+	r = vmlaq_lane_f32(r, a1, vget_low_f32(b), 1);  // 乘加
+	r = vmlaq_lane_f32(r, a2, vget_high_f32(b), 0);
+	r = vmlaq_lane_f32(r, a3, vget_high_f32(b), 1);
+	vst1q_f32(matrixR, r); /* store col 0 of result */
+	
+	b = vld1q_f32(matrixB + 4); /* load col 1 of matrixB */
+	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);
+	r = vmlaq_lane_f32(r, a1, vget_low_f32(b), 1);
+	r = vmlaq_lane_f32(r, a2, vget_high_f32(b), 0);
+	r = vmlaq_lane_f32(r, a3, vget_high_f32(b), 1);
+	vst1q_f32(matrixR + 4, r); /* store col 1 of result */
+	
+	b = vld1q_f32(matrixB + 8); /* load col 2 of matrixB */
+	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);
+	r = vmlaq_lane_f32(r, a1, vget_low_f32(b), 1);
+	r = vmlaq_lane_f32(r, a2, vget_high_f32(b), 0);
+	r = vmlaq_lane_f32(r, a3, vget_high_f32(b), 1);
+	vst1q_f32(matrixR + 8, r); /* store col 2 of result */
+	
+	b = vld1q_f32(matrixB + 12); /* load col 3 of matrixB */
+	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);
+	r = vmlaq_lane_f32(r, a1, vget_low_f32(b), 1);
+	r = vmlaq_lane_f32(r, a2, vget_high_f32(b), 0);
+	r = vmlaq_lane_f32(r, a3, vget_high_f32(b), 1);
+	vst1q_f32(matrixR + 12, r); /* store col 3 of result */
+}
+```
+
+
 ## 4. NEON assembly
 
 NEON可以有两种写法：
