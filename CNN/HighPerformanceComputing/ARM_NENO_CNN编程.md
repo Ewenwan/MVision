@@ -1165,7 +1165,17 @@ int main (void)
 }
 
 ```
+vld3_u8：
 
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/rgb-3.PNG)	
+
+vld21_u8：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/rgb.PNG)	
+
+加载和保存：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/rgb-store.PNG)	
 
 ### 数组相乘
 ```c
