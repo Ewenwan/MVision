@@ -1,4 +1,6 @@
 # MVision　Machine Vision 机器视觉
+[AI算法工程师手册 数学基础 统计学习 深度学习 自然语言处理 工具使用](http://www.huaxiaozhuan.com/)
+
 [AI 安全数据科学和算法 ](https://github.com/Ewenwan/AI-Security-Learning)
 
 [澳大利亚机器人视觉研究中心](https://www.roboticvision.org/)
