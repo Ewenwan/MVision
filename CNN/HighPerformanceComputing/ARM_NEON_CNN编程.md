@@ -1178,44 +1178,108 @@ vld21_u8：
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/rgb-store.PNG)	
 
 ### 数组相乘
+
+    列主导4*4矩阵相乘：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/matrixMul.PNG)
+
+细节-结果矩阵的产生：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/matrixMul_COL.PNG)
+
+结果矩阵的第一列：
+
+A矩阵第一列和B矩阵第一列的第一个元素相乘 +
+A矩阵第二列和B矩阵第一列的第二个元素相乘 +
+A矩阵第三列和B矩阵第一列的第三个元素相乘 +
+A矩阵第四列和B矩阵第一列的第四个元素相乘 
+
 ```c
 void altneonmult(const float *matrixA, const float *matrixB, float *matrixR)
 // matrixA \ matrixB \ matrixR均为 4*4 浮点数矩阵，列优先存储??
 // 计算过程为 matrixR = matrixA * matrixB
 {
 	float32x4_t a, b0, b1, b2, b3, r;// 4通道32位浮点数  行row 列column
-	a0 = vld1q_f32(matrixA);     /* 列col 0 of matrixA  从内存地址加载数据，连续加载，4个32位共128位数据*/
-	a1 = vld1q_f32(matrixA + 4); /* 列col 1 of matrixA */
-	a2 = vld1q_f32(matrixA + 8); /* 列col 2 of matrixA */
-	a3 = vld1q_f32(matrixA + 12); /* 列col 3 of matrixA */
+	a0 = vld1q_f32(matrixA);     /* A矩阵第一列 从内存地址加载数据，连续加载，4个32位共128位数据*/
+	a1 = vld1q_f32(matrixA + 4); /* A矩阵第二列*/
+	a2 = vld1q_f32(matrixA + 8); /* A矩阵第三列*/
+	a3 = vld1q_f32(matrixA + 12); /* A矩阵第四列 */
 	
-	b = vld1q_f32(matrixB); /* load col 0 of matrixB */
-	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);     // 乘
+// 结果矩阵的第一列
+	b = vld1q_f32(matrixB); /* B矩阵第一列 */
+	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);     // A矩阵第一列 乘 B矩阵第一列的第一个元素
 	r = vmlaq_lane_f32(r, a1, vget_low_f32(b), 1);  // 乘加
 	r = vmlaq_lane_f32(r, a2, vget_high_f32(b), 0);
 	r = vmlaq_lane_f32(r, a3, vget_high_f32(b), 1);
 	vst1q_f32(matrixR, r); /* store col 0 of result */
-	
-	b = vld1q_f32(matrixB + 4); /* load col 1 of matrixB */
+// 结果矩阵的第二列
+	b = vld1q_f32(matrixB + 4); /* B矩阵第二列 */
 	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);
 	r = vmlaq_lane_f32(r, a1, vget_low_f32(b), 1);
 	r = vmlaq_lane_f32(r, a2, vget_high_f32(b), 0);
 	r = vmlaq_lane_f32(r, a3, vget_high_f32(b), 1);
 	vst1q_f32(matrixR + 4, r); /* store col 1 of result */
-	
-	b = vld1q_f32(matrixB + 8); /* load col 2 of matrixB */
+// 结果矩阵的第三列
+	b = vld1q_f32(matrixB + 8); /* B矩阵第三列 */
 	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);
 	r = vmlaq_lane_f32(r, a1, vget_low_f32(b), 1);
 	r = vmlaq_lane_f32(r, a2, vget_high_f32(b), 0);
 	r = vmlaq_lane_f32(r, a3, vget_high_f32(b), 1);
 	vst1q_f32(matrixR + 8, r); /* store col 2 of result */
-	
-	b = vld1q_f32(matrixB + 12); /* load col 3 of matrixB */
+// 结果矩阵的第四列
+	b = vld1q_f32(matrixB + 12); /* B矩阵第四列 */
 	r = vmulq_lane_f32(a0, vget_low_f32(b), 0);
 	r = vmlaq_lane_f32(r, a1, vget_low_f32(b), 1);
 	r = vmlaq_lane_f32(r, a2, vget_high_f32(b), 0);
 	r = vmlaq_lane_f32(r, a3, vget_high_f32(b), 1);
 	vst1q_f32(matrixR + 12, r); /* store col 3 of result */
+}
+
+// 先提取 再计算 最后存取
+void neonmult(const float *matrixA, const float *matrixB, float *matrixR)
+{
+// 0. 定义变量
+	float32x4_t a0, a1, a2, a3, b0, b1, b2, b3, r0, r1, r2, r3;
+	
+// 1. 先提取每个矩阵的每一列
+	a0 = vld1q_f32(matrixA); /* col 0 of matrixA */
+	a1 = vld1q_f32(matrixA + 4); /* col 1 of matrixA */
+	a2 = vld1q_f32(matrixA + 8); /* col 2 of matrixA */
+	a3 = vld1q_f32(matrixA + 12); /* col 3 of matrixA */
+	
+	b0 = vld1q_f32(matrixB); /* col 0 of matrixB */
+	b1 = vld1q_f32(matrixB + 4); /* col 1 of matrixB */
+	b2 = vld1q_f32(matrixB + 8); /* col 2 of matrixB */
+	b3 = vld1q_f32(matrixB + 12); /* col 3 of matrixB */
+	
+// 2. 计算结果矩阵的每一列
+	/* compute all the cols in the order specified by compiler */
+        // 第一列
+	r0 = vmulq_lane_f32(a0, vget_low_f32(b0), 0);     // 乘 
+	r0 = vmlaq_lane_f32(r0, a1, vget_low_f32(b0), 1); // 乘加
+	r0 = vmlaq_lane_f32(r0, a2, vget_high_f32(b0), 0);// 乘加
+	r0 = vmlaq_lane_f32(r0, a3, vget_high_f32(b0), 1);// 乘加
+	//第二列
+	r1 = vmulq_lane_f32(a0, vget_low_f32(b1), 0);
+	r1 = vmlaq_lane_f32(r1, a1, vget_low_f32(b1), 1);
+	r1 = vmlaq_lane_f32(r1, a2, vget_high_f32(b1), 0);
+	r1 = vmlaq_lane_f32(r1, a3, vget_high_f32(b1), 1);
+	//第三列
+	r2 = vmulq_lane_f32(a0, vget_low_f32(b2), 0);
+	r2 = vmlaq_lane_f32(r2, a1, vget_low_f32(b2), 1);
+	r2 = vmlaq_lane_f32(r2, a2, vget_high_f32(b2), 0);
+	r2 = vmlaq_lane_f32(r2, a3, vget_high_f32(b2), 1);
+	//第四列
+	r3 = vmulq_lane_f32(a0, vget_low_f32(b3), 0);
+	r3 = vmlaq_lane_f32(r3, a1, vget_low_f32(b3), 1);
+	r3 = vmlaq_lane_f32(r3, a2, vget_high_f32(b3), 0);
+	r3 = vmlaq_lane_f32(r3, a3, vget_high_f32(b3), 1);
+	
+// 3. 存储设置结果矩阵
+	vst1q_f32(matrixR, r0);    // 第一列
+	vst1q_f32(matrixR + 4, r1);//第二列
+	vst1q_f32(matrixR + 8, r2);//第三列
+	vst1q_f32(matrixR + 12, r3);//第四列
 }
 ```
 
