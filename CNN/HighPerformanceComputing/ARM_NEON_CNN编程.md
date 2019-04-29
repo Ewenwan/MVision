@@ -1117,7 +1117,7 @@ static void neon_vector_mul(
 
 ```
 
-### 从内存变量 加载数据 到 寄存器向量
+### 示例3：从内存变量 加载数据 到 寄存器向量
 ```c
 #include <stdio.h>
 #include <arm_neon.h>
@@ -1134,7 +1134,7 @@ int main(void)
 ```
 
 
-### 直接从数据创建vcreate_u8()寄存器变量
+### 示例4：直接从数据创建vcreate_u8()寄存器变量
 ```c
 #include <arm_neon.h>
 int main (void)
@@ -1148,7 +1148,7 @@ int main (void)
 
 ```
 
-### 加载多个向量数据
+### 示例5：加载多个向量数据
 ```c
 #include <arm_neon.h>
 int main (void)
@@ -1177,7 +1177,7 @@ vld21_u8：
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/rgb-store.PNG)	
 
-### 数组相乘
+### 示例6：数组矩阵相乘
 
     列主导4*4矩阵相乘：
 
@@ -1282,6 +1282,76 @@ void neonmult(const float *matrixA, const float *matrixB, float *matrixR)
 	vst1q_f32(matrixR + 12, r3);//第四列
 }
 ```
+### 示例7：向量叉乘 Cross product
+
+a = [ai, aj, ak]
+
+b = [bi, bj, bk]
+
+> ** r = a 叉乘 b = [aj*bk-ak*bj, ak*bi-ai*bk, ai*bj-aj*bi]**
+
+```c
+// Single cross product===== 单叉积?
+void cross_product_s(float32_t *r, float32_t* a, float32_t* b)
+{
+	// 向量存储 ai bi在低地址，ak bk在高地址
+	// 寄存器内存 register for example:
+	// [element3, element2, element1, element0]  element0低地址  element3高地址
+	float32x2_t vec_a_1 = vld1_f32(a + 1); //D register = [ak, aj]  aj低地址
+	float32x2_t vec_a_2 = vld1_f32(a);     //D register = [aj, ai]  ai低地址
+	
+	float32x2_t vec_b_1 = vld1_f32(b + 1); //D register = [bk, bj]  bj低地址
+	float32x2_t vec_b_2 = vld1_f32(b);     //D register = [bj, bi]  bi低地址
+	
+	// 寄存器合并 combine
+	float32x4_t vec_a = vcombine_f32(vec_a_1, vec_a_2); //Q register = [aj, ai, ak, aj]
+	float32x4_t vec_b = vcombine_f32(vec_b_1, vec_b_2); //Q register = [bj, bi, bk, bj]
+        // 寄存器移通道 低位通道数据到最高位通道，其他数据依次往低位通道移动
+	float32x4_t vec_a_rot = vextq_f32(vec_a, vec_a, 1); //Q register = [ aj, aj, ai, ak ] 
+	float32x4_t vec_b_rot = vextq_f32(vec_b, vec_b, 1); //Q register = [ bj, bj, bi, bk ]
+	
+	// vec_a = [ aj, ai, ak, aj ]
+	// vec_b_rot = [ bj, bj, bi, bk ]
+	// vec_a_rot = [ aj, aj, ai, ak ]
+	// vec_b = [ bj, bi, bk, bj ]
+	
+	float32x4_t prod = vmulq_f32(vec_a, vec_b_rot); // 乘
+	// prod = [ ajbj, aibj, akbi, ajbk ]
+	
+        // vec_a_rot*vec_b = [aj*bj, aj*bi, ai*bk, ak*bj]
+	prod = vmlsq_f32(prod, vec_a_rot, vec_b);// 乘  再 减  prod - vec_a_rot * vec_b
+	// prod = [ ajbj-ajbj, aibj-ajbi, akbi-aibk, ajbk-akbj ]
+	
+	vst1_f32(r, vget_low_f32(prod)); // 先存储低位两个通道  [XXX, akbi-aibk, ajbk-akbj]
+	vst1_lane_f32(r + 2, vget_high_f32(prod), 0); // 再存储第三个通道 [aibj-ajbi, akbi-aibk, ajbk-akbj]
+}
+
+
+// Four cross products
+void cross_product_q(float32_t* r, float32_t* a, float32_t* b)
+{
+	float32x4x3_t vec_a = vld3q_f32(a); // [,,,ai]  0
+	                                    // [,,,aj]  1
+					    // [,,,ak]  2
+					    
+	float32x4x3_t vec_b = vld3q_f32(b); // [,,,bi]  0
+	                                    // [,,,bj]  1
+					    // [,,,bk]  2
+	float32x4x3_t result;
+	
+	result.val[0] = vmulq_f32(vec_a.val[1], vec_b.val[2]); // 乘 aj*bk
+	result.val[0] = vmlsq_f32(result.val[0], vec_a.val[2], vec_b.val[1]); // 乘减 aj*bk - ak*bj
+	
+	result.val[1] = vmulq_f32(vec_a.val[2], vec_b.val[0]); // 乘 ak*bi
+	result.val[1] = vmlsq_f32(result.val[1], vec_a.val[0], vec_b.val[2]); // 乘减 ak*bi - ai*bk
+	
+	result.val[2] = vmulq_f32(vec_a.val[0], vec_b.val[1]); // 乘 ai*bj
+	result.val[2] = vmlsq_f32(result.val[2], vec_a.val[1], vec_b.val[0]); // 乘减 ai*bj - aj*bi
+	
+	vst3q_f32(r, result);
+}
+```
+
 
 
 ## 4. NEON assembly
