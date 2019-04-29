@@ -1,4 +1,7 @@
 # 深度学习算法 The deeplearning algorithms includes (now):
+
+[深度学习笔记 ](https://github.com/Ewenwan/deep_learning_notes)
+
 - 逻辑回归 Logistic Regression   [logisticRegression.py](logisticRegression.py)
 - 多层感知机 Multi-Layer Perceptron (MLP) [mlp.py](mlp.py)
 - 卷积神经网络 Convolution Neural Network (CNN) [cnn.py](cnn.py)
