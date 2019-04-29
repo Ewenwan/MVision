@@ -1,4 +1,4 @@
-# ARM_NENO_CNN编程
+# ARM_NEON_CNN编程
 
 > 术语： 
 
