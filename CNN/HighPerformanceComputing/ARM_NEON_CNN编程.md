@@ -239,12 +239,24 @@ NEON和VFP的区别在于VFP是加速浮点计算的硬件不具备数据并行�
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/data-range.PNG)
 
+数据类型 x 的饱和范围 (s 就是signed，有符号的意思，u就是unsigned，无符号的意思） 
+
+	s8   –2^7  <= x < 2^7 
+	s16  –2^15 <= x < 2^15 
+	s32  –2^31 <= x < 2^31 
+	s64  –2^63 <= x < 2^63 
+	u8   0     <= x < 2^8 
+	u16  0     <= x < 2^16 
+	u32  0     <= x < 2^32 
+	u64  0     <= x < 2^64
+
+
 > **NEON指令集（重点）ARMv7/AArch32指令格式**
 
 所有的支持NEON指令都有一个助记符V，下面以32位指令为例，说明指令的一般格式：
 
 V{<mod模式>}<op操作>{<shape指令类型>}{<cond条件>}{.<dt数据类型>}{<dest目标地址>}, src1, src2
-	
+
 > <mod模式> 可选：
 
 	Q: Staturating饱和结果，The instruction uses saturating arithmetic, so that the result is saturated within the range of the specified data type, such as VQABS, VQSHLetc.
@@ -378,7 +390,54 @@ int16x4_t val[2];
 * vaddl_u8，l为long长指令标识，是指两个包含无符号 8 位值的 64 位向量按长型相加，结果为无符号 16 位值的 128 位向量。
 这编译为 VADDL.U8 q1, d0, d1。
 
-	
+* int8_t vget_lane_s8 (int8x8_t __a, const int __b); 
+
+v是向量操作，可以认为就是neon函数，shr是右移位，lane表示操作向量中的某个元素，s8表示结果是s8类型（向量） 
+
+* int8x8_t vget_high_s8 (int8x16_t __a); //ri = a(i+4); 
+
+v是向量操作，可以认为就是neon函数，get是取值，high表示取高64位，s8表示结果是s8类型（向量） 
+
+* int8x8_t vget_low_s8 (int8x16_t __a); //ri = ai; 
+
+v是向量操作，可以认为就是neon函数，get是取值，low表示取低64为，s8表示结果是s8类型（向量）
+
+     v<noen函数前缀>q<饱和操作>ops<具体操作>tyep<指令类型  q,l,w,n>_flag<标识  n,lane,high or low>_dtype<返回值类型或参数类型>
+     
+	add 加法 
+	mul 乘法 
+	sub 减法 
+	mla 乘加 
+	mls 乘减 
+	ceq 比较，类似与 == 
+	cge 比较，类似与 >= 
+	cle 比较，类似与 <= 
+	cgt 比较，类似与 > 
+	clt 比较，类似与 < 
+	tst 做与运算后，判断是否等于0 ,ri = (ai & bi != 0) ? 1…1:0…0; 
+	abd 两个向量相减后的绝对值，vabd -> ri = |ai - bi|; 
+	max 求最大值，ri = ai >= bi ? ai : bi; 
+	min 求最小值，ri = ai >= bi ? bi : ai; 
+	shl 左移位， ri = ai << b; 
+	shr 右移位， ri = ai >> b; 
+	abs 求绝对值，ri = |ai|; 
+	neg 取反，ri = -ai; 
+	mvn 按位取反，ri = ~ai; 
+	and 与运算，ri = ai & bi; 
+	orr 或运算，ri = ai | bi; 
+	eor 异或运算，ri = ai ^ bi; 
+	cls 计算连续相同的位数 
+	get 取值，从向量中取出一个值，所谓的向量可以认为是一个数组，给数组中的某个元素赋值 
+	set 赋值，给向量中赋值 
+	dup 构造一个向量，并赋上初始值，ri = a; 
+	combine 合并操作，把两个向量合并 
+	mov 改变数据类型，数据范围，比如把u8 变成u16，或者u16变成u8 
+	zip 压缩操作 
+	uzp 解压操作 
+	ld1 加载数据，给定的buffer 指针中拷贝数据，注意是ld后面的是数字1，而不是字母l 
+	st1 拷贝数据，将neon数据类型拷贝到指定buffer中
+
+
 〉**示例函数指令分析**
 ```c
 int16x8_t vqaddq_s16 (int16x8_t, int16x8_t)
