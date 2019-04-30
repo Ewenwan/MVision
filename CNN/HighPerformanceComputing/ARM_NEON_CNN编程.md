@@ -375,6 +375,34 @@ int16x4_t val[2];
 };
 ```
 
+标号和具体类型转换：
+
+	标记  双字64位D寄存器    四字128位寄存器
+	s8    int8x8_t           int8x16_t        有符号整数
+	s16   int16x4_t          int16x8_t
+	s32   int32x2_t          int32x4_t
+	s64   int64x1_t          int64x2_t 
+	u8    uint8x8_t          uint8x16_t       无符号整数
+	u16   uint16x4_t         uint16x8_t
+	u32   uint32x2_t         uint32x4_t
+	u64   uint64x1_t         uint64x2_t
+	f16   float16x4_t        float16x8_t      浮点数
+	f32   float32x2_t        float32x4_t
+	p8    poly8x8_t          poly8x16_t       多项式数
+	p16   poly16x4_t         poly16x8_t
+
+vcombine_type()  连接组合函数 结果类型长度加倍
+
+vget_high_type() 获取高位     结果类型长度减半
+
+vget_low_type()  获取低位     结果类型长度减半
+
+长指令类型 结果类型长度加倍
+
+窄指令类型 结果类型长度减半
+
+
+
 ### 内在函数 inline function
 每个内在函数的格式如下：
 
