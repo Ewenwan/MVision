@@ -1335,7 +1335,7 @@ void neonmult(const float *matrixA, const float *matrixB, float *matrixR)
 	vst1q_f32(matrixR + 12, r3);//第四列
 }
 ```
-### 示例7：向量叉乘 Cross product
+### 示例7： 向量叉乘 Cross product
 
 a = [ai, aj, ak]
 
@@ -1404,6 +1404,63 @@ void cross_product_q(float32_t* r, float32_t* a, float32_t* b)
 	vst3q_f32(r, result);
 }
 ```
+
+### 示例7： 向量的点积 Dot product
+A = (a1,a2,a3,...,an)
+
+B = (b1,b2,b3,...,bn)
+
+A * B = a1b1 + a2b2 + a3b3 + ... + anbn
+
+向量的每一维相乘然后相加，相乘之间具有良好的并行性，所以可以通过ARM NEON intrinsic指令进行加速。下面是代码实现：
+
+```c
+// 浮点数 
+float dot(float* A,float* B,int K)
+{
+    float sum=0;
+    float32x4_t sum_vec=vdupq_n_f32(0); // 和向量，从立即数创建数据
+    float32x4_t left_vec,right_vec;     // 向量A 和 向量 B
+    for(int k=0; k<K; k+=4) // 这里默认K为4倍数，未考虑剩余数据
+    {
+        left_vec  = vld1q_f32(A + k); // 先将两个数组每次4个存入ARM NEON intrinsic下的128位变量中
+        right_vec = vld1q_f32(B + k);
+        sum_vec   = vmlaq_f32(sum_vec,left_vec,right_vec);// 乘加,利用一个乘加指令计算4个乘积的累加和。
+    }
+    
+    // 最后将4个sum再相加就得到最终的结果。
+    float32x2_t r = vadd_f32(vget_high_f32(sum_vec),vget_low_f32(sum_vec));// 两两相加
+    sum += vget_lane_f32(vpadd_f32(r,r),0);
+
+    return sum;
+}
+
+// 相比于串行代码，上面的代码有接近4倍的加速比。当数据类型是short或者char时，可以取得更高的加速比，下面以char举例：
+
+int dot(char* A,char* B,int K)
+{
+    int sum=0;
+    int16x8_t sum_vec=vdupq_n_s16(0);// 128位 和向量，从立即数创建数据
+    int8x8_t left_vec, right_vec;    // 64位  向量A 和 向量B
+    int32x4_t part_sum4; // 4个32位 128位寄存器 和
+    int32x2_t part_sum2; // 2个32位 64位寄存器  和
+
+    //有溢出的风险
+    for(k=0; k<K; k+=8)
+    {
+        left_vec  = vld1_s8(A + A_pos + k);
+        right_vec = vld1_s8(B + B_pos + k);
+        sum_vec   = vmlal_s8(sum_vec,left_vec,right_vec);
+    }
+
+    part_sum4=vaddl_s16(vget_high_s16(sum_vec),vget_low_s16(sum_vec));   
+    part_sum2=vadd_s32(vget_high_s32(part_sum4),vget_low_s32(part_sum4));
+    sum+=vget_lane_s32(vpadd_s32(part_sum2,part_sum2),0);
+
+    return sum;
+}
+```
+
 
 
 
