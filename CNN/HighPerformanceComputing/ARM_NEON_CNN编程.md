@@ -1192,7 +1192,7 @@ static void neon_vector_mul(
 如果改变你要处理的数组大小，比如增加数组大小到向量大小的整数倍，这样就能在最后一次数据处理时也按照向量大小处理而不会把临近的数据损坏。如上面的例子里，把数组大小增加到24个元素，这样就能用NEON用3次迭代完成所有的数据处理而不会损坏周边数据。
 
 填补数组到向量的整数个大小：
-![](![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/Large-Arrays.jpg)	)
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/Large-Arrays.jpg)
 
 一些情况下，可能没法初始化填充的数据，无论填充什么都会影响计算的结果；
 
