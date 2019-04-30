@@ -1171,7 +1171,7 @@ vld3_u8：
 
 vswp_u8: 交换R和B通道
 
-![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/rgb-bgr.PNG)	
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/img/rgb-bgr.jpg)	
 
 
 vld1_u8：
