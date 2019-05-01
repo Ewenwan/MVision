@@ -1734,6 +1734,9 @@ VopL{cond}.datatype Qd, Dn, Dm
 优点：在C代码中嵌入汇编，调用简单，无需手动存储寄存器；
 缺点：有较为复杂的格式需要事先学习，不好移植到其他语言环境。
 
+[汇编语言笔记](https://github.com/Ewenwan/ShiYanLou/blob/master/OS/%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.md)
+
+[内联汇编参考](https://github.com/Ewenwan/ShiYanLou/tree/master/OS/Linux#c内联汇编)
 
 比如上述intrinsics代码产生的汇编代码为：
 ```c
