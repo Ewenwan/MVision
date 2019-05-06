@@ -1951,7 +1951,7 @@ __asm__ __volatile__(
 ## ARM NEON CNN卷积网络优化 深度学习优化 实例
 [参考NCNN](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/ncnn_%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.md)
 
-### 1.绝对值 arm_neon_v7 neon_v8 优化
+### 1.绝对值 AbsVal arm_neon_v7 neon_v8 优化
 ```c
 //  arm 内联汇编
 // asm(
@@ -1972,6 +1972,10 @@ __asm__ __volatile__(
 // 如果编译器再进行优化的话，很有可能效果还不如不优化，而且也有可能会出现奇怪的错误，所以通常都会带上这个关键字。
 // 同样，“__volatile__”也可以写成“volatile”，但可能兼容性会没那么好。
 
+#if __ARM_NEON
+#include <arm_neon.h>
+#endif // __ARM_NEON
+
 // 换行符和制表符的使用可以使得指令列表看起来变得美观。
 int AbsVal_arm::forward_inplace(Mat& bottom_top_blob) const
 {
@@ -1989,7 +1993,7 @@ int AbsVal_arm::forward_inplace(Mat& bottom_top_blob) const
 // 如果支持ARM_NEON 则使用NEOB进行优化
 #if __ARM_NEON
         int nn = size >> 2;// 128位的寄存器，一次可以操作 4个float32位,剩余不够4个的，最后面直接c语言执行
-                           // 左移两位相当于除以4
+                           // 右移两位相当于除以4
         int remain = size - (nn << 2);// 4*32 =128字节对其后 剩余的 float32个数, 剩余不够4个的数量
         
 #else
@@ -2037,7 +2041,9 @@ v8:
             "ld1        {v0.4s}, [%1]         \n" // 载入 ptr 指针对应的值，连续4个
             "fabs       v0.4s, v0.4s          \n" // ptr 指针对应的值 连续4个，使用fabs函数 进行绝对值操作 4s表示浮点数
             "subs       %w0, %w0, #1          \n" // %0 引用 参数 nn 操作次数每次 -1  #1表示1
+	                                          // 
             "st1        {v0.4s}, [%1], #16    \n" // %1 引用 参数 ptr 指针 向前移动 4*4=16字节
+	                                          // store 1, {v0.4s} 计算绝对值后 再存入 [%1]?
             "bne        0b                    \n" // 如果非0，则向后跳转到 0标志处执行
             
             // 每个操作数的寄存器行为 “=”，表示此操作数类型是只写，即输出寄存器。
@@ -2060,10 +2066,14 @@ v8:
         {
         asm volatile(
             "0:                             \n" // 0: 作为标志，局部标签
-            "vld1.f32   {d0-d1}, [%1]       \n" // %1处为ptr标识为1标识,即数据地址，
-            "vabs.f32   q0, q0              \n" // q0寄存器 = [d1 d0]，128位寄存器，取出四个 float 单精度浮点数
+            "vld1.f32   {d0-d1}, [%1]       \n" // %1处为ptr标识为1标识,即数据地址
+	                                        // IA 表示在每次传送后递增地址。IA 是缺省值，可以省略。？？
+            "vabs.f32   q0, q0              \n" // q0寄存器 = [d1 d0]，128位寄存器，取出四个 float 单精度浮点数 进行绝对值计算 后 写入
             "subs       %0, #1              \n" // %0为 循环变量nn标识，标识循环次数-1  #1表示1
-            "vst1.f32   {d0-d1}, [%1]!      \n" // ??????
+            "vst1.f32   {d0-d1}, [%1]!      \n" // 存储 store1 经过绝对值运算后的寄存器的值 存入原内存中
+	                                        // !感叹号作用? 指针前移16字节??
+						// ! 指定必须将更新后的基址写回到 [%1] 中
+						
             "bne        0b                  \n" // 如果非0，则向后跳转到 0标志处执行
             // 每个操作数的寄存器行为 “=”，表示此操作数类型是只写，即输出寄存器。
             : "=r"(nn),     // %0
@@ -2088,6 +2098,125 @@ v8:
 
     return 0;
 }
+
+```
+
+### 2. BN层 通道数据归一化 BatchNorm
+
+```c
+// load_model() 函数预处理===============
+
+    // 去均值 归一化 合在一起=============
+    // 各个通道均值 mean_data = sum(xi)/m
+    // 各个通道方差 var_data     = sum((xi - mean_data)^2)/m
+    // xi‘ = ( xi - mean_data )/(sqrt(var_data + eps))  // 去均值，除以方差，归一化
+    
+    // yi = slope_data * xi'  + bias_data  //  缩放 + 平移=====
+    
+    // 写成一起=====================
+    // yi = slope_data / (sqrt(var_data + eps)) * xi  + bias_data - slope_data*mean_data/(sqrt(var_data + eps)) 
+    // b = slope_data / (sqrt(var_data + eps)) = slope_data /sqrt_var;
+    // a = bias_data - slope_data*mean_data/(sqrt(var_data + eps)) = bias_data - slope_data*mean_data/sqrt_var;
+    
+    // yi = b * xi + a
+    
+    
+int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int dims = bottom_top_blob.dims;
+    
+    if (dims != 3) // 只有三通道的特征图才使用 neon加速
+        return BatchNorm::forward_inplace(bottom_top_blob, opt);
+
+    // a = bias - slope * mean / sqrt(var)
+    // b = slope / sqrt(var)
+    // value = b * value + a
+
+    int w = bottom_top_blob.w;// 特征图宽度
+    int h = bottom_top_blob.h;// 特征图高度
+    int size = w * h;// 一张特征图尺寸
+
+// 整合后的变化系数  yi = b * xi + a
+    const float* a_data_ptr = a_data; // batchnorm.h 中公开的 Mat矩阵数据，数组首地址
+    const float* b_data_ptr = b_data;
+    
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)// 遍历每个通道
+    {
+        float* ptr = bottom_top_blob.channel(q);// 每一个通道的 特征图 数据 首地址
+ // 每通道 的 变化系数===
+        float a = a_data_ptr[q];
+        float b = b_data_ptr[q];
+
+#if __ARM_NEON
+        int nn = size >> 2; // 128位寄存器一个可以操作 4个 32位浮点数，所以总数除以4得到 寄存器操作次数
+	                    // 右移动2位，相当于除以4，例如 10，右移两位相当于乘除4，得到2
+        int remain = size - (nn << 2);// 10-2*4=2 剩余2个 不够4，使用普通c语言版本
+#else
+        int remain = size; // 如果不支持neon，则全部使用 普通c语言计算呢
+#endif // __ARM_NEON
+
+#if __ARM_NEON
+#if __aarch64__
+        if (nn > 0)
+        {
+        asm volatile(
+            "dup        v1.4s, %w4             \n"
+            "dup        v2.4s, %w5             \n"
+            "0:                                \n"
+            "prfm       pldl1keep, [%1, #128]  \n"
+            "ld1        {v0.4s}, [%1]          \n"
+            "orr        v3.16b, v1.16b, v1.16b \n"
+            "fmla       v3.4s, v0.4s, v2.4s    \n"
+            "subs       %w0, %w0, #1           \n"
+            "st1        {v3.4s}, [%1], #16     \n"
+            "bne        0b                     \n"
+            : "=r"(nn),     // %0
+              "=r"(ptr)     // %1
+            : "0"(nn),
+              "1"(ptr),
+              "r"(a),       // %4
+              "r"(b)        // %5
+            : "cc", "memory", "v0", "v1", "v2", "v3"
+        );
+        }
+#else
+        if (nn > 0)
+        {
+        asm volatile(
+            "vdup.f32   q1, %4              \n"
+            "vdup.f32   q2, %5              \n"
+            "0:                             \n"
+            "pld        [%1, #128]          \n"
+            "vld1.f32   {d0-d1}, [%1 :128]  \n"
+            "vorr.32    q3, q1, q1          \n"
+            "vmla.f32   q3, q0, q2          \n"
+            "subs       %0, #1              \n"
+            "vst1.f32   {d6-d7}, [%1 :128]! \n"
+            "bne        0b                  \n"
+            : "=r"(nn),     // %0
+              "=r"(ptr)     // %1
+            : "0"(nn),
+              "1"(ptr),
+              "r"(a),       // %4
+              "r"(b)        // %5
+            : "cc", "memory", "q0", "q1", "q2", "q3"
+        );
+        }
+#endif // __aarch64__
+#endif // __ARM_NEON
+        for (; remain>0; remain--)
+        {
+            *ptr = b * *ptr + a;
+
+            ptr++;
+        }
+    }
+
+    return 0;
+}    
+    
+
 
 ```
 
