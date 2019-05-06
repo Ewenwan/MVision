@@ -2164,7 +2164,7 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) cons
         if (nn > 0)
         {
         asm volatile(
-            "dup        v1.4s, %w4             \n" // 每通道的 变化系数a,b都一样只需载入一次
+            "dup        v1.4s, %w4             \n" // 每通道的 变化系数a,b都一样只需载入一次，传入的为立即数使用dup
             "dup        v2.4s, %w5             \n" // v1存储a，v2存储b，v0存储特征数据，v3存储变化的数据地址以及a
             "0:                                \n" // 构成循环的标记号
             "prfm       pldl1keep, [%1, #128]  \n" // 从%1 ptr 处预读取 128字节 4*32 4个浮点数
@@ -2188,14 +2188,14 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) cons
         if (nn > 0)
         {
         asm volatile(
-            "vdup.f32   q1, %4              \n"// 每通道的 变化系数a,b都一样只需载入一次
+            "vdup.f32   q1, %4              \n"// 每通道的 变化系数a,b都一样只需载入一次，传入的为立即数使用dup
             "vdup.f32   q2, %5              \n"// q1存储变量 a,q2存储变量b，q0存储特征值
 	                                       // q3存储中间变量，先存储a和b以及q0执行乘加后，存储最终的结果
 					       // 最后把 在q3中的结果 存储回原 特征数据地址处
 					       
             "0:                             \n"// 构成循环的标记号
             "pld        [%1, #128]          \n"// 从%1 ptr 处预读取 128字节 4*32 4个浮点数
-            "vld1.f32   {d0-d1}, [%1 :128]  \n"// 从%1 ptr 处载入 4个浮点数到q0
+            "vld1.f32   {d0-d1}, [%1 :128]  \n"// 从%1 ptr 处载入 4个浮点数到q0，传入的为指针，使用ld
             "vorr.32    q3, q1, q1          \n"// q3 = q1 或 q1 = 变量a
             "vmla.f32   q3, q0, q2          \n"// q3 += q0(特征值)*q2(变量b), 乘加运算
             "subs       %0, #1              \n"// 循环次数 nn -1
@@ -2228,4 +2228,65 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) cons
 
 ```
 
+### 3.添加偏置类 bias
 
+```c
+// 进行运算： y = x + bias ---> x
+
+int Bias_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
+{
+    int w = bottom_top_blob.w;// 特征图宽度
+    int h = bottom_top_blob.h;// 特征图高度
+    int channels = bottom_top_blob.c;// 通道数量（特征 图 厚度，汉堡包层数）
+    int size = w * h;// 单通道特征尺寸
+
+    const float* bias_ptr = bias_data; // 偏置数据 指针 在 bias.h 中定义的 public公开数据
+    
+    #pragma omp parallel for num_threads(opt.num_threads)// omp并行执行
+    
+    for (int q=0; q<channels; q++)// 遍历每个通道
+    {
+        float* ptr = bottom_top_blob.channel(q);// 每个通道数据起始指针 (原有特征数据)
+
+        float bias = bias_ptr[q];// 每通道偏置参数一样
+
+#if __ARM_NEON
+        int nn = size >> 2; // 128位寄存器一个可以操作 4个 32位浮点数，所以总数除以4得到 寄存器操作次数
+	                    // 右移动2位，相当于除以4，例如 10，右移两位相当于乘除4，得到2
+        int remain = size - (nn << 2);// 剩余不够4个的数量 1～3
+#else
+        int remain = size;
+#endif // __ARM_NEON
+
+#if __ARM_NEON
+// 这里 直接使用了 neon Instrinsic 内在函数，不过优化程度不如 汇编代码
+
+        float32x4_t _bias = vdupq_n_f32(bias);// 偏置数据 dup载入到 寄存器 4个32位的浮点数
+	                                      // 传入的为 立即数
+        for (; nn>0; nn--)
+        {
+            float32x4_t _p = vld1q_f32(ptr);// 载入 特征值 传入的为 数据的地址 
+            float32x4_t _outp = vaddq_f32(_p, _bias);// 加上偏置_bias
+            vst1q_f32(ptr, _outp);                   // 从寄存器数据 设置内存数据 store1存储结果数据到ptr
+
+            ptr += 4;// 特征指针 移动四个单位
+        }
+	
+// 可以试写 neon内联汇编代码，区分v8 、v7===============
+	
+#endif // __ARM_NEON
+
+        for (; remain>0; remain--)
+        {
+            *ptr = *ptr + bias; // 普通c 版本 加上偏置
+
+            ptr++;
+        }
+    }
+
+    return 0;
+}
+
+
+
+```
