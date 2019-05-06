@@ -2045,7 +2045,10 @@ v8:
             "st1        {v0.4s}, [%1], #16    \n" // %1 引用 参数 ptr 指针 向前移动 4*4=16字节
 	                                          // store 1, {v0.4s} 计算绝对值后 再存入 [%1]?
             "bne        0b                    \n" // 如果非0，则向后跳转到 0标志处执行
-            
+	    
+            // BNE指令会去查看状态寄存器,当Z!=0的时候就跳转到指定位置.
+            // BEQ功能与BNE刚好相反,Z==0的时候才跳转到指定位置.
+
             // 每个操作数的寄存器行为 “=”，表示此操作数类型是只写，即输出寄存器。
 	    // "[modifier修改符可选]constraint限定符" (C expression C语言表达式) 
             : "=r"(nn),     // %0 操作次数 nn  循环变量
@@ -2056,7 +2059,7 @@ v8:
             : "0"(nn),  
               "1"(ptr)
             // 寄存器变化表　list of clobbered registers  
-            : "cc", "memory", "v0" // v0寄存器，内存memory，cc??可能会变化
+            : "cc", "memory", "v0" // v0寄存器，内存memory， cc CPU状态位 可能会变化
         );
         }
 #else
@@ -2071,8 +2074,8 @@ v8:
             "vabs.f32   q0, q0              \n" // q0寄存器 = [d1 d0]，128位寄存器，取出四个 float 单精度浮点数 进行绝对值计算 后 写入
             "subs       %0, #1              \n" // %0为 循环变量nn标识，标识循环次数-1  #1表示1
             "vst1.f32   {d0-d1}, [%1]!      \n" // 存储 store1 经过绝对值运算后的寄存器的值 存入原内存中
-	                                        // !感叹号作用? 指针前移16字节??
-						// ! 指定必须将更新后的基址写回到 [%1] 中
+	                                        // !感叹号作用? 指针 [%1] 前移16字节??
+						// ! 指定必须将更新后的基址([%1]递增16)写回到 [%1] 中
 						
             "bne        0b                  \n" // 如果非0，则向后跳转到 0标志处执行
             // 每个操作数的寄存器行为 “=”，表示此操作数类型是只写，即输出寄存器。
@@ -2082,7 +2085,7 @@ v8:
             : "0"(nn),
               "1"(ptr)
             // 寄存器变化表　list of clobbered registers  
-            : "cc", "memory", "q0"// q0寄存器，内存memory，cc??可能会变化
+            : "cc", "memory", "q0"// q0寄存器，内存memory， cc CPU状态位 可能会变化 
         );
         }
 #endif // __aarch64__
@@ -2144,7 +2147,7 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) cons
     for (int q=0; q<channels; q++)// 遍历每个通道
     {
         float* ptr = bottom_top_blob.channel(q);// 每一个通道的 特征图 数据 首地址
- // 每通道 的 变化系数===
+ // 每通道 的 变化系数==都一样=
         float a = a_data_ptr[q];
         float b = b_data_ptr[q];
 
@@ -2161,62 +2164,67 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) cons
         if (nn > 0)
         {
         asm volatile(
-            "dup        v1.4s, %w4             \n"
-            "dup        v2.4s, %w5             \n"
-            "0:                                \n"
-            "prfm       pldl1keep, [%1, #128]  \n"
-            "ld1        {v0.4s}, [%1]          \n"
-            "orr        v3.16b, v1.16b, v1.16b \n"
-            "fmla       v3.4s, v0.4s, v2.4s    \n"
-            "subs       %w0, %w0, #1           \n"
-            "st1        {v3.4s}, [%1], #16     \n"
-            "bne        0b                     \n"
+            "dup        v1.4s, %w4             \n" // 每通道的 变化系数a,b都一样只需载入一次
+            "dup        v2.4s, %w5             \n" // v1存储a，v2存储b，v0存储特征数据，v3存储变化的数据地址以及a
+            "0:                                \n" // 构成循环的标记号
+            "prfm       pldl1keep, [%1, #128]  \n" // 从%1 ptr 处预读取 128字节 4*32 4个浮点数
+            "ld1        {v0.4s}, [%1]          \n" // 载入 ptr 指针对应的值到 v0，连续4个float
+            "orr        v3.16b, v1.16b, v1.16b \n" // v1 --> v3,  v3 =a
+            "fmla       v3.4s, v0.4s, v2.4s    \n" // 特征数据v0*缩放v2 + 偏置v3 最后赋值给 v3 += v0×b
+            "subs       %w0, %w0, #1           \n" // %0 为nn 执行次数 -1   #1   为1
+            "st1        {v3.4s}, [%1], #16     \n" // 结果v3 store存储到 原数据地址处，原数据地址递增16字节
+            "bne        0b                     \n" // 不为零跳回去，继续循环
             : "=r"(nn),     // %0
               "=r"(ptr)     // %1
-            : "0"(nn),
-              "1"(ptr),
-              "r"(a),       // %4
-              "r"(b)        // %5
+            : "0"(nn),      // 2 ???=====
+              "1"(ptr),     // 3 ???=====
+              "r"(a),       // %4 存入寄存器 只读, 不变, 参数 偏置a
+              "r"(b)        // %5 存入寄存器 只读, 不变，参数 缩放归一化系数
             : "cc", "memory", "v0", "v1", "v2", "v3"
+	    //  cc CPU状态位，内存memory，v，v1，v2，v3寄存器 可能会变化
         );
         }
 #else
         if (nn > 0)
         {
         asm volatile(
-            "vdup.f32   q1, %4              \n"
-            "vdup.f32   q2, %5              \n"
-            "0:                             \n"
-            "pld        [%1, #128]          \n"
-            "vld1.f32   {d0-d1}, [%1 :128]  \n"
-            "vorr.32    q3, q1, q1          \n"
-            "vmla.f32   q3, q0, q2          \n"
-            "subs       %0, #1              \n"
-            "vst1.f32   {d6-d7}, [%1 :128]! \n"
-            "bne        0b                  \n"
-            : "=r"(nn),     // %0
-              "=r"(ptr)     // %1
-            : "0"(nn),
-              "1"(ptr),
+            "vdup.f32   q1, %4              \n"// 每通道的 变化系数a,b都一样只需载入一次
+            "vdup.f32   q2, %5              \n"// q1存储变量 a,q2存储变量b，q0存储特征值
+	                                       // q3存储中间变量，先存储a和b以及q0执行乘加后，存储最终的结果
+					       // 最后把 在q3中的结果 存储回原 特征数据地址处
+					       
+            "0:                             \n"// 构成循环的标记号
+            "pld        [%1, #128]          \n"// 从%1 ptr 处预读取 128字节 4*32 4个浮点数
+            "vld1.f32   {d0-d1}, [%1 :128]  \n"// 从%1 ptr 处载入 4个浮点数到q0
+            "vorr.32    q3, q1, q1          \n"// q3 = q1 或 q1 = 变量a
+            "vmla.f32   q3, q0, q2          \n"// q3 += q0(特征值)*q2(变量b), 乘加运算
+            "subs       %0, #1              \n"// 循环次数 nn -1
+            "vst1.f32   {d6-d7}, [%1 :128]! \n"// q3->{d6-d7} 结果值 顺序store到 原特征值地址处[%1]
+	                                       // !感叹号，强制[%1]向后跳转128位 
+            "bne        0b                  \n"// 不为零跳回去，继续循环 
+	    
+            : "=r"(nn),     // %0 循环次数(按寄存器一次并行运算4个浮点数数) nn 
+              "=r"(ptr)     // %1 特征值数据地址
+            : "0"(nn),      // 2 ???===
+              "1"(ptr),     // 3 ???===
               "r"(a),       // %4
               "r"(b)        // %5
             : "cc", "memory", "q0", "q1", "q2", "q3"
+	    //  cc CPU状态位，内存memory，q0，q1，q2，q3寄存器 可能会变化
         );
         }
 #endif // __aarch64__
 #endif // __ARM_NEON
         for (; remain>0; remain--)
         {
-            *ptr = b * *ptr + a;
+            *ptr = b * *ptr + a;// 剩余不够 4个的 直接c语言执行
 
-            ptr++;
+            ptr++;// 数据地址增加 1
         }
     }
-
     return 0;
 }    
     
-
 
 ```
 
