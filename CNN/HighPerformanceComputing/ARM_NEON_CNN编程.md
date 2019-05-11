@@ -1212,6 +1212,9 @@ float32x4_t vmulq_f32 (float32x4_t a, float32x4_t b)
 float32x4_t vmlaq_f32 (float32x4_t a, float32x4_t b, float32x4_t c) 
 乘加 r = a +b*c
 
+float32x4_t vmlsq_f32 (float32x4_t a, float32x4_t b, float32x4_t c) 
+乘减 r = a - b*c
+
 float32x4_t vextq_f32 (float32x4_t a, float32x4_t b, const int n) 
 拼接两个寄存器并返回从第n位开始的大小为4的寄存器 0<=n<=3 
 例如 
@@ -1223,12 +1226,17 @@ float32x4_t vextq_f32 (float32x4_t a, float32x4_t b, const int n)
 	vextq_f32(a,b,3) -> r: 4 5 6 7
 	
 ```c
-float32x4_t sum = vdupq_n_f32(0);
+float32x4_t sum = vdupq_n_f32(0); // sum四个通道全部赋值为0，sum={0,0,0,0}
 float _a[] = {1,2,3,4}, _b[] = {5,6,7,8} ;
-float32x4_t a = vld1q_f32(_a), b = vld1q_f32(_b)  ;
-float32x4_t sum1 = vfmaq_laneq_f32(sum, a, b, 0);
-float32x4_t sum2 = vfmaq_laneq_f32(sum1, a, b, 1);
+float32x4_t a = vld1q_f32(_a), b = vld1q_f32(_b)  ;// 载入两个数组元素到 两个寄存器
+
+//a的元素乘以b的第几个通道元素，然后后面的累加
+float32x4_t sum1 = vfmaq_laneq_f32(sum, a, b, 0);  // sum1={5,10,15,20}
+float32x4_t sum2 = vfmaq_laneq_f32(sum1, a, b, 1); 
+// sum2={5,10,15,20}+{6,12,18,24} = {11,22,33,44}
+
 float32x4_t sum3 = vfmaq_laneq_f32(sum2, a, b, 2);
+// sum3={11,22,33,44}+{7,14,21,28} = {18,36,54,72}
 ```
 
 [官方文档 其他常用函数](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
@@ -1666,9 +1674,6 @@ int dot(char* A,char* B,int K)
 }
 ```
 
-
-
-
 ## 4. NEON assembly
 
 采用汇编语言进行NEON(**NEON 汇编（assembly）**)的最底层优化，可以使优化性能最大化，但汇编语言比较灵活，手写汇编程序对开发人员来说具有较大挑战，如果使用不恰当，反而会影响优化性能。
@@ -1867,14 +1872,14 @@ VopL{cond}.datatype Qd, Dn, Dm
 void add_float_neon2(int* dst, int* src1, int* src2, int count)
 {
 	asm volatile (
-		"1: \n"
-		"vld1.32 {q0}, [%[src1]]! \n"
+		"1: \n"                        // 用于构成循环的标记号
+		"vld1.32 {q0}, [%[src1]]! \n"  // 从src地址处载入4个32位的浮点数 地址递增
 		"vld1.32 {q1}, [%[src2]]! \n"
-		"vadd.f32 q0, q0, q1 \n"
-		"subs %[count], %[count], #4 \n"
-		"vst1.32 {q0}, [%[dst]]! \n"
-		"bgt 1b \n"
-		: [dst] "+r" (dst)
+		"vadd.f32 q0, q0, q1 \n"       // q0 = q0 +q1
+		"subs %[count], %[count], #4 \n"// 循环计数count = count-4
+		"vst1.32 {q0}, [%[dst]]! \n"   // 将运算结果存储到目标地址，目标地址递增
+		"bgt 1b \n"                    // 如果count>0,跳转到标记号1处继续执行
+		: [dst] "+r" (dst)             // 可写
 		: [src1] "r" (src1), [src2] "r" (src2), [count] "r" (count)
 		: "memory", "q0", "q1"
 	);
@@ -1962,7 +1967,7 @@ asm volatile (
 
 	限定符   在ARM指令集下              在Thumb指令集下
 	f         浮点寄存器f0...f7              N/A
-	h         N/A	                        寄存器r8...r15
+	h         N/A                           寄存器r8...r15
 	G         浮点常量立即数                 N/A
 	H         和G作用相同                    N/A
 	I         数据处理指令中用到的立即数      范围为0...255的常量
@@ -1974,7 +1979,7 @@ asm volatile (
 	m         内存地址memory                 内存地址
 	N         N/A                           范围为0...31的常量
 	O         N/A                           范围为 -508...508 的4的倍数的常量
-	r         通用寄存器r0...r15       	    N/A
+	r         通用寄存器r0...r15             N/A
 	w         向量浮点寄存器s0...s31         N/A
 	X         任何类型的操作数               任何类型的操作数
         
