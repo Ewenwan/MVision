@@ -1,4 +1,7 @@
 # ARM_NEON_CNN编程
+[aarch64 armv8 neon intrinsics 和内嵌汇编混用](https://github.com/Tencent/ncnn/wiki/aarch64-neon-intrinsics-%E5%92%8C%E5%86%85%E5%B5%8C%E6%B1%87%E7%BC%96%E6%B7%B7%E7%94%A8)
+
+[32位 armv7 neon intrinsics 和内嵌汇编混用](https://github.com/Tencent/ncnn/wiki/armv7-neon-intrinsics-%E5%92%8C%E5%86%85%E5%B5%8C%E6%B1%87%E7%BC%96%E6%B7%B7%E7%94%A8)
 
 [ARM NEON 社区](https://community.arm.com/cn/f/tags/NEON)
 
