@@ -1,4 +1,10 @@
 # ARM_NEON_CNN编程
+[神经网络arm neon加速实现](https://blog.csdn.net/fuwenyan/article/details/78793907)
+
+[常用NEON 内置函数记录备用](https://blog.csdn.net/fuwenyan/article/details/78811034)
+
+[ARM Cortex系列(A8/A9/A15/A7) NEON多媒体处理SIMD引擎优化](https://blog.csdn.net/yxnyxnyxnyxnyxn/article/details/18267955)
+
 [aarch64 armv8 neon intrinsics 和内嵌汇编混用](https://github.com/Tencent/ncnn/wiki/aarch64-neon-intrinsics-%E5%92%8C%E5%86%85%E5%B5%8C%E6%B1%87%E7%BC%96%E6%B7%B7%E7%94%A8)
 
 [32位 armv7 neon intrinsics 和内嵌汇编混用](https://github.com/Tencent/ncnn/wiki/armv7-neon-intrinsics-%E5%92%8C%E5%86%85%E5%B5%8C%E6%B1%87%E7%BC%96%E6%B7%B7%E7%94%A8)
