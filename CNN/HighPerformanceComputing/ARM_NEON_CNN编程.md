@@ -1682,7 +1682,37 @@ int dot(char* A,char* B,int K)
     return sum;
 }
 ```
+### 示例8：3x3  pool 池化代码 最大值/均值池化
 
+```c
+// 先分别读取三列
+constexpr const int pool_size = 3;
+const float32x4_t top_data    = vld1q_f32(reinterpret_cast<const float *>(input_top_ptr + input.offset()));
+const float32x4_t middle_data = vld1q_f32(reinterpret_cast<const float *>(input_middle_ptr + input.offset()));
+const float32x4_t bottom_data = vld1q_f32(reinterpret_cast<const float *>(input_bottom_ptr + input.offset()));
+
+float32x2_t       res         = {};
+if(pooling_type == PoolingType::AVG)
+{// 均值池化=============
+   // Calculate scale
+   float scale = calculate_avg_scale(id, pool_size, upper_bound_w, upper_bound_h, pool_pad_x, pool_pad_y, pool_stride_x, pool_stride_y);
+   const float32x2_t scale_v = vdup_n_f32(scale);// 寄存器 初始化为 scale 2个32位
+
+   // Perform pooling
+   const float32x4_t sum_data = vaddq_f32(vaddq_f32(top_data, bottom_data), middle_data);
+   res = vpadd_f32(vget_high_f32(vsetq_lane_f32(0.f, sum_data, 3)), vget_low_f32(sum_data));
+   res  = vmul_f32(vpadd_f32(res, res), scale_v);// 得到4个最大的float 
+}
+else
+{// 最大值池化
+   const float32x4_t max_data = vmaxq_f32(vmaxq_f32(top_data, bottom_data), middle_data);
+   res = vpmax_f32(vget_high_f32(vsetq_lane_f32(-std::numeric_limits<float>::max(), max_data, 3)), vget_low_f32(max_data));
+   res = vpmax_f32(res, res);
+}
+
+*(reinterpret_cast<float *>(output.ptr())) = vget_lane_f32(res, 0);
+
+```
 ## 4. NEON assembly
 
 采用汇编语言进行NEON(**NEON 汇编（assembly）**)的最底层优化，可以使优化性能最大化，但汇编语言比较灵活，手写汇编程序对开发人员来说具有较大挑战，如果使用不恰当，反而会影响优化性能。
