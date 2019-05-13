@@ -4,7 +4,7 @@
 ```c
 vcreate_type: 将一个64bit的数据装入vector中，并返回元素类型为type的vector。r=a
 vdup_n_type/vmov_n_type: 用类型为type的数值，初始化一个元素类型为type的新vector的所有元素。ri=a
-vdupq_n_type/vmovq_n_type:
+vdupq_n_type/vmovq_n_type: 128位寄存器
 vdup_lane_type: 用元素类型为type的vector的某个元素，初始化一个元素类型为type的新vector的所有元素。ri=a[b]
 vdupq_lane_type:
 vmovl_type: 将vector的元素bit位扩大到原来的两倍，元素值不变。
@@ -18,7 +18,7 @@ vqmovun_type: 作用与vqmovn_type类似，但它输入的是有符号vector，�
 ## 从内存加载数据进neon寄存器
 ```c
 vld1_type: 按顺序将内存的数据装入neon寄存器，并返回元素类型为type格式的vector
-vld1q_type:
+vld1q_type: 128位
 vld1_lane_type：用旧vector创建一个同类型的新vector，同时将新vector中指定元素的值改为内存中的值。
 vld1q_lane_type:
 vld1_dup_type：用type类型的内存中第一个值，初始化一个元素类型为type的新vector的所有元素。
@@ -68,6 +68,7 @@ vget_lane_type: 获取元素类型为type的vector中指定的某个元素值。
 vgetq_lane_type:
 ```
 ## 直接设置neon寄存器某个通道的值
+```c
 vset_lane_type: 设置元素类型为type的vector中指定的某个元素的值，并返回新vector。
 vsetq_lane_type:
 ```
