@@ -7,3 +7,5 @@
 
 [李宏毅老师课程](http://speech.ee.ntu.edu.tw/~tlkagk/courses_MLSD15_2.html)
 
+[李宏毅老师课程 SL笔记](https://www.cnblogs.com/bluemapleman/p/9277175.html)
+
