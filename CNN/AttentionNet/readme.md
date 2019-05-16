@@ -6,9 +6,13 @@
 
 [完全图解RNN、RNN变体、Seq2Seq、Attention机制-知乎](https://zhuanlan.zhihu.com/p/28054589)
 
+[Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf)
+
 Attention即为注意力，人脑在对于的不同部分的注意力是不同的。需要attention的原因是非常直观的，比如，我们期末考试的时候，我们需要老师划重点，划重点的目的就是为了尽量将我们的attention放在这部分的内容上，以期用最少的付出获取尽可能高的分数；再比如我们到一个新的班级，吸引我们attention的是不是颜值比较高的人？普通的模型可以看成所有部分的attention都是一样的，而这里的attention-based model对于不同的部分，重要的程度则不同。
 
 Attention-based Model其实就是一个相似性的度量，当前的输入与目标状态越相似，那么在当前的输入的权重就会越大，说明当前的输出越依赖于当前的输入。严格来说，Attention并算不上是一种新的model，而仅仅是在以往的模型中加入attention的思想，所以Attention-based Model或者Attention Mechanism是比较合理的叫法，而非Attention Model。
+
+Attention Mechanism可以帮助模型对输入的X每个部分赋予不同的权重，抽取出更加关键及重要的信息，使模型做出更加准确的判断，同时不会对模型的计算和存储带来更大的开销，这也是Attention Mechanism应用如此广泛的原因。
 
 > 从Attention的作用角度出发，Attention分为两类： 
 
@@ -16,6 +20,20 @@ Attention-based Model其实就是一个相似性的度量，当前的输入与�
 * **2.时间注意力 Temporal Attention，不同时期内容的关联**
 
 这样的分类更多的是从应用层面上，而从 Attention的作用方法上，可以将其分为 Soft Attention 和 Hard Attention，这既我们所说的， Attention输出的向量分布是一种one-hot的独热分布还是soft的软分布，这直接影响对于上下文信息的选择作用。
+
+> CNN with Attention
+
+主要分为两种，一种是spatial attention, 另外一种是channel attention。 
+CNN每一层都会输出一个C x H x W的特征图，C就是通道，代表卷积核的数量，亦为特征的数量，H 和W就是原始图片经过压缩后的图，spatial attention就是对于所有的通道，在二维平面上，对H x W尺寸的图学习到一个权重，对每个像素都会学习到一个权重。你可以想象成一个像素是C维的一个向量，深度是C，在C个维度上，权重都是一样的，但是在平面上，权重不一样。这方面的论文已经很多了，重点关注一下image/video caption。相反的，channel attention就是对每个C，在channel维度上，学习到不同的权重，平面维度上权重相同。spatial 和 channel attention可以理解为关注图片的不同区域和关注图片的不同特征。channel attention写的最好的一篇论文个人感觉是SCA-CNN
+
+> attention机制听起来高达上，其实就是学出一个权重分布，再拿这个权重分布施加在原来的特征之上，就可以叫做attention。简单来说： 
+
+**（1）这个加权可以是保留所有分量均做加权（即soft attention）；也可以是在分布中以某种采样策略选取部分分量（即hard attention）。**
+
+**（2）这个加权可以作用在空间尺度上，给不同空间区域加权；也可以作用在channel尺度上，给不同通道特征加权；甚至特征图上每个元素加权。 **
+
+**（3）这个加权还可以作用在不同时刻历史特征上，如Machine Translation，以及我前段时间做的视频相关的工作。**
+
 
 深度学习里的Attention model其实模拟的是人脑的注意力模型，举个例子来说，当我们观赏一幅画时，虽然我们可以看到整幅画的全貌，但是在我们深入仔细地观察时，其实眼睛聚焦的就只有很小的一块，这个时候人的大脑主要关注在这一小块图案上，也就是说这个时候人脑对整幅图的关注并不是均衡的，是有一定的权重区分的。这就是深度学习里的Attention Model的核心思想。
 
