@@ -58,6 +58,102 @@ RAM model讲得是视觉的注意力机制，说人识别一个东西的时候�
 
 循环注意力模型 Attention rnn 
 
-> 单个神经元
+[参考](https://github.com/scutan90/DeepLearning-500-questions/blob/master/ch06_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C(RNN)/%E7%AC%AC%E5%85%AD%E7%AB%A0_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C(RNN).md)
+
+> **1.单个神经元 基本的单层网络结构**
+
+在进一步了解RNN之前，先给出最基本的单层网络结构，输入是x，经过变换Wx+b和激活函数f得到输出y：
+
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/single_cnn.jpg)
 
+
+> **2.图解经典RNN结构
+
+在实际应用中，我们还会遇到很多序列形的数据，如：
+
+a.自然语言处理问题,x1可以看做是第一个单词，x2可以看做是第二个单词，依次类推。
+b.语音处理,此时，x1、x2、x3……是每帧的声音信号。
+c.时间序列问题,例如每天的股票价格等等。
+
+序列形的数据就不太好用原始的神经网络处理了。为了建模序列问题，RNN引入了隐状态h（hidden state）的概念，h可以对序列形的数据提取特征，接着再转换为输出。
+
+为了便于理解，先从h1的计算开始看：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_1.jpg)
+
+注：h0是初始隐藏状态，图中的圆圈表示向量，箭头表示对向量做变换。
+
+h2的计算和h1类似。要注意的是，在计算时，每一步使用的参数U、W、b都是一样的，也就是说每个步骤的参数都是共享的，这是RNN的重要特点，一定要牢记。
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_2.jpg)
+
+依次计算剩下来的h3、h4也是类似的（使用相同的参数U、W、b，计算隐藏层共享参数 U W b）：
+
+    h3 =f(U*h2 + W*x3 + b)
+   
+    h4 =f(U*h3 + W*x3 + b)
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_3.jpg)
+
+我们这里为了方便起见，只画出序列长度为4的情况，实际上，这个计算过程可以无限地持续下去。
+
+我们目前的RNN还没有输出，得到输出值的方法就是直接通过对隐藏状态h进行类似 最开始x的计算方式：
+
+采用 Softmax 作为激活函数,
+
+    y1=Softmax(V*h1 + c)
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_4.jpg)
+
+剩下的输出类似进行（使用和y1同样的参数V和c 同样隐藏层解码也共享参数V和c）：
+
+    y2 = Softmax(V*h2 + c)
+    y3 = Softmax(V*h3 + c)
+    y4 = Softmax(V*h4 + c)
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_5.jpg)
+
+这就是最经典的RNN结构，它的输入是x1, x2, .....xn，输出为y1, y2, ...yn，也就是说，输入和输出序列必须要是等长的。
+
+由于这个限制的存在，经典RNN的适用范围比较小，但也有一些问题适合用经典的RNN结构建模，如：
+
+计算视频中每一帧的分类标签。因为要对每一帧进行计算，因此输入和输出序列等长。
+输入为字符，输出为下一个字符的概率。
+这就是著名的[Char RNN](https://zhuanlan.zhihu.com/p/29212896)
+可以用来生成文章，诗歌，甚至是代码，非常有意思）。
+
+ > **3.vector-to-sequence结构 一入多出**
+ 
+ 有时我们要处理的问题输入是一个单独的值，输出是一个序列。此时，有两种主要建模方式：
+
+方式一：可只在其中的某一个序列进行计算，比如序列第一个进行输入计算，其建模方式如下：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_1_n.jpg)
+
+方式二：把输入信息X作为每个阶段的输入，其建模方式如下：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_1n_n.jpg)
+
+这种 1 VS N 的结构可以处理的问题有：
+
+a.从图像生成文字（image caption），此时输入的X就是图像的特征，而输出的y序列就是一段句子.
+
+b.从类别生成语音或音乐等
+
+ > **4.sequence-to-vector结构 多入一出**
+ 
+ 有时我们要处理的问题输入是一个序列，输出是一个单独的值，此时通常在最后的一个隐含状态h上进行输出变换，其建模如下所示：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_n_1.jpg)
+
+这种结构通常用来处理序列分类问题。
+如：
+a.输入一段文字判别它所属的类别，
+b.输入一个句子判断其情感倾向，
+c.输入一段视频并判断它的类别等等。
+
+![]()
+
+
+
+![]()
