@@ -60,14 +60,14 @@ RAM model讲得是视觉的注意力机制，说人识别一个东西的时候�
 
 [参考](https://github.com/scutan90/DeepLearning-500-questions/blob/master/ch06_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C(RNN)/%E7%AC%AC%E5%85%AD%E7%AB%A0_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C(RNN).md)
 
-> **1.单个神经元 基本的单层网络结构**
+### **1.单个神经元 基本的单层网络结构**
 
 在进一步了解RNN之前，先给出最基本的单层网络结构，输入是x，经过变换Wx+b和激活函数f得到输出y：
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/single_cnn.jpg)
 
 
-> **2.图解经典RNN结构
+### **2.图解经典RNN结构
 
 在实际应用中，我们还会遇到很多序列形的数据，如：
 
@@ -115,14 +115,14 @@ h2的计算和h1类似。要注意的是，在计算时，每一步使用的参�
 
 这就是最经典的RNN结构，它的输入是x1, x2, .....xn，输出为y1, y2, ...yn，也就是说，输入和输出序列必须要是等长的。
 
-由于这个限制的存在，经典RNN的适用范围比较小，但也有一些问题适合用经典的RNN结构建模，如：
+> **由于这个限制的存在，经典RNN的适用范围比较小，但也有一些问题适合用经典的RNN结构建模，如：**
 
 计算视频中每一帧的分类标签。因为要对每一帧进行计算，因此输入和输出序列等长。
 输入为字符，输出为下一个字符的概率。
 这就是著名的[Char RNN](https://zhuanlan.zhihu.com/p/29212896)
 可以用来生成文章，诗歌，甚至是代码，非常有意思）。
 
- > **3.vector-to-sequence结构 一入多出**
+### **3.vector-to-sequence结构 一入多出**
  
  有时我们要处理的问题输入是一个单独的值，输出是一个序列。此时，有两种主要建模方式：
 
@@ -134,26 +134,70 @@ h2的计算和h1类似。要注意的是，在计算时，每一步使用的参�
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_1n_n.jpg)
 
-这种 1 VS N 的结构可以处理的问题有：
+> **这种 1 VS N 的结构可以处理的问题有：**
 
 a.从图像生成文字（image caption），此时输入的X就是图像的特征，而输出的y序列就是一段句子.
 
-b.从类别生成语音或音乐等
+b.从类别(图像)生成语音或音乐等
 
- > **4.sequence-to-vector结构 多入一出**
+### **4.sequence-to-vector结构 多入一出**
  
  有时我们要处理的问题输入是一个序列，输出是一个单独的值，此时通常在最后的一个隐含状态h上进行输出变换，其建模如下所示：
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn_n_1.jpg)
 
-这种结构通常用来处理序列分类问题。
-如：
+> **这种结构通常用来处理序列分类问题。如：**
+
 a.输入一段文字判别它所属的类别，
 b.输入一个句子判断其情感倾向，
 c.输入一段视频并判断它的类别等等。
 
-![]()
+ ### **4.sequence-to-sequence结构 不等长多入多出**
+ 
+原始的N vs N RNN要求序列等长，然而我们遇到的大部分问题序列都是不等长的，如机器翻译中，源语言和目标语言的句子往往并没有相同的长度。
+
+下面我们来介绍RNN最重要的一个变种：N vs M。这种结构又叫Encoder-Decoder模型，也可以称之为Seq2Seq模型。
+
+其建模步骤如下：
+
+步骤一：将输入数据x 通过隐含状态h 编码成一个上下文向量c，这部分称为Encoder编码。
+
+得到c有多种方式：
+
+a.最简单的方法就是把Encoder的最后一个隐状态hn赋值给c = hn，
+b.还可以对最后的隐状态做一个变换得到 c=q(hn)，
+c.也可以对所有的隐状态做变换 c=q(h1,h2,...,hn)。
+
+其示意如下所示：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn-s2s-encoder.jpg)
+
+步骤二：拿到 编码数据c 之后，就用另一个RNN网络对其进行解码，这部分RNN网络被称为Decoder。
+
+方法一：具体做法就是将c当做之前的初始状态h0输入到Decoder中：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn-s2s-decoder.jpg)
+
+方法二是将 编码数据c 作为Decoder的每一步输入，示意图如下所示：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn-s2s-decoder2.jpg)
+
+> **由于这种Encoder-Decoder结构不限制输入和输出的序列长度，因此应用的范围非常广泛，比如：**
+
+a.机器翻译。Encoder-Decoder的最经典应用，事实上这一结构就是在机器翻译领域最先提出的
+b.文本摘要。输入是一段文本序列，输出是这段文本序列的摘要序列。
+c.阅读理解。将输入的文章和问题分别编码，再对其进行解码得到问题的答案。
+d.语音识别。输入是语音信号序列，输出是文字序列。
 
 
+### 5.RNN中的Attention机制
 
-![]()
+在Encoder-Decoder结构中，Encoder把所有的输入序列都编码成一个统一的语义特征c再解码，因此， c中必须包含原始序列中的所有信息，它的长度就成了限制模型性能的瓶颈。如机器翻译问题，当要翻译的句子较长时，一个c可能存不下那么多信息，就会造成翻译精度的下降。
+
+Attention机制通过在每个时间输入不同的c来解决这个问题，下图是带有Attention机制的Decoder：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn-s2s-decoder-attention.jpg)
+
+每一个c会自动去选取与当前所要输出的y最合适的上下文信息。具体来说，我们用 a_{ij} 衡量Encoder中第j阶段的hj和解码时第i阶段的相关性，最终Decoder中第i阶段的输入的上下文信息 c_i 就来自于所有 h_j 对 a_{ij} 的加权和。
+
+
