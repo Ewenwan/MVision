@@ -1,8 +1,20 @@
 # 联结主义时间分类器 Connectionist Temporal Classifier 
+
+为什么要发明CTC，对于真实世界的序列学习任务，数据往往含有噪声和没有预先分割。RNN是一个强大的序列学习模型，但是需要对数据进行预先处理，所以有了CTC我们就能够提升RNN的性能。
+
+用来解决输入序列和输出序列难以一一对应的问题。
+
+举例来说，在语音识别中，我们希望音频中的音素和翻译后的字符可以一一对应，这是训练时一个很天然的想法。但是要对齐是一件很困难的事，有人说话块，有人说话慢，每个人说话快慢不同，不可能手动地对音素和字符对齐，这样太耗时。
+
+再比如，在OCR中使用RNN时，RNN的每一个输出要对应到字符图像中的每一个位置，要手工做这样的标记工作量太大，而且图像中的字符数量不同，字体样式不同，大小不同，导致输出不一定能和每个字符一一对应。
+
+[CTC（Connectionist Temporal Classification）介绍](https://www.cnblogs.com/liaohuiqiang/p/9953978.html)
+
+[关于CTC模型的理解](https://blog.csdn.net/gzj_1101/article/details/80153686)
+
 [tensorflow LSTM+CTC实现端到端的不定长数字串识别](https://www.jianshu.com/p/45828b18f133)
 
 [Use CTC + tensorflow to OCR ](https://github.com/ilovin/lstm_ctc_ocr)
-
 
 [caffe + WarpCTC](https://github.com/xmfbit/warpctc-caffe)
 
