@@ -1,6 +1,8 @@
 # ncnn 使用 
 [源码仓库](https://github.com/Tencent/ncnn)
 
+[NCNN 在 window linux android平台下的部署](https://github.com/scutan90/DeepLearning-500-questions/blob/master/ch17_%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E3%80%81%E5%8A%A0%E9%80%9F%E5%8F%8A%E7%A7%BB%E5%8A%A8%E7%AB%AF%E9%83%A8%E7%BD%B2/17.8.1%20NCNN%E9%83%A8%E7%BD%B2.md)
+
 安装编译：
 
     git clone https://github.com/Tencent/ncnn.git
