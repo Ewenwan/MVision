@@ -209,6 +209,55 @@ Attention机制通过在每个时间输入不同的c来解决这个问题，下�
 
 ![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/rnn-s2s-decoder-attention.jpg)
 
-每一个c会自动去选取与当前所要输出的y最合适的上下文信息。具体来说，我们用 a_{ij} 衡量Encoder中第j阶段的hj和解码时第i阶段的相关性，最终Decoder中第i阶段的输入的上下文信息 c_i 就来自于所有 h_j 对 a_{ij} 的加权和。
+每一个c会自动去选取与当前所要输出的y最合适的上下文信息。具体来说，我们用 a_ij 衡量Encoder中第j阶段的hj和解码时第i阶段的相关性，最终Decoder中第i阶段的输入的上下文信息 c_i 就来自于所有 h_j 对 a_ij 的加权和。
+
+以机器翻译为例（将中文“我爱中国”翻译成英文I love china）：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/ilovechina.jpg)
+
+输入的序列是“我爱中国”，因此，Encoder中的h1、h2、h3、h4就可以分别看做是“我”、“爱”、“中”、“国”经过编码器得到的特征信息(隐藏信息)。在翻译成英语时，第一个上下文c1应该和“我”这个字最相关，因此对应的 a_11 就比较大，而相应的 a_12 、 a_13 、 a_14 就比较小。c2应该和“爱”最相关，因此对应的 a_22 就比较大。最后的c3和h3、h4最相关，因此 a_33 、 a_34 的值就比较大。
+
+**至此，关于Attention模型，我们就只剩最后一个问题了，那就是：这些权重 a_{ij} 是怎么来的？**
+
+事实上， a_ij 同样是从模型中学出的，它实际和Decoder的第i-1阶段的隐状态h' 、Encoder第j个阶段的隐状态 h 有关。
+
+同样还是拿上面的机器翻译举例， a_1j 的计算（此时箭头就表示对h'和 h_j 同时做变换）：
+
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/a1j.jpg)
+
+a2j: h1\h2\h3\h4 是编码阶段的隐状态，h1'是解码阶段的隐藏状态
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/a2j.jpg)
+
+a3j:
+![](https://github.com/Ewenwan/MVision/blob/master/CNN/AttentionNet/img/a3j.jpg)
+
+以上就是带有Attention的Encoder-Decoder模型计算的全过程。
 
 
+![]()
+
+![]()
+
+![]()
+
+![]()
+
+![]()
+
+
+![]()
+
+![]()
+
+
+![]()
+
+![]()
+
+
+![]()
+
+![]()
+
+
+![]()
