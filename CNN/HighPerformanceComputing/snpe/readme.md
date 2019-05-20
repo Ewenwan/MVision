@@ -26,6 +26,41 @@
 3.准备模型的输入数据。  
 4.使用SNPE运行时加载并执行模型。  
 
+
+> 配置环境，用Snapdragon NPE SDK进行人工智能的开发需要满足一些先决条件的，具体如下所述：
+
+1.需要运行一个卷积模型的一个或多个垂直行业，包括手机、汽车、物联网、AR，机器人，和机器人  
+2.知道怎样去设置并且训练一个模型或者已经有一个训练好的模型文件。  
+3.选择的framework应该是Caffe/Caffe2或者TensorFlow  
+4.你做Android 的JAVA APPs或者使用Android或LInux本地的应用。  
+5.需要有ubuntu 14.04的开发环境  
+6.有一个支持的设备用来检测应用。
+
+
+构建示例Android APP 
+ 
+Android APP结合了Snapdragon NPE运行环境（/android/snpe-release.aar Android库提供）和 上述Caffe Alexnet示例生成的DLC模型。 
+
+1.复制运行环境和模型，为构建APP作好准备 
+
+•cd $SNPE_ROOT/examples/android/image-classifiers  
+•cp ../../../android/snpe- release.aar ./app/libs # copies the NPE runtime library  
+•bash ./setup_models.sh # packages the Alexnet example (DLC, labels, imputs) as an Android resource file  
+
+选项A：从Android studio构建Android APK：
+
+1.启动Android Studio。  
+2.打开~/snpe-sdk/examples/android/image- classifiers文件夹中的项目。  
+3.如有的话，接受Android Studio建议，升级 构建系统组件。  
+4.按下“运行应用”按钮，构建并运行APK。  
+
+选项B：从命令行构建Android APK：
+
+•sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1  
+•libbz2-1.0:i386 # Android SDK build dependencies on ubuntu  
+•./gradlew assembleDebug # build the APK  
+
+上述命令可能需要将ANDROID_HOME和JAVA_HOME 设置为系统中的Android SDK和JRE/JDK所在位置。
 ## linux 下开发
 
 一、下载地址
