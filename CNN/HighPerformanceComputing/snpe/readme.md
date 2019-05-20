@@ -8,14 +8,23 @@
 
 > 使用SNPE，用户可以：
  
-1.执行任意深度的神经网络
-2.在SnapdragonTM CPU，AdrenoTM GPU或HexagonTM DSP上执行网络。
-3.在x86 Ubuntu Linux上调试网络执行
-4.将Caffe，Caffe2，ONNXTM和TensorFlowTM模型转换为SNPE深度学习容器（DLC）文件
-5.将DLC文件量化为8位定点，以便在Hexagon DSP上运行
-6.使用SNPE工具调试和分析网络性能
-7.通过C ++或Java将网络集成到应用程序和其他代码中
+1.执行任意深度的神经网络  
+2.在SnapdragonTM CPU，AdrenoTM GPU或HexagonTM DSP上执行网络。  
+3.在x86 Ubuntu Linux上调试网络执行  
+4.将Caffe，Caffe2，ONNXTM和TensorFlowTM模型转换为SNPE深度学习容器（DLC）文件  
+5.将DLC文件量化为8位定点，以便在Hexagon DSP上运行  
+6.使用SNPE工具调试和分析网络性能  
+7.通过C ++或Java将网络集成到应用程序和其他代码中  
 
+
+模型训练在流行的深度学习框架上进行（SNPE支持Caffe，Caffe2，ONNX和TensorFlow模型。）训练完成后，训练的模型将转换为可加载到SNPE运行时的DLC文件。 然后，可以使用此DLC文件使用其中一个Snapdragon加速计算核心执行前向推断传递。
+
+> 基本的SNPE工作流程只包含几个步骤：
+
+1.将网络模型转换为可由SNPE加载的DLC文件。  
+2.可选择量化DLC文件以在Hexagon DSP上运行。  
+3.准备模型的输入数据。  
+4.使用SNPE运行时加载并执行模型。  
 
 ## linux 下开发
 
