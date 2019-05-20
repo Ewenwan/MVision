@@ -1,5 +1,8 @@
 # 高通SNPE 神经网络处理引擎（SNPE）
 
+[snpe-1.6.0/helper.md ](https://github.com/RuiZeWu/Android-OpenPose/blob/master/snpe-1.6.0/helper.md)
+
+
 可运行于搭载了高通Zeroth机器智能平台的820芯片处理器，开发者可以在SNPE上搭建自己的深度学习网络模型。更详细的介绍可以登录高通SNPE相关网页了解：https://developer.qualcomm.com/software/snapdragon-neural-processing-engine
 
 高通提供了用户定义层（UDL）功能，通过回调函数可以自定义算子，并通过重编译C++代码将自定义文件编译到可执行文件中。如果开发就是使用的C++，那比较容易实现用户定义层，但如果是运行在Android上就比较麻烦了，上层java代码需要通过JNI来调用snpe原生的C++编译好的.so文件，因为用户定义层的代码是不可能预先编译到snpe原生.so文件中的，所以用snpe提供的Java
