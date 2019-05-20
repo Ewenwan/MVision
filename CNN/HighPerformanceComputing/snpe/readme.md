@@ -6,6 +6,17 @@
  API是无法获得用户定义层的功能的，所以，必须重新开发SNPE的JNI。
 
 
+> 使用SNPE，用户可以：
+ 
+1.执行任意深度的神经网络
+2.在SnapdragonTM CPU，AdrenoTM GPU或HexagonTM DSP上执行网络。
+3.在x86 Ubuntu Linux上调试网络执行
+4.将Caffe，Caffe2，ONNXTM和TensorFlowTM模型转换为SNPE深度学习容器（DLC）文件
+5.将DLC文件量化为8位定点，以便在Hexagon DSP上运行
+6.使用SNPE工具调试和分析网络性能
+7.通过C ++或Java将网络集成到应用程序和其他代码中
+
+
 ## linux 下开发
 
 一、下载地址
