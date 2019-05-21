@@ -34,5 +34,108 @@
 
 
     
-    
+## 文字识别 OCR
+文字识别也是图像领域一个常见问题。然而，对于自然场景图像，首先要定位图像中的文字位置，然后才能进行识别。
+
+所以一般来说，从自然场景图片中进行文字识别，需要包括2个步骤：
+
+1.文字检测：解决的问题是哪里有文字，文字的范围.  
+2.文字识别：对定位好的文字区域进行识别，主要解决的问题是每个文字是什么，将图像中的文字区域进转化为字符信息.  
+
+[场景文字检测 — CTPN原理与实现 ](https://zhuanlan.zhihu.com/p/34757009)
+
+对于复杂场景的文字识别，首先要定位文字的位置，即文字检测。
+
+### 文字检测
+CTPN是在ECCV 2016提出的一种文字检测算法。CTPN结合CNN与LSTM深度网络，能有效的检测出复杂场景的横向分布的文字，是目前比较好的文字检测算法。
+
+由于CTPN是从Faster RCNN改进而来，本文默认读者熟悉CNN原理和Faster RCNN网络结构。
+
+[一文读懂Faster RCNN](https://zhuanlan.zhihu.com/p/31426458)
+
+> Faster RCNN其实可以分为4个主要内容：
+
+1.Conv layers。作为一种CNN网络目标检测方法，Faster RCNN首先使用一组基础的conv+relu+pooling层提取image的feature maps。该feature maps被共享用于后续RPN层和全连接层。  
+2.Region Proposal Networks。RPN网络用于生成region proposals。该层通过softmax判断anchors属于foreground或者background，再利用bounding box regression修正anchors获得精确的proposals。  
+3.Roi Pooling。该层收集输入的feature maps和proposals，综合这些信息后提取proposal feature maps，送入后续全连接层判定目标类别。  
+4.Classification。利用proposal feature maps计算proposal的类别，同时再次bounding box regression获得检测框最终的精确位置。  
+
+[CTPN相关：caffe代码](https://github.com/tianzhi0549/CTPN)
+
+原始CTPN只检测横向排列的文字。CTPN结构与Faster R-CNN基本类似，但是加入了LSTM层。
+
+卷积网络之后 使用 双向 LSTM提取特征 (包含空间特征，也包含了LSTM学习到的序列特征) 再经过“FC”卷积层，最后经过类似Faster R-CNN的RPN网络，获得text proposals。
+
+[完全解析RNN, Seq2Seq, Attention注意力机制](https://zhuanlan.zhihu.com/p/51383402)
+
+循环神经网络RNN结构被广泛应用于机器翻译，语音识别，文字识别OCR等方向。
+
+CNN学习的是感受野内的空间信息，LSTM学习的是序列特征。对于文本序列检测，显然既需要CNN抽象空间特征，也需要序列特征（毕竟文字是连续的）。
+
+CTPN中使用双向LSTM，相比一般单向LSTM有什么优势？双向LSTM实际上就是将2个方向相反的LSTM连起来.
+
+> 总结:
+
+1.由于加入LSTM，所以CTPN对水平文字检测效果超级好。  
+2.因为Anchor设定的原因，CTPN只能检测横向分布的文字，小幅改进加入水平Anchor即可检测竖直文字。但是由于框架限定，对不规则倾斜文字检测效果非常一般。 
+
+倾斜文字 可以想办法 校准为 水平文字???
+
+3.CTPN加入了双向LSTM学习文字的序列特征，有利于文字检测。但是引入LSTM后，在训练时很容易梯度爆炸，需要小心处理。  
   
+### 文字识别
+
+> 常用文字识别算法主要有两个框架：
+
+1. CNN+RNN+CTC(CRNN+CTC)  
+  
+2. CNN+Seq2Seq+Attention  
+
+CNN+Seq2Seq+Attention+word2vec
+
+#### 1. CNN+RNN+CTC(CRNN+CTC)  
+
+[OCR_TF_CRNN_CTC 代码 ](https://github.com/bai-shang/OCR_TF_CRNN_CTC)
+  
+[论文](https://arxiv.org/pdf/1507.05717.pdf)
+  
+2. CNN+Seq2Seq+Attention  
+
+> 整个CRNN网络可以分为三个部分:
+
+0.假设输入图像大小为 (32, 100,3)，注意提及图像都是 [\text{Height},\text{Width},\text{Channel}] 形式。
+
+1.Convlutional Layers
+
+这里的卷积层就是一个普通的CNN网络，用于提取输入图像的Convolutional feature maps，即将大小为 (32, 100,3) 的图像转换为 (1,25,512) 大小的卷积特征矩阵。
+
+2. Recurrent Layers
+
+这里的循环网络层是一个深层双向LSTM网络，在卷积特征的基础上继续提取文字序列特征。
+
+所谓深层RNN网络，是指超过两层的RNN网络。
+
+3. Transcription Layers
+
+将RNN输出做softmax后，通过转化为字符。
+
+对于Recurrent Layers，如果使用常见的Softmax Loss，则每一列输出都需要对应一个字符元素。那么训练时候每张样本图片都需要标记出每个字符在图片中的位置，再通过CNN感受野对齐到Feature map的每一列获取该列输出对应的Label才能进行训练，如图8。
+
+在实际情况中，标记这种对齐样本非常困难，工作量非常大。另外，由于每张样本的字符数量不同，字体样式不同，字体大小不同，导致每列输出并不一定能与每个字符一一对应。
+
+当然这种问题同样存在于语音识别领域。例如有人说话快，有人说话慢，那么如何进行语音帧对齐，是一直以来困扰语音识别的巨大难题。
+
+所以Connectionist Temporal Classification(CTC)提出一种对不需要对齐的Loss计算方法，用于训练网络，被广泛应用于文本行识别和语音识别中。'
+
+CRNN+CTC总结将CNN/LSTM/CTC三种方法结合：
+
+1.首先CNN提取图像卷积特征   
+2.然后LSTM进一步提取图像卷积特征中的序列特征  
+3.最后引入CTC解决训练时字符无法对齐的问题  
+即提供了一种end2end文字图片识别算法，也算是OCR方向的简单入门文章。  
+
+
+
+
+
+
