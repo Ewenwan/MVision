@@ -35,6 +35,9 @@
 
     
 ## 文字识别 OCR
+
+[文字识别OCR方法整理](https://zhuanlan.zhihu.com/p/65707543)
+
 文字识别也是图像领域一个常见问题。然而，对于自然场景图像，首先要定位图像中的文字位置，然后才能进行识别。
 
 所以一般来说，从自然场景图片中进行文字识别，需要包括2个步骤：
@@ -46,7 +49,11 @@
 
 对于复杂场景的文字识别，首先要定位文字的位置，即文字检测。
 
-### 文字检测
+### 文字检测（Text Detection）
+文字检测定位图片中的文本区域，而Detection定位精度直接影响后续Recognition结果。
+
+EAST/CTPN/SegLink/PixelLink/TextBoxes/TextBoxes++/TextSnake/MSR/...
+
 CTPN是在ECCV 2016提出的一种文字检测算法。CTPN结合CNN与LSTM深度网络，能有效的检测出复杂场景的横向分布的文字，是目前比较好的文字检测算法。
 
 由于CTPN是从Faster RCNN改进而来，本文默认读者熟悉CNN原理和Faster RCNN网络结构。
@@ -83,7 +90,9 @@ CTPN中使用双向LSTM，相比一般单向LSTM有什么优势？双向LSTM实�
 
 3.CTPN加入了双向LSTM学习文字的序列特征，有利于文字检测。但是引入LSTM后，在训练时很容易梯度爆炸，需要小心处理。  
   
-### 文字识别
+### 文字识别（Text Recognition）
+
+识别水平文本行，一般用CRNN或Seq2Seq两种方法.
 
 > 常用文字识别算法主要有两个框架：
 
@@ -92,6 +101,35 @@ CTPN中使用双向LSTM，相比一般单向LSTM有什么优势？双向LSTM实�
 2. CNN+Seq2Seq+Attention  
 
 CNN+Seq2Seq+Attention+word2vec
+
+对于特定的弯曲文本行识别，早在CVPR2016就已经有了相关paper：
+
+[Robust Scene Text Recognition with Automatic Rectification](https://arxiv.org/pdf/1603.03915.pdf)
+
+对于弯曲不规则文本，如果按照之前的识别方法，直接将整个文本区域图像强行送入CNN+RNN，由于有大量的无效区域会导致识别效果很差。所以这篇文章提出一种通过**STN网络Spatial Transformer Network(STN)**学习变换参数，将Rectified Image对应的特征送入后续RNN中识别。
+
+[STN网络Spatial Transformer Network(STN)](https://arxiv.org/pdf/1506.02025.pdf)
+
+对于STN网络，可以学习一组点 (x_i^s,y_i^s) 到对应点 (x_i^t,y_i^t) 的变换。而且STN可以插入轻松任意网络结构中学习到对应的变换。
+
+    (x_i^s,
+    y_i^s)    =  (c11, c12, c13
+                  c21, c22, c23)    *  (x_i^t,
+                                        y_i^t,
+                                        1) 
+**核心就是将传统二维图像变换（如旋转/缩放/仿射等）End2End融入到网络中。**
+
+文字检测和文字识别是分为两个网络分别完成的，所以一直有研究希望将OCR中的Detection+ Recognition合并成一个End2End网络。目前End2End OCR相关研究如下：
+
+[Li_Towards_End-To-End_Text](http://openaccess.thecvf.com/content_ICCV_2017/papers/Li_Towards_End-To-End_Text_ICCV_2017_paper.pdf)
+
+该篇文章采用Faster R-CNN的Two-stage结构：首先Text Proposal Network（即RPN）生成对应的文本区域Text Proposal，后续通过Bounding Box regression和Box Classification进一步精修文本位置。但是不同的是，在RoI Pooling后接入一个LSTM+Attention的文字识别分支中.
+
+但是这样的结构存在问题。举例说明：Faster R-CNN的RPN只是初步产生Proposal，后续还需要再经过一次Bounding Box regression才能获取准确的检测框.
+
+所以Text Proposal不一定很准会对后续识别分支产生巨大影响，导致该算法在复杂数据集上其实并不是很work。
+
+
 
 #### 1. CNN+RNN+CTC(CRNN+CTC)  
 
