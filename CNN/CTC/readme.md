@@ -8,6 +8,8 @@
 
 再比如，在OCR中使用RNN时，RNN的每一个输出要对应到字符图像中的每一个位置，要手工做这样的标记工作量太大，而且图像中的字符数量不同，字体样式不同，大小不同，导致输出不一定能和每个字符一一对应。
 
+[一文读懂 CRNN文字检测 + CTC文字识别](https://zhuanlan.zhihu.com/p/43534801)
+
 [CTC（Connectionist Temporal Classification）介绍](https://www.cnblogs.com/liaohuiqiang/p/9953978.html)
 
 [关于CTC模型的理解](https://blog.csdn.net/gzj_1101/article/details/80153686)
