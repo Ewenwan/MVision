@@ -137,7 +137,75 @@ CNN+Seq2Seq+Attention+word2vec
   
 [论文](https://arxiv.org/pdf/1507.05717.pdf)
   
-2. CNN+Seq2Seq+Attention  
+> **CRNN=CNN+RNN(LSTM)：**
+
+为了将特征输入到Recurrent Layers，做如下处理： 
+
+先通过CNN提取文本图片的Feature map，然后将每一个channel作为 D=512 的时间序列输入到LSTM中。
+
+1.首先会将图像缩放到 32* W(例如100) * 3 大小， H * W * C的顺序。   
+2.然后经过CNN后变为 1* (W/4) * 512。  
+3.接着针对LSTM，设置时间长度 T=(W/4)（即有25个时间输入） ， 每个输入的维度 D=512 ，即可将特征输入LSTM。  
+
+所以在处理输入图像的时候，建议在保持长宽比的情况下将高缩放到 32，这样能够尽量不破坏图像中的文本细节。当然也，也可以将输入图像缩放到固定宽度，但是这样肯定会造成性能下降。
+
+
+> **CTC的存在理由**
+问题引入：
+
+对于Recurrent Layers，如果使用常见的Softmax Loss，则每一列输出都需要对应一个字符元素。那么训练时候每张样本图片都需要标记出每个字符在图片中的位置，再通过CNN感受野对齐到Feature map的每一列获取该列输出对应的Label才能进行训练。
+
+在实际情况中，标记这种对齐样本非常困难，工作量非常大。另外，由于每张样本的字符数量不同，字体样式不同，字体大小不同，导致每列输出并不一定能与每个字符一一对应。
+
+当然这种问题同样存在于语音识别领域。例如有人说话快，有人说话慢，那么如何进行语音帧对齐，是一直以来困扰语音识别的巨大难题。
+
+所以CTC提出一种对不需要对齐的Loss计算方法，用于训练网络，被广泛应用于文本行识别和语音识别中。
+
+
+在看懂CTC之前需要了解隐马尔可夫模型和EM算法。其实CTC里面的思想和HMM很相似，但是又有所区别，如果搞懂了HMM，那么对于CTC的理解就会轻松很多。如果有对HMM不太懂的可以参考我前面几篇博客。
+
+[EM算法(Expectation maximization algorithm) 期望最大化](https://blog.csdn.net/gzj_1101/article/details/79924655)
+
+[隐马尔科夫HMM模型一(概念理解)](https://blog.csdn.net/gzj_1101/article/details/79955340)
+
+[隐马尔可夫HMM模型二(公式推导)](https://blog.csdn.net/gzj_1101/article/details/80031298)
+
+[CTC原理 !!!!!!](https://x-algo.cn/index.php/2017/05/31/2345/)
+
+[TensorFLow 中 CTC 的相关函数介绍](https://blog.csdn.net/mzpmzk/article/details/81586245)
+
+图像经过CNN网络得到 CNN Feature map  X 维度为 m * T
+
+    X =(x1,x2,...,xT)      T=25
+    xi=(xi1,xi2,...,xim)   m=512
+    
+CNN Feature map输入到 LSTM网络，得到 LSTM特征(时间片特征)
+
+LSTM的每一个时间片后接softmax，输出 y 是一个后验概率矩阵y，维度为 n * T
+
+    y =(y1,y2,...,yT)                     T = 时间片段数量
+    其中每一列为： yi=(yi1,yi2,...,yin)    n = 需要识别的字符集合长度(应该考虑空白字符)
+    sum(yin) = 1.
+    对 y 每一列进行 argmax() (最大概率所在的字符index)操作，即可获得每一列输出字符的类别。
+
+使用CTC在这个概率矩阵状态图中选择一个概率最大的路径。
+
+CTC是一种Loss计算方法，用CTC代替Softmax Loss，训练样本无需对齐。CTC特点：
+
+1.引入blank字符，解决有些位置没有字符的问题。  
+2.通过递推，快速计算梯度。  
+
+
+> **CRNN+CTC总结**
+
+将CNN/LSTM/CTC三种方法结合：
+
+1.首先CNN提取图像卷积特征  
+2.然后LSTM进一步提取图像卷积特征中的序列特征  
+3.最后引入CTC解决训练时字符无法对齐的问题  
+
+
+#### 2. CNN+Seq2Seq+Attention  
 
 > 整个CRNN网络可以分为三个部分:
 
