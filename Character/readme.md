@@ -1,5 +1,7 @@
 # 文字识别 Optical Character Recognition,OCR
 
+[自然场景文本检测识别技术综述](https://cloud.tencent.com/developer/article/1154619)
+
 将图片上的文字内容，智能识别成为可编辑的文本。
 
 > 场景文字识别（Scene Text Recognition，STR）
@@ -123,6 +125,8 @@ cnn + rnn(lstm) + CTC
 
 空间变换的控制参数是根据原始特征图U动态生成的，生成空间变换控制参数的元参数则是在模型训练阶段学习到的、并且存放于定位网络的权重（weights）矩阵中。
 
+## CTC网络
+链结式时间分类算法（CTC，Connectionist Temporal Classification）是一个损失函数，主要在序列数据上进行监督式学习，且不需要调整输入数据和标签。
 
 # 检测网络框架
 
@@ -224,6 +228,7 @@ WordSup弱监督训练框架中，两个训练步骤被交替执行：给定当�
 
 [caffe crnn](https://github.com/Ewenwan/crnn.caffe)
 
+[use STN+CNN+BLSTM+CTC to do OCR](https://github.com/wushilian/STN_CNN_LSTM_CTC_TensorFlow)
 
 CRNN(Convolutional Recurrent Neural Network）是目前较为流行的图文识别模型，可识别较长的文本序列。它包含CNN特征提取层和BLSTM序列特征提取层，能够进行端到端的联合训练。 它利用BLSTM和CTC部件学习字符图像中的上下文关系， 从而有效提升文本识别准确率，使得模型更加鲁棒。预测过程中，前端使用标准的CNN网络提取文本图像的特征，利用BLSTM将特征向量进行融合以提取字符序列的上下文特征，然后得到每列特征的概率分布，最后通过转录层(CTC rule)进行预测得到文本序列。
 
@@ -258,3 +263,20 @@ CRNN(Convolutional Recurrent Neural Network）是目前较为流行的图文识�
 
 最终的输出结果直观上可以想象成将128分为33份，每一份对应5530个类别的概率
 
+## RARE模型
+
+RARE（Robust text recognizer with Automatic Rectification）模型在识别变形的图像文本时效果很好。如下图所示，模型预测过程中，输入图像首先要被送到一个空间变换网络中做处理，矫正过的图像然后被送入序列识别网络中得到文本预测结果。
+
+空间变换网络内部包含定位网络、网格生成器、采样器三个部件。经过训练后，它可以根据输入图像的特征图动态地产生空间变换网格，然后采样器根据变换网格核函数从原始图像中采样获得一个矩形的文本图像。RARE中支持一种称为TPS（thin-plate splines）的空间变换，从而能够比较准确地识别透视变换过的文本、以及弯曲的文本.
+
+# 端到端模型
+
+端到端模型的目标是一站式直接从图片中定位和识别出所有文本内容来。
+
+## FOTS Rotation-Sensitive Regression
+
+FOTS（Fast Oriented Text Spotting）是图像文本检测与识别同步训练、端到端可学习的网络模型。检测和识别任务共享卷积特征层，既节省了计算时间，也比两阶段训练方式学习到更多图像特征。引入了旋转感兴趣区域（RoIRotate）, 可以从卷积特征图中产生出定向的文本区域，从而支持倾斜文本的识别.
+
+STN-OCR模型
+
+STN-OCR是集成了了图文检测和识别功能的端到端可学习模型。在它的检测部分嵌入了一个空间变换网络（STN）来对原始输入图像进行仿射（affine）变换。利用这个空间变换网络，可以对检测到的多个文本块分别执行旋转、缩放和倾斜等图形矫正动作，从而在后续文本识别阶段得到更好的识别精度。在训练上STN-OCR属于半监督学习方法，只需要提供文本内容标注，而不要求文本定位信息。作者也提到，如果从头开始训练则网络收敛速度较慢，因此建议渐进地增加训练难度。STN-OCR已经开放了工程源代码和预训练模型。
