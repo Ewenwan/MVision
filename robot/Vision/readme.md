@@ -15,4 +15,4 @@
 
 [机器人学 —— 机器人视觉（Bundle Adjustment） 机器人视觉学中，最顶尖的方法 基于非线性优化的相机位姿估计 雅克比矩阵 ](https://www.cnblogs.com/ironstark/p/5493030.html)
 
-[]()
+[OCR字符识别 ](https://github.com/Ewenwan/MVision/tree/master/CNN/CTC)
