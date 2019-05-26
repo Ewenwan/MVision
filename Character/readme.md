@@ -34,6 +34,14 @@ OCR英文全称是Optical Character Recognition，中文叫做光学字符识别
 
 [传统opencv 轮廓检测+透视变换+二值化](https://www.cnblogs.com/skyfsm/p/7324346.html)
 
+最后总结一下两个算法的应用场景：
+
+> 基于轮廓提取的矫正算法更适用于车牌、身份证、人民币、书本、发票一类矩形形状而且边界明显的物体矫正。
+
+> 基于直线探测的矫正算法更适用于文本类的矫正。
+
+[基于轮廓和直线的图片校正](https://www.cnblogs.com/skyfsm/p/6902524.html)
+
 [cnn计算图像透视变换系数 Spatial Transformer Network(STN) ](https://arxiv.org/pdf/1506.02025.pdf)
 
 对于弯曲不规则文本，如果按照之前的识别方法，直接将整个文本区域图像强行送入CNN+RNN，由于有大量的无效区域会导致识别效果很差。所以这篇文章提出一种通过**STN网络Spatial Transformer Network(STN)**学习变换参数，将Rectified Image对应的特征送入后续RNN中识别。
