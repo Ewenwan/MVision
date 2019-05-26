@@ -218,6 +218,13 @@ WordSup弱监督训练框架中，两个训练步骤被交替执行：给定当�
 
 ## CRNN模型
 
+[代码 pytorch + wrap_ctc ](https://github.com/Ewenwan/crnn)
+
+[百度warp-ctc CPU和GPU上高效并行的CTC代码库 （library）](https://github.com/Ewenwan/warp-ctc)
+
+[caffe crnn](https://github.com/Ewenwan/crnn.caffe)
+
+
 CRNN(Convolutional Recurrent Neural Network）是目前较为流行的图文识别模型，可识别较长的文本序列。它包含CNN特征提取层和BLSTM序列特征提取层，能够进行端到端的联合训练。 它利用BLSTM和CTC部件学习字符图像中的上下文关系， 从而有效提升文本识别准确率，使得模型更加鲁棒。预测过程中，前端使用标准的CNN网络提取文本图像的特征，利用BLSTM将特征向量进行融合以提取字符序列的上下文特征，然后得到每列特征的概率分布，最后通过转录层(CTC rule)进行预测得到文本序列。
 
 网络架构。架构包括三部分：1) 卷积层，从输入图像中提取特征序列；2) 循环层，预测每一帧的标签分布；3) 转录层，将每一帧的预测变为最终的标签序列。
