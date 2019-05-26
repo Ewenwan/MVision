@@ -5,6 +5,7 @@
         语义理解ALU 
         文字转语言TTS  
         文字识别ocr 等
+[语音识别 RNN LSTM HMM GMM CTC The official repository of the Eesen project](https://github.com/Ewenwan/eesen)
 
 ## 语言识别ASR 
 ![](http://antkillerfarm.github.io/images/img2/speech.png)
