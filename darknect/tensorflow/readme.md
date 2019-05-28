@@ -7,7 +7,7 @@
 
 [TFLearn: Deep learning library featuring a higher-level API for TensorFlow ](https://github.com/Ewenwan/tflearn)
 
-[Learn_TensorFLow](https://github.com/Ewenwan/Learn_TensorFLow)
+[我的Learn_TensorFLow](https://github.com/Ewenwan/Learn_TensorFLow)
 
 [TensorFlow技术内幕（一）：导论](https://www.imooc.com/article/265350)
 
