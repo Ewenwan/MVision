@@ -1,4 +1,4 @@
-#-*- coding:utf-8 -*-
+ #-*- coding:utf-8 -*-
 import sys
 # add your caffe/python path
 sys.path.insert(0, "/home/wanyouwen/ewenwan/software/caffe-ssd/python")
@@ -58,12 +58,13 @@ def print_net_parameters_flops (deploy_file):
                 # flops = h*w*c1*c2*w_h*w_w
                 cur_flops = (np.product(net.params[layer_name][0].data.shape) * \
                              h_out*w_out)# 是否需要乘以2
-                
+                # 输出图面积 * 卷积核面积 * 输入通道数量 * 输出通道数量
                 
                 # mac访存  h*w*c_in + h2*w2*c_out  + c_in*c_out*w_h*w_w
                 cur_mac = (h_in*w_in*net.params[layer_name][0].data.shape[1] + \
                            h_out*w_out*net.params[layer_name][0].data.shape[0] + \
                            np.product(net.params[layer_name][0].data.shape))
+                #输入内存大小 +输出内存大小 + 卷积核内存大小
                 
                 # 特征图H*W * Weight_h * Weight_w*c_in*c_out*2 / 1
                 # 乘法和加法
