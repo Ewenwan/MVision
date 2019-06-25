@@ -2,7 +2,6 @@
 [Hands-On-Algorithms-for-Computer-Vision 代码](https://github.com/PacktPublishing/Hands-On-Algorithms-for-Computer-Vision)
 
 [OpenCV 3 Computer Vision Application Programming Cookbook, Third Edition](https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition)
-
 [计算机视觉OpenCV实现 csdn专栏](https://blog.csdn.net/column/details/computer-vision.html?&page=3)
 
 [机器视觉与计算机视觉](https://www.cnblogs.com/ironstark/category/745953.html)
@@ -38,8 +37,12 @@
 
 
 ## window下安装
-       下载地址 https://sourceforge.net/projects/opencvlibrary/files/opencv-win/
-
+      下载地址 https://sourceforge.net/projects/opencvlibrary/files/opencv-win/
+      
+      python 下 opencv安装 https://www.cnblogs.com/ncuhwxiong/p/7439604.html
+      安装 Numpy  https://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
+      安装opencv  https://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv
+      
       1、系统环境变量设置
       动态链接库配置
       计算机 -> 右键属性 ->高级系统设置 -> 高级标签  -> 最下边 环境变量
