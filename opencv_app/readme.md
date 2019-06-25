@@ -38,6 +38,8 @@
 
 
 ## window下安装
+       下载地址 https://sourceforge.net/projects/opencvlibrary/files/opencv-win/
+
       1、系统环境变量设置
       动态链接库配置
       计算机 -> 右键属性 ->高级系统设置 -> 高级标签  -> 最下边 环境变量
