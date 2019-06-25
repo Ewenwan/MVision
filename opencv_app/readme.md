@@ -41,7 +41,8 @@
       
       python 下 opencv安装 https://www.cnblogs.com/ncuhwxiong/p/7439604.html
       安装 Numpy  https://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
-      安装opencv  https://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv
+      安装 opencv  https://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv
+      使用 pip install  安装whl
       
       1、系统环境变量设置
       动态链接库配置
