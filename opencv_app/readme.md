@@ -1,4 +1,6 @@
-# opencv 学习
+# opencv 学习  图像处理等
+[linux android window 下的jpeg解码库 libjpeg-turbo](https://blog.csdn.net/gdp12315_gu/article/details/45061947)
+
 [Hands-On-Algorithms-for-Computer-Vision 代码](https://github.com/PacktPublishing/Hands-On-Algorithms-for-Computer-Vision)
 
 [OpenCV 3 Computer Vision Application Programming Cookbook, Third Edition](https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition)
