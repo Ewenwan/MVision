@@ -5,7 +5,7 @@
 
 linux 安装编译：
 
-    git clone https://github.com/Tencent/ncnn.git
+    git \ https://github.com/Tencent/ncnn.git
     cd ncnn 
     gedit CMakeLists.txt
     拉到最后
@@ -20,7 +20,7 @@ linux 安装编译：
     cmake ..
     make 
 
-[Windows NCNN编译](https://blog.csdn.net/ycdhqzhiai/article/details/80738987)
+[Windows NCNN\protobuf 编译](https://blog.csdn.net/ycdhqzhiai/article/details/80738987)
 
 
 # 1. 图像分类网络
