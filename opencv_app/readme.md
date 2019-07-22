@@ -1,4 +1,6 @@
 # opencv 学习  图像处理等
+[简单易用的图像解码库 stb_image](https://github.com/Ewenwan/stb)
+
 [linux android window 下的jpeg解码库 libjpeg-turbo](https://blog.csdn.net/gdp12315_gu/article/details/45061947)
 
 [Hands-On-Algorithms-for-Computer-Vision 代码](https://github.com/PacktPublishing/Hands-On-Algorithms-for-Computer-Vision)
