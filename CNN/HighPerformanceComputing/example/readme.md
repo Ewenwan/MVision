@@ -25,7 +25,10 @@
 2.模型解析   ncnn::Net
 
     2.1 Net::load_param 载入网络参数文件 proto net.cpp
-        文件头魔术数(版本?) 层类型
+        文件头魔术数(版本?) 层类型 层名字 创建层 create_layer()/ net::create_custom_layer() 层输入blob数量 输出blob数量
+        读取输入blob 与层挂钩； 读取输出blob与层挂钩；解析层特殊参数(参数字典)  paramDict::load_param(fp);  按照 id=参数/参数数组 解析
+        每一层 的 特殊参数不一样 https://github.com/Tencent/ncnn/wiki/operation-param-weight-table
+        层载入解析得到的层特殊参数  layer->load_param(pd) 每一层特有的参数
     
     2.2 Net::load_model 载入网络模型文件 bin 权重数据 net.cpp
     
