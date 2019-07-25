@@ -2087,12 +2087,181 @@ __asm__ __volatile__(
 
 	类型           作用
 	r0...r15     告诉编译器汇编代码中 修改了通用寄存器r0...r15
-	cc           告诉编译器汇编代码 会 导致 CPU状态位 的 改变
-	memory       告诉编译器汇编代码 会 读取或修 改内存中某个地址 存放的值
+	cc           告诉编译器汇编代码 会 导致 CPU状态位 的 改变	memory       告诉编译器汇编代码 会 读取或修 改内存中某个地址 存放的值
 
 对于“memory”来说，它并不是表示寄存器被读取或修改了，而是表示内存中的值被修改了。出于优化的目的，在执行你的汇编代码之前，编译器将某些变量的值还保存在寄存器中，并没有被写到实际的内存中。但是，如果你的汇编代码会读取内存中的值，则很有可能新的值还在寄存器中，而内存中存放的还是老的值，这样就会造成错误。添加了“memory”之后，编译器会在执行你的代码之前，保证将保存在寄存器中，没有更新到内存中的值全部都写入到内存中。
 
 此列表中的每一项都要用双引号（""）括起来，每项之间要用逗号（“,”）分割。 
+
+
+
+### 浮点向量加法 NEON instruction 内联函数 Inline assembly内联汇编  NEON assembly 纯汇编 对比
+[Neon 寄存器 指令集 ARMv7/v8 对比](https://blog.csdn.net/zsc09_leaf/article/details/45825015)
+
+// c 与内联函数对比
+```c
+#include<arm_neon.h>
+ 
+void add_float_c(float* dst, float* src1, float* src2, int count)
+{
+     int i;
+     for (i = 0; i < count; i++)
+         dst[i] = src1[i] + src2[i];
+}
+ 
+void add_float_neon1(float* dst, float* src1, float* src2, int count)
+{
+     int i = 0;
+     for (; i < count - 3; i += 4)
+     {
+         float32x4_t in1, in2, out;
+         in1 = vld1q_f32(src1);
+         src1 += 4;
+         in2 = vld1q_f32(src2);
+         src2 += 4;
+	 // v8
+	 #if __aarch64__
+             out = vaddvq_f32(in1, in2);
+	 #else
+             out = vaddq_f32(in1, in2);
+	 #endif
+         vst1q_f32(dst, out);
+         dst += 4;
+     }
+     // 剩余 1~3个数 使用普通c
+     for(;i < count; i++)
+     {
+         dst[i] = src1[i] + src2[i]
+     }
+}
+
+
+
+```
+
+// 内联函数 V7 V8 对比
+```c
+// ARMv7-A/AArch32
+void add_float_neon3(float* dst, float* src1, float* src2, int count)
+{
+    int nn = count >> 4;
+    int remain = count - (nn << 2);
+/*
+    asm volatile (
+               "1:                                           \n" // 用于循环跳转，标记号
+               "vld1.32         {q0}, [%4]!                  \n"
+               "vld1.32         {q1}, [%5]!                  \n"
+               "vadd.f32        q0, q0, q1                   \n"
+               "subs            %1, #1                       \n"
+               "vst1.32         {q0}, [%0]!                  \n"
+               "bgt             1b                           \n"
+               : "+r"(dst),     // %0 输出参数列表
+	         "+r"(nn)       // %1
+	       : "0"(dst)     
+	         "1"(nn)
+                 "r"(src1),     // %4 输入参数列表
+	         "r"(src2)      // %5
+               : "memory", "q0", "q1"
+          );
+*/
+    asm volatile (
+               "1:                                           \n" // 用于循环跳转，标记号
+               "vld1.32         {q0}, [%[src1]]!             \n"
+               "vld1.32         {q1}, [%[src2]]!             \n"
+               "vadd.f32       q0, q0, q1                    \n"
+               "subs            %[nn], %[nn], #4       \n"
+               "vst1.32         {q0}, [%[dst]]!              \n"
+               "bgt             1b                           \n"
+               : [dst] "+r" (dst)
+               : [src1] "r" (src1), [src2] "r" (src2), [nn] "r" (nn)
+               : "memory", "q0", "q1"
+          );
+    // 剩余数处理  
+    for( ; remain > 0; remain--)
+    {
+        *dst = *src1 + *src2;
+    }
+}
+
+
+// AArch64
+void add_float_neon3(float* dst, float* src1, float* src2, int count)
+{
+    asm volatile (
+               "1:                                           \n" // 用于循环跳转，标记号
+               "ld1             {v0.4s}, [%[src1]], #16      \n"
+               "ld1             {v1.4s}, [%[src2]], #16      \n"
+               "fadd            v0.4s, v0.4s, v1.4s          \n"
+               "subs            %[count],  %[count], #4      \n"
+               "st1             {v0.4s}, [%[dst]], #16       \n"
+               "bgt             1b                           \n"
+               : [dst] "+r" (dst)   //输出参数
+               : [src1] "r" (src1), [src2] "r" (src2), [count] "r" (count)
+               : "memory", "v0", "v1"
+          );
+ 
+}
+```
+
+> 纯汇编 V7 V8 对比
+
+// 函数声明头文件
+```c
+//header
+void add_float_neon2(float* dst, float* src1, float* src2, int count);
+```
+
+// v7
+
+```asm
+    .text
+    .syntax unified
+ 
+    .align 4
+    .global add_float_neon2             # 函数名
+    .type add_float_neon2, %function    # 函数名
+    .thumb
+.thumb_func
+ 
+add_float_neon2:
+.L_loop:
+    vld1.32  {q0}, [r1]!                # 函数第一个参数为 r0 第二个为 r1 第三个位r2 第四个为 r3
+    vld1.32  {q1}, [r2]!
+    vadd.f32 q0, q0, q1
+    subs r3, r3, #4
+    vst1.32  {q0}, [r0]!
+    bgt .L_loop
+ 
+    bx lr
+
+
+```
+
+// v8
+
+```asm
+   .text
+ 
+    .align 4
+    .global add_float_neon2            # 函数名
+    .type add_float_neon2, %function   # 函数名
+ 
+add_float_neon2:
+ 
+.L_loop:
+    ld1  {v0.4s}, [x1], #16      # 函数第一个参数为 x0 第二个为 x1 第三个为 x2 第四个为 x3
+    ld1  {v1.4s}, [x2], #16
+    fadd v0.4s, v0.4s, v1.4s
+    subs x3, x3, #4
+    st1  {v0.4s}, [x0], #16
+    bgt .L_loop
+ 
+    ret
+
+```
+
+
+
 
 ## ARM NEON CNN卷积网络优化 深度学习优化 实例
 [参考NCNN](https://github.com/Ewenwan/MVision/blob/master/CNN/HighPerformanceComputing/example/ncnn_%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.md)
