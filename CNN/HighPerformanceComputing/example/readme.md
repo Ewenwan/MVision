@@ -1,4 +1,35 @@
-# ncnn 使用 
+# ncnn 
+
+> 架构:
+
+1.图像预处理 ncnn::Mat
+
+    1.1 from_pixels_resize() 生成目标尺寸大小的网络输入Mat   mat_pixel.cpp
+        双线性插值图像形变 resize_bilinear_c1/c2/c3/4 1通道/2通道/3通道/4通道 图像变形算法   mat_pixel_resize.cpp
+        像素图像 转换成ncnn::Mat   Mat::from_pixels()   >>> 不同类型 from_rgb() 
+                                                像素数据指针rgb间隔 依次赋值给Mat的三个通道的指针   mat_pixel.cpp
+    1.2 substract_mean_normalize() 去均值并归一化图像   mat.cpp
+        有均值参数         
+              创建 偏置层   ncnn::create_layer(ncnn::LayerType::Bias);  载入层参数 op->load_param(pd);  3通道
+              载入层权重数据 op->load_model(ncnn::ModelBinFromMatArray(weights));  -均值参数
+              运行层        op->forward_inplace(*this);
+        有归一化参数
+              创建 尺度层   ncnn::create_layer(ncnn::LayerType::Scale);  载入层参数 op->load_param(pd);  3通道
+              载入层权重数据 op->load_model(ncnn::ModelBinFromMatArray(weights));  尺度参数
+              运行层        op->forward_inplace(*this);
+        有均值和归一化参数
+              创建 尺度层   ncnn::create_layer(ncnn::LayerType::Scale);  载入层参数 op->load_param(pd);  3通道
+              载入层权重数据 op->load_model(ncnn::ModelBinFromMatArray(weights));  -均值参数 和 尺度参数
+              运行层        op->forward_inplace(*this);
+    
+2.模型解析   ncnn::Net
+
+3.网络运行  ncnn::Extractor
+
+
+
+# 编译
+
 [源码仓库](https://github.com/Tencent/ncnn)
 
 [NCNN 在 window linux android平台下的部署](https://github.com/scutan90/DeepLearning-500-questions/blob/master/ch17_%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E3%80%81%E5%8A%A0%E9%80%9F%E5%8F%8A%E7%A7%BB%E5%8A%A8%E7%AB%AF%E9%83%A8%E7%BD%B2/17.8.1%20NCNN%E9%83%A8%E7%BD%B2.md)
