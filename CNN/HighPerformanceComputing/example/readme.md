@@ -24,6 +24,14 @@
     
 2.模型解析   ncnn::Net
 
+    2.1 Net::load_param 载入网络参数文件 proto net.cpp
+        文件头魔术数(版本?) 层类型
+    
+    2.2 Net::load_model 载入网络模型文件 bin 权重数据 net.cpp
+    
+    
+    
+    
 3.网络运行  ncnn::Extractor
 
 
