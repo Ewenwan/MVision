@@ -37,10 +37,13 @@
         3.部分层需要 根据层实际参数 调整运行流水线 layer->create_pipeline 例如卷积层和全连接层
         4.量化的网络需要融合 Net::fuse_network()
     
-    
-    
 3.网络运行  ncnn::Extractor
 
+    3.1 创建网络提取器 Extractor Net::create_extractor 提供设置网络输入 获取网络输出 设置网络运行线程参数的接口
+    3.2 设置线程参数 Extractor::set_num_threads 设置网络输入 Extractor::input
+    3.3 提取网络输出 Extractor::extract 运行网络前向运行函数 net->forward_layer
+        会根据层类型(单输入单输出/其他) blob类型(可本地修改(在输入直接修改)/不可本地修改)执行每一次的前向运行函数
+        当输入blob为空时，会递归调用 网络前向运行函数 net->forward_layer 获取前置层的输出blob
 
 
 # 编译
