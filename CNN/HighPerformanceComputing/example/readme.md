@@ -31,9 +31,11 @@
         层载入解析得到的层特殊参数  layer->load_param(pd) 每一层特有的参数
     
     2.2 Net::load_model 载入网络模型文件 bin 权重数据 net.cpp
-        创建 ModelBinFromStdio 对象 提供载入参数的接口函数 ModelBinFromStdio::load() src/modelbin.cpp 
-        根据 权重数据开始的一个四字节数据类型参数(float32/float16/int8等) 和 指定的参数数量 读取数据到 Mat 并返回Mat
-        根据load_param 获取到的网络层信息 便利每一层 载入每一层的模型数据 layer->load_model() 每一层特有函数
+        1.创建 ModelBinFromStdio 对象 提供载入参数的接口函数 ModelBinFromStdio::load() src/modelbin.cpp 
+          根据 权重数据开始的一个四字节数据类型参数(float32/float16/int8等) 和 指定的参数数量 读取数据到 Mat 并返回Mat
+        2.根据load_param 获取到的网络层信息 便利每一层 载入每一层的模型数据 layer->load_model() 每一层特有函数
+        3.部分层需要 根据层实际参数 调整运行流水线 layer->create_pipeline 例如卷积层和全连接层
+        4.量化的网络需要融合 Net::fuse_network()
     
     
     
