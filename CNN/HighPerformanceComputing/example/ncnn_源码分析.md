@@ -206,10 +206,11 @@ int ParamDict::load_param_bin(FILE* fp)
       [padding] (optional 可选)
 
           flag : unsigned int, little-endian, indicating the weight storage type, 
-                 0 => float32, 
+                 0          => float32, 
                  0x01306B47 => float16, 
-                 otherwise => quantized int8, 
-                      may be omitted if the layer implementation forced the storage type explicitly。
+                 0x000D4B38 => int8, 
+                 0x0002C056 => raw data with extra scaling  带有尺度信息的 float32
+		 其他 非0   =>  quantized data  256个量化数 和 索引表
           raw data : raw weight data, little-endian, 
                      float32 data or float16 data or quantized table 
                      and indexes depending on the storage type flag。
