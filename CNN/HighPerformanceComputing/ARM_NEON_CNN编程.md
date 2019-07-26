@@ -2711,15 +2711,15 @@ int Clip_arm::forward_inplace(Mat &bottom_top_blob, const Option &opt) const
         {
             float* ptr = bottom_top_blob.channel(q);
 
-            float32x4_t _max = vdupq_n_f32(max);
-            float32x4_t _min = vdupq_n_f32(min);
+            float32x4_t _max = vdupq_n_f32(max); // 最小值
+            float32x4_t _min = vdupq_n_f32(min); // 最大值
 
             for (int i=0; i<size; i++)
             {
-                float32x4_t _ptr = vld1q_f32(ptr);
-                _ptr = vmaxq_f32(_ptr, _min);
-                _ptr = vminq_f32(_ptr, _max);
-                vst1q_f32(ptr, _ptr);
+                float32x4_t _ptr = vld1q_f32(ptr);// 载入特征值 x
+                _ptr = vmaxq_f32(_ptr, _min);     // 下限处理
+                _ptr = vminq_f32(_ptr, _max);     // 上限处理
+                vst1q_f32(ptr, _ptr);             // 结果存回 内存地址
 
                 ptr += 4;
             }
@@ -2735,15 +2735,15 @@ int Clip_arm::forward_inplace(Mat &bottom_top_blob, const Option &opt) const
         float* ptr = bottom_top_blob.channel(q);
 
 #if __ARM_NEON
-        int nn = size >> 2;
-        int remain = size & 3;
+        int nn = size >> 2;                  // 除以4 的余数
+        int remain = size & 3;               // 剩余
 #else
         int remain = size;
 #endif
 
 #if __ARM_NEON
-        float32x4_t _max = vdupq_n_f32(max);
-        float32x4_t _min = vdupq_n_f32(min);
+        float32x4_t _max = vdupq_n_f32(max); // 最小值
+        float32x4_t _min = vdupq_n_f32(min); // 最大值
 #if __aarch64__
         for (; nn>0; nn--)
         {
@@ -2758,11 +2758,11 @@ int Clip_arm::forward_inplace(Mat &bottom_top_blob, const Option &opt) const
         {
         asm volatile(
             "0:                             \n"
-            "pld        [%1, #128]          \n"
-            "vld1.f32   {d0-d1}, [%1: 128]  \n"
-            "vmax.f32   q0, q0, %q4         \n"
-            "vmin.f32   q0, q0, %q5         \n"
-            "subs       %0, #1              \n"
+            "pld        [%1, #128]          \n" // 预取 128位(字节?)
+            "vld1.f32   {d0-d1}, [%1: 128]  \n" // q0 寄存器存储 普通人指针处 的值
+            "vmax.f32   q0, q0, %q4         \n" // 下限处理
+            "vmin.f32   q0, q0, %q5         \n" // 上限处理
+            "subs       %0, #1              \n" 
             "vst1.f32   {d0-d1}, [%1: 128]! \n"
             "bne        0b                  \n"
 
