@@ -2438,6 +2438,45 @@ v8:
     
     // yi = b * xi + a
     
+// 在layer/batchnorm.cpp  的 BatchNorm::load_model 函数中处理
+
+int BatchNorm::load_model(const ModelBin& mb)
+
+{
+    slope_data = mb.load(channels, 1);  // 缩放系数
+    if (slope_data.empty())
+        return -100;
+	
+    mean_data = mb.load(channels, 1);   // 均值
+    if (mean_data.empty())
+        return -100;
+
+    var_data = mb.load(channels, 1);    // 方差
+    if (var_data.empty())
+        return -100;
+	
+    bias_data = mb.load(channels, 1);   // 标准差
+    if (bias_data.empty())
+        return -100;
+	
+    a_data.create(channels);            // 去均值减方差 缩放和平移合在一起 >>> 新缩放系数
+    if (a_data.empty()) 
+        return -100;
+
+    b_data.create(channels);            // 新偏移量
+    if (b_data.empty())
+        return -100;
+
+    for (int i=0; i<channels; i++)
+    {
+        float sqrt_var = sqrt(var_data[i] + eps);                           // 标准差
+        a_data[i] = bias_data[i] - slope_data[i] * mean_data[i] / sqrt_var; // 新缩放系数
+        b_data[i] = slope_data[i] / sqrt_var;                               // 新偏移量
+    }
+
+    return 0;
+} 
+    
     
 int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 {
