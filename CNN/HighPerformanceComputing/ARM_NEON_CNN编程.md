@@ -2613,6 +2613,7 @@ int Bias_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 #endif // __ARM_NEON
 
 #if __ARM_NEON
+/*
 // 这里 直接使用了 neon Instrinsic 内在函数，不过优化程度不如 汇编代码
 
         float32x4_t _bias = vdupq_n_f32(bias);// 偏置数据 dup载入到 寄存器 4个32位的浮点数
@@ -2625,8 +2626,54 @@ int Bias_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 
             ptr += 4;// 特征指针 移动四个单位
         }
-	
+*/	
 // 可以试写 neon内联汇编代码，区分v8 、v7===============
+	
+#if __aarch64__
+        if (nn > 0)
+        {
+        asm volatile(
+            "dup        v1.4s, %w4             \n" // 每通道的 变化系数a,b都一样只需载入一次，传入的为立即数使用dup
+            "0:                                \n" // 构成循环的标记号
+            "prfm       pldl1keep, [%1, #128]  \n" // 从%1 ptr 处预读取 128字节 4*32 4个浮点数
+            "ld1        {v0.4s}, [%1]          \n" // 载入 ptr 指针对应的值到 v0，连续4个float
+            "fadd       v0.4s, v0.4s, v1.4s    \n" // v0 = v0 + v1
+            "subs       %w0, %w0, #1           \n" // %0 为nn 执行次数 -1   #1   为1
+            "st1        {v0.4s}, [%1], #16     \n" // 结果v0 store存储到 原数据地址处，原数据地址递增16字节
+            "bne        0b                     \n" // subs结果不为零的话跳转回去，继续循环
+            : "=r"(nn),     // %0
+              "=r"(ptr)     // %1
+            : "0"(nn),      // 2 ???=====
+              "1"(ptr),     // 3 ???=====
+              "r"(bias)     // %4 存入寄存器 只读, 不变, 参数 偏置a
+            : "cc", "memory", "v0", "v1"
+	    //  cc CPU状态位，内存memory，v，v1，v2，v3寄存器 可能会变化
+        );
+        }
+#else
+        if (nn > 0)
+        {
+        asm volatile(
+            "vdup.f32   q1, %4              \n"// 每通道的 变化系数a,b都一样只需载入一次，传入的为立即数使用dup		       
+            "0:                             \n"// 构成循环的标记号
+            "pld        [%1, #128]          \n"// 从%1 ptr 处预读取 128字节 4*32 4个浮点数
+            "vld1.f32   {d0-d1}, [%1 :128]  \n"// 从%1 ptr 处载入 4个浮点数到q0，传入的为指针，使用ld
+            "vadd.f32   q0, q0, q1          \n"// q0 = q0(特征值) + q1(变量bias)
+            "subs       %0, #1              \n"// 循环次数 nn -1
+            "vst1.f32   {d0-d1}, [%1 :128]! \n"// q0->{d0-d1} 结果值 顺序store到 原特征值地址处[%1]  !感叹号，强制[%1]向后跳转128位 
+            "bne        0b                  \n"// 不为零跳回去，继续循环 
+	    
+            : "=r"(nn),     // %0 循环次数(按寄存器一次并行运算4个浮点数数) nn 
+              "=r"(ptr)     // %1 特征值数据地址
+            : "0"(nn),      // 2 ???===
+              "1"(ptr),     // 3 ???===
+              "r"(bias)     // %4
+            : "cc", "memory", "q0", "q1"
+	    //  cc CPU状态位，内存memory，q0，q1，q2，q3寄存器 可能会变化
+        );
+        }
+#endif // __aarch64__	
+	
 	
 #endif // __ARM_NEON
 
