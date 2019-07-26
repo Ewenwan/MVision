@@ -2227,18 +2227,20 @@ void add_float_neon2(float* dst, float* src1, float* src2, int count);
 // v7
 
 ```asm
-    .text
+    .text                               // .text表示代码正文部分
     .syntax unified
  
-    .align 4
-    .global add_float_neon2             # 函数名
-    .type add_float_neon2, %function    # 函数名
-    .thumb
+    .align 4                            // .align根据不同的汇编器会有不同的行为，像这里的.align4可能表示4字节对齐，也可能表示16字节对齐。
+    .global add_float_neon2             // 函数名 可以用.global或.globl来标注全局函数。在Apple的Assembler中仅支持.globl。函数名前要加下划线。
+    .type add_float_neon2, %function    // 函数名
+    .thumb    // .arm表示后面的函数中的指令都是arm指令。
+              // 而.thumb表示后面函数中的指令都是thumb或thumb-2指令。
+	      // 其中，如果一个函数是用thumb写的，那么必须用 .thumb_func 修饰，否则连接器在连接符号时会有问题。
 .thumb_func
  
 add_float_neon2:
 .L_loop:
-    vld1.32  {q0}, [r1]!                # 函数第一个参数为 r0 第二个为 r1 第三个位r2 第四个为 r3
+    vld1.32  {q0}, [r1]!                // 函数第一个参数为 r0 第二个为 r1 第三个位r2 第四个为 r3
     vld1.32  {q1}, [r2]!
     vadd.f32 q0, q0, q1
     subs r3, r3, #4
