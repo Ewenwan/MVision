@@ -2459,19 +2459,19 @@ int BatchNorm::load_model(const ModelBin& mb)
     if (bias_data.empty())
         return -100;
 	
-    a_data.create(channels);            // 去均值减方差 缩放和平移合在一起 >>> 新缩放系数
+    a_data.create(channels);            // 去均值减方差 缩放和平移合在一起 >>> 新偏移量
     if (a_data.empty()) 
         return -100;
 
-    b_data.create(channels);            // 新偏移量
+    b_data.create(channels);            // 新 缩放系数
     if (b_data.empty())
         return -100;
 
     for (int i=0; i<channels; i++)
     {
         float sqrt_var = sqrt(var_data[i] + eps);                           // 标准差
-        a_data[i] = bias_data[i] - slope_data[i] * mean_data[i] / sqrt_var; // 新缩放系数
-        b_data[i] = slope_data[i] / sqrt_var;                               // 新偏移量
+        a_data[i] = bias_data[i] - slope_data[i] * mean_data[i] / sqrt_var; // 新偏移量
+        b_data[i] = slope_data[i] / sqrt_var;                               // 新 缩放系数
     }
 
     return 0;
@@ -2527,7 +2527,7 @@ int BatchNorm_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) cons
             "fmla       v3.4s, v0.4s, v2.4s    \n" // 特征数据v0*缩放v2 + 偏置v3 最后赋值给 v3 += v0×b
             "subs       %w0, %w0, #1           \n" // %0 为nn 执行次数 -1   #1   为1
             "st1        {v3.4s}, [%1], #16     \n" // 结果v3 store存储到 原数据地址处，原数据地址递增16字节
-            "bne        0b                     \n" // 不为零跳回去，继续循环
+            "bne        0b                     \n" // subs结果不为零的话跳转回去，继续循环
             : "=r"(nn),     // %0
               "=r"(ptr)     // %1
             : "0"(nn),      // 2 ???=====
