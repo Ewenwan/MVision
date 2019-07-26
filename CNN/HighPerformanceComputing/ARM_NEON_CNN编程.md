@@ -2689,5 +2689,113 @@ int Bias_arm::forward_inplace(Mat& bottom_top_blob, const Option& opt) const
 }
 
 
+```
+
+### 4.修剪 clip 上下阈值处理
+
+
+```c
+int Clip_arm::forward_inplace(Mat &bottom_top_blob, const Option &opt) const
+{
+    int w = bottom_top_blob.w;
+    int h = bottom_top_blob.h;
+    int channels = bottom_top_blob.c;
+    int size = w * h;
+    int elempack = bottom_top_blob.elempack;
+
+#if __ARM_NEON
+    if (elempack == 4)  // 如果数据数量是4的整数倍 直接使用instric指令计算 也不用考虑剩余数的处理
+    {
+        #pragma omp parallel for num_threads(opt.num_threads)
+        for (int q=0; q<channels; q++)
+        {
+            float* ptr = bottom_top_blob.channel(q);
+
+            float32x4_t _max = vdupq_n_f32(max);
+            float32x4_t _min = vdupq_n_f32(min);
+
+            for (int i=0; i<size; i++)
+            {
+                float32x4_t _ptr = vld1q_f32(ptr);
+                _ptr = vmaxq_f32(_ptr, _min);
+                _ptr = vminq_f32(_ptr, _max);
+                vst1q_f32(ptr, _ptr);
+
+                ptr += 4;
+            }
+        }
+
+        return 0;
+    }
+#endif // __ARM_NEON
+
+    #pragma omp parallel for num_threads(opt.num_threads)
+    for (int q=0; q<channels; q++)
+    {
+        float* ptr = bottom_top_blob.channel(q);
+
+#if __ARM_NEON
+        int nn = size >> 2;
+        int remain = size & 3;
+#else
+        int remain = size;
+#endif
+
+#if __ARM_NEON
+        float32x4_t _max = vdupq_n_f32(max);
+        float32x4_t _min = vdupq_n_f32(min);
+#if __aarch64__
+        for (; nn>0; nn--)
+        {
+            float32x4_t _ptr = vld1q_f32(ptr);
+            _ptr = vmaxq_f32(_ptr, _min);
+            _ptr = vminq_f32(_ptr, _max);
+            vst1q_f32(ptr, _ptr);
+            ptr += 4;
+        }
+#else
+        if (nn > 0)
+        {
+        asm volatile(
+            "0:                             \n"
+            "pld        [%1, #128]          \n"
+            "vld1.f32   {d0-d1}, [%1: 128]  \n"
+            "vmax.f32   q0, q0, %q4         \n"
+            "vmin.f32   q0, q0, %q5         \n"
+            "subs       %0, #1              \n"
+            "vst1.f32   {d0-d1}, [%1: 128]! \n"
+            "bne        0b                  \n"
+
+            : "=r"(nn),     // %0
+              "=r"(ptr)     // %1
+            : "0"(nn),
+              "1"(ptr),
+              "w"(_min),    // %q4
+              "w"(_max)     // %q5
+            : "cc", "memory", "q0"
+        );
+        }
+#endif // __aarch64__
+#endif // __ARM_NEON
+
+        for (; remain>0; remain--)
+        {
+            if (*ptr < min)
+                *ptr = min;
+            if (*ptr > max)
+                *ptr = max;
+            ptr++;
+        }
+    }
+
+    return 0;
+}
 
 ```
+
+
+
+
+
+
+
