@@ -1,4 +1,15 @@
 # ARM_NEON_CNN编程
+
+内联函数优化的越来越好了，甚至在ARMv8 平台下有优于汇编的性能，同时兼容性方面又比汇编好，因此使用内联函数是上上之选。
+毕竟，NEON肯定会更新的，到时一更新你的底层汇编得全部跟着更新，但是使用内联函数的话就不要考虑这些了，反正编译器都帮我们做了嘛！
+最后关于内联函数告诉后辈们几点人生经验：
+
+使用的寄存器数量要考虑周全；
+编译器注意好啊！
+一定要看看产生的汇编代码啊！
+
+[什么？！NEON还要优化？](https://www.jianshu.com/p/16d60ac56249)
+
 [神经网络arm neon加速实现](https://blog.csdn.net/fuwenyan/article/details/78793907)
 
 [常用NEON 内置函数记录备用](https://blog.csdn.net/fuwenyan/article/details/78811034)
