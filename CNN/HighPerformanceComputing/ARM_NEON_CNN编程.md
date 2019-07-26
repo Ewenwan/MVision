@@ -8,6 +8,8 @@
 编译器注意好啊！
 一定要看看产生的汇编代码啊！
 
+[AI 移动端框架常用指令·汇总 v7 v8 差异](https://www.jianshu.com/p/5f75fa02c5d0)
+
 [什么？！NEON还要优化？](https://www.jianshu.com/p/16d60ac56249)
 
 [神经网络arm neon加速实现](https://blog.csdn.net/fuwenyan/article/details/78793907)
