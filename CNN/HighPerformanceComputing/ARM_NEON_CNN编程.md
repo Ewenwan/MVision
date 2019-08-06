@@ -8,6 +8,8 @@
 编译器注意好啊！
 一定要看看产生的汇编代码啊！
 
+[图像算法的工程优化技术: 算法流程优化 CPU多线程 SIMD GPU编程 专用芯片](https://blog.csdn.net/jxt1234and2010/article/details/50768263)
+
 [AI 移动端框架常用指令·汇总 v7 v8 差异](https://www.jianshu.com/p/5f75fa02c5d0)
 
 [什么？！NEON还要优化？](https://www.jianshu.com/p/16d60ac56249)
