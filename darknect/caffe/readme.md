@@ -1,4 +1,7 @@
+
 [yolo_darknet 转 caffe](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/yolo_darknet_to_caffe.md)
+
+[详细教程：window下安装Caffe深度学习框架！（同时安装pycaffe）](https://blog.csdn.net/weixin_37621229/article/details/80547934)
 
 # caffe使用
 [caffe 安装](https://github.com/Ewenwan/MVision/blob/master/darknect/caffe/caffe_%E5%AE%89%E8%A3%85.md)
