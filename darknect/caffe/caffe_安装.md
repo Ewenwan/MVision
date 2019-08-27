@@ -91,5 +91,25 @@
     
     
     
+# 11. protobuf 源码安装
+下载 https://github.com/protocolbuffers/protobuf/archive/v3.8.0.tar.gz
 
+解压 tar -xvf protobuf-3.8.0.tar.gz
+
+编译安装
+
+./autogen.sh 
+
+可以修改安装目录通过 
+
+ ./configure --prefix=/usr/local/protobuf
+ 
+ make
+ 
+ make check
+ 
+ make install
+
+
+ldconfig
 
