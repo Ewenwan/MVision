@@ -1,8 +1,10 @@
 # PyTorch
 [参考](https://blog.csdn.net/zzulp/article/details/80573331)
 
-[PyTorch 实战教程 待整合](https://github.com/Ewenwan/PyTorch_Tutorials)
+[PyTorch_Tutorials PyTorch 实战教程 待整合](https://github.com/Ewenwan/PyTorch_Tutorials)
 
+[PyTorch_Tutorials 2 ](https://github.com/Ewenwan/PyTorch-Tutorial-1)
+ 
 [pytorch-tutorial 2 ](https://github.com/Ewenwan/pytorch-tutorial)
 
 [PyTorch 中文手册 （pytorch handbook）](https://github.com/Ewenwan/pytorch-handbook)
