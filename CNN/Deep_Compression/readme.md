@@ -17,6 +17,8 @@ tag: 深度学习
 
 [model-pruning 模型剪枝总结](https://xmfbit.github.io/2018/10/03/paper-summary-model-pruning/#more)
 
+[iccv2019 通道自动搜索剪裁  网络编码 随机搜索 测试性能 进化算法获得最优剪裁方案](https://github.com/Ewenwan/MetaPruning)
+
 # 性能提升方法
 [本文github链接](https://github.com/Ewenwan/MVision/blob/master/CNN/Deep_Compression/readme.md)
  
