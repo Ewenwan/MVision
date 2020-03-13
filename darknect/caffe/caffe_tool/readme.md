@@ -32,3 +32,37 @@
 ##  caffe  coco模型 转 voc模型
       coco2voc.py
 
+
+## 模型修改
+```py
+import numpy as np
+import caffe
+from caffe.proto import caffe_pb2
+from google.protobuf import text_format
+
+# //修改后的prototxt
+src_prototxt = "xxx.prototxt"
+
+# //原始的prototxt
+old_prototxt = "s.prototxt"
+old_caffemodel = "s.caffemodel"
+
+# 创建网络模型对象
+caffe.set_mode_cpu()
+net = caffe.Net(src_prototxt, caffe.TEST)
+net_old = caffe.Net(old_prototxt, old_caffemodel, caffe.TEST)
+
+src_net_params = caffe_pb2.NetParameter()
+text_format.Merge(open(src_prototxt).read(), src_net_params)
+
+#拷贝相同名字层的参数
+for k,v in net_old.params.items():
+    # print (k,v[0].data.shape)
+    # print (np.size(net_old.params[k]))
+    if(k in net.layer_dict.keys()):
+        print(k, v[0].data.shape)
+        print(np.size(net_old.params[k]))
+        for i in range(np.size(net_old.params[k])):
+           net.params[k][i].data[:] = np.copy(net_old.params[k][i].data[:])
+net.save("eur_single.caffemodel")
+```
