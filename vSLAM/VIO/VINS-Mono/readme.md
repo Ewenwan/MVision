@@ -22,6 +22,9 @@
 
 ![](https://images2018.cnblogs.com/blog/699318/201804/699318-20180414235214918-500793897.png)
 
+[VINS-Mono代码注释以及公式推导](https://github.com/Ewenwan/VINS-Mono-code-annotation)
+
+[VINS-Mono代码注释，仅供学习](https://github.com/Ewenwan/VINS-Mono-Learning)
 
 ### Feature tracker 特征跟踪
     这部分代码在feature_tracker包下面，主要是接收图像topic,
