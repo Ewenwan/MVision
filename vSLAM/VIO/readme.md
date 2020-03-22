@@ -14,6 +14,8 @@
 
 [VINS-Mono代码注释以及公式推导](https://github.com/Ewenwan/VINS-Mono-code-annotation)
 
+[VINS-Mono代码注释，仅供学习](https://github.com/Ewenwan/VINS-Mono-Learning)
+
       IO和之前的几种SLAM最大的不同在于两点：
         首先，VIO在硬件上需要传感器的融合，包括相机和六轴陀螺仪，
              相机产生图片，
