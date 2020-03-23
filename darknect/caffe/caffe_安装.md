@@ -53,8 +53,7 @@
       sudo apt-get install python-numpy
 
     7.2 测试  
-        python
-        import caffe
+        python        import caffe
     错误1：
       ImportError: No module named caffe
       导入路径
@@ -110,6 +109,18 @@
  
  make install
 
-
 ldconfig
 
+
+安装python支持:
+
+     $ cd   protobuf/python
+     $ python3 setup.py build
+     $ python3 setup.py test
+     $ python setup.py install
+     
+     可能会提示差一些其他包
+     
+     
+     
+     
