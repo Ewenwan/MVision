@@ -9,6 +9,8 @@ MNN 是一个轻量级的深度学习端侧推理引擎，核心解决深度神�
 
 [主仓库](https://github.com/Ewenwan/MNN)
 
+[浅淡深度学习的发机机——张量计算](https://blog.csdn.net/jxt1234and2010/article/details/103595866)
+
 # 代码分析
 
 read model-->create Net(Interpreter) --> 配置backend --> create session --> config input and output --> run session -->（Pipeline --> Unit-->op-->Execution(调用不同后端算子)）--> finished
