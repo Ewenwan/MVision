@@ -117,7 +117,7 @@ CPU 、 GPU 已是主流， NPU 、 TPU 渐渐成为标配， DSP 、 FPGA 在 I
 ## 1. 转换工具
 ### 1.1 模型优化
 
-在模型优化中，MNN 引入了前端的概念来统一训练框架。不同的前端负责加载不同训练框架的模型，统一转换为 MNN 的模型格式。对于最常用的训练框架 TensorFlow 和 Caffe ，我们提供了独立的前端；其他训练框架，比如 MXNet ，则需要先将模型转换为 ONNX ，再通过 ONNX 前端加载。这里，由于 TensorFlow 的算子颗粒度相比 Caffe 和 ONNX 要更小，我们引入了图优化的模块来对齐算子之间的颗粒度。模型转换之后，会经过优化器优化，包含算子融合、算子替换、布局调整等等。之后，可以选择对浮点模型执行量化压缩。目前模型压缩的模块还没有开源，我们会在完善之后，将相关代码开源。这些步骤都完成之后，会使用 flatbuffer 来保存部署模型。
+在模型优化中，MNN 引入了前端的概念来统一训练框架。不同的前端负责加载不同训练框架的模型，统一转换为 MNN 的模型格式。对于最常用的训练框架 TensorFlow 和 Caffe ，我们提供了独立的前端；其他训练框架，比如 MXNet ，则需要先将模型转换为 ONNX ，再通过 ONNX 前端加载。这里，由于 TensorFlow 的算子颗粒度相比 Caffe 和 ONNX 要更小，我们引入了图优化的模块来对齐算子之间的颗粒度。模型转换之后，会经过优化器优化，包含**图优化、算子融合、算子替换、布局调整**等等。之后，可以选择对浮点模型执行量化压缩。目前模型压缩的模块还没有开源，我们会在完善之后，将相关代码开源。这些步骤都完成之后，会使用 flatbuffer 来保存部署模型。
 
 ### 图优化   TensorFlow
 这里以 RNN-GRU cell 为例，说明一下图优化。
@@ -130,6 +130,15 @@ CPU 、 GPU 已是主流， NPU 、 TPU 渐渐成为标配， DSP 、 FPGA 在 I
 首先融合 Convolution 和 Batchnorm，Convolution 的 weight 等于 weight 乘 alpha ，而 bias 等于 bias 乘 alpha 再加 beta ；而后融合 Convolution 和 Scale ，融合过程和 Batchnorm 类似；最后融合 Convolution 和 ReLU ，在输出结果前，计算激活函数 ReLU 即可。
 
 这样，四个算子就可以合并成一个算子。融合的过程避免了三次 tensor 读写、两次 tensor 乘加。
+
+
+### 模型压缩 量化
+
+模型转换好之后，可以使用 MNN 的量化工具对模型进行压缩。目前，MNN支持 post-training quantization（无训练量化）。后续 MNN 会支持 quantization-aware training（带训练量化），以获得更好的准确率和更低比特的压缩。
+
+MNN的量化方案是自己实现的，它目前有ADMM和KL散度两种方案。也就是说，“源头”的预训练好的模型需要是浮点的。ADMM量化方案，是MNN根据达摩院的Paper “Extremely Low Bit Neural Network: Squeeze the Last Bit Out with ADMM” [3] 实现的。它与KL散度的区别在于：ADMM是基于数学优化的方法，只需要几十个数据点即可，但是计算较慢。而KL散度是基于概率统计的方法，需要较多的数据（500到1000个数据点），计算较快。实际操作上来说，对特征的量化，ADMM和KL散度没有巨大的差距；对权重的量化，推荐使用ADMM。
+
+NLP 应用是未来的一大趋势。而 NLP 的模型普遍大于 CV 模型。在这个时候，大幅度地压缩模型，能够让之前只能在服务器运行的模型放到端上运行。所以未来的 MNN ，会提供更好的模型压缩。
 
 ## 2. 智能调度
 
