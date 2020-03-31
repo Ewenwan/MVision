@@ -33,6 +33,10 @@ Polyhedral method 是一种对多重循环程序的表示方法，问题表示�
 
 polyhedral 是近些年发展出来的最优雅的抽象方法，是并行编译领域的一种数学抽象，利用空间几何的仿射变换来实现循环优化。
 
+Pluto是众多Polyhedral编译器中应用范围最广、最成功的编译器之一，以该编译器为平台实现的Pluto调度算法代表了Polyhedral model调度最先进的研究水平。Pluto编译器是一个很好的开发程序并行性和数据局部性的优化工具。
+
+Pluto调度算法至今在众多领域包括将机器学习算法部署在特定加速部件等方面都发挥着重要作用。所以，Pluto编译器是一个很好的循环优化工具，也是研究Polyhedral model一个很好的平台。 Pluto编译器是一个从C程序到OpenMP的source-to-source编译器。
+
 
 > **深度学习编译优化技术与手工优化的对比**
 
@@ -77,6 +81,40 @@ MindSpore里面也支持基本的数据并行能力。不过从MindSpore里面�
 
 对于自动并行而言，最大的挑战是如何寻优到最佳的并行策略。对于常见的数据并行而言，我们只需要将模型副本分布到不同的设备上，选择合适的时间对梯度进行AllReduce即可。对于自动并行，我们需要考虑不同的通信拓扑（比如以太网、NVLink、多网卡设备）、算子拆分（Layer间拆分、Layer内拆分）、设备算力、流水并行、算子计算依赖、显存大小、通信成本（Weight，Activation等）等众多维度。Google有一个项目，Mesh-Tensorflow，目前是提供了相应算子的拆分机制。算法同学可以自由的在不同的维度（Batch维度、NCHW四个维度、Matmul维度等）进行拆分。在MindSpore里面我们也看到也提供了类似的拆分能力，在MindSpore源代码里面我们看到了支持算子的定义，不过相应拆分的能力目前没有看到可以让用户来指定。
 
+# 开发深度学习框架的知识架构
+
+作者：袁进辉
+链接：https://www.zhihu.com/question/315611053/answer/676815240
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+1，熟悉常见深度学习模型，CNN, GAN, RNN/LSTM, BERT, Transformer;
+
+2,熟悉后向误差传播算法（BP），完成从标量求导到矩阵求导思维方式的转换，熟悉常见算子的梯度推导（矩阵乘，卷积， 池化，Relu，如果会batch normalization 就一步到位了）；
+
+3，熟悉autograd的基本原理，能自己手撸一个最好；
+
+4，熟悉cuda编程（举一反三），熟悉cuda高阶用法，event, stream, 异步/同步，会优化常见cuda kernel, element-wise, reduce, broadcast， MatMul, conv, pooling 等；
+
+5，熟悉c++和python, 对c++高级用法感到舒服，各种模式，惯用法，模板；熟悉vim, gdb 程序调试；
+
+6，熟悉socket, RDMA编程，熟悉常见collective operation代价分析，譬如ring allreduce, tree allreduce 代价分析；
+
+7，熟悉多线程编程，熟悉锁，条件变量，内核线程，用户级线程，对actor, CSP(coroutine)各种技术熟悉；
+
+8，熟悉编译器基本原理，parser什么的不重要，主要是dataflow分析，灵活运用；熟悉多重循环程序优化技巧，譬如polyhedral 模型；
+
+9，熟悉常见分布式系统原理，mapreduce, spark, flink, tensorflow 等；
+
+10，熟悉计算机体系机构，量化分析方法，Amdahl' Law, Roofline Model, 流水线分析（譬如David Patterson 那本书）；
+
+11，熟悉操作系统原理及常用系统诊断工具，譬如各种资源利用率分析；
+
+12，programming language 原理，命令式编程，函数式编程，逻辑编程，入门书《程序的构造与解释》？
+
+13，熟悉项目构建原理，compiler, assembler, linker， loader之类，有一本书《程序员的自我修养》有比较全面覆盖。
+
+[编译器书籍 现代体系结构的优化编译器 高级编译器设计与实现](https://github.com/Ewenwan/compilerbook)
 
 # 目标检测 yolov3相关  darknet框架
 
