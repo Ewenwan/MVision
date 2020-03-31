@@ -46,6 +46,24 @@
 
 ### DFSMN  && Kaldi
 
+[参考](https://www.zhihu.com/search?type=content&q=%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E6%A8%A1%E5%9E%8B%20DFSMN)
+
+目前主流的语音识别系统普遍采用基于深度神经网络和隐马尔可夫（Deep Neural Networks-Hidden Markov Model，DNN-HMM）的声学模型.
+
+声学模型的输入是传统的语音波形经过加窗、分帧，然后提取出来的频谱特征，如 PLP， MFCC 和 FBK等。而模型的输出一般采用不同粒度的声学建模单元，例如单音素 (mono-phone)、单音素状态、绑定的音素状态 (tri-phonestate) 等。从输入到输出之间可以采用不同的神经网络结构，将输入的声学特征映射得到不同输出建模单元的后验概率，然后再结合HMM进行解码得到最终的识别结果。
+
+最早采用的网络结构是前馈全连接神经网路（Feedforward Fully-connected Neural Networks, FNN）。FNN实现固定输入到固定输出的一对一映射，其存在的缺陷是没法有效利用语音信号内在的长时相关性信息。一种改进的方案是采用基于长短时记忆单元（Long-Short Term Memory，LSTM）的循环神经网络（Recurrent Neural Networks，RNN）。LSTM-RNN通过隐层的循环反馈连接，可以将历史信息存储在隐层的节点中，从而可以有效地利用语音信号的长时相关性。
+
+进一步地通过使用双向循环神经网络（BidirectionalRNN），可以有效地利用语音信号历史以及未来的信息，更有利于语音的声学建模。基于循环神经网络的语音声学模型相比于前馈全连接神经网络可以获得显著的性能提升。但是循环神经网络相比于前馈全连接神经网络模型更加复杂，往往包含更多的参数，这会导致模型的训练以及测试都需要更多的计算资源。
+另外基于双向循环神经网络的语音声学模型，会面临很大的时延问题，对于实时的语音识别任务不适用。现有的一些改进的模型，例如，基于时延可控的双向长短时记忆单元（Latency Controlled LSTM，LCBLSTM ）[1-2]，以及前馈序列记忆神经网络（Feedforward SequentialMemory Networks，FSMN）[3-5]。
+
+FSMN是近期被提出的一种网络结构，通过在FNN的隐层添加一些可学习的记忆模块，从而可以有效地对语音的长时相关性进行建模。FSMN相比于LCBLSTM不仅可以更加方便地控制时延，而且也能获得更好的性能，需要的计算资源也更少。但是标准的FSMN很难训练非常深的结构，会由于梯度消失问题导致训练效果不好。而深层结构的模型目前在很多领域被证明具有更强的建模能力。因而针对此我们提出了一种改进的FSMN模型，称之为深层的FSMN（DeepFSMN, DFSMN）。进一步地我们结合LFR（lowframe rate）技术构建了一种高效的实时语音识别声学模型，相比于去年我们上线的LCBLSTM声学模型可以获得超过20%的相对性能提升，同时可以获得2-3倍的训练以及解码的加速，可以显著地减少我们的系统实际应用时所需要的计算资源。
+
+
+
+DFSMN 特点：跳层连接，更深的层数。和LFR结合。模型尺寸更小，低延迟。
+实验结果表明DFSMN是用于声学模型的BLSTM强有力替代方案。
+
 [参考](https://blog.csdn.net/zhanaolu4821/article/details/88977782)
 
 Kaldi 是一个开源的语音识别工具库，隶属于 Apache 基金会，主要由 Daniel Povey 开发和维护。Kaldi 内置功能强大，支持 GMM-HMM、SGMM-HMM、DNN-HMM 等多种语音识别模型的训练和预测。随着深度学习的影响越来越大，Kaldi 目前对 DNN、CNN、LSTM 以及 Bidirectional-LSTM 等神经网络结构均提供模型训练支持。
