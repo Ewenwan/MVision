@@ -1,6 +1,6 @@
 # 深度学习框架  训练&前向推理
 
-清华计图Jittor & 华为深度学习框架MindSpore & 旷视深度学习框架MegEngine(天元） & caffe & Google的TFBOYS & Facebook的Pytorch  & XLA
+OneFlow & 清华计图Jittor & 华为深度学习框架MindSpore & 旷视深度学习框架MegEngine(天元） & caffe & Google的TFBOYS & Facebook的Pytorch  & XLA
 
 严格意义来说TVM和Jittor都不算深度学习框架，TVM和Jittor更多的是一套独立的深度学习编译器。我们可以将导出的模型文件通过TVM或者Jittor离线编译成一个Serving的模块，从而可以在云上或者端上部署模型的预测服务。
 
@@ -9,7 +9,6 @@
 [清华计图Jittor  gt](https://github.com/Jittor/jittor/blob/master/README.cn.md)
 
 [旷视深度学习框架MegEngine gt](https://github.com/MegEngine/MegEngine)
-
 
 ## 深度学习编译器
 
@@ -37,6 +36,17 @@ Pluto是众多Polyhedral编译器中应用范围最广、最成功的编译器�
 
 Pluto调度算法至今在众多领域包括将机器学习算法部署在特定加速部件等方面都发挥着重要作用。所以，Pluto编译器是一个很好的循环优化工具，也是研究Polyhedral model一个很好的平台。 Pluto编译器是一个从C程序到OpenMP的source-to-source编译器。
 
+polyhedral compilation的研究内容分为依赖关系分析、调度变换和代码生成几个部分。当然，在做这些之前，polyhedral需要用一个parser来做解析，现在比较常用的parser是pet（“Polyhedral extraction tool”（IMPACT 2012））还有clan。polyhedral涉及到的工具及其链接大部分可以在polyhedral.info这个网站上找到。
+
+现在的polyhedral研究大多被认为是由Feautrier针对数据流分析的工作“Dataflow analysis of array and scalar references”（IJPP 1991）奠基而来的。数据流分析的优势在于把依赖关系分析的粒度从语句细化到语句的实例，所以结果比传统的依赖关系分析结果更精确。但是在polyhedral里面的依赖关系分析，我并不会推荐去读这篇文章，因为这篇文章 比较难懂，我更推荐去看Pugh的“The Omega test: a fast and practical integer programming algorithm for dependence analysis”（ICS 1991）这篇文章，这篇文章对polyhedral的思维构建很有帮助。
+
+依赖关系分为value-based和memory-based两种依赖关系，这个为polyhedral里面的scheduling算法在优化和正确性方面提供了很多支持。
+
+现在大部分的polyhedral算法是Bondhugula的pluto算法“A practical automatic polyhedral parallelizer and locality optimizer”（PLDI 2008），这个算法是真正让polyhedral前后贯通的一个scheduling算法。如果对scheduling算法感兴趣，我会建议去阅读pluto算法或者Bondhugula的博士论文“Effective Automatic Parallelization and Locality Optimization using the Polyhedral Model”，这个算法也是Pluto编译器的核心。Bondhugula对scheduling算法后续做了许多优化和提升例如Pluto+，这部分可以参考他的个人主页。
+
+polyhedral的代码生成工具主要有CodeGen+，“Code generation for multiple mappings”（Frontiers 1995）和CLooG，“Code generation in the polyhedral model is easier than you think”（PACT 2004）两个工具。CodeGen+部分主要是在Omega库里使用，而CLooG和CodeGen+的代码生成方式有一些不同。这两篇文章都值得去看一下，了解一下如何生成代码。不过，“Polyhedral AST generation is more than scanning polyhedra”（TOPLAS 2015）这篇文章我建议对AST生成部分有兴趣的话可以仔细阅读一下，这个长达50页的文章系统地介绍了如何生成循环的边界、控制流条件语句还有避免代码膨胀等问题。
+
+
 
 > **深度学习编译优化技术与手工优化的对比**
 
@@ -49,6 +59,8 @@ Pluto调度算法至今在众多领域包括将机器学习算法部署在特定
 3).手工优化是可能向编译优化迁移的。比如通过扩展编译引擎的内核，来加入对应的支持。比如我们最近在TVM社区里针对NV GPU TensorCore提供了基于graph/IR pass/codegen模块改造的作法，能够做到用户完全无感，自动完成TensorCore kernel优化生成的效果，而社区的另一个相关工作作法则是需要显式提供TensorCore相关intrinsics的描述，将一部分工作offload到用户层。这算是一个手工优化，向编译优化层次迁移的示例。
 
 4).总会有些优化在编译优化层面完成会存在事倍功半的效果，这类优化我们就应该考虑either是通过手工优化扩充，或是通过提供pre-defined library，甚至runtime强化的方式来进行协同优化，而不是什么优化都往编译层面压。反过来也一样。手工优化可以在极限场景下找到非常精细的性能优化空间，但是并不是所有的手工优化所探索的性能空间都复杂精细到编译优化不能支持的程度。找到不同技术适合的土壤就好。之前跟NV的同学沟通，他们针对TensorCore kernel的支持，考虑采取设计若干个小的recipe，recipe提供可定制的可能，再进行拼装组合来实现不同尺寸的GEMM kernel，这种作法，包括CUTLASS的设计思想，在我看来，都具备了一定的将手工优化的经验向编译优化层次转移的味道，只是程度不同而已。
+
+对于AI芯片来说，已经以后专门的硬件架构来解决ai中常见的计算密集型算子，GPU虽然有一定通用性没有完全硬件化，但TensorCore的出现也使它未来可能有这方面的趋势，这样来说软件编译器在这里能做的事情应该是有限的；可能“主要开销都不是计算密集型算子”，数据搬运非常关键。
 
 
 ## 深度学习框架简述
