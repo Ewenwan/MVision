@@ -83,11 +83,6 @@ MindSpore里面也支持基本的数据并行能力。不过从MindSpore里面�
 
 # 开发深度学习框架的知识架构
 
-作者：袁进辉
-链接：https://www.zhihu.com/question/315611053/answer/676815240
-来源：知乎
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-
 1，熟悉常见深度学习模型，CNN, GAN, RNN/LSTM, BERT, Transformer;
 
 2,熟悉后向误差传播算法（BP），完成从标量求导到矩阵求导思维方式的转换，熟悉常见算子的梯度推导（矩阵乘，卷积， 池化，Relu，如果会batch normalization 就一步到位了）；
