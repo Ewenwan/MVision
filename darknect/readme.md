@@ -1,4 +1,4 @@
-# 深度学习框架  训练&前向推理
+# 深度学习框架  人工智能操作系统 训练&前向推理
 
 OneFlow & 清华计图Jittor & 华为深度学习框架MindSpore & 旷视深度学习框架MegEngine(天元） & caffe & Google的TFBOYS & Facebook的Pytorch  & XLA
 
