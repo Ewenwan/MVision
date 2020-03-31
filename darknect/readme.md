@@ -1,10 +1,48 @@
+
 # 深度学习框架  训练&前向推理
 
 清华计图Jittor & 华为深度学习框架MindSpore & 旷视深度学习框架MegEngine(天元） & caffe & Google的TFBOYS & Facebook的Pytorch  & XLA
 
+严格意义来说TVM和Jittor都不算深度学习框架，TVM和Jittor更多的是一套独立的深度学习编译器。我们可以将导出的模型文件通过TVM或者Jittor离线编译成一个Serving的模块，从而可以在云上或者端上部署模型的预测服务。
+
+[华为 mindspore](https://github.com/Ewenwan/mindspore)
+
 [清华计图Jittor  gt](https://github.com/Jittor/jittor/blob/master/README.cn.md)
 
 [旷视深度学习框架MegEngine gt](https://github.com/MegEngine/MegEngine)
+
+## 深度学习框架简述
+
+深度学习框架发展到今天，目前在架构上大体已经基本上成熟并且逐渐趋同。无论是国外的Tensorflow、PyTorch，亦或是国内最近开源的MegEngine、MindSpore，目前基本上都是支持EagerMode和GraphMode两种模式。
+
+> Tensorflow
+
+Google的Tensorflow最早是按照GraphMode来设计的，GraphMode是系统同学比较偏爱的一个架构。用户通过申明式的API来定义好模型，然后后面具体的优化、执行都交给后端的系统。由于系统能够一次能够拿到整个执行的Graph，因此系统同学便有足够的空间对系统做各种优化。比如在Tensorflow里面，我们可以做各种类型的优化，包括Placement的优化、图优化（Grappler）、内存优化、分布式优化等。不过GraphMode有一个弊端，就是模型调试。许多使用Tensorflow的算法同学对于运行过程中遇到的各种千奇百怪的问题都感到束手无策。不过需要说的是，从Tensorflow上来看的话Google在整个AI系统领域的布局是最完善的，从底层的芯片（推理、训练、端）、到深度学习框架（Tensorflow、、XLA），再到模型部署（TF Serving、TFLite），最后再到TF的训练链路（TFX、TF.js、Tensorboard、federated）。从这些布局来看，整个Tensorflow的设计完全体现出了Google的系统深度，并完全引领了整个AI系统。
+
+> PyTorch
+
+PyTorch从一开始就是按照EagerMode来进行架构实现。和Tensorflow v1.0对比，PyTorch非常灵活，对于开发者极其友好。因此，在开发者社区上PyTorch很快就逼近了Tensorflow，从最近两年的论文应用上我们也能看到PyTorch的引用数和Tensorflow越来越接近。从这个角度来看会给人一个感觉就是Tensorflow起了个大早赶了个晚集。我们也能看到Tensorflow也在2.0里面也开始支持EagerMode并将EagerMode设置为默认的运行模式，希望能够补齐易用性这个短板。不过其实对于Tensorflow而言转型支持EagerMode其实不容易。就像前面说道的，Tensorflow自身的架构是完全按照GraphMode来设计的，因此为了支持EagerMode，Tensorflow自身的改动也是很痛苦，从Tensorflow的代码来看许多地方都加入了if（eager_mode)这样的判断条件。不过PyTorch也不是完美无缺。对于PyTorch的开发者而言，PyTorch模型的Deployment过程是一个痛苦的过程。这也是在工业界Tensorflow相比较PyTorch更受欢迎的一个重要原因。
+
+> 华为MindSpore
+
+华为在国内是一个很值得尊敬的企业。可以这么说，华为在IT这个领域是整体上部署最完善的公司。这些领域包括了云计算最底层的网络、存储、服务器、芯片，也包括了上层的编译器、高斯数据库。在深度学习这个领域，华为可以说布局也比较完整，比如Asend芯片（训练、推理）、最近刚开源的深度学习框架MindSpore。对于一家企业而言，布局这些领域都是需要极大的决心。不过企业布局这些领域也不是为了开发而开发，为了自研而自研。对于企业而言，布局这些领域最终肯定是希望能够在商业上带来相应的回报。(开源社区与华为共成长)
+
+从MindSpore这个框架的架构来看，MindSpore的架构和目前已有引擎的架构比较相似，整体执行也都是基于自动微分进行的设计。这个也比较合理。另外，整个框架从上往下依次是Python的DSL层、中间的Graph优化层以及底下的执行层。这个架构也是目前主流的引擎的相似的架构。此外，由于有了后发的优势，MindSpore应该是在设计之初就考虑了如何兼具EagerMode和GraphMode两种执行方式，这样就可以同时兼具易用性和高性能。在底层不同设备的支持上，我们也能够看到MindSpore支持了包括CPU，GPU加速器，当然最重要的还是自家的Ascend芯片。
+
+> 自动并行 Auto Parallel
+
+MindSpore里面我觉得一个比较大的亮点也是他们在文档里面强调的一个就是自动并行的训练能力。自动并行是一个在其他领域研究的比较多的方向，比如在大数据领域对于用户写的一条SQL语句我们能够在优化器内部自动生成一个相对较优的执行计划，从而生成一个自动并行的Mapper-Reduce任务。在深度学习这个领域也存在这个问题，那就是如何将用户的模型最大高效的并行执行。
+
+在深度学习这个领域存在多种并行的范式，比如数据并行（Data Paralle)，模型并行（Model Parallel），混合并行（Hybrid Parallel)等。目前在深度学习分布式执行这个领域应用最多的还是数据并行，也就是Data Parallel。业内多个框架，比如Horovod，Tensorflow的DistributeStrategy，PyTorch的DDP，这些都是数据并行的分布式框架。数据并行就是将模型在多个设备上进行复制并行训练，同时基于NCCL进行梯度同步，从而达到分布式执行的效果。数据并行这个架构比较简洁，模型构建也比较清晰，因此目前绝大部分任务都是采用数据并行的训练方式。
+
+MindSpore里面也支持基本的数据并行能力。不过从MindSpore里面他着重强调的是自动并行。这里的自动并行是指从众多的并行可能性里面搜寻出一种最优的并行执行方式，比如将部分算子进行自动拆分从而达到一个比较好的并行效果。从下面的图里面我们能够看到MindSpore的自动并行是基于一个Cost Model来进行并行策略的评估。通过Cost Model，我们可以对不同的并行策略进行评估，从而可以选择一个cost最小的并行策略。在Cost Model里面，我们通常会对通信的cost、计算的cost、算子拆分的cost等进行评估。并行策略的搜寻算法在MindSpore里面我们看到使用了动态规划（dynamic programming)和递归算法(recursive programming)。
+
+> 自动并行的挑战
+
+对于自动并行而言，最大的挑战是如何寻优到最佳的并行策略。对于常见的数据并行而言，我们只需要将模型副本分布到不同的设备上，选择合适的时间对梯度进行AllReduce即可。对于自动并行，我们需要考虑不同的通信拓扑（比如以太网、NVLink、多网卡设备）、算子拆分（Layer间拆分、Layer内拆分）、设备算力、流水并行、算子计算依赖、显存大小、通信成本（Weight，Activation等）等众多维度。Google有一个项目，Mesh-Tensorflow，目前是提供了相应算子的拆分机制。算法同学可以自由的在不同的维度（Batch维度、NCHW四个维度、Matmul维度等）进行拆分。在MindSpore里面我们也看到也提供了类似的拆分能力，在MindSpore源代码里面我们看到了支持算子的定义，不过相应拆分的能力目前没有看到可以让用户来指定。
+
+
+# 目标检测 yolov3相关  darknet框架
 
 [YOLO_v3 TF 加强版 GN FC DA ](https://github.com/Stinky-Tofu/YOLO_V3)
 
@@ -30,7 +68,7 @@
 
 [自动标注图片工具 A self automatically labeling tool ](https://github.com/eric612/AutoLabelImg)
 
-## 0.项目主页
+## 0. darknet 项目主页
 [darknet yolov3](https://pjreddie.com/darknet/yolo/)
 
 [darknet yolov3 from scratch in PyTorch 详细](https://blog.paperspace.com/how-to-implement-a-yolo-object-detector-in-pytorch/)
