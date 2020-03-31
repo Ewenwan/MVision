@@ -1,4 +1,10 @@
-# yolo darknet
+# 深度学习框架  训练&前向推理
+
+清华计图Jittor & 华为深度学习框架MindSpore & 旷视深度学习框架MegEngine(天元） & caffe & Google的TFBOYS & Facebook的Pytorch  & XLA
+
+[清华计图Jittor  gt](https://github.com/Jittor/jittor/blob/master/README.cn.md)
+
+[旷视深度学习框架MegEngine gt](https://github.com/MegEngine/MegEngine)
 
 [YOLO_v3 TF 加强版 GN FC DA ](https://github.com/Stinky-Tofu/YOLO_V3)
 
