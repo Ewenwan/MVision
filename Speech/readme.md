@@ -7,8 +7,11 @@
         语言识别ASR 
         语义理解ALU 
         文字转语言TTS  
-        文字识别ocr 等
+        文字识别ocr 
+        声纹识别 VPR
 [语音识别 RNN LSTM HMM GMM CTC The official repository of the Eesen project](https://github.com/Ewenwan/eesen)
+
+[声纹识别发展综述](https://zhuanlan.zhihu.com/p/67563275)
 
 ## 语言识别ASR 
 ![](http://antkillerfarm.github.io/images/img2/speech.png)
