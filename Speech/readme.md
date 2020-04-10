@@ -15,7 +15,7 @@
 
 [声纹识别发展综述](https://zhuanlan.zhihu.com/p/67563275)
 
-> 回声消除  AEC/AES
+## 回声消除  AEC/AES
 
 Android 和 WebRTC 里应该都有相应的模块。
 
@@ -30,6 +30,8 @@ Android 和 WebRTC 里应该都有相应的模块。
 从上面的描述你应该可以看出来，你的声音是在对方设备上产生的回声，所以你的声音的回声是在对方设备上消除的，同理，对方声音得回声在你的设备上消除
 
 [即时语音（如：YY语音）中回声消除技术是如何实现的？](https://www.zhihu.com/question/21406954/answer/5072738420
+
+从通讯回音产生的原因看，可以分为声学回音（Acoustic Echo 如上图）和线路回音（Line Echo），相应的回声消除技术就叫声学回声消除（Acoustic Echo Cancellation，AEC）和线路回声消除（Line Echo Cancellation, LEC）。声学回音是由于在免提或者会议应用中，扬声器的声音多次反馈到麦克风引起的（比较好理解）；线路回音是由于物理电子线路的二四线匹配耦合引起的（一般硬件厂商来保证，不做具体阐述）。
 
 ## 语言识别ASR 
 ![](http://antkillerfarm.github.io/images/img2/speech.png)
