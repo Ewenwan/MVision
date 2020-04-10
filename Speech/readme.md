@@ -29,7 +29,7 @@ Android 和 WebRTC 里应该都有相应的模块。
 
 从上面的描述你应该可以看出来，你的声音是在对方设备上产生的回声，所以你的声音的回声是在对方设备上消除的，同理，对方声音得回声在你的设备上消除
 
-
+[即时语音（如：YY语音）中回声消除技术是如何实现的？](https://www.zhihu.com/question/21406954/answer/5072738420
 
 ## 语言识别ASR 
 ![](http://antkillerfarm.github.io/images/img2/speech.png)
