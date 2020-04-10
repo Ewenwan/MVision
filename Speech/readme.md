@@ -9,9 +9,16 @@
         文字转语言TTS  
         文字识别ocr 
         声纹识别 VPR
+        回声消除  AEC/AES
 [语音识别 RNN LSTM HMM GMM CTC The official repository of the Eesen project](https://github.com/Ewenwan/eesen)
 
 [声纹识别发展综述](https://zhuanlan.zhihu.com/p/67563275)
+
+> 回声消除  AEC/AES
+
+Android 和 WebRTC 里应该都有相应的模块。
+
+回声消除指的是 AEC/AES，在手机上用于消除手机 MIC 录进手机扬声器的对方通话声音，避免对方在通话时听到自己的声音，不是指 dereverberation（去混响）。
 
 ## 语言识别ASR 
 ![](http://antkillerfarm.github.io/images/img2/speech.png)
