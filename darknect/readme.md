@@ -8,6 +8,8 @@ OneFlow & 清华计图Jittor & 华为深度学习框架MindSpore & 旷视深度�
 
 [清华计图Jittor  gt](https://github.com/Jittor/jittor/blob/master/README.cn.md)
 
+依赖: sudo apt install python3.7-dev libomp-dev    pip3 install pybind11  numpy   tqdm    pillow  astunparse  six  wheel
+
 [旷视深度学习框架MegEngine gt](https://github.com/MegEngine/MegEngine)
 
 ## 深度学习编译器
