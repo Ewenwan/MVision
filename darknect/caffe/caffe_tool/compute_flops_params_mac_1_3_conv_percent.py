@@ -56,6 +56,7 @@ def print_net_parameters_flops (deploy_file):
             # ['Convolution']
             if net.layer_dict[layer_name].type == typenames[0]:
                 # 计算量 乘加次数 macc  = h_out*w_ou*c_in*c_out* k_h * k_w
+                # 如果是 flops  近似为 2倍的 macc
                 cur_flops = (np.product(net.params[layer_name][0].data.shape) * \
                              h_out*w_out)# 
                 # 输出图面积 * 卷积核面积 * 输入通道数量 * 输出通道数量
@@ -84,20 +85,26 @@ def print_net_parameters_flops (deploy_file):
                 # K × K × C_out × Hout × Wout
                 
                 # mac访存  h*w*c_in + h2*w2*c_out  + c_in*c_out*w_h*w_w/group
-                cur_mac = (h_in*w_in*net.params[layer_name][0].data.shape[1] + \
+                cur_mac = (h_out*w_out*np.product(net.params[layer_name][0].data.shape)/net.params[layer_name][0].data.shape[1] + \
                            h_out*w_out*net.params[layer_name][0].data.shape[0] + \
                            np.product(net.params[layer_name][0].data.shape)/net.params[layer_name][0].data.shape[1])
+                # 输入 输入(K × K × 1) x (Hout x Wout x Cout) 
+                # 输出 h_out*w_out*C_out  
+                # 权重 C_out * c_in *k_h * k_w / c_in    厚度从 c_in 变为1
+                
                 
             # InnerProduct  c_in*c_out*1*1
             else:
                 cur_flops = np.product(net.params[layer_name][0].data.shape)
-                # 特征图H*W = 1*1
-                # Weight_h * Weight_w * c_in*c_out*2
+                # kernel特征图H*W = 1*1
+                # flops = Weight_h * Weight_w * c_in*c_out*2
                 
                 # mac访存  h*w*c_in + 1*1*c_out  + c_in*c_out*w_h*w_w/group
                 cur_mac = (h_in*w_in*net.params[layer_name][0].data.shape[1] + \
                            1*1*net.params[layer_name][0].data.shape[0] + \
                            np.product(net.params[layer_name][0].data.shape))
+                
+                
             #'''
             
             # 3*3卷积
