@@ -6,10 +6,14 @@ description: "量化 剪枝 ncnn Ristretto"
 tag: 深度学习
 ---   
 # 背景
+
     近几年来，深度学习技术在计算机视觉、语音识别和自然语言处理等诸多领域取得的了一系列重大突破。
     然而，深度学习的发展依然面临诸多问题。
     尤为突出的是，时下主流的深度神经网络,一般包含数千万甚至是过亿的学习参数，
     而如此海量的参数给神经网络模型在存储、计算和功耗开销等方面带来了严峻的考验。
+
+[阿里巴巴的轻量网络训练方法: 剪枝和压缩 轻量级 知识蒸馏 模型量化 算子融合](https://github.com/Captain1986/CaptainBlackboard/blob/master/D%230034-%E7%81%AB%E7%AE%AD%E5%8F%91%E5%B0%84%EF%BC%9A%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4%E7%9A%84%E8%BD%BB%E9%87%8F%E7%BD%91%E7%BB%9C%E8%AE%AD%E7%BB%83%E6%96%B9%E6%B3%95/D%230034.md)
+ 
 
 [DeepCompression-caffe](https://github.com/Ewenwan/DeepCompression-caffe/blob/master/README.md)
 
