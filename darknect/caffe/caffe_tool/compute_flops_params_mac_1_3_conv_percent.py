@@ -55,24 +55,33 @@ def print_net_parameters_flops (deploy_file):
             # 卷积核维度 output_channel * input_channel * kernel_height * kernel_width
             # ['Convolution']
             if net.layer_dict[layer_name].type == typenames[0]:
-                # flops = h*w*c1*c2*w_h*w_w
+                # 计算量 乘加次数 macc  = h_out*w_ou*c_in*c_out* k_h * k_w
                 cur_flops = (np.product(net.params[layer_name][0].data.shape) * \
-                             h_out*w_out)# 是否需要乘以2
+                             h_out*w_out)# 
                 # 输出图面积 * 卷积核面积 * 输入通道数量 * 输出通道数量
+                # 卷积核参数 net.params[layer_name][0].data
+                # shape[0] shape[1] shape[2] shape[3]    输出数量Cout 输入数量Cin k_h  k_w             
                 
-                # mac访存  h*w*c_in + h2*w2*c_out  + c_in*c_out*w_h*w_w
-                cur_mac = (h_in*w_in*net.params[layer_name][0].data.shape[1] + \
+                # mem acc cost 访存  h*w*c_in + h2*w2*c_out  + c_in*c_out* k_h*k_w
+                cur_mac = (h_out*w_out*np.product(net.params[layer_name][0].data.shape) + \
                            h_out*w_out*net.params[layer_name][0].data.shape[0] + \
                            np.product(net.params[layer_name][0].data.shape))
-                #输入内存大小 +输出内存大小 + 卷积核内存大小
+                # 输入访问 + 输出内存大小 + 卷积核内存大小
+                # 1. 输入(K × K × Cin) x (Hout x Wout x Cout)   一次访问输入数据大小(单个卷积核参数量) * 总共多少次(输出像素数量)
+                # 2. 输出  output = Hout × Wout × Cout 计算一次，输出赋值一次
+                # 3. 参数 weights = K × K × Cin × Cout + Cout 读取一次在缓存，Cout 个 维度为 K × K × Cin 的卷积核
+                
                 
                 # 特征图H*W * Weight_h * Weight_w*c_in*c_out*2 / 1
+                
                 # 乘法和加法
             # ['DepthwiseConvolution'] 
             elif net.layer_dict[layer_name].type == typenames[1]:
+                # 逐通道卷积  一个卷积核的厚度 从c_in 变为 1  相当于组卷积数量 为 输入c_in数量
+                # 是普通卷积 的 macc / c_in
                 cur_flops = (np.product(net.params[layer_name][0].data.shape) * \
                              h_out*w_out/net.params[layer_name][0].data.shape[1])
-                # 特征图H*W * Weight_h * Weight_w*c_in*c_out*2 / group
+                # K × K × C_out × Hout × Wout
                 
                 # mac访存  h*w*c_in + h2*w2*c_out  + c_in*c_out*w_h*w_w/group
                 cur_mac = (h_in*w_in*net.params[layer_name][0].data.shape[1] + \
