@@ -16,6 +16,9 @@ pybind11使用问题  https://zhuanlan.zhihu.com/p/52619334
 
 [模型可视化超好用的工具](https://github.com/lutzroeder/Netron)
 
+[使用自动代码生成技术TVM优化深度学习算子的一些思考](https://zhuanlan.zhihu.com/p/101026192)
+
+
 ## 深度学习编译器
 
 [谈谈对深度学习编译技术的一些思考](https://zhuanlan.zhihu.com/p/87458316)
