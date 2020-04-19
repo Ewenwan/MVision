@@ -8,6 +8,8 @@
       在性能很高的环境中，网状网络系统在主机之间提供较短的潜伏期，
       所以可改善总体网络性能和传输速率。
       
+[海思NNIE之Mobilefacenet量化部署](https://github.com/Ewenwan/nniefacelib)
+
 [斯坦福大学Fall 2018课程-机器学习硬件加速器 cs217](https://cs217.stanford.edu/)
       
 [浮点运算和代码优化, 并行计算, Optimizer软件](http://antkillerfarm.github.io/ai/2015/10/12/float.html)
