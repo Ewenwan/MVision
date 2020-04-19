@@ -14,6 +14,8 @@ pybind11使用问题  https://zhuanlan.zhihu.com/p/52619334
 
 [旷视深度学习框架MegEngine gt](https://github.com/MegEngine/MegEngine)
 
+[模型可视化超好用的工具](https://github.com/lutzroeder/Netron)
+
 ## 深度学习编译器
 
 [谈谈对深度学习编译技术的一些思考](https://zhuanlan.zhihu.com/p/87458316)
