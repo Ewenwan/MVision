@@ -4,6 +4,8 @@
 
 [Tengine 推断引擎：树莓派也能玩转深度学习](https://shumeipai.nxez.com/2018/12/07/tengine-inference-engine-raspberry-pi-deep-learning.html)
 
+[AI深度加速--Tengine Winograd快速卷积算法 ](https://aijishu.com/l/1110000000021582)
+
 
 # 编译
 
