@@ -8,7 +8,11 @@
 
 [低数值精度深度学习推理与训练](https://software.intel.com/zh-cn/articles/lower-numerical-precision-deep-learning-inference-and-training)
 
+![](https://pic3.zhimg.com/80/v2-e9348fa8928c882d7978cc469b3cc312_720w.jpg)
 
+我们将conv2d-fp32的操作，转化成了如下几个操作的组合：权重编码、fp32-to-int8-IO、输入编码、fp32-int8-IO、conv2d-int8操作、输出反编码、int32-to-fp32-IO。假设当前计算的寄存器位宽为128，理论上fp32算子的峰值加速比为4，int8算子的峰值加速比为16。但为什么我们量化后，从fp32到int8的加速比达不到4呢？因为我们还做了很多额外的操作，IO上的操作如两个fp32-to-int8-IO、一个int32-to-fp32-IO，编码操作如一个权重编码和一个输入编码，反编码操作int32-to-fp32-IO。在经过这一系列额外的操作后，很多情况下，我们依然还能达到约1.2~1.5的加速比。与此同时，量化还能减轻模型的存储压力和内存压力（fp32的权值转由int8权值进行存储）。缺点嘛，会带来精度损失！如何最小化精度损失呢？
+
+[谈谈MNN的模型量化（一）数学模型](https://zhuanlan.zhihu.com/p/81243626)
 
 # 具体量化方法
 [参考](https://github.com/Ewenwan/pytorch-playground/blob/master/utee/quant.py)
