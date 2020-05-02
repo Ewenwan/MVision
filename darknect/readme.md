@@ -18,6 +18,8 @@ pybind11使用问题  https://zhuanlan.zhihu.com/p/52619334
 
 [使用自动代码生成技术TVM优化深度学习算子的一些思考](https://zhuanlan.zhihu.com/p/101026192)
 
+[基于ARM-v8的Tengine GEMM教程](https://github.com/Ewenwan/Tengine_gemm_tutorial)
+
 
 ## 深度学习编译器
 
