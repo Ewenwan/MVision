@@ -26,3 +26,13 @@ sudo apt-get install libprotobuf-dev protobuf-compiler libboost-all-dev libgoogl
     opencv 是一个开源的计算机视觉库
     openblas 是一个开源的基础线性代数子程序库
 
+> 特点
+
+重点加速卷积等最为耗时的算子 convolution/FC/Pooling 支持多种卷积计算模式 GEMM/Direct/Winogrid
+
+手工汇编调优，CPU微架构极致优化，Dataflow多线程加速，适配ARM A7/A17/A35/A53/A72/A73/A55/A76
+
+支持F32/F16/Int8动态量化混合精度计算模式
+
+
+
