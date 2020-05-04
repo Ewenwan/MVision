@@ -4,7 +4,7 @@
 
 [Tengine 推断引擎：树莓派也能玩转深度学习](https://shumeipai.nxez.com/2018/12/07/tengine-inference-engine-raspberry-pi-deep-learning.html)
 
-[Tengine Winograd快速卷积算法 ](https://aijishu.com/l/1110000000021582)
+[Tengine Winograd快速卷积算法 ](https://github.com/Ewenwan/Winograd_tutorial_python)
 
 [基于ARM-v8的Tengine GEMM 矩阵乘法 汇编优化 教程 ](https://github.com/Ewenwan/Tengine_gemm_tutorial)
 
@@ -38,10 +38,94 @@ sudo apt-get install libprotobuf-dev protobuf-compiler libboost-all-dev libgoogl
 
 > **gemm  矩阵乘法（全连接层、卷积核和输入展开后的矩阵乘法、卷积winogrid变换后的矩阵乘法）**
 
+矩阵乘法的加速运算 A[M K] * B[K N]  ======  C[M N]
+
+纯c实现:
+```C
+
+void gemm_pure_c(float* A, float* B, float* C,int m,int n,int k)
+{
+   for(int i=0;i<M;i++) // 安装目标 C 矩阵维度遍历 先行维M  
+    {
+       for(int j=0; j<N;j++) // 再 列维 N    主要是 矩阵 是 列优先排布
+       {
+           C[i*n+j]=0.f;
+           for(int p=0; p<K;p++) //A 矩阵每一行K个元素
+           {
+                C[i*N + j] += A[i*K + p] * B[p*N + j];
+                // C的i行j列   A的i行p列    B的p行j列
+           }
+       }
+    }
+}
+
+```
+
+openblas 函数实现
+
+数据并行SIMD  NEON 向量优化
+
+手写向量汇编优化
+
 
 
 > **winogrid变换卷积运算**
 
+
+      输入矩阵转换
+               ----> 元素乘法 gemm算法  ----> 输出转换
+      权重矩阵转换
+      
+      
+1. define transform matrix
+   ```python
+   # kernel转换
+   G_F23 = np.array([
+        [ 1.0,  0.0, 0.0 ],
+        [ 0.5,  0.5, 0.5 ],
+        [ 0.5, -0.5, 0.5 ],
+        [ 0.0,  0.0, 1.0 ]])
+    # 输入转换矩阵
+    Bt_F23 = np.array([
+        [ 1.0,  0.0, -1.0,  0.0 ],
+        [ 0.0,  1.0,  1.0,  0.0 ],
+        [ 0.0, -1.0,  1.0,  0.0 ],
+        [ 0.0,  1.0,  0.0, -1.0 ]])
+    # 输出转换矩阵    
+    At_F23 = np.array([
+        [ 1.0, 1.0,  1.0,  0.0 ],
+        [ 0.0, 1.0, -1.0, -1.0 ]])
+   ```
+2. compute transformation for input, kernel, output
+   ```python
+    # 输入矩阵转换   g' = G*g*G转置 
+    def trans_kernel(g):
+        return np.dot(np.dot(G_F23,g),G_F23.T)
+    # 权重kernel转换 d' = B转置*d*B转
+    def trans_input(d):
+        return np.dot(np.dot(Bt_F23,d),Bt_F23.T)
+    # o' = g' * d'
+    # 输出转换 o = A转置*o'*A转
+    def trans_output(r):
+        return np.dot(np.dot(At_F23,r),At_F23.T)
+   ```
+3. do conv_winof23, conv_direct
+   ```python
+    def wino_f23(kernel,input):
+        tran_inp = trans_input(input)
+        tran_ker = trans_kernel(kernel)
+        mid = tran_inp * tran_ker
+        out = trans_output(mid)
+        return out
+
+    def conv_direct(kernel,input):
+        out=np.zeros((2,2))
+        for h in range(2):
+            for w in range(2):
+                out[h,w]=np.sum(input[h:h+3,w:w+3]*kernel)
+        return out
+   ```
+      
 
 
 
