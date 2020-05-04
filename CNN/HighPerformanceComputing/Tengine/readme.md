@@ -8,6 +8,7 @@
 
 [基于ARM-v8的Tengine GEMM 矩阵乘法 汇编优化 教程 ](https://github.com/Ewenwan/Tengine_gemm_tutorial)
 
+[Tengine 白皮书](https://cdn-file.aijishu.com/494/739/494739128-5d51139b186ca.pdf?_upt=c49f6b9e1588562426)
 
 # 编译
 
