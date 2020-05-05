@@ -73,9 +73,11 @@ sudo apt-get install libprotobuf-dev protobuf-compiler libboost-all-dev libgoogl
 
        release_tengine();
        
+新接口（类似ncnn的）：
 
 
-> **gemm  矩阵乘法（全连接层、卷积核和输入展开后的矩阵乘法、卷积winogrid变换后的矩阵乘法）**
+
+## **gemm  矩阵乘法（全连接层、卷积核和输入展开后的矩阵乘法、卷积winogrid变换后的矩阵乘法）**
 
 矩阵乘法的加速运算 A[M K] * B[K N]  ======  C[M N]
 
@@ -106,7 +108,7 @@ openblas 函数实现
 
 手写向量汇编优化
 
-> **winogrid变换卷积运算**
+## **winogrid变换卷积运算**
 
 
       输入矩阵转换
