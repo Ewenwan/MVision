@@ -37,6 +37,44 @@ sudo apt-get install libprotobuf-dev protobuf-compiler libboost-all-dev libgoogl
 
 支持F32/F16/Int8动态量化混合精度计算模式
 
+
+## 框架
+
+老接口：
+
+1. 初始化 init_tengine();
+
+2. 载入模型，创建图 create_graph(nullptr, "tengine", tm_file)  普通设备
+
+       create_graph(nullptr, "tiny", tm_mem)     // mcu  stm32
+       create_graph(nullptr, "zhouyi", tm_file)   // 周易 AIPU
+       create_graph(nullptr, "nnie", tm_file, config)     // 海思 nnie 3519  3516
+       create_graph(nullptr, "rk3399pro", tm_mem)   // rk3399pro  AIPU
+
+3. 设置图属性 和 输入数据
+     
+       get_graph_input_tensor(graph, 0, 0);
+       set_graph_attr(graph, "low_mem_mode", &val, sizeof(val));
+       
+4. 预推理 
+       
+       prerun_graph(graph)
+       
+5. 正式运行
+       
+       run_graph(graph, 1)
+       
+6. 清理
+
+       release_graph_tensor(input_tensor);
+       release_graph_tensor(output_tensor);
+       postrun_graph(graph);
+       destroy_graph(graph);
+
+       release_tengine();
+       
+
+
 > **gemm  矩阵乘法（全连接层、卷积核和输入展开后的矩阵乘法、卷积winogrid变换后的矩阵乘法）**
 
 矩阵乘法的加速运算 A[M K] * B[K N]  ======  C[M N]
@@ -67,8 +105,6 @@ openblas 函数实现
 数据并行SIMD  NEON 向量优化
 
 手写向量汇编优化
-
-
 
 > **winogrid变换卷积运算**
 
