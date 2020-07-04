@@ -60,7 +60,27 @@ APA : Parking            自动泊车辅助
 
 
 
+#  ADAS FCW 前车碰撞预警
 
+#  ADAS AEB 自动紧急刹车
+
+# ADAS LDW 车道偏离预警
+
+# 定速巡航控制软件开发 ACC : Adaptive Cruise Control  自适应巡航
+
+# ADAS LCA Lane Change Assist 辅助变道
+
+# 自动驾驶基础--路径搜索算法Dijkstra
+
+# 自动驾驶基础--路径规划算法A*
+
+# 自动驾驶基础--动态路径规划算法
+
+# 自动驾驶路径规划--车辆防碰撞问题
+
+# AD路径跟踪算法
+
+# ADAS功能软件开发_BSD
 
 
 
