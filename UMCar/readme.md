@@ -47,6 +47,7 @@
    2. 定位
    3. 规划  
    4. 控制
+   5. 高精度地图和车联网 基础设施
    
 [comma.ai（无人驾驶公司）的这两千行Python/tf代码 Learning a Driving Simulator](https://github.com/Ewenwan/research)
 
@@ -91,6 +92,7 @@
 数据同步融合 / 数据异步融合
 
 
+有数据级融合，特征级融合，目标级融合，应用于不同的场景，融合策略就不同。
 
 
 ##  2.精准定位
