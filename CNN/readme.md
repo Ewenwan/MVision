@@ -1,5 +1,7 @@
 # 包含目录
 
+[动手学深度学习（Dive into Deep Learning，D2L）  墙裂推荐](https://github.com/d2l-ai/d2l-zh)
+
         1. 行为识别 Action_Recognition
           IDT
           TSN
