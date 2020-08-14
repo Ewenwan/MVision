@@ -327,6 +327,7 @@
 
 
 # 2. 李群李代数知识
+[【Sophus库 学习笔记 1】 Sophus的安装与使用  基础知识](https://blog.csdn.net/wb790238030/article/details/88014059?utm_medium=distribute.pc_relevant.none-task-blog-baidulandingword-8&spm=1001.2101.3001.4242)
 
 [李群李代数 反对称矩阵 指数映射 对数 刚体变换群SE3](https://blog.csdn.net/x_r_su/article/details/52749616)
 
