@@ -1,6 +1,37 @@
 
-
 # 测试单层
+```
+# test_east
+input: "_tadd_blob137"
+input_shape {
+  dim: 1
+  dim: 8
+  dim: 128
+  dim: 128
+}
+input: "sigmoid_blob138"
+input_shape {
+  dim: 1
+  dim: 1
+  dim: 128
+  dim: 128
+}
+layer {
+  name: "east_out"
+  type: "EastOutput"
+  bottom: "_tadd_blob137"
+  bottom: "sigmoid_blob138"
+  top: "output"
+  east_out_param {
+    stride: 4
+    score_thre: 0.8
+    nms_thre: 0.01
+    nms_method: 2
+  }
+}
+
+
+```
 ```py
 
 #!/usr/bin/env python
