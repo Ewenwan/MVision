@@ -7,7 +7,7 @@
     --src_model src_bn.caffemodel \
     --dst_proto dest_debn_net.prototxt \
     --dst_model dest_debn.caffemodel \
-    --caffe_path /data/caffe/darwin-caffe-SVN28509_yolov2_ReOrgOri-FeatReshape-shufflenet_eqr_yolov3_190125_ls
+    --caffe_path /data/caffe/python
 '''
 '''
 吸收模型文件caffemodel中的BN层参数
