@@ -5,7 +5,7 @@
 --src_prototxt src_net.prototxt \
 --dst_prototxt dest_net.prototxt \
 --dst_width 1280 --dst_height 720 \
---caffe_path /data/caffe/darwin-caffe-SVN28509_yolov2_ReOrgOri-FeatReshape-shufflenet_eqr_yolov3_190125_ls
+--caffe_path /data/caffe/python
 '''
 import sys
 import argparse
@@ -66,7 +66,7 @@ args = parse_args()
 #caffe_path = osp.join(args.caffe_path,'python')
 add_path(args.caffe_path)
 
-#caffe_root = '/data/caffe/darwin-caffe-SVN28509_yolov2_ReOrgOri-FeatReshape-shufflenet_eqr_yolov3_190125_ls/python'
+#caffe_root = '/data/caffe/python'
 #sys.path.insert(0, caffe_root)
 import caffe
 from caffe.proto import caffe_pb2
