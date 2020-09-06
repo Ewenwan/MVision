@@ -5,6 +5,8 @@
 
 [百度apollo课程 6-8](https://www.bilibili.com/video/BV1iJ411d7XA/?spm_id_from=333.788.videocard.0)
 
+[七月在线 无人驾驶系列知识入门到提高](https://www.bilibili.com/video/BV137411E7oC/?spm_id_from=333.788.videocard.0)
+
 当今，自动驾驶技术已经成为整个汽车产业的最新发展方向。应用自动驾驶技术可以全面提升汽车驾驶的安全性、舒适性，满足更高层次的市场需求等。自动驾驶技术得益于人工智能技术的应用及推广，在环境感知、精准定位、决策与规划、控制与执行、高精地图与车联网V2X 等方面实现了全面提升。科研院校、汽车制造厂商、科技公司、自动驾驶汽车创业公司以及汽车零部件供应商在自动驾驶技术领域进行不断地探索，寻求通过人工智能技术来获得技术上的新突破。
 
 自动驾驶汽车（Automated Vehicle；Intelligent Vehicle；Autonomous Vehicle；Self-drivingCar；Driverless Car）又称智能汽车、自主汽车、自动驾驶汽车或轮式移动机器人，是一种通过计算机实现自动驾驶的智能汽车。
