@@ -1,5 +1,7 @@
 # 深度学习框架  人工智能操作系统 训练&前向推理
 
+[AI嵌入式框架](https://github.com/Ewenwan/nortrom-notes/blob/master/system/ai_framework.md)
+
 OneFlow & 清华计图Jittor & 华为深度学习框架MindSpore & 旷视深度学习框架MegEngine(天元） & caffe & Google的TFBOYS & Facebook的Pytorch  & XLA
 
 严格意义来说TVM和Jittor都不算深度学习框架，TVM和Jittor更多的是一套独立的深度学习编译器。我们可以将导出的模型文件通过TVM或者Jittor离线编译成一个Serving的模块，从而可以在云上或者端上部署模型的预测服务。
@@ -103,6 +105,234 @@ MindSpore里面也支持基本的数据并行能力。不过从MindSpore里面�
 > 自动并行的挑战
 
 对于自动并行而言，最大的挑战是如何寻优到最佳的并行策略。对于常见的数据并行而言，我们只需要将模型副本分布到不同的设备上，选择合适的时间对梯度进行AllReduce即可。对于自动并行，我们需要考虑不同的通信拓扑（比如以太网、NVLink、多网卡设备）、算子拆分（Layer间拆分、Layer内拆分）、设备算力、流水并行、算子计算依赖、显存大小、通信成本（Weight，Activation等）等众多维度。Google有一个项目，Mesh-Tensorflow，目前是提供了相应算子的拆分机制。算法同学可以自由的在不同的维度（Batch维度、NCHW四个维度、Matmul维度等）进行拆分。在MindSpore里面我们也看到也提供了类似的拆分能力，在MindSpore源代码里面我们看到了支持算子的定义，不过相应拆分的能力目前没有看到可以让用户来指定。
+
+# AI通用框架
+
+## caffe
+
+* concept
+    * top & bottom
+        * forward: bottom -> top
+        * backward: top -> bottom
+* usage
+    * check caffe proto
+        * [Netscope Editor](http://ethereon.github.io/netscope/#/editor)
+    * set weight init method
+        * see include/caffe/filler.hpp
+    * iter_size
+        * You can change the iter_size in the solver parameters. Caffe accumulates gradients over **iter_size x batch_size** instances in each stochastic gradient descent step. So increasing iter_size can also get more stable gradient when you cannot use large batch_size due to the limited memory.
+    * test_iter
+        * how many iterations to be executed for a test loop(each iteration calculate a batch of test image)
+    * test_interval
+        * how often a test is executed, test_interval iterations(each iteration calculate a batch of train image)
+    * epoch
+        * iteration number needs to iterate all train image number = train image num / batch size
+    * lr_policy
+        * learning rate policy, usually set to "step"
+            * fixed:　　 保持base_lr不变.
+            * step: 　　 如果设置为step,则还需要设置一个stepsize,  返回base_lr \* gamma ^ (floor(iter / stepsize)),其中iter表示当前的迭代次数
+            * exp:   　　返回base_lr \* gamma ^ iter， iter为当前迭代次数
+            * inv:　　    如果设置为inv,还需要设置一个power, 返回base_lr \* (1 + gamma \* iter) ^ (- power)- multistep: 如果设置为multistep,则还需要设置一个stepvalue。这个参数和step很相似，step是均匀等间隔变化，而multistep则是根据                                 stepvalue值变化
+            * poly: 　　  学习率进行多项式误差, 返回 base_lr (1 - iter/max_iter) ^ (power)- sigmoid:　学习率进行sigmod衰减，返回 base_lr ( 1/(1 + exp(-gamma \* (iter - stepsize))))
+    * display
+        * show loss/lr in console in each 'display' iterations
+* layer
+    * power
+        * 输入1 featuremap，输出1 featuremap
+        * eltwise级操作
+        * 计算：$(shift + scale * x)^{power}$
+    * scale
+        * 输入2 featuremap，输出1 featuremap
+        * 输入1：$n*c*h*w$，输入2：$n*c*1*1$
+        * 计算：输入2h&w维度平铺展开，与输入1 eltwise prod
+    * permute
+        * 输入1 featuremap，输出1 featuremap
+        * 交换caffe_blob中数据的维度，下面参数将$n*c*h*w$-->$c*n*h*w$
+        
+        ```
+        permute_param {
+            order: 1
+            order: 0
+            order: 2
+            order: 3
+        }
+        ```
+    
+    * reshape
+        * 输入1 featuremap，输出1 featuremap
+        * 只改变输入数据的维度表示，内容不变
+        * dim的参数0：表示维度不变，x：表示将原来维度变化为x，-1：表示自动推算剩下维度
+        * 比如下面的参数将32x3x28x28变换为32x3x14x56
+
+        ```
+        shape {
+            dim: 0  # 32 --> 32
+            dim: 0  # 3  --> 3
+            dim: 14 # 28 --> 14
+            dim: -1 # deduce 28 --> 56
+        }
+        ```
+
+    * flatten
+        * 输入1 featuremap，输出1 featuremap
+        * 只改变输入数据的维度表示，内容不变，将数据拉成一维向量
+        * $n*c*h*w$-->$n*1*1*(chw)$
+* proto
+    * 简介
+        * protobuf是一种轻便高效的结构化数据存储格式。
+        * 包含proto文件，prototxt，protoc编译器。
+        * prototxt文件是结构化数据按照proto文件定义的格式序列化后的文本文件。
+    * caffe.proto
+        * 在caffe编译过程中，protoc编译器编译caffe.proto得到caffe.pb.cc和caffe.pb.h，包含了所有消息类型的序列化和反序列化接口。
+
+## tensorflow
+
+* 简介
+    * 2015.11
+* 机制
+    * 计算图(静态图)
+        * 声明式编程(declarative programming)，不兼容python自身语法体系，无法实时调试和打印，甚至无法使用python自带的if-else和while控制语句。
+        * 基于静态图进行了深入的优化，但牺牲了灵活性。
+* 静态图优化范畴
+    * 算子融合、内存复用、计算划分、即时编译
+* 基本概念
+    * Graph: 计算图
+    * Node: 包含计算节点和数据节点，类似于caffe中的layer概念
+    * Tensor: 实际数据的表示形式，在计算图中为节点和节点的连接
+    * Session: 会话，为整个计算图的计算提供上下文，包括GPU配置信息等
+    * meta：计算图结构文件
+    * ckpt：模型参数文件
+* 常见问题
+    * 为什么tensorflow必须使用特定域语言描述计算图？
+        * 对计算性能的极致要求，需要完善的数值库，非常低的编译开销，很高的硬件支持，这是python无法提供的。
+    * 为什么tensorflow的静态图有这么大的局限性？
+        * 因为静态图对计算类型有预设，目前的计算图中仅对有向无环图支持友好，一旦出现条件分支、循环、递归、以及模型大小取决于输入规模等（word2vec），就会给框架带来巨大挑战
+    * 为什么tensorflow的特定域语言图灵完备？
+        * 因为其包含tf.cond和tf.while_loop
+
+
+## pytorch
+
+* 简介
+    * 2016.10
+* 机制
+    * 计算图（动态图）
+        * 命令式编程(imperative programming)，数据实时计算，支持实时调试，和python语法完全兼容
+        * 保证灵活性但部分程度上牺牲运行时性能
+
+## mindspore
+
+* 机制
+    * 张量加速引擎（TBE）
+        * 介绍：用张量加速引擎语言编写TBE算子，构建各种神经网络模型
+        * 模块：特定域语言（DSL）模块；调度模块；中间表达模块；编译器传递模块；代码生成模块（本人预测仅该部分为昇腾实现，前4个模块均复用TVM框架）
+        * 应用场景
+            * TBE标准算子库
+            * TBE自定义算子（自定义计算）
+            * TBE算子融合
+        * TVM&引擎关联
+            * 昇腾构建TVM lowerIR与芯片代码间的关联，用户根据场景搜索出合适的代码实现。（参见昇腾AI处理器架构与实现P178）
+            * DSL--> Deep Learning IR --> LLVM IR --> Target(参见昇腾AI处理器架构与实现P163)
+    * 离线模型生成器
+        * 需预先确定模型输入维度和对应的内存大小
+        * 独立于硬件的算子融合优化及内存复用优化
+
+## 比较
+
+||图类型|序列化方式|模型|
+|---|---|---|---|
+|caffe|静态|prototxt(protobuf)|.caffemodel|
+|tensorflow|静态（eager动态）|meta|.ckpt|
+|pytorch|动态（jit静态）||.pth|
+|mindspore|静态+动态||.ms|
+
+* 深度学习编译栈比较
+    * TensorRT
+        * 只关注模型在GPU架构上的推理性能
+    * tensorflow XLA
+        * 使用LLVM中间表示来描述各个算子，能复用LLVM的一系列前端优化手段
+    * Tensor Comprehensions
+        * 使用Halide中间表示来描述底层计算，通过各种编译器理论中的优化方法，针对特定硬件架构对底层的计算循环进行变换和优化
+    * TVM
+        * 图级别中间表示NNVM和Relay，Halide中间表示作为下层的计算支撑，AutoTVM提供搜索算法针对特定硬件架构找到最优方案。
+
+## 推理优化
+
+* 基本优化方法
+    * 优化内存
+        * 多次推理复用同一片存储区域
+        * 共享输出层的内存合并，共享输入层的内存复用
+    * 优化计算效率
+        * 多batch（补零，启动时间，调度时间开销较大）
+* 融合
+    * 算子融合
+        * 常量运算预计算（batchnorm）
+        * 公共子表达式消除（fused-conv-bn-relu，又称CBR）
+        * 子图融合（多个共享相同输入和参数规模的CBR融合）
+* 计算优化
+    * 计算模型优化
+        * FFT
+        * winograd
+    * 计算效率优化
+        * 循环展开，矩阵分块
+        * 存储顺序优化（NCkHWK,NC4HW4,NHWC）
+        * 专用内核
+
+## 其他概念
+
+* 网络格式转换
+    * ONNX(开发网络交换格式)
+    * MMdnn
+* 编译器堆栈(compiler stack)
+    * 深度学习推理引擎完成了不同深度学习框架下的模型到不同硬件平台的端到端任务，类似于编译器完成不同编译器到不同平台的任务，所以被称作为编译器堆栈。
+
+# AI集群框架
+## 涉及的问题
+
+* 数据传输带宽
+  * 单机内传输
+    * PCI-E，NVLINK
+  * 多机间传输
+    * 以太网，Inifiniband，Omini-Patch Architecture
+* 文件读写带宽
+  * 随机读写-IOPS，大文件读写-带宽
+  * 介质：HDA，SSD，3d xpoint
+  * refer [storage performance](./system.md#performance)
+* 并行方案
+  * 方案
+    * 数据并行：计算节点单独进行前向与反向运算，梯度规约之后进行更新
+    * 模型并行：不同的计算节点负责网络的一部分运算
+    * 混合并行：数据并行+模型并行
+  * 常用策略
+    * 由于数据并行虽然加速明显，但需要节点间数据传输；因此计算密集型操作可数据并行，数据密集型操作可模型并行。比如conv适合数据并行，fc适合模型并行
+
+# 大数据框架
+
+* 分布式计算框架
+  * MapReduce:离线批处理框架
+  * Tez:DAG计算框架
+  * Spark:迭代/内存计算框架
+  * Storm:实时流计算框架
+* 技术支撑
+  * 一致性算法：Paxos
+  * 分布式协同：Apache Zookeeper & Google Chubby
+  * 分布式存储：HDFS & HBase
+* 概念
+    * yarn:Yet Another Resource Negotiator，一种新的 Hadoop 资源管理器
+    * spark工作模式：单机/standalone/yarn
+    * 流式API：
+        * 流水线式处理数据，处理类型为函数式编程中常见的map/sort/reduce/filter等操作
+        * 举例
+        ```java
+        List<String> threeHighCaloricDishNames =
+          menu.stream()//从menu获得流
+          .filter(d -> d.getCalories() > 300)//筛选热量大于300的
+          .map(Dish::getName)//只需要名称
+          .limit(3)//限制取3个元素
+          .collect(toList());//保存结果到List
+        System.out.println(threeHighCaloricDishNames);
+        ```
+
 
 # 开发深度学习框架的知识架构
 
