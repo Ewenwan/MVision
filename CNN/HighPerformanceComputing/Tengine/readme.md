@@ -14,7 +14,7 @@
 
 >  安装相关工具
 
-    sudo apt-get instal git cmake
+    sudo apt-get install git cmake
 
     git 是一个版本控制系统，稍后将用来从 github 网站上下载Tengine的源码
     cmake 是一个编译工具，用来产生make过程中所需要的Makefile文件
