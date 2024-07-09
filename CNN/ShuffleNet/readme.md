@@ -11,8 +11,6 @@
 
 [预训练的ShuffleNet-cafe模型参数文件](https://github.com/msnqqer/ShuffleNet)
 
-[预训练模型文件 password is "bcj6"](https://pan.baidu.com/s/1eS8NOm2)
-
 ## ResNet 残差网络  结合不同层特征
      ________________________________>
     |                                 ADD -->  f(x) + x
