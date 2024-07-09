@@ -390,9 +390,7 @@
         YOLOv2：voc2007 map0.5: 76.8; 
         YOLOv2 544x544：voc2007 map0.5: 78.6; 
         YOLOv2 608x608:coco上 map0.5: 48.1
-        
-      caffe下 
-     448*448尺寸caffeinemodel  https://pan.baidu.com/s/1c71EB-6A1xQb2ImOISZiHA password: 9u5v
+    
       
 #### 裁剪
 #### 量化
